@@ -135,7 +135,7 @@ export function HeroSection() {
   const typedText = useTypingEffect(typingWords);
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden">
+    <section id="hero" className="relative min-h-[calc(100vh-64px)] flex items-center justify-center pt-20 pb-8 md:pt-24 md:pb-12 overflow-hidden">
       {/* Cyber grid background */}
       <div className="absolute inset-0 cyber-grid" />
 
