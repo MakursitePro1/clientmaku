@@ -199,26 +199,6 @@ export function Footer() {
               </motion.div>
             </div>
 
-            {/* Stats row */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
-            >
-              {[
-                { label: "Free Tools", value: `${tools.length}+` },
-                { label: "Categories", value: `${categories.length - 1}` },
-                { label: "No Signup", value: "100%" },
-                { label: "Uptime", value: "99.9%" },
-              ].map((stat, i) => (
-                <div key={i} className="text-center py-4 px-6 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                  <p className="text-xl font-bold gradient-text">{stat.value}</p>
-                  <p className="text-white/30 text-xs mt-1">{stat.label}</p>
-                </div>
-              ))}
-            </motion.div>
 
             {/* Divider */}
             <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mb-8" />
