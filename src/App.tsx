@@ -112,6 +112,24 @@ const UserAgentParser = lazy(() => import("./pages/tools/UserAgentParser"));
 const ReactionTimeTest = lazy(() => import("./pages/tools/ReactionTimeTest"));
 const PayrollCalculator = lazy(() => import("./pages/tools/PayrollCalculator"));
 const TextSummarizer = lazy(() => import("./pages/tools/TextSummarizer"));
+const BulkPasswordGenerator = lazy(() => import("./pages/tools/BulkPasswordGenerator"));
+const TextEncryptor = lazy(() => import("./pages/tools/TextEncryptor"));
+const PhishingLinkChecker = lazy(() => import("./pages/tools/PhishingLinkChecker"));
+const PrivateNotepad2 = lazy(() => import("./pages/tools/PrivateNotepad"));
+const BrowserFingerprint = lazy(() => import("./pages/tools/BrowserFingerprint"));
+const CompoundInterestCalc = lazy(() => import("./pages/tools/CompoundInterestCalc"));
+const TaxCalculator = lazy(() => import("./pages/tools/TaxCalculator"));
+const SavingsGoalCalculator = lazy(() => import("./pages/tools/SavingsGoalCalculator"));
+const ProfitMarginCalc = lazy(() => import("./pages/tools/ProfitMarginCalc"));
+const SocialPostGenerator = lazy(() => import("./pages/tools/SocialPostGenerator"));
+const HashtagGenerator = lazy(() => import("./pages/tools/HashtagGenerator"));
+const YouTubeTagGenerator = lazy(() => import("./pages/tools/YouTubeTagGenerator"));
+const TweetFormatter = lazy(() => import("./pages/tools/TweetFormatter"));
+const MemoryGame = lazy(() => import("./pages/tools/MemoryGame"));
+const NumberGuessingGame = lazy(() => import("./pages/tools/NumberGuessingGame"));
+const TicTacToe = lazy(() => import("./pages/tools/TicTacToe"));
+const SnakeGame = lazy(() => import("./pages/tools/SnakeGame"));
+const WordScramble = lazy(() => import("./pages/tools/WordScramble"));
 
 const queryClient = new QueryClient();
 
@@ -234,6 +252,24 @@ const App = () => (
             <Route path="/tools/reaction-time-test" element={<ReactionTimeTest />} />
             <Route path="/tools/payroll-calculator" element={<PayrollCalculator />} />
             <Route path="/tools/text-summarizer" element={<TextSummarizer />} />
+            <Route path="/tools/bulk-password-generator" element={<BulkPasswordGenerator />} />
+            <Route path="/tools/text-encryptor" element={<TextEncryptor />} />
+            <Route path="/tools/phishing-link-checker" element={<PhishingLinkChecker />} />
+            <Route path="/tools/private-notepad" element={<PrivateNotepad2 />} />
+            <Route path="/tools/browser-fingerprint" element={<BrowserFingerprint />} />
+            <Route path="/tools/compound-interest" element={<CompoundInterestCalc />} />
+            <Route path="/tools/tax-calculator" element={<TaxCalculator />} />
+            <Route path="/tools/savings-goal" element={<SavingsGoalCalculator />} />
+            <Route path="/tools/profit-margin" element={<ProfitMarginCalc />} />
+            <Route path="/tools/social-post-generator" element={<SocialPostGenerator />} />
+            <Route path="/tools/hashtag-generator" element={<HashtagGenerator />} />
+            <Route path="/tools/youtube-tag-generator" element={<YouTubeTagGenerator />} />
+            <Route path="/tools/tweet-formatter" element={<TweetFormatter />} />
+            <Route path="/tools/memory-game" element={<MemoryGame />} />
+            <Route path="/tools/number-guessing" element={<NumberGuessingGame />} />
+            <Route path="/tools/tic-tac-toe" element={<TicTacToe />} />
+            <Route path="/tools/snake-game" element={<SnakeGame />} />
+            <Route path="/tools/word-scramble" element={<WordScramble />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
