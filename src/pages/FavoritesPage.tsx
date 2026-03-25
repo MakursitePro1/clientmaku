@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Heart, ArrowRight, LogIn, Sparkles } from "lucide-react";
-import { tools } from "@/data/tools";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, ArrowRight, LogIn, Sparkles, Search, Filter, X, Grid3X3, List } from "lucide-react";
+import { tools, categories } from "@/data/tools";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Navbar } from "@/components/Navbar";
@@ -10,17 +10,39 @@ import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { cn } from "@/lib/utils";
 
 export default function FavoritesPage() {
   const { user, loading: authLoading } = useAuth();
   const { favorites, loading } = useFavorites();
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const favoriteTools = useMemo(
     () => tools.filter(t => favorites.includes(t.id)),
     [favorites]
   );
+
+  const filteredTools = useMemo(() => {
+    let result = favoriteTools;
+    if (selectedCategory !== "all") {
+      result = result.filter(t => t.category === selectedCategory);
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(t => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
+    }
+    return result;
+  }, [favoriteTools, selectedCategory, search]);
+
+  const activeCategories = useMemo(() => {
+    const cats = new Set(favoriteTools.map(t => t.category));
+    return categories.filter(c => c.id === "all" || cats.has(c.id));
+  }, [favoriteTools]);
 
   if (authLoading) return null;
 
@@ -32,16 +54,20 @@ export default function FavoritesPage() {
       <div className="pt-28 pb-20 px-4 relative">
         <div className="absolute inset-0 cyber-grid opacity-20" />
         <div className="max-w-7xl mx-auto relative z-10">
+          {/* Header */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-primary/20 bg-accent/50 mb-5">
-              <Heart className="w-4 h-4 text-primary fill-primary" />
-              <span className="text-sm font-semibold gradient-text">My Favorites</span>
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-red-500/20 bg-red-500/5 mb-5">
+              <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" />
+              <span className="text-sm font-semibold text-red-400">My Favorites</span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-3">
               Favorite <span className="gradient-text">Tools</span>
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Your personal collection of most-used tools
+              {favoriteTools.length > 0 && (
+                <span className="ml-2 text-primary font-semibold">({favoriteTools.length} tools)</span>
+              )}
             </p>
           </motion.div>
 
@@ -72,42 +98,165 @@ export default function FavoritesPage() {
               </Button>
             </motion.div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {favoriteTools.map((tool, index) => (
-                <motion.div
-                  key={tool.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(index * 0.03, 0.3) }}
-                >
-                  <Link
-                    to={tool.path}
-                    className="group relative block rounded-2xl p-5 border border-border/40 transition-all duration-500 overflow-hidden h-full hover:-translate-y-2"
-                    style={{ background: 'hsl(var(--card))' }}
-                  >
-                    <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
+            <>
+              {/* Filters Bar */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mb-8 space-y-4"
+              >
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Search */}
+                  <div className="relative flex-1 max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search favorites..."
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                      className="pl-10 bg-card border-border/50 rounded-xl"
                     />
-                    <div className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite]"
-                      style={{ background: `linear-gradient(105deg, transparent 40%, ${tool.color.replace(')', ' / 0.06)')}, transparent 60%)` }}
-                    />
-                    <div className="relative z-10 flex items-start gap-4">
-                      <div
-                        className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
-                        style={{ backgroundColor: tool.color.replace(')', ' / 0.1)'), color: tool.color }}
+                    {search && (
+                      <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* View Toggle */}
+                  <div className="flex items-center gap-1 bg-card border border-border/50 rounded-xl p-1">
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={cn("p-2 rounded-lg transition-all", viewMode === "grid" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
+                    >
+                      <Grid3X3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={cn("p-2 rounded-lg transition-all", viewMode === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Category Filters */}
+                <div className="flex flex-wrap gap-2">
+                  {activeCategories.map(cat => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 border",
+                        selectedCategory === cat.id
+                          ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
+                          : "bg-card text-muted-foreground border-border/50 hover:border-primary/30 hover:text-foreground"
+                      )}
+                    >
+                      <cat.icon className="w-3.5 h-3.5" />
+                      {cat.label}
+                      {cat.id !== "all" && (
+                        <span className="ml-0.5 opacity-70">
+                          ({favoriteTools.filter(t => t.category === cat.id).length})
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Results Info */}
+              {filteredTools.length !== favoriteTools.length && (
+                <p className="text-sm text-muted-foreground mb-4">
+                  Showing {filteredTools.length} of {favoriteTools.length} favorites
+                </p>
+              )}
+
+              {/* Tools Grid/List */}
+              {filteredTools.length === 0 ? (
+                <div className="text-center py-16">
+                  <Filter className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                  <p className="text-muted-foreground font-medium">No favorites match your filter</p>
+                  <button onClick={() => { setSearch(""); setSelectedCategory("all"); }} className="text-sm text-primary mt-2 hover:underline">
+                    Clear filters
+                  </button>
+                </div>
+              ) : viewMode === "grid" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <AnimatePresence mode="popLayout">
+                    {filteredTools.map((tool, index) => (
+                      <motion.div
+                        key={tool.id}
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ delay: Math.min(index * 0.03, 0.3) }}
                       >
-                        <tool.icon className="w-5 h-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors truncate">{tool.name}</h3>
-                        <p className="text-xs text-muted-foreground line-clamp-1">{tool.description}</p>
-                      </div>
-                      <FavoriteButton toolId={tool.id} />
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
+                        <Link
+                          to={tool.path}
+                          className="group relative block rounded-2xl p-5 border border-border/40 transition-all duration-500 overflow-hidden h-full hover:-translate-y-2"
+                          style={{ background: 'hsl(var(--card))' }}
+                        >
+                          <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
+                          />
+                          <div className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite]"
+                            style={{ background: `linear-gradient(105deg, transparent 40%, ${tool.color.replace(')', ' / 0.06)')}, transparent 60%)` }}
+                          />
+                          <div className="relative z-10 flex items-start gap-4">
+                            <div
+                              className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-110"
+                              style={{ backgroundColor: tool.color.replace(')', ' / 0.1)'), color: tool.color }}
+                            >
+                              <tool.icon className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors truncate">{tool.name}</h3>
+                              <p className="text-xs text-muted-foreground line-clamp-1">{tool.description}</p>
+                            </div>
+                            <FavoriteButton toolId={tool.id} />
+                          </div>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <AnimatePresence mode="popLayout">
+                    {filteredTools.map((tool, index) => (
+                      <motion.div
+                        key={tool.id}
+                        layout
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        transition={{ delay: Math.min(index * 0.02, 0.2) }}
+                      >
+                        <Link
+                          to={tool.path}
+                          className="group flex items-center gap-4 rounded-xl p-4 border border-border/40 bg-card hover:border-primary/30 hover:shadow-md transition-all"
+                        >
+                          <div
+                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: tool.color.replace(')', ' / 0.1)'), color: tool.color }}
+                          >
+                            <tool.icon className="w-5 h-5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-bold text-sm group-hover:text-primary transition-colors">{tool.name}</h3>
+                            <p className="text-xs text-muted-foreground truncate">{tool.description}</p>
+                          </div>
+                          <FavoriteButton toolId={tool.id} />
+                          <ArrowRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
