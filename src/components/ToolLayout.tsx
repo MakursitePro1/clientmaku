@@ -115,7 +115,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                   {currentTool && <FavoriteButton toolId={currentTool.id} size="lg" />}
 
                   {/* Share Button with dropdown */}
-                  <div className="relative">
+                  <div className="relative z-50">
                     <Button
                       variant="outline"
                       size="sm"
@@ -128,13 +128,13 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                     <AnimatePresence>
                       {shareOpen && (
                         <>
-                          <div className="fixed inset-0 z-40" onClick={() => setShareOpen(false)} />
+                          <div className="fixed inset-0 z-[60]" onClick={() => setShareOpen(false)} />
                           <motion.div
                             initial={{ opacity: 0, y: 8, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute top-full mt-2 left-0 w-64 rounded-2xl bg-card border border-border/50 shadow-2xl z-50 p-2 backdrop-blur-xl"
+                            className="absolute bottom-full mb-2 left-0 w-64 rounded-2xl bg-card border border-border/50 shadow-2xl z-[70] p-2 backdrop-blur-xl"
                           >
                             <div className="px-3 py-2 border-b border-border/20 mb-1">
                               <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider">Share this tool</p>
