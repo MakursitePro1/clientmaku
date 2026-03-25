@@ -118,7 +118,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                   {/* Share Button with dropdown */}
                   <div className="relative">
                     <Button
-                      ref={(el) => { if (el) (window as any).__shareBtnRef = el; }}
+                      ref={shareBtnRef}
                       variant="outline"
                       size="sm"
                       className="rounded-xl border-2 border-border/60 hover:border-primary/30 gap-2"
@@ -138,16 +138,9 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                             transition={{ duration: 0.2 }}
                             className="fixed rounded-2xl bg-card border border-border/50 shadow-2xl z-[9999] p-3 backdrop-blur-xl"
                             style={{
-                              top: (() => {
-                                const btn = (window as any).__shareBtnRef as HTMLElement | undefined;
-                                if (!btn) return 0;
-                                const rect = btn.getBoundingClientRect();
-                                return rect.bottom + 8;
-                              })(),
-                              left: (() => {
-                                const btn = (window as any).__shareBtnRef as HTMLElement | undefined;
-                                if (!btn) return 0;
-                                return btn.getBoundingClientRect().left;
+                              top: shareBtnRef.current ? shareBtnRef.current.getBoundingClientRect().bottom + 8 : 0,
+                              left: shareBtnRef.current ? shareBtnRef.current.getBoundingClientRect().left : 0,
+                            }}
                               })(),
                             }}
                           >
