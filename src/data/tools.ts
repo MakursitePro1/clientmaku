@@ -102,7 +102,7 @@ export const tools: Tool[] = [
   { id: "hash-generator", name: "Hash Generator", description: "Generate MD5, SHA-1, SHA-256, SHA-512 hashes", icon: Hash, category: "developer", path: "/tools/hash-generator", color: "hsl(0, 84%, 60%)" },
   { id: "timestamp-converter", name: "Timestamp Converter", description: "Convert between Unix timestamps and dates", icon: Clock, category: "developer", path: "/tools/timestamp-converter", color: "hsl(142, 71%, 45%)" },
   { id: "meta-tag-generator", name: "Meta Tag Generator", description: "Generate SEO-friendly meta tags for websites", icon: FileCode, category: "developer", path: "/tools/meta-tag-generator", color: "hsl(280, 90%, 55%)" },
-  { id: "favicon-generator", name: "Favicon Generator", description: "Create favicons from text or images", icon: ImageIcon, category: "developer", path: "/tools/favicon-generator", color: "hsl(25, 95%, 53%)" },
+  { id: "favicon-generator", name: "Favicon Generator", description: "Create favicons from text or images", icon: Image, category: "developer", path: "/tools/favicon-generator", color: "hsl(25, 95%, 53%)" },
 
   // ID Card Makers
   { id: "fake-bd-old-nid", name: "Fake BD Old NID Card Maker", description: "Generate fake old format BD NID cards", icon: CreditCard, category: "id-card", path: "/tools/fake-bd-old-nid", color: "hsl(142, 71%, 45%)" },
