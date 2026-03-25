@@ -70,6 +70,11 @@ const IpAddressLookup = lazy(() => import("./pages/tools/IpAddressLookup"));
 const MetaTagGenerator = lazy(() => import("./pages/tools/MetaTagGenerator"));
 const FaviconGenerator = lazy(() => import("./pages/tools/FaviconGenerator"));
 const SlugGenerator = lazy(() => import("./pages/tools/SlugGenerator"));
+const JsonToCsv = lazy(() => import("./pages/tools/JsonToCsv"));
+const ColorPaletteGenerator = lazy(() => import("./pages/tools/ColorPaletteGenerator"));
+const RegexCheatSheet = lazy(() => import("./pages/tools/RegexCheatSheet"));
+const CharacterMap = lazy(() => import("./pages/tools/CharacterMap"));
+const PdfMerger = lazy(() => import("./pages/tools/PdfMerger"));
 
 const queryClient = new QueryClient();
 
