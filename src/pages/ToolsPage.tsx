@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { tools, categories, type ToolCategory } from "@/data/tools";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { ToolsBanner } from "@/components/ToolsBanner";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { FavoriteButton } from "@/components/FavoriteButton";
@@ -198,6 +199,7 @@ export default function ToolsPage() {
         </div>
       </div>
 
+      <ToolsBanner />
       <Footer />
       <ScrollToTop />
     </div>

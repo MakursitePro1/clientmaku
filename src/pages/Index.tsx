@@ -11,6 +11,7 @@ import { ContactSection } from "@/components/ContactSection";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { ToolsBanner } from "@/components/ToolsBanner";
 
 const Index = () => {
   return (
@@ -26,6 +27,7 @@ const Index = () => {
       <AboutSection />
       <FAQSection />
       <ContactSection />
+      <ToolsBanner />
       <Footer />
       <ScrollToTop />
     </div>
