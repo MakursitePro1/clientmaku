@@ -20,12 +20,14 @@ import {
   PiggyBank, Receipt, Target, CircleDollarSign,
   Share2, MessageSquare, Youtube, Twitter, Tv,
   Joystick, Puzzle, Swords, Boxes, Trophy,
-  // New icons for newly registered tools
   FlipHorizontal, Layers, Contrast, ImageMinus, SunMedium,
   FileImage as FileImageIcon, Grid2X2, Eraser, Wand2, RotateCcw,
   ArrowUpDown, GitCompare, Repeat, RefreshCw, Ruler,
   Square, Droplets, TimerReset, Home, GraduationCap as GradCapIcon,
-  Wallet, Video, Award
+  Wallet, Video, Award,
+  FileOutput, FileMinus, FileCheck, FileSearch, FileLock, FileSignature, FileStack,
+  FileUp, FileX, Files, SplitSquareHorizontal, BookMarked, Stamp,
+  Layout, Figma, Component, Frame, Shapes, SwatchBook, LayoutGrid, Brush, Pen, Aperture
 } from "lucide-react";
 
 export type ToolCategory = 
