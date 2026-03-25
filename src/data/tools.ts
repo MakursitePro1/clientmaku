@@ -42,7 +42,8 @@ export type ToolCategory =
   | "social"
   | "games"
   | "pdf-tools"
-  | "design";
+  | "design"
+  | "email";
 
 export interface Tool {
   id: string;
