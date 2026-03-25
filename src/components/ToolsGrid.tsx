@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Search, Sparkles, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { tools, categories, type ToolCategory } from "@/data/tools";
 import { cn } from "@/lib/utils";
@@ -10,83 +10,117 @@ export function ToolsGrid() {
   const [activeCategory, setActiveCategory] = useState<ToolCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredTools = tools.filter((tool) => {
+  const filteredTools = useMemo(() => tools.filter((tool) => {
     const matchesCategory = activeCategory === "all" || tool.category === activeCategory;
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
-  });
+  }), [activeCategory, searchQuery]);
 
   const toolCount = filteredTools.length;
 
   return (
-    <section id="tools" className="py-24 px-4 relative">
-      {/* Background decoration */}
-      <div className="absolute inset-0 cyber-grid opacity-50" />
+    <section id="tools" className="py-28 px-4 relative">
+      {/* Background effects */}
+      <div className="absolute inset-0 cyber-grid opacity-30" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-[200px] pointer-events-none" style={{ background: "hsl(263 85% 58% / 0.04)" }} />
       
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="text-center mb-14">
+        {/* Section Header */}
+        <div className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/50 border border-primary/20 mb-4"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-primary/20 bg-accent/50 mb-6 relative overflow-hidden"
           >
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">Our Tools</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 animate-gradient" />
+            <Sparkles className="w-4 h-4 text-primary animate-pulse-glow relative z-10" />
+            <span className="text-sm font-semibold gradient-text relative z-10">Powerful Tool Collection</span>
           </motion.div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-3 mb-4 tracking-tight">
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-3 mb-5 tracking-tight"
+          >
             Explore Our <span className="gradient-text">Web Tools</span>
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Every tool is designed to make your work faster and easier
-          </p>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed"
+          >
+            Every tool is crafted with precision — fast, free, and ready to use
+          </motion.p>
         </div>
 
-        {/* Search - Premium glassmorphism */}
-        <div className="max-w-lg mx-auto mb-10">
+        {/* Search Bar - Glassmorphism */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.15 }}
+          className="max-w-xl mx-auto mb-12"
+        >
           <div className="relative group">
-            <div className="absolute -inset-0.5 gradient-bg rounded-2xl opacity-20 group-focus-within:opacity-40 blur transition-opacity" />
+            <div className="absolute -inset-1 gradient-bg rounded-2xl opacity-0 group-focus-within:opacity-20 blur-lg transition-all duration-500" />
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/60 group-focus-within:text-primary transition-colors" />
               <Input
-                placeholder="Search tools..."
+                placeholder="Search from 200+ tools..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 py-6 rounded-2xl bg-card border-border/50 text-base focus:border-primary/50 transition-all"
+                className="pl-13 pr-20 py-7 rounded-2xl bg-card/80 backdrop-blur-sm border-border/40 text-base focus:border-primary/40 transition-all shadow-sm focus:shadow-[0_0_30px_-8px_hsl(263_85%_58%/0.15)]"
+                style={{ paddingLeft: '3.25rem' }}
               />
               {searchQuery && (
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-muted-foreground bg-accent px-2 py-1 rounded-lg">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-lg">
                   {toolCount} found
                 </span>
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Category Filter - Premium pills */}
-        <div className="flex flex-wrap justify-center gap-2.5 mb-14">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={cn(
-                "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300",
-                activeCategory === cat.id
-                  ? "gradient-bg text-primary-foreground shadow-lg glow-shadow scale-105"
-                  : "bg-card text-muted-foreground hover:text-foreground border border-border/50 hover:border-primary/30 hover:bg-accent/50"
-              )}
-            >
-              <cat.icon className="w-4 h-4" />
-              {cat.label}
-              {activeCategory === cat.id && (
-                <span className="bg-primary-foreground/20 text-primary-foreground text-xs px-2 py-0.5 rounded-md">
-                  {cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
+        {/* Category Filter - Premium Scrollable Pills */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-wrap justify-center gap-2 mb-16"
+        >
+          {categories.map((cat, i) => {
+            const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
+            const isActive = activeCategory === cat.id;
+            return (
+              <motion.button
+                key={cat.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setActiveCategory(cat.id)}
+                className={cn(
+                  "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden",
+                  isActive
+                    ? "gradient-bg text-primary-foreground shadow-lg glow-shadow"
+                    : "bg-card/80 text-muted-foreground hover:text-foreground border border-border/40 hover:border-primary/30 hover:bg-accent/50 hover:shadow-md"
+                )}
+              >
+                {isActive && <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 animate-gradient" />}
+                <cat.icon className="w-4 h-4 relative z-10" />
+                <span className="relative z-10">{cat.label}</span>
+                <span className={cn(
+                  "text-xs px-2 py-0.5 rounded-md relative z-10 font-bold",
+                  isActive ? "bg-white/20 text-white" : "bg-accent text-muted-foreground"
+                )}>{count}</span>
+              </motion.button>
+            );
+          })}
+        </motion.div>
 
         {/* Tools Grid - Premium Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -95,40 +129,62 @@ export function ToolsGrid() {
               <motion.div
                 key={tool.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                initial={{ opacity: 0, scale: 0.92, y: 24 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3, delay: index * 0.02 }}
+                exit={{ opacity: 0, scale: 0.92 }}
+                transition={{ duration: 0.35, delay: Math.min(index * 0.015, 0.3), ease: [0.25, 0.46, 0.45, 0.94] }}
               >
                 <Link
                   to={tool.path}
-                  className="group relative block rounded-2xl p-6 border border-border/50 hover:border-primary/40 transition-all duration-500 hover-lift overflow-hidden"
+                  className="tool-card group relative block rounded-2xl p-6 border border-border/40 transition-all duration-500 overflow-hidden h-full"
                   style={{ background: 'hsl(var(--card))' }}
                 >
-                  {/* Hover glow effect */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ background: `radial-gradient(circle at 50% 0%, ${tool.color.replace(')', ' / 0.08)')}, transparent 70%)` }}
+                  {/* Animated gradient border on hover */}
+                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: `linear-gradient(135deg, ${tool.color.replace(')', ' / 0.06)')}, transparent 60%)`,
+                    }}
+                  />
+                  
+                  {/* Top shimmer line */}
+                  <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
                   />
 
-                  <div className="relative z-10">
-                    <div
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
-                      style={{ 
-                        backgroundColor: tool.color.replace(')', ' / 0.12)'),
-                        color: tool.color,
-                        boxShadow: 'none'
-                      }}
-                    >
-                      <tool.icon className="w-7 h-7" />
+                  <div className="relative z-10 flex flex-col h-full">
+                    {/* Icon with animated glow */}
+                    <div className="relative mb-5">
+                      <div
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+                        style={{
+                          backgroundColor: tool.color.replace(')', ' / 0.1)'),
+                          color: tool.color,
+                        }}
+                      >
+                        <tool.icon className="w-7 h-7 transition-transform duration-300 group-hover:rotate-3" />
+                      </div>
+                      {/* Glow dot */}
+                      <div 
+                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110"
+                        style={{ backgroundColor: tool.color, boxShadow: `0 0 12px ${tool.color}` }}
+                      />
                     </div>
-                    <h3 className="font-bold text-base mb-2 group-hover:text-primary transition-colors duration-300">
+
+                    {/* Content */}
+                    <h3 className="font-bold text-[15px] mb-2 group-hover:text-primary transition-colors duration-300 leading-snug">
                       {tool.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-5 line-clamp-2 leading-relaxed">
+                    <p className="text-sm text-muted-foreground mb-auto pb-5 line-clamp-2 leading-relaxed">
                       {tool.description}
                     </p>
-                    <div className="flex items-center text-sm font-semibold text-primary translate-x-0 group-hover:translate-x-1 transition-transform duration-300">
-                      Use Tool <ArrowRight className="ml-1.5 w-4 h-4" />
+
+                    {/* Footer action */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border/30 group-hover:border-primary/20 transition-colors duration-300">
+                      <span className="flex items-center text-sm font-semibold text-primary/70 group-hover:text-primary transition-all duration-300">
+                        Open Tool
+                        <ArrowRight className="ml-1.5 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+                      </span>
+                      <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-primary/50 transition-colors duration-300" />
                     </div>
                   </div>
                 </Link>
@@ -137,15 +193,18 @@ export function ToolsGrid() {
           </AnimatePresence>
         </div>
 
+        {/* Empty State */}
         {filteredTools.length === 0 && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-24"
           >
-            <Search className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-lg text-muted-foreground font-medium">No tools found matching your criteria</p>
-            <p className="text-sm text-muted-foreground/60 mt-1">Try a different search term or category</p>
+            <div className="w-20 h-20 rounded-3xl bg-accent/50 flex items-center justify-center mx-auto mb-6">
+              <Search className="w-10 h-10 text-muted-foreground/30" />
+            </div>
+            <p className="text-xl text-muted-foreground font-semibold mb-2">No tools found</p>
+            <p className="text-sm text-muted-foreground/60">Try a different search term or category</p>
           </motion.div>
         )}
       </div>
