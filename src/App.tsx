@@ -136,6 +136,40 @@ const BoxShadowGenerator = lazy(() => import("./pages/tools/BoxShadowGenerator")
 const GradientGenerator = lazy(() => import("./pages/tools/GradientGenerator"));
 const BorderRadiusPreviewer = lazy(() => import("./pages/tools/BorderRadiusPreviewer"));
 
+// PDF Tools
+const PdfToImage = lazy(() => import("./pages/tools/PdfToImage"));
+const PdfCompressor = lazy(() => import("./pages/tools/PdfCompressor"));
+const PdfPageRemover = lazy(() => import("./pages/tools/PdfPageRemover"));
+const PdfPageExtractor = lazy(() => import("./pages/tools/PdfPageExtractor"));
+const PdfRotate = lazy(() => import("./pages/tools/PdfRotate"));
+const PdfPasswordProtect = lazy(() => import("./pages/tools/PdfPasswordProtect"));
+const PdfWatermark = lazy(() => import("./pages/tools/PdfWatermark"));
+const PdfPageReorder = lazy(() => import("./pages/tools/PdfPageReorder"));
+const PdfSplitter = lazy(() => import("./pages/tools/PdfSplitter"));
+const PdfMetadataEditor = lazy(() => import("./pages/tools/PdfMetadataEditor"));
+const PdfPageNumber = lazy(() => import("./pages/tools/PdfPageNumber"));
+const PdfHeaderFooter = lazy(() => import("./pages/tools/PdfHeaderFooter"));
+const PdfSign = lazy(() => import("./pages/tools/PdfSign"));
+const PdfFormFiller = lazy(() => import("./pages/tools/PdfFormFiller"));
+const PdfBookmarkEditor = lazy(() => import("./pages/tools/PdfBookmarkEditor"));
+const PdfTextExtractor = lazy(() => import("./pages/tools/PdfTextExtractor"));
+const PdfMergeImages = lazy(() => import("./pages/tools/PdfMergeImages"));
+const PdfUnlock = lazy(() => import("./pages/tools/PdfUnlock"));
+const PdfCompare = lazy(() => import("./pages/tools/PdfCompare"));
+const PdfToText = lazy(() => import("./pages/tools/PdfToText"));
+
+// Design Tools
+const WireframeGenerator = lazy(() => import("./pages/tools/WireframeGenerator"));
+const TypographyTester = lazy(() => import("./pages/tools/TypographyTester"));
+const IconGenerator = lazy(() => import("./pages/tools/IconGenerator"));
+const PatternGenerator = lazy(() => import("./pages/tools/PatternGenerator"));
+const ColorSchemeGenerator = lazy(() => import("./pages/tools/ColorSchemeGenerator"));
+const MockupGenerator = lazy(() => import("./pages/tools/MockupGenerator"));
+const GridGenerator = lazy(() => import("./pages/tools/GridGenerator"));
+const SvgEditor = lazy(() => import("./pages/tools/SvgEditor"));
+const GlassmorphismGenerator = lazy(() => import("./pages/tools/GlassmorphismGenerator"));
+const TextArtGenerator = lazy(() => import("./pages/tools/TextArtGenerator"));
+
 // ID Card Makers
 const FakeBdOldNid = lazy(() => import("./pages/tools/FakeBdOldNid"));
 const FacebookIdCard = lazy(() => import("./pages/tools/FacebookIdCard"));
