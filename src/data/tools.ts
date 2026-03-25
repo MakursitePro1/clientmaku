@@ -68,6 +68,7 @@ export const categories: { id: ToolCategory; label: string; icon: any }[] = [
   { id: "finance", label: "Finance", icon: PiggyBank },
   { id: "social", label: "Social Media", icon: Share2 },
   { id: "games", label: "Games & Fun", icon: Gamepad2 },
+  { id: "email", label: "Email Tools", icon: Mail },
 ];
 
 export const tools: Tool[] = [
