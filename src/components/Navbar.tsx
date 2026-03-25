@@ -108,14 +108,14 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 pt-2 sm:pt-3 lg:pt-4">
         <div
           className={cn(
-            "navbar-glass rounded-2xl px-6 py-3 flex items-center justify-between transition-all duration-500",
+            "navbar-glass rounded-xl sm:rounded-2xl px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between transition-all duration-500",
             scrolled ? "navbar-glass-scrolled" : ""
           )}
         >
-          <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 rounded-xl sm:rounded-2xl overflow-hidden pointer-events-none">
             <div className="navbar-shine" />
           </div>
 
@@ -125,12 +125,12 @@ export function Navbar() {
               e.preventDefault();
               handleNavClick({ name: "Home", path: "/", hash: "hero" });
             }}
-            className="flex items-center gap-2.5 relative z-10"
+            className="flex items-center gap-2 sm:gap-2.5 relative z-10 min-w-0"
           >
-            <div className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center glow-shadow">
-              <Zap className="w-5 h-5 text-primary-foreground" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl gradient-bg flex items-center justify-center glow-shadow flex-shrink-0">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-bold tracking-tight">
+            <span className="text-base sm:text-lg font-bold tracking-tight whitespace-nowrap">
               <span className="gradient-text">Cyber</span>
               <span className="text-white"> Venom</span>
             </span>
@@ -142,7 +142,7 @@ export function Navbar() {
                 key={link.name}
                 onClick={() => handleNavClick(link)}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative",
+                  "px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative whitespace-nowrap",
                   isActive(link)
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
                     : "text-white/60 hover:text-white hover:bg-white/10"
@@ -155,7 +155,7 @@ export function Navbar() {
 
           <div className="hidden md:block relative z-10">
             <Button
-              className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-all glow-shadow hover:scale-105"
+              className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-all glow-shadow hover:scale-105 text-sm lg:text-base"
               onClick={() => navigate("/tools")}
             >
               Get Started
@@ -163,10 +163,10 @@ export function Navbar() {
           </div>
 
           <button
-            className="md:hidden text-white relative z-10"
+            className="md:hidden text-white relative z-10 p-1"
             onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
           </button>
         </div>
 
