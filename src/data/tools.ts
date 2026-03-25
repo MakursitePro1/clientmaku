@@ -1,5 +1,5 @@
 import {
-  Wifi, ShieldAlert, GraduationCap, Code2, Train, Image, Smile, 
+  Wifi, ShieldAlert, GraduationCap, Code2, Train, Image, Smile, Mail, MailCheck, MailPlus, MailSearch, MailX, MailWarning,
   FileText, Link, Keyboard, Type, ImagePlus, Calculator, 
   Languages, Globe, Lock, Camera, QrCode, ScanLine, 
   CreditCard, IdCard, User, Sparkles, FileImage, Monitor,
