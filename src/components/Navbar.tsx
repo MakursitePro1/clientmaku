@@ -131,7 +131,7 @@ export function Navbar() {
       <div className="w-full px-2 sm:px-4 lg:px-8 pt-2 sm:pt-3 lg:pt-4 box-border">
         <div
           className={cn(
-            "relative w-full max-w-full box-border navbar-glass rounded-xl sm:rounded-2xl px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 transition-all duration-500",
+            "relative w-full max-w-full box-border navbar-glass rounded-xl sm:rounded-2xl px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 flex items-center gap-2 transition-all duration-500",
             scrolled ? "navbar-glass-scrolled" : ""
           )}
         >
@@ -145,18 +145,18 @@ export function Navbar() {
               e.preventDefault();
               handleNavClick({ name: "Home", path: "/", hash: "hero" });
             }}
-            className="flex items-center gap-2 sm:gap-2.5 relative z-10 min-w-0 flex-1"
+            className="flex items-center gap-2 sm:gap-2.5 relative z-10 flex-shrink-0"
           >
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl gradient-bg flex items-center justify-center glow-shadow flex-shrink-0">
               <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
             </div>
-            <span className="text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap leading-none truncate">
+            <span className="text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap leading-none">
               <span className="gradient-text">Cyber</span>
-              <span className="text-white hidden sm:inline"> Venom</span>
+              <span className="text-white"> Venom</span>
             </span>
           </Link>
 
-          <div className={cn("items-center gap-1 bg-white/5 rounded-xl px-2 py-1 relative z-10 border border-white/5", isCompactNav ? "hidden" : "flex")}>
+          <div className={cn("items-center gap-1 bg-white/5 rounded-xl px-2 py-1 relative z-10 border border-white/5 mx-auto", isCompactNav ? "hidden" : "flex")}>
             {navLinks.map((link) => (
               <button
                 key={link.name}
@@ -173,7 +173,7 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className={cn("relative z-10", isCompactNav ? "hidden" : "block")}>
+          <div className={cn("relative z-10 ml-auto", isCompactNav ? "hidden" : "block")}>
             <Button
               className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-all glow-shadow hover:scale-105 text-sm lg:text-base"
               onClick={() => navigate("/tools")}
@@ -183,7 +183,7 @@ export function Navbar() {
           </div>
 
           <button
-            className={cn("text-white relative z-10 p-1 flex-shrink-0", isCompactNav ? "inline-flex" : "hidden")}
+            className={cn("text-white relative z-10 p-1 flex-shrink-0 ml-auto", isCompactNav ? "inline-flex" : "hidden")}
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle navigation menu"
           >
