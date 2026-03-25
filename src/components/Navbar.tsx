@@ -11,7 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
   { name: "Home", path: "/", hash: "hero" },
-  { name: "Tools", path: "/tools", hash: "" },
+  { name: "Tools", path: "/tools", hash: "", highlight: true },
+  { name: "Blog", path: "/blog", hash: "" },
   { name: "About", path: "/", hash: "about" },
   { name: "FAQ", path: "/", hash: "faq" },
   { name: "Contact", path: "/", hash: "contact" },
