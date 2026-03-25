@@ -28,7 +28,11 @@ export type ToolCategory =
   | "image-media"
   | "id-card"
   | "developer"
-  | "utility";
+  | "utility"
+  | "security"
+  | "finance"
+  | "social"
+  | "games";
 
 export interface Tool {
   id: string;
