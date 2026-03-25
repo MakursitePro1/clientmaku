@@ -8,7 +8,7 @@ import {
   AlignLeft, Activity, Percent, Banknote, UtensilsCrossed,
   Timer, StickyNote, ListChecks, Brain, Shrink, Maximize,
   Volume2, Shuffle, Coins, Dices, Zap, CaseSensitive,
-  DollarSign, Replace, Tag
+  DollarSign, Replace, Tag, MapPin, FileCode, Link2
 } from "lucide-react";
 
 export type ToolCategory = 
