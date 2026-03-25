@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Zap, Heart, LogIn, LogOut, User, Settings } from "lucide-react";
+import { Menu, X, Zap, Heart, LogIn, LogOut, User, Settings, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -106,7 +106,8 @@ export function Navbar() {
   }, [location.pathname, location.hash]);
 
   const isActive = (link: typeof navLinks[0]) => {
-    if (link.path === "/tools") return location.pathname === "/tools";
+    if (link.path === "/tools") return location.pathname === "/tools" || location.pathname.startsWith("/tools/");
+    if (link.path === "/blog") return location.pathname === "/blog" || location.pathname.startsWith("/blog/");
     if (location.pathname !== "/") return false;
     return link.hash === activeHash;
   };
@@ -160,12 +161,20 @@ export function Navbar() {
                 key={link.name}
                 onClick={() => handleNavClick(link)}
                 className={cn(
-                  "px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative whitespace-nowrap",
+                  "px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative whitespace-nowrap flex items-center gap-1.5",
                   isActive(link)
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
                     : "text-white/60 hover:text-white hover:bg-white/10"
                 )}
               >
+                {link.highlight && (
+                  <motion.span
+                    animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.15, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Wrench className="w-3.5 h-3.5" />
+                  </motion.span>
+                )}
                 {link.name}
               </button>
             ))}
