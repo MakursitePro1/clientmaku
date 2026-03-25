@@ -141,23 +141,23 @@ export default function ToolsPage() {
       </section>
 
       {/* ===== SEARCH & FILTER ===== */}
-      <div className="px-4 pb-6 relative z-10">
+      <div className="px-4 pb-6 relative z-20">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="max-w-4xl mx-auto"
+          className="max-w-2xl mx-auto"
         >
-          <div className="relative rounded-2xl border border-border/30 bg-card/60 backdrop-blur-sm p-3 sm:p-4 shadow-lg">
-            <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative rounded-2xl border-2 border-primary/20 bg-card/80 backdrop-blur-md p-3 sm:p-4 shadow-xl shadow-primary/5">
+            <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
               {/* Search */}
-              <div className="relative flex-1 group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/60 group-focus-within:text-primary transition-colors" />
+              <div className="relative flex-1 w-full group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary/60 group-focus-within:text-primary transition-colors" />
                 <Input
                   placeholder="Search 200+ tools..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-10 py-6 rounded-xl bg-background/80 border-border/30 text-base focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all"
+                  className="pl-12 pr-10 py-6 rounded-xl bg-background border-2 border-primary/15 text-base focus:border-primary/40 focus:ring-2 focus:ring-primary/20 transition-all"
                 />
                 {searchQuery && (
                   <button onClick={() => setSearchQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all">
@@ -167,54 +167,66 @@ export default function ToolsPage() {
               </div>
 
               {/* Category Dropdown */}
-              <div className="relative">
+              <div className="relative w-full sm:w-auto">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className={cn(
-                    "flex items-center gap-2.5 px-5 py-3 sm:py-0 sm:h-full rounded-xl border transition-all duration-300 min-w-[200px] justify-between",
+                    "flex items-center gap-2.5 px-5 py-3 sm:py-3.5 rounded-xl border-2 transition-all duration-300 w-full sm:min-w-[200px] justify-between",
                     dropdownOpen
-                      ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/5"
-                      : "border-border/30 bg-background/80 hover:border-primary/30"
+                      ? "border-primary bg-primary/10 shadow-lg shadow-primary/10"
+                      : "border-primary/20 bg-background hover:border-primary/40 hover:bg-primary/5"
                   )}
                 >
                   <div className="flex items-center gap-2">
                     <Filter className="w-4 h-4 text-primary" />
                     {ActiveIcon && <ActiveIcon className="w-4 h-4 text-primary/70" />}
-                    <span className="text-sm font-semibold">{activeLabel}</span>
+                    <span className="text-sm font-bold">{activeLabel}</span>
                   </div>
-                  <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", dropdownOpen && "rotate-180")} />
+                  <ChevronDown className={cn("w-4 h-4 text-primary transition-transform duration-300", dropdownOpen && "rotate-180")} />
                 </button>
 
                 <AnimatePresence>
                   {dropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full mt-2 right-0 w-72 rounded-2xl bg-card border border-border/50 shadow-2xl z-50 overflow-hidden backdrop-blur-xl p-1.5"
-                    >
-                      {categories.map(cat => {
-                        const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
-                        const isActive = activeCategory === cat.id;
-                        return (
-                          <button
-                            key={cat.id}
-                            onClick={() => { setActiveCategory(cat.id); setDropdownOpen(false); }}
-                            className={cn(
-                              "w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all",
-                              isActive
-                                ? "bg-primary/10 text-primary font-semibold"
-                                : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-                            )}
-                          >
-                            <cat.icon className="w-4 h-4" />
-                            <span className="flex-1 text-left">{cat.label}</span>
-                            <span className={cn("text-xs px-2 py-0.5 rounded-lg font-bold", isActive ? "bg-primary/20 text-primary" : "bg-accent text-muted-foreground")}>{count}</span>
-                          </button>
-                        );
-                      })}
-                    </motion.div>
+                    <>
+                      {/* Backdrop overlay to block background content */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40"
+                        onClick={() => setDropdownOpen(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full mt-2 left-0 right-0 sm:left-auto sm:right-0 sm:w-80 rounded-2xl bg-card border-2 border-primary/20 shadow-2xl z-50 p-2 max-h-[60vh] overflow-y-auto"
+                      >
+                        {categories.map(cat => {
+                          const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
+                          const isActive = activeCategory === cat.id;
+                          return (
+                            <button
+                              key={cat.id}
+                              onClick={() => { setActiveCategory(cat.id); setDropdownOpen(false); }}
+                              className={cn(
+                                "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all",
+                                isActive
+                                  ? "bg-primary/15 text-primary font-bold border border-primary/20"
+                                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                              )}
+                            >
+                              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", isActive ? "bg-primary/20" : "bg-accent")}>
+                                <cat.icon className="w-4 h-4" />
+                              </div>
+                              <span className="flex-1 text-left">{cat.label}</span>
+                              <span className={cn("text-xs px-2.5 py-1 rounded-full font-bold", isActive ? "bg-primary text-primary-foreground" : "bg-accent text-muted-foreground")}>{count}</span>
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    </>
                   )}
                 </AnimatePresence>
               </div>
@@ -222,7 +234,7 @@ export default function ToolsPage() {
           </div>
 
           {/* Active filter + count */}
-          <div className="flex items-center justify-between mt-4 px-2">
+          <div className="flex items-center justify-center mt-4 px-2">
             <p className="text-sm text-muted-foreground">
               Showing <span className="font-bold text-foreground">{filteredTools.length}</span> tools
               {activeCategory !== "all" && (
