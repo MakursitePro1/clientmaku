@@ -273,6 +273,7 @@ const App = () => (
             <Route path="/tools" element={<Suspense fallback={<Loading />}><ToolsPage /></Suspense>} />
             <Route path="/auth" element={<Suspense fallback={<Loading />}><AuthPage /></Suspense>} />
             <Route path="/favorites" element={<Suspense fallback={<Loading />}><FavoritesPage /></Suspense>} />
+            <Route path="/profile" element={<Suspense fallback={<Loading />}><ProfilePage /></Suspense>} />
             {/* Utility */}
             <Route path="/tools/internet-speed-tester" element={<InternetSpeedTester />} />
             <Route path="/tools/courier-fraud-checker" element={<CourierFraudChecker />} />
