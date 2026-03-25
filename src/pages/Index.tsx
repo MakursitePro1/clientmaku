@@ -11,6 +11,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead title="Cyber Venom" description="67+ free online web tools — image editors, code testers, converters, calculators, and more. No signup required." path="/" />
+      <Navbar />
       <HeroSection />
       <ToolsGrid />
       <AboutSection />
