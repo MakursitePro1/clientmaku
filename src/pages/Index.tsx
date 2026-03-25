@@ -2,7 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { CategoriesMarquee } from "@/components/CategoriesMarquee";
 import { ToolsGrid } from "@/components/ToolsGrid";
-import { ReviewsMarquee } from "@/components/ReviewsMarquee";
+import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { AboutSection } from "@/components/AboutSection";
 import { FAQSection } from "@/components/FAQSection";
 import { ContactSection } from "@/components/ContactSection";
@@ -18,7 +18,7 @@ const Index = () => {
       <HeroSection />
       <CategoriesMarquee />
       <ToolsGrid />
-      <ReviewsMarquee />
+      <TestimonialsSection />
       <AboutSection />
       <FAQSection />
       <ContactSection />
