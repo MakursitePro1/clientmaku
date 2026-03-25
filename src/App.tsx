@@ -181,6 +181,26 @@ const App = () => (
             <Route path="/tools/regex-cheat-sheet" element={<RegexCheatSheet />} />
             <Route path="/tools/character-map" element={<CharacterMap />} />
             <Route path="/tools/pdf-merger" element={<PdfMerger />} />
+            <Route path="/tools/html-entity-converter" element={<HtmlEntityConverter />} />
+            <Route path="/tools/screen-resolution" element={<ScreenResolutionChecker />} />
+            <Route path="/tools/text-to-handwriting" element={<TextToHandwriting />} />
+            <Route path="/tools/whatsapp-link-generator" element={<WhatsAppLinkGenerator />} />
+            <Route path="/tools/color-blindness-simulator" element={<ColorBlindnessSimulator />} />
+            <Route path="/tools/crontab-generator" element={<CrontabGenerator />} />
+            <Route path="/tools/barcode-generator" element={<BarcodeGenerator />} />
+            <Route path="/tools/privacy-policy-generator" element={<PrivacyPolicyGenerator />} />
+            <Route path="/tools/url-shortener" element={<UrlShortener />} />
+            <Route path="/tools/text-to-binary" element={<TextToBinary />} />
+            <Route path="/tools/json-to-yaml" element={<JsonToYaml />} />
+            <Route path="/tools/html-preview" element={<HtmlPreview />} />
+            <Route path="/tools/csv-viewer" element={<CsvViewer />} />
+            <Route path="/tools/image-color-extractor" element={<ImageColorExtractor />} />
+            <Route path="/tools/jwt-decoder" element={<JwtDecoder />} />
+            <Route path="/tools/password-strength-checker" element={<PasswordStrengthChecker />} />
+            <Route path="/tools/email-validator" element={<EmailValidator />} />
+            <Route path="/tools/text-to-morse" element={<TextToMorse />} />
+            <Route path="/tools/hex-editor" element={<HexEditor />} />
+            <Route path="/tools/text-encryption" element={<TextEncryption />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
