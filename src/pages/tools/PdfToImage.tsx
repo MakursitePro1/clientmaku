@@ -29,7 +29,7 @@ export default function PdfToImage() {
         const { width, height } = page.getSize();
 
         const pdfBytes = await singlePdf.save();
-        const blob = new Blob([pdfBytes], { type: "application/pdf" });
+        const blob = new Blob([pdfBytes as BlobPart], { type: "application/pdf" });
         const url = URL.createObjectURL(blob);
 
         const canvas = document.createElement("canvas");

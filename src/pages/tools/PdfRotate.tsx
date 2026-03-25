@@ -26,7 +26,7 @@ export default function PdfRotate() {
     const pdf = await PDFDocument.load(pdfBytes);
     pdf.getPages().forEach(page => page.setRotation(degrees(page.getRotation().angle + parseInt(rotation))));
     const output = await pdf.save();
-    const blob = new Blob([output], { type: "application/pdf" });
+    const blob = new Blob([output as BlobPart], { type: "application/pdf" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `rotated_${fileName}`; a.click();
   };
 

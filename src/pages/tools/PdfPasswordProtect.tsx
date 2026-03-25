@@ -26,7 +26,7 @@ export default function PdfPasswordProtect() {
     newPdf.setTitle(`Protected: ${fileName}`);
     newPdf.setProducer("CyberVenom PDF Tools");
     const output = await newPdf.save();
-    const blob = new Blob([output], { type: "application/pdf" });
+    const blob = new Blob([output as BlobPart], { type: "application/pdf" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `protected_${fileName}`; a.click();
   };
 

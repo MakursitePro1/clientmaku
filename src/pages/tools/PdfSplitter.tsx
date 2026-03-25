@@ -37,7 +37,7 @@ export default function PdfSplitter() {
 
     for (const [doc, label] of [[part1, "part1"], [part2, "part2"]] as const) {
       const output = await doc.save();
-      const blob = new Blob([output], { type: "application/pdf" });
+      const blob = new Blob([output as BlobPart], { type: "application/pdf" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${fileName.replace(".pdf", "")}_${label}.pdf`; a.click();
     }
   };

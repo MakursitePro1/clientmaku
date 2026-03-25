@@ -34,7 +34,7 @@ export default function PdfPageRemover() {
       const pages = await newPdf.copyPages(pdf, keepIndices);
       pages.forEach(p => newPdf.addPage(p));
       const output = await newPdf.save();
-      const blob = new Blob([output], { type: "application/pdf" });
+      const blob = new Blob([output as BlobPart], { type: "application/pdf" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `edited_${fileName}`; a.click();
     } catch {}
     setLoading(false);

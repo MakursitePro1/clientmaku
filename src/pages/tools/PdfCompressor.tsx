@@ -27,7 +27,7 @@ export default function PdfCompressor() {
       pages.forEach(p => newPdf.addPage(p));
       const compressed = await newPdf.save({ useObjectStreams: true });
       setCompressedSize(compressed.length);
-      const blob = new Blob([compressed], { type: "application/pdf" });
+      const blob = new Blob([compressed as BlobPart], { type: "application/pdf" });
       setCompressedUrl(URL.createObjectURL(blob));
     } catch { setCompressedUrl(""); }
     setLoading(false);

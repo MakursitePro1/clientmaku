@@ -31,7 +31,7 @@ export default function PdfPageReorder() {
     const pages = await newPdf.copyPages(pdf, indices);
     pages.forEach(p => newPdf.addPage(p));
     const output = await newPdf.save();
-    const blob = new Blob([output], { type: "application/pdf" });
+    const blob = new Blob([output as BlobPart], { type: "application/pdf" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `reordered_${fileName}`; a.click();
   };
 

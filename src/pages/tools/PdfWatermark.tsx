@@ -32,7 +32,7 @@ export default function PdfWatermark() {
       });
     }
     const output = await pdf.save();
-    const blob = new Blob([output], { type: "application/pdf" });
+    const blob = new Blob([output as BlobPart], { type: "application/pdf" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `watermarked_${fileName}`; a.click();
   };
 
