@@ -208,16 +208,24 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.2] mb-6 tracking-tight"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] mb-6 tracking-tight"
         >
           <span className="block">Your Ultimate Collection</span>
-          <span className="block mt-2">
+          <span className="block mt-2 min-h-[1.2em]">
             <span className="relative inline-block">
-              <span className="gradient-text">{typedText}</span>
               <motion.span
-                className="inline-block w-[3px] h-[0.9em] bg-primary ml-1 align-middle rounded-full"
-                animate={{ opacity: [1, 0] }}
-                transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
+                className="gradient-text"
+                key={typedText}
+                initial={{ opacity: 0.7 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15 }}
+              >
+                {typedText}
+              </motion.span>
+              <motion.span
+                className="inline-block w-[3px] h-[0.85em] bg-primary ml-1 align-middle rounded-full shadow-[0_0_8px_hsl(263_85%_58%/0.8),0_0_20px_hsl(263_85%_58%/0.4)]"
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 0.8, repeat: Infinity, ease: "steps(2)" }}
               />
             </span>
           </span>
