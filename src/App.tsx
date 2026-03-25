@@ -45,6 +45,27 @@ const CssMinifier = lazy(() => import("./pages/tools/CssMinifier"));
 const HashGenerator = lazy(() => import("./pages/tools/HashGenerator"));
 const UnitConverter = lazy(() => import("./pages/tools/UnitConverter"));
 const TimestampConverter = lazy(() => import("./pages/tools/TimestampConverter"));
+// New 20 tools
+const WordCounter = lazy(() => import("./pages/tools/WordCounter"));
+const BmiCalculator = lazy(() => import("./pages/tools/BmiCalculator"));
+const PercentageCalculator = lazy(() => import("./pages/tools/PercentageCalculator"));
+const LoanCalculator = lazy(() => import("./pages/tools/LoanCalculator"));
+const TipCalculator = lazy(() => import("./pages/tools/TipCalculator"));
+const StopwatchTimer = lazy(() => import("./pages/tools/StopwatchTimer"));
+const Notepad = lazy(() => import("./pages/tools/Notepad"));
+const TodoList = lazy(() => import("./pages/tools/TodoList"));
+const PomodoroTimer = lazy(() => import("./pages/tools/PomodoroTimer"));
+const ImageCompressor = lazy(() => import("./pages/tools/ImageCompressor"));
+const ImageResizer = lazy(() => import("./pages/tools/ImageResizer"));
+const TextToSpeech = lazy(() => import("./pages/tools/TextToSpeech"));
+const RandomNumberGenerator = lazy(() => import("./pages/tools/RandomNumberGenerator"));
+const FlipCoin = lazy(() => import("./pages/tools/FlipCoin"));
+const DiceRoller = lazy(() => import("./pages/tools/DiceRoller"));
+const ElectricityCalculator = lazy(() => import("./pages/tools/ElectricityCalculator"));
+const CaseConverter = lazy(() => import("./pages/tools/CaseConverter"));
+const CurrencyConverter = lazy(() => import("./pages/tools/CurrencyConverter"));
+const TextReplacer = lazy(() => import("./pages/tools/TextReplacer"));
+const DiscountCalculator = lazy(() => import("./pages/tools/DiscountCalculator"));
 
 const queryClient = new QueryClient();
 
@@ -101,6 +122,27 @@ const App = () => (
             <Route path="/tools/hash-generator" element={<HashGenerator />} />
             <Route path="/tools/unit-converter" element={<UnitConverter />} />
             <Route path="/tools/timestamp-converter" element={<TimestampConverter />} />
+            {/* New 20 tools */}
+            <Route path="/tools/word-counter" element={<WordCounter />} />
+            <Route path="/tools/bmi-calculator" element={<BmiCalculator />} />
+            <Route path="/tools/percentage-calculator" element={<PercentageCalculator />} />
+            <Route path="/tools/loan-calculator" element={<LoanCalculator />} />
+            <Route path="/tools/tip-calculator" element={<TipCalculator />} />
+            <Route path="/tools/stopwatch-timer" element={<StopwatchTimer />} />
+            <Route path="/tools/notepad" element={<Notepad />} />
+            <Route path="/tools/todo-list" element={<TodoList />} />
+            <Route path="/tools/pomodoro-timer" element={<PomodoroTimer />} />
+            <Route path="/tools/image-compressor" element={<ImageCompressor />} />
+            <Route path="/tools/image-resizer" element={<ImageResizer />} />
+            <Route path="/tools/text-to-speech" element={<TextToSpeech />} />
+            <Route path="/tools/random-number" element={<RandomNumberGenerator />} />
+            <Route path="/tools/flip-coin" element={<FlipCoin />} />
+            <Route path="/tools/dice-roller" element={<DiceRoller />} />
+            <Route path="/tools/electricity-calculator" element={<ElectricityCalculator />} />
+            <Route path="/tools/case-converter" element={<CaseConverter />} />
+            <Route path="/tools/currency-converter" element={<CurrencyConverter />} />
+            <Route path="/tools/text-replacer" element={<TextReplacer />} />
+            <Route path="/tools/discount-calculator" element={<DiscountCalculator />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
