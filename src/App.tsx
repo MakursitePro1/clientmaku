@@ -75,6 +75,26 @@ const ColorPaletteGenerator = lazy(() => import("./pages/tools/ColorPaletteGener
 const RegexCheatSheet = lazy(() => import("./pages/tools/RegexCheatSheet"));
 const CharacterMap = lazy(() => import("./pages/tools/CharacterMap"));
 const PdfMerger = lazy(() => import("./pages/tools/PdfMerger"));
+const HtmlEntityConverter = lazy(() => import("./pages/tools/HtmlEntityConverter"));
+const ScreenResolutionChecker = lazy(() => import("./pages/tools/ScreenResolutionChecker"));
+const TextToHandwriting = lazy(() => import("./pages/tools/TextToHandwriting"));
+const WhatsAppLinkGenerator = lazy(() => import("./pages/tools/WhatsAppLinkGenerator"));
+const ColorBlindnessSimulator = lazy(() => import("./pages/tools/ColorBlindnessSimulator"));
+const CrontabGenerator = lazy(() => import("./pages/tools/CrontabGenerator"));
+const BarcodeGenerator = lazy(() => import("./pages/tools/BarcodeGenerator"));
+const PrivacyPolicyGenerator = lazy(() => import("./pages/tools/PrivacyPolicyGenerator"));
+const UrlShortener = lazy(() => import("./pages/tools/UrlShortener"));
+const TextToBinary = lazy(() => import("./pages/tools/TextToBinary"));
+const JsonToYaml = lazy(() => import("./pages/tools/JsonToYaml"));
+const HtmlPreview = lazy(() => import("./pages/tools/HtmlPreview"));
+const CsvViewer = lazy(() => import("./pages/tools/CsvViewer"));
+const ImageColorExtractor = lazy(() => import("./pages/tools/ImageColorExtractor"));
+const JwtDecoder = lazy(() => import("./pages/tools/JwtDecoder"));
+const PasswordStrengthChecker = lazy(() => import("./pages/tools/PasswordStrengthChecker"));
+const EmailValidator = lazy(() => import("./pages/tools/EmailValidator"));
+const TextToMorse = lazy(() => import("./pages/tools/TextToMorse"));
+const HexEditor = lazy(() => import("./pages/tools/HexEditor"));
+const TextEncryption = lazy(() => import("./pages/tools/TextEncryption"));
 
 const queryClient = new QueryClient();
 
