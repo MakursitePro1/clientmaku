@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { tools, categories, type ToolCategory } from "@/data/tools";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,6 @@ export function ToolsGrid() {
     return () => window.removeEventListener("select-category", handler);
   }, []);
 
-  // Reset page when filters change
   useEffect(() => { setCurrentPage(1); }, [activeCategory, searchQuery]);
 
   const filteredTools = useMemo(() => tools.filter((tool) => {
@@ -152,50 +151,93 @@ export function ToolsGrid() {
           })}
         </motion.div>
 
-        {/* Tools Grid */}
+        {/* Tools Grid - Premium Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           <AnimatePresence mode="popLayout">
             {paginatedTools.map((tool, index) => (
               <motion.div
                 key={tool.id}
                 layout
-                initial={{ opacity: 0, scale: 0.92, y: 24 }}
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.92 }}
-                transition={{ duration: 0.35, delay: Math.min(index * 0.015, 0.3), ease: [0.25, 0.46, 0.45, 0.94] }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4, delay: Math.min(index * 0.02, 0.4), type: "spring", stiffness: 120 }}
               >
                 <Link
                   to={tool.path}
-                  className="tool-card group relative block rounded-2xl p-6 border border-border/40 transition-all duration-500 overflow-hidden h-full"
-                  style={{ background: 'hsl(var(--card))' }}
+                  className="group relative block rounded-2xl overflow-hidden h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_25px_60px_-15px_hsl(263_85%_58%/0.2),0_10px_25px_-10px_hsl(0_0%_0%/0.1)]"
                 >
-                  <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ background: `linear-gradient(135deg, ${tool.color.replace(')', ' / 0.06)')}, transparent 60%)` }}
+                  {/* Card background with glass effect */}
+                  <div className="absolute inset-0 bg-card/95 backdrop-blur-sm border border-border/40 rounded-2xl group-hover:border-primary/30 transition-colors duration-500" />
+                  
+                  {/* Animated top gradient bar */}
+                  <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl overflow-hidden">
+                    <div
+                      className="h-full w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{ background: `linear-gradient(90deg, transparent 0%, ${tool.color} 50%, transparent 100%)` }}
+                    />
+                  </div>
+
+                  {/* Hover glow effect */}
+                  <div
+                    className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[80px] opacity-0 group-hover:opacity-20 transition-all duration-700"
+                    style={{ background: tool.color }}
                   />
-                  <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
+
+                  {/* Corner accent */}
+                  <div
+                    className="absolute top-0 right-0 w-24 h-24 opacity-0 group-hover:opacity-100 transition-all duration-500"
+                    style={{
+                      background: `radial-gradient(circle at top right, ${tool.color.replace(')', ' / 0.08)')}, transparent 70%)`,
+                    }}
                   />
-                  <div className="relative z-10 flex flex-col h-full">
+
+                  <div className="relative z-10 p-6 flex flex-col h-full">
+                    {/* Icon with animated ring */}
                     <div className="relative mb-5">
-                      <div
-                        className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110"
-                        style={{ backgroundColor: tool.color.replace(')', ' / 0.1)'), color: tool.color }}
+                      <motion.div
+                        whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                        transition={{ duration: 0.5 }}
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center relative overflow-hidden transition-all duration-500 group-hover:shadow-lg"
+                        style={{
+                          backgroundColor: tool.color.replace(')', ' / 0.1)'),
+                          color: tool.color,
+                        }}
                       >
-                        <tool.icon className="w-7 h-7 transition-transform duration-300 group-hover:rotate-3" />
-                      </div>
-                      <div
-                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110"
-                        style={{ backgroundColor: tool.color, boxShadow: `0 0 12px ${tool.color}` }}
+                        {/* Inner shine */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <tool.icon className="w-7 h-7 relative z-10" />
+                      </motion.div>
+                      
+                      {/* Floating dot indicator */}
+                      <motion.div
+                        className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100"
+                        style={{ backgroundColor: tool.color, boxShadow: `0 0 10px 2px ${tool.color}` }}
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
                       />
                     </div>
-                    <h3 className="font-bold text-[15px] mb-2 group-hover:text-primary transition-colors duration-300 leading-snug">{tool.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-auto pb-5 line-clamp-2 leading-relaxed">{tool.description}</p>
-                    <div className="flex items-center justify-between pt-4 border-t border-border/30 group-hover:border-primary/20 transition-colors duration-300">
-                      <span className="flex items-center text-sm font-semibold text-primary/70 group-hover:text-primary transition-all duration-300">
-                        Open Tool
-                        <ArrowRight className="ml-1.5 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+
+                    {/* Content */}
+                    <h3 className="font-bold text-[15px] mb-2.5 leading-snug group-hover:text-primary transition-colors duration-300">
+                      {tool.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-auto pb-5 line-clamp-2 leading-relaxed group-hover:text-muted-foreground/80 transition-colors duration-300">
+                      {tool.description}
+                    </p>
+
+                    {/* Footer with action */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border/20 group-hover:border-primary/15 transition-all duration-500">
+                      <span className="flex items-center text-sm font-semibold text-primary/60 group-hover:text-primary transition-all duration-300">
+                        <span className="relative">
+                          Open Tool
+                          <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-primary group-hover:w-full transition-all duration-500" />
+                        </span>
+                        <ArrowRight className="ml-2 w-4 h-4 transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-primary" />
                       </span>
-                      <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-primary/50 transition-colors duration-300" />
+                      <div className="w-8 h-8 rounded-lg bg-accent/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bg-primary/10">
+                        <ExternalLink className="w-3.5 h-3.5 text-primary/60" />
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -224,11 +266,8 @@ export function ToolsGrid() {
             className="mt-16"
           >
             <div className="relative max-w-2xl mx-auto">
-              {/* Decorative line */}
               <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent -translate-y-1/2" />
-
               <div className="relative flex flex-col items-center gap-5">
-                {/* Page buttons */}
                 <div className="flex items-center gap-1.5 sm:gap-2 bg-card/90 backdrop-blur-sm border border-border/40 rounded-2xl px-3 py-2.5 shadow-lg">
                   <button
                     onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
@@ -237,9 +276,7 @@ export function ToolsGrid() {
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-
                   <div className="w-px h-6 bg-border/40 mx-1" />
-
                   {getPageNumbers().map((page, i) => (
                     typeof page === "string" ? (
                       <span key={`dots-${i}`} className="w-6 flex items-center justify-center text-muted-foreground/40 text-xs">•••</span>
@@ -261,9 +298,7 @@ export function ToolsGrid() {
                       </button>
                     )
                   ))}
-
                   <div className="w-px h-6 bg-border/40 mx-1" />
-
                   <button
                     onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
                     disabled={currentPage === totalPages}
@@ -272,8 +307,6 @@ export function ToolsGrid() {
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
-
-                {/* Info + View All */}
                 <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
                   <p className="text-sm text-muted-foreground">
                     Showing <span className="font-bold text-foreground">{(currentPage - 1) * TOOLS_PER_PAGE + 1}-{Math.min(currentPage * TOOLS_PER_PAGE, filteredTools.length)}</span> of <span className="font-bold text-foreground">{filteredTools.length}</span> tools
