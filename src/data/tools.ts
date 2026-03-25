@@ -20,12 +20,14 @@ import {
   PiggyBank, Receipt, Target, CircleDollarSign,
   Share2, MessageSquare, Youtube, Twitter, Tv,
   Joystick, Puzzle, Swords, Boxes, Trophy,
-  // New icons for newly registered tools
   FlipHorizontal, Layers, Contrast, ImageMinus, SunMedium,
   FileImage as FileImageIcon, Grid2X2, Eraser, Wand2, RotateCcw,
   ArrowUpDown, GitCompare, Repeat, RefreshCw, Ruler,
   Square, Droplets, TimerReset, Home, GraduationCap as GradCapIcon,
-  Wallet, Video, Award
+  Wallet, Video, Award,
+  FileOutput, FileMinus, FileCheck, FileSearch, FileLock, FileSignature, FileStack,
+  FileUp, FileX, Files, SplitSquareHorizontal, BookMarked, Stamp,
+  Layout, Figma, Component, Frame, Shapes, SwatchBook, LayoutGrid, Brush, Pen, Aperture
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -38,7 +40,9 @@ export type ToolCategory =
   | "security"
   | "finance"
   | "social"
-  | "games";
+  | "games"
+  | "pdf-tools"
+  | "design";
 
 export interface Tool {
   id: string;
@@ -54,6 +58,8 @@ export const categories: { id: ToolCategory; label: string; icon: any }[] = [
   { id: "all", label: "All Tools", icon: Gauge },
   { id: "text-language", label: "Text & Language", icon: Type },
   { id: "image-media", label: "Image & Media", icon: Image },
+  { id: "pdf-tools", label: "PDF Tools", icon: FileText },
+  { id: "design", label: "Design Tools", icon: Palette },
   { id: "id-card", label: "ID Card Makers", icon: IdCard },
   { id: "developer", label: "Developer Tools", icon: Code2 },
   { id: "utility", label: "Utility Tools", icon: Sparkles },
@@ -257,4 +263,38 @@ export const tools: Tool[] = [
   { id: "business-card-maker", name: "Business Card Maker", description: "Create professional business cards", icon: CreditCard, category: "id-card", path: "/tools/business-card-maker", color: "hsl(199, 89%, 48%)" },
   { id: "employee-id-card", name: "Employee ID Card Maker", description: "Create employee identification cards", icon: IdCard, category: "id-card", path: "/tools/employee-id-card", color: "hsl(263, 85%, 58%)" },
   { id: "event-badge-maker", name: "Event Badge Maker", description: "Create event badges and name tags", icon: Award, category: "id-card", path: "/tools/event-badge-maker", color: "hsl(25, 95%, 53%)" },
+
+  // PDF Tools
+  { id: "pdf-to-image", name: "PDF to Image", description: "Convert PDF pages to high-quality images", icon: FileImage, category: "pdf-tools", path: "/tools/pdf-to-image", color: "hsl(263, 85%, 58%)" },
+  { id: "pdf-compressor", name: "PDF Compressor", description: "Compress PDF files to reduce size", icon: Shrink, category: "pdf-tools", path: "/tools/pdf-compressor", color: "hsl(142, 71%, 45%)" },
+  { id: "pdf-page-remover", name: "PDF Page Remover", description: "Remove specific pages from PDF files", icon: FileMinus, category: "pdf-tools", path: "/tools/pdf-page-remover", color: "hsl(0, 84%, 60%)" },
+  { id: "pdf-page-extractor", name: "PDF Page Extractor", description: "Extract specific pages from a PDF", icon: FileOutput, category: "pdf-tools", path: "/tools/pdf-page-extractor", color: "hsl(199, 89%, 48%)" },
+  { id: "pdf-rotate", name: "PDF Page Rotator", description: "Rotate PDF pages to any angle", icon: RotateCcw, category: "pdf-tools", path: "/tools/pdf-rotate", color: "hsl(25, 95%, 53%)" },
+  { id: "pdf-password-protect", name: "PDF Password Protector", description: "Add password protection to PDF files", icon: FileLock, category: "pdf-tools", path: "/tools/pdf-password-protect", color: "hsl(340, 82%, 52%)" },
+  { id: "pdf-watermark", name: "PDF Watermark Adder", description: "Add text watermarks to PDF documents", icon: Stamp, category: "pdf-tools", path: "/tools/pdf-watermark", color: "hsl(280, 90%, 55%)" },
+  { id: "pdf-page-reorder", name: "PDF Page Reorder", description: "Rearrange pages in your PDF document", icon: ArrowUpDown, category: "pdf-tools", path: "/tools/pdf-page-reorder", color: "hsl(220, 90%, 56%)" },
+  { id: "pdf-splitter", name: "PDF Splitter", description: "Split a PDF into multiple documents", icon: SplitSquareHorizontal, category: "pdf-tools", path: "/tools/pdf-splitter", color: "hsl(47, 95%, 55%)" },
+  { id: "pdf-metadata-editor", name: "PDF Metadata Editor", description: "Edit title, author, and metadata of PDFs", icon: FileEdit, category: "pdf-tools", path: "/tools/pdf-metadata-editor", color: "hsl(170, 75%, 41%)" },
+  { id: "pdf-page-number", name: "PDF Page Numberer", description: "Add page numbers to PDF documents", icon: Hash, category: "pdf-tools", path: "/tools/pdf-page-number", color: "hsl(263, 85%, 58%)" },
+  { id: "pdf-header-footer", name: "PDF Header/Footer Adder", description: "Add custom headers and footers to PDFs", icon: FileText, category: "pdf-tools", path: "/tools/pdf-header-footer", color: "hsl(142, 71%, 45%)" },
+  { id: "pdf-sign", name: "PDF Signature Tool", description: "Add digital signatures to PDF documents", icon: FileSignature, category: "pdf-tools", path: "/tools/pdf-sign", color: "hsl(0, 84%, 60%)" },
+  { id: "pdf-form-filler", name: "PDF Form Filler", description: "Fill out PDF forms directly in browser", icon: FileCheck, category: "pdf-tools", path: "/tools/pdf-form-filler", color: "hsl(199, 89%, 48%)" },
+  { id: "pdf-bookmark-editor", name: "PDF Bookmark Editor", description: "Add and edit bookmarks in PDF files", icon: BookMarked, category: "pdf-tools", path: "/tools/pdf-bookmark-editor", color: "hsl(25, 95%, 53%)" },
+  { id: "pdf-text-extractor", name: "PDF Text Extractor", description: "Extract all text content from PDF files", icon: FileSearch, category: "pdf-tools", path: "/tools/pdf-text-extractor", color: "hsl(340, 82%, 52%)" },
+  { id: "pdf-merge-images", name: "Images to PDF", description: "Convert multiple images into a single PDF", icon: FileUp, category: "pdf-tools", path: "/tools/pdf-merge-images", color: "hsl(280, 90%, 55%)" },
+  { id: "pdf-unlock", name: "PDF Unlocker", description: "Remove password protection from PDFs", icon: LockKeyhole, category: "pdf-tools", path: "/tools/pdf-unlock", color: "hsl(220, 90%, 56%)" },
+  { id: "pdf-compare", name: "PDF Compare", description: "Compare two PDF documents side by side", icon: GitCompare, category: "pdf-tools", path: "/tools/pdf-compare", color: "hsl(47, 95%, 55%)" },
+  { id: "pdf-to-text", name: "PDF to Text", description: "Convert PDF documents to plain text", icon: FileType, category: "pdf-tools", path: "/tools/pdf-to-text", color: "hsl(170, 75%, 41%)" },
+
+  // Design Tools
+  { id: "wireframe-generator", name: "Wireframe Generator", description: "Create quick wireframe mockups for web pages", icon: Layout, category: "design", path: "/tools/wireframe-generator", color: "hsl(263, 85%, 58%)" },
+  { id: "typography-tester", name: "Typography Tester", description: "Preview and compare Google Fonts in real-time", icon: Type, category: "design", path: "/tools/typography-tester", color: "hsl(340, 82%, 52%)" },
+  { id: "icon-generator", name: "Icon Generator", description: "Create custom SVG icons with various styles", icon: Component, category: "design", path: "/tools/icon-generator", color: "hsl(142, 71%, 45%)" },
+  { id: "pattern-generator", name: "Pattern Generator", description: "Create seamless background patterns", icon: Shapes, category: "design", path: "/tools/pattern-generator", color: "hsl(280, 90%, 55%)" },
+  { id: "color-scheme-generator", name: "Color Scheme Generator", description: "Generate harmonious color schemes", icon: SwatchBook, category: "design", path: "/tools/color-scheme-generator", color: "hsl(199, 89%, 48%)" },
+  { id: "mockup-generator", name: "Device Mockup Generator", description: "Place designs in phone and laptop mockups", icon: Frame, category: "design", path: "/tools/mockup-generator", color: "hsl(25, 95%, 53%)" },
+  { id: "grid-generator", name: "CSS Grid Generator", description: "Visual CSS grid layout builder", icon: LayoutGrid, category: "design", path: "/tools/grid-generator", color: "hsl(47, 95%, 55%)" },
+  { id: "svg-editor", name: "SVG Editor", description: "Create and edit SVG shapes visually", icon: Pen, category: "design", path: "/tools/svg-editor", color: "hsl(0, 84%, 60%)" },
+  { id: "glassmorphism-generator", name: "Glassmorphism Generator", description: "Create frosted glass CSS effects", icon: Aperture, category: "design", path: "/tools/glassmorphism-generator", color: "hsl(220, 90%, 56%)" },
+  { id: "text-art-generator", name: "ASCII Art Generator", description: "Convert text to ASCII art typography", icon: Brush, category: "design", path: "/tools/text-art-generator", color: "hsl(170, 75%, 41%)" },
 ];
