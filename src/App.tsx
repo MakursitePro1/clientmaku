@@ -236,6 +236,18 @@ const BusinessCardMaker = lazy(() => import("./pages/tools/BusinessCardMaker"));
 const EmployeeIdCard = lazy(() => import("./pages/tools/EmployeeIdCard"));
 const EventBadgeMaker = lazy(() => import("./pages/tools/EventBadgeMaker"));
 
+// Email Tools
+const EmailSignatureGenerator = lazy(() => import("./pages/tools/EmailSignatureGenerator"));
+const EmailTemplateBuilder = lazy(() => import("./pages/tools/EmailTemplateBuilder"));
+const MailtoLinkGenerator = lazy(() => import("./pages/tools/MailtoLinkGenerator"));
+const EmailHeaderAnalyzer = lazy(() => import("./pages/tools/EmailHeaderAnalyzer"));
+const EmailExtractor = lazy(() => import("./pages/tools/EmailExtractor"));
+const EmailObfuscator = lazy(() => import("./pages/tools/EmailObfuscator"));
+const EmailSubjectTester = lazy(() => import("./pages/tools/EmailSubjectTester"));
+const DisposableEmailChecker = lazy(() => import("./pages/tools/DisposableEmailChecker"));
+const BulkEmailValidator = lazy(() => import("./pages/tools/BulkEmailValidator"));
+const EmailFormatter = lazy(() => import("./pages/tools/EmailFormatter"));
+
 const queryClient = new QueryClient();
 
 const Loading = () => (
@@ -468,6 +480,17 @@ const App = () => (
             <Route path="/tools/business-card-maker" element={<BusinessCardMaker />} />
             <Route path="/tools/employee-id-card" element={<EmployeeIdCard />} />
             <Route path="/tools/event-badge-maker" element={<EventBadgeMaker />} />
+            {/* Email Tools */}
+            <Route path="/tools/email-signature-generator" element={<EmailSignatureGenerator />} />
+            <Route path="/tools/email-template-builder" element={<EmailTemplateBuilder />} />
+            <Route path="/tools/mailto-link-generator" element={<MailtoLinkGenerator />} />
+            <Route path="/tools/email-header-analyzer" element={<EmailHeaderAnalyzer />} />
+            <Route path="/tools/email-extractor" element={<EmailExtractor />} />
+            <Route path="/tools/email-obfuscator" element={<EmailObfuscator />} />
+            <Route path="/tools/email-subject-tester" element={<EmailSubjectTester />} />
+            <Route path="/tools/disposable-email-checker" element={<DisposableEmailChecker />} />
+            <Route path="/tools/bulk-email-validator" element={<BulkEmailValidator />} />
+            <Route path="/tools/email-formatter" element={<EmailFormatter />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
