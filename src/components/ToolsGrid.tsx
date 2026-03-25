@@ -133,7 +133,7 @@ export function ToolsGrid() {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  "relative flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden",
+                  "relative flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-sm font-semibold transition-all duration-300 overflow-hidden whitespace-nowrap",
                   cat.id === "all" && "col-span-2",
                   isActive
                     ? "gradient-bg text-primary-foreground shadow-lg glow-shadow"
