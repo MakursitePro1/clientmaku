@@ -133,7 +133,7 @@ export function PopularToolsSection() {
                 )}
 
                 {/* Favorite button */}
-                <div className="absolute top-2.5 left-2.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute top-2.5 left-2.5 z-20">
                   <FavoriteButton toolId={tool.id} />
                 </div>
 
