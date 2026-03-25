@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Wrench } from "lucide-react";
+import { Menu, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -31,25 +31,27 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <div className="rounded-2xl px-6 py-3 flex items-center justify-between" style={{ backgroundColor: "hsl(240, 20%, 12%)" }}>
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg gradient-bg flex items-center justify-center">
-              <Wrench className="w-5 h-5 text-primary-foreground" />
+        <div className="glass-strong rounded-2xl px-6 py-3 flex items-center justify-between border border-border/50">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center glow-shadow">
+              <Zap className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-bold" style={{ color: "hsl(0, 0%, 95%)" }}>WebTools</span>
+            <span className="text-lg font-bold tracking-tight">
+              <span className="gradient-text">Cyber</span> Venom
+            </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1 rounded-xl px-2 py-1" style={{ backgroundColor: "hsl(240, 15%, 18%)" }}>
+          <div className="hidden md:flex items-center gap-1 bg-secondary/80 rounded-xl px-2 py-1">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.path.startsWith("/#") ? "/" : link.path}
                 onClick={() => handleNavClick(link.path)}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                   location.pathname === link.path
-                    ? "bg-background/10 text-white"
-                    : "text-white/70 hover:text-white hover:bg-background/5"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 )}
               >
                 {link.name}
@@ -58,13 +60,13 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:block">
-            <Button className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity">
+            <Button className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity glow-shadow">
               Get Started
             </Button>
           </div>
 
           <button
-            className="md:hidden text-white"
+            className="md:hidden text-foreground"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -72,13 +74,13 @@ export function Navbar() {
         </div>
 
         {isOpen && (
-          <div className="md:hidden mt-2 rounded-2xl p-4 space-y-2" style={{ backgroundColor: "hsl(240, 20%, 12%)" }}>
+          <div className="md:hidden mt-2 glass-strong rounded-2xl p-4 space-y-2 border border-border/50">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 to={link.path.startsWith("/#") ? "/" : link.path}
                 onClick={() => handleNavClick(link.path)}
-                className="block px-4 py-3 rounded-lg text-white/80 hover:text-white hover:bg-background/10 transition-colors"
+                className="block px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
               >
                 {link.name}
               </Link>
