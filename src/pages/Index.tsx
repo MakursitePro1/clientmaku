@@ -8,6 +8,7 @@ import { FAQSection } from "@/components/FAQSection";
 import { ContactSection } from "@/components/ContactSection";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
       <FAQSection />
       <ContactSection />
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };
