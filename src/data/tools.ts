@@ -3,7 +3,7 @@ import {
   FileText, Link, Keyboard, Type, ImagePlus, Calculator, 
   Languages, Globe, Lock, Camera, QrCode, ScanLine, 
   CreditCard, IdCard, User, Sparkles, FileImage, Monitor,
-  Palette, PenTool, Search, Gauge
+  Palette, PenTool, Search, Gauge, Braces, FileDown, Pipette, Binary
 } from "lucide-react";
 
 export type ToolCategory = 
