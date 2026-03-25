@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { TrendingUp, ArrowRight, Flame } from "lucide-react";
+import { ArrowRight, Flame, Crown } from "lucide-react";
 import { tools } from "@/data/tools";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 const popularToolIds = [
   "qr-code-maker", "password-generator", "image-compressor", "json-formatter",
@@ -58,13 +59,30 @@ export function PopularToolsSection() {
                   style={{ background: `linear-gradient(105deg, transparent 35%, ${tool.color.replace(')', ' / 0.08)')}, transparent 65%)` }}
                 />
 
-                <div className="relative z-10">
+                {/* Rank badge for top 3 */}
+                {i < 3 && (
+                  <div className="absolute top-2 right-2 z-20">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black ${
+                      i === 0 ? 'bg-amber-500 text-white shadow-[0_0_12px_rgba(245,158,11,0.5)]' :
+                      i === 1 ? 'bg-gray-400 text-white shadow-[0_0_12px_rgba(156,163,175,0.4)]' :
+                      'bg-amber-700 text-white shadow-[0_0_12px_rgba(180,83,9,0.4)]'
+                    }`}>
+                      {i === 0 ? <Crown className="w-3 h-3" /> : i + 1}
+                    </div>
+                  </div>
+                )}
+
+                {/* Favorite button */}
+                <div className="absolute top-2 left-2 z-20">
+                  <FavoriteButton toolId={tool.id} />
+                </div>
+
+                <div className="relative z-10 mt-3">
                   <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3 mx-auto transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
                     style={{
                       backgroundColor: tool.color.replace(')', ' / 0.12)'),
                       color: tool.color,
-                      boxShadow: `0 0 0 0 ${tool.color.replace(')', ' / 0)')}`,
                     }}
                   >
                     <tool.icon className="w-6 h-6" />
