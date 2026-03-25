@@ -53,9 +53,7 @@ export function Footer() {
               {/* Brand Column */}
               <div className="md:col-span-5 flex flex-col gap-4">
                 <Link to="/" className="flex items-center gap-3 group w-fit">
-                  <div className="w-11 h-11 rounded-2xl gradient-bg flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow">
-                    <Zap className="w-5 h-5 text-primary-foreground" />
-                  </div>
+                  <img src="/logo.jpg" alt="Cyber Venom" className="w-11 h-11 rounded-2xl object-cover shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow" />
                   <span className="text-xl font-extrabold tracking-tight">
                     <span className="gradient-text">Cyber</span>
                     <span className="text-foreground"> Venom</span>

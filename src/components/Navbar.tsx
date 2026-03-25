@@ -145,9 +145,7 @@ export function Navbar() {
             onClick={(e) => { e.preventDefault(); handleNavClick({ name: "Home", path: "/", hash: "hero" }); }}
             className="flex items-center gap-2 sm:gap-2.5 relative z-10 flex-shrink-0"
           >
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl gradient-bg flex items-center justify-center glow-shadow flex-shrink-0">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-            </div>
+            <img src="/logo.jpg" alt="Cyber Venom" className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover glow-shadow flex-shrink-0" />
             <span className="text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap leading-none">
               <span className="gradient-text">Cyber</span>
               <span className="text-white"> Venom</span>

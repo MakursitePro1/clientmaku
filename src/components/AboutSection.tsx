@@ -114,9 +114,7 @@ export function AboutSection() {
                 whileHover={{ scale: 1.03 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center glow-shadow">
-                  <Zap className="w-8 h-8 text-primary-foreground" />
-                </div>
+                <img src="/logo.jpg" alt="Cyber Venom" className="w-16 h-16 rounded-2xl object-cover glow-shadow" />
                 <div>
                   <h3 className="text-xl font-bold">Cyber Venom</h3>
                   <p className="text-sm text-muted-foreground">Free Online Tools Platform</p>
