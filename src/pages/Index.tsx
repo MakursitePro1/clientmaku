@@ -1,6 +1,8 @@
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
+import { CategoriesMarquee } from "@/components/CategoriesMarquee";
 import { ToolsGrid } from "@/components/ToolsGrid";
+import { ReviewsMarquee } from "@/components/ReviewsMarquee";
 import { AboutSection } from "@/components/AboutSection";
 import { FAQSection } from "@/components/FAQSection";
 import { ContactSection } from "@/components/ContactSection";
@@ -13,7 +15,9 @@ const Index = () => {
       <SEOHead title="Cyber Venom" description="67+ free online web tools — image editors, code testers, converters, calculators, and more. No signup required." path="/" />
       <Navbar />
       <HeroSection />
+      <CategoriesMarquee />
       <ToolsGrid />
+      <ReviewsMarquee />
       <AboutSection />
       <FAQSection />
       <ContactSection />
