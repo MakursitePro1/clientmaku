@@ -13,7 +13,7 @@ const FlipCoin = () => {
     setTimeout(() => {
       const r = Math.random() < 0.5 ? "heads" : "tails";
       setResult(r);
-      setHistory(prev => [r, ...prev].slice(0, 20));
+      setHistory(prev => [r, ...prev].slice(0, 20) as ("heads" | "tails")[]);
       setFlipping(false);
     }, 800);
   };
