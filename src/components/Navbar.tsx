@@ -127,7 +127,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 w-screen max-w-[100vw] overflow-x-clip">
+    <nav className="fixed inset-x-0 top-0 z-50 w-full max-w-full overflow-x-clip">
       <div className="w-full px-2 sm:px-4 lg:px-8 pt-2 sm:pt-3 lg:pt-4 box-border">
         <div
           className={cn(
