@@ -101,9 +101,9 @@ export function Navbar() {
   const handleNavClick = (link: typeof navLinks[0]) => {
     setIsOpen(false);
 
-    // Tools page - direct navigation
-    if (link.path === "/tools") {
-      navigate("/tools");
+    // Direct navigation pages
+    if (link.path === "/tools" || link.path === "/favorites") {
+      navigate(link.path);
       window.scrollTo({ top: 0 });
       return;
     }
