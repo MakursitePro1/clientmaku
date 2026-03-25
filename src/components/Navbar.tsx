@@ -1,29 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "Tools", path: "/#tools" },
-  { name: "About", path: "/#about" },
-  { name: "FAQ", path: "/#faq" },
-  { name: "Contact", path: "/#contact" },
+  { name: "Home", path: "/", hash: "" },
+  { name: "Tools", path: "/", hash: "tools" },
+  { name: "About", path: "/", hash: "about" },
+  { name: "FAQ", path: "/", hash: "faq" },
+  { name: "Contact", path: "/", hash: "contact" },
 ];
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const [activeHash, setActiveHash] = useState("");
 
-  const handleNavClick = (path: string) => {
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      setActiveHash("");
+      return;
+    }
+
+    const handleScroll = () => {
+      const sections = ["contact", "faq", "about", "tools"];
+      let found = "";
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 150) {
+            found = id;
+            break;
+          }
+        }
+      }
+      setActiveHash(found);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [location.pathname]);
+
+  const isActive = (link: typeof navLinks[0]) => {
+    if (location.pathname !== "/") return false;
+    if (link.hash === "" && activeHash === "") return true;
+    return link.hash === activeHash;
+  };
+
+  const handleNavClick = (link: typeof navLinks[0]) => {
     setIsOpen(false);
-    if (path.startsWith("/#")) {
-      const id = path.replace("/#", "");
+    if (link.hash) {
       if (location.pathname === "/") {
-        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+        document.getElementById(link.hash)?.scrollIntoView({ behavior: "smooth" });
       } else {
-        window.location.href = path;
+        window.location.href = `/#${link.hash}`;
       }
     }
   };
@@ -45,11 +78,11 @@ export function Navbar() {
             {navLinks.map((link) => (
               <Link
                 key={link.name}
-                to={link.path.startsWith("/#") ? "/" : link.path}
-                onClick={() => handleNavClick(link.path)}
+                to={link.path}
+                onClick={() => handleNavClick(link)}
                 className={cn(
                   "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                  location.pathname === link.path
+                  isActive(link)
                     ? "bg-primary text-primary-foreground shadow-md"
                     : "text-muted-foreground hover:text-foreground hover:bg-accent"
                 )}
@@ -60,7 +93,16 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:block">
-            <Button className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity glow-shadow">
+            <Button
+              className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity glow-shadow"
+              onClick={() => {
+                if (location.pathname === "/") {
+                  document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" });
+                } else {
+                  window.location.href = "/#tools";
+                }
+              }}
+            >
               Get Started
             </Button>
           </div>
@@ -78,14 +120,29 @@ export function Navbar() {
             {navLinks.map((link) => (
               <Link
                 key={link.name}
-                to={link.path.startsWith("/#") ? "/" : link.path}
-                onClick={() => handleNavClick(link.path)}
-                className="block px-4 py-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                to={link.path}
+                onClick={() => handleNavClick(link)}
+                className={cn(
+                  "block px-4 py-3 rounded-lg transition-colors",
+                  isActive(link)
+                    ? "bg-primary text-primary-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                )}
               >
                 {link.name}
               </Link>
             ))}
-            <Button className="w-full gradient-bg text-primary-foreground rounded-xl font-semibold mt-2">
+            <Button
+              className="w-full gradient-bg text-primary-foreground rounded-xl font-semibold mt-2"
+              onClick={() => {
+                setIsOpen(false);
+                if (location.pathname === "/") {
+                  document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" });
+                } else {
+                  window.location.href = "/#tools";
+                }
+              }}
+            >
               Get Started
             </Button>
           </div>
