@@ -225,7 +225,7 @@ export function HeroSection() {
               <motion.span
                 className="inline-block w-[3px] h-[0.85em] bg-primary ml-1 align-middle rounded-full shadow-[0_0_8px_hsl(263_85%_58%/0.8),0_0_20px_hsl(263_85%_58%/0.4)]"
                 animate={{ opacity: [1, 0, 1] }}
-                transition={{ duration: 0.8, repeat: Infinity, ease: "steps(2)" }}
+                transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
               />
             </span>
           </span>
