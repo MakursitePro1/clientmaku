@@ -28,7 +28,7 @@ const typingWords = [
 const getStats = () => [
   { value: `${tools.length}+`, label: "Free Tools", icon: Zap },
   { value: "100%", label: "Free to Use", icon: Shield },
-  { value: "0", label: "Signup Required", icon: Globe },
+  { value: "200K+", label: "Happy Users", icon: Globe },
   { value: `${categories.length - 1}`, label: "Categories", icon: BarChart3 },
 ];
 
