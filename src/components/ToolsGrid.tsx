@@ -1,23 +1,30 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Search, Sparkles, ExternalLink } from "lucide-react";
+import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { tools, categories, type ToolCategory } from "@/data/tools";
 import { cn } from "@/lib/utils";
 
+const TOOLS_PER_PAGE = 24;
+
 export function ToolsGrid() {
   const [activeCategory, setActiveCategory] = useState<ToolCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const handler = (e: Event) => {
       const category = (e as CustomEvent).detail as ToolCategory;
       setActiveCategory(category);
+      setCurrentPage(1);
     };
     window.addEventListener("select-category", handler);
     return () => window.removeEventListener("select-category", handler);
   }, []);
+
+  // Reset page when filters change
+  useEffect(() => { setCurrentPage(1); }, [activeCategory, searchQuery]);
 
   const filteredTools = useMemo(() => tools.filter((tool) => {
     const matchesCategory = activeCategory === "all" || tool.category === activeCategory;
@@ -26,14 +33,28 @@ export function ToolsGrid() {
     return matchesCategory && matchesSearch;
   }), [activeCategory, searchQuery]);
 
-  const toolCount = filteredTools.length;
+  const totalPages = Math.ceil(filteredTools.length / TOOLS_PER_PAGE);
+  const paginatedTools = filteredTools.slice((currentPage - 1) * TOOLS_PER_PAGE, currentPage * TOOLS_PER_PAGE);
+
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("...");
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   return (
     <section id="tools" className="py-28 px-4 relative">
-      {/* Background effects */}
       <div className="absolute inset-0 cyber-grid opacity-30" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-[200px] pointer-events-none" style={{ background: "hsl(263 85% 58% / 0.04)" }} />
-      
+
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -67,7 +88,7 @@ export function ToolsGrid() {
           </motion.p>
         </div>
 
-        {/* Search Bar - Glassmorphism */}
+        {/* Search Bar */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -88,14 +109,14 @@ export function ToolsGrid() {
               />
               {searchQuery && (
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-lg">
-                  {toolCount} found
+                  {filteredTools.length} found
                 </span>
               )}
             </div>
           </div>
         </motion.div>
 
-        {/* Category Filter - Premium Scrollable Pills */}
+        {/* Category Filter Pills */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -103,7 +124,7 @@ export function ToolsGrid() {
           transition={{ delay: 0.2 }}
           className="flex flex-wrap justify-center gap-2 mb-16"
         >
-          {categories.map((cat, i) => {
+          {categories.map((cat) => {
             const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
             const isActive = activeCategory === cat.id;
             return (
@@ -131,10 +152,10 @@ export function ToolsGrid() {
           })}
         </motion.div>
 
-        {/* Tools Grid - Premium Cards */}
+        {/* Tools Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           <AnimatePresence mode="popLayout">
-            {filteredTools.map((tool, index) => (
+            {paginatedTools.map((tool, index) => (
               <motion.div
                 key={tool.id}
                 layout
@@ -148,46 +169,27 @@ export function ToolsGrid() {
                   className="tool-card group relative block rounded-2xl p-6 border border-border/40 transition-all duration-500 overflow-hidden h-full"
                   style={{ background: 'hsl(var(--card))' }}
                 >
-                  {/* Animated gradient border on hover */}
                   <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{
-                      background: `linear-gradient(135deg, ${tool.color.replace(')', ' / 0.06)')}, transparent 60%)`,
-                    }}
+                    style={{ background: `linear-gradient(135deg, ${tool.color.replace(')', ' / 0.06)')}, transparent 60%)` }}
                   />
-                  
-                  {/* Top shimmer line */}
                   <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                     style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
                   />
-
                   <div className="relative z-10 flex flex-col h-full">
-                    {/* Icon with animated glow */}
                     <div className="relative mb-5">
                       <div
                         className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110"
-                        style={{
-                          backgroundColor: tool.color.replace(')', ' / 0.1)'),
-                          color: tool.color,
-                        }}
+                        style={{ backgroundColor: tool.color.replace(')', ' / 0.1)'), color: tool.color }}
                       >
                         <tool.icon className="w-7 h-7 transition-transform duration-300 group-hover:rotate-3" />
                       </div>
-                      {/* Glow dot */}
-                      <div 
+                      <div
                         className="absolute -top-1 -right-1 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110"
                         style={{ backgroundColor: tool.color, boxShadow: `0 0 12px ${tool.color}` }}
                       />
                     </div>
-
-                    {/* Content */}
-                    <h3 className="font-bold text-[15px] mb-2 group-hover:text-primary transition-colors duration-300 leading-snug">
-                      {tool.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-auto pb-5 line-clamp-2 leading-relaxed">
-                      {tool.description}
-                    </p>
-
-                    {/* Footer action */}
+                    <h3 className="font-bold text-[15px] mb-2 group-hover:text-primary transition-colors duration-300 leading-snug">{tool.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-auto pb-5 line-clamp-2 leading-relaxed">{tool.description}</p>
                     <div className="flex items-center justify-between pt-4 border-t border-border/30 group-hover:border-primary/20 transition-colors duration-300">
                       <span className="flex items-center text-sm font-semibold text-primary/70 group-hover:text-primary transition-all duration-300">
                         Open Tool
@@ -204,17 +206,69 @@ export function ToolsGrid() {
 
         {/* Empty State */}
         {filteredTools.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-24"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-24">
             <div className="w-20 h-20 rounded-3xl bg-accent/50 flex items-center justify-center mx-auto mb-6">
               <Search className="w-10 h-10 text-muted-foreground/30" />
             </div>
             <p className="text-xl text-muted-foreground font-semibold mb-2">No tools found</p>
             <p className="text-sm text-muted-foreground/60">Try a different search term or category</p>
           </motion.div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-14 flex flex-col items-center gap-5">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
+                disabled={currentPage === 1}
+                className="w-10 h-10 rounded-xl border border-border/40 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              {getPageNumbers().map((page, i) => (
+                typeof page === "string" ? (
+                  <span key={`dots-${i}`} className="w-10 h-10 flex items-center justify-center text-muted-foreground/50 text-sm">…</span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => { setCurrentPage(page); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
+                    className={cn(
+                      "w-10 h-10 rounded-xl text-sm font-bold transition-all duration-300",
+                      currentPage === page
+                        ? "gradient-bg text-primary-foreground shadow-lg glow-shadow"
+                        : "border border-border/40 bg-card/80 text-muted-foreground hover:text-foreground hover:border-primary/30"
+                    )}
+                  >
+                    {page}
+                  </button>
+                )
+              ))}
+
+              <button
+                onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
+                disabled={currentPage === totalPages}
+                className="w-10 h-10 rounded-xl border border-border/40 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                Page <span className="font-bold text-foreground">{currentPage}</span> of <span className="font-bold text-foreground">{totalPages}</span>
+                <span className="mx-2">·</span>
+                <span className="font-semibold text-foreground">{filteredTools.length}</span> tools
+              </p>
+              <Link
+                to="/tools"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              >
+                View All Tools <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
         )}
       </div>
     </section>
