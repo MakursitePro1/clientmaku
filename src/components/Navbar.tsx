@@ -183,7 +183,7 @@ export function Navbar() {
           </div>
 
           <button
-            className={cn("text-white relative z-10 p-1 flex-shrink-0", isCompactNav ? "inline-flex" : "hidden")}
+            className={cn("text-white relative z-10 p-1 flex-shrink-0 ml-auto", isCompactNav ? "inline-flex" : "hidden")}
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle navigation menu"
           >
