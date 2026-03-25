@@ -121,7 +121,7 @@ export function ToolsGrid() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-2 mb-16"
+          className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2 mb-16"
         >
           {categories.map((cat) => {
             const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
@@ -133,7 +133,8 @@ export function ToolsGrid() {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  "relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden",
+                  "relative flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden",
+                  cat.id === "all" && "col-span-2",
                   isActive
                     ? "gradient-bg text-primary-foreground shadow-lg glow-shadow"
                     : "bg-card/80 text-muted-foreground hover:text-foreground border border-border/40 hover:border-primary/30 hover:bg-accent/50 hover:shadow-md"
