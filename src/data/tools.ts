@@ -172,4 +172,30 @@ export const tools: Tool[] = [
   { id: "reaction-time-test", name: "Reaction Time Test", description: "Test your reaction speed", icon: MousePointer, category: "utility", path: "/tools/reaction-time-test", color: "hsl(142, 71%, 45%)" },
   { id: "payroll-calculator", name: "Payroll Calculator", description: "Calculate net salary with tax and deductions", icon: FileSpreadsheet, category: "utility", path: "/tools/payroll-calculator", color: "hsl(220, 90%, 56%)" },
   { id: "text-summarizer", name: "Text Summarizer", description: "Summarize long texts by extracting key sentences", icon: Scissors, category: "text-language", path: "/tools/text-summarizer", color: "hsl(340, 82%, 52%)" },
+
+  // Security & Privacy Tools
+  { id: "bulk-password-generator", name: "Bulk Password Generator", description: "Generate multiple secure passwords at once", icon: LockKeyhole, category: "security", path: "/tools/bulk-password-generator", color: "hsl(0, 84%, 60%)" },
+  { id: "text-encryptor", name: "AES-like Text Encryptor", description: "Encrypt and decrypt text with a secret key", icon: Lock, category: "security", path: "/tools/text-encryptor", color: "hsl(263, 85%, 58%)" },
+  { id: "phishing-link-checker", name: "Phishing Link Checker", description: "Check if a URL looks suspicious", icon: FileWarning, category: "security", path: "/tools/phishing-link-checker", color: "hsl(47, 95%, 55%)" },
+  { id: "private-notepad", name: "Private Encrypted Notepad", description: "Write notes encrypted with your password", icon: Shield, category: "security", path: "/tools/private-notepad", color: "hsl(142, 71%, 45%)" },
+  { id: "browser-fingerprint", name: "Browser Fingerprint Viewer", description: "See what info your browser reveals about you", icon: Fingerprint, category: "security", path: "/tools/browser-fingerprint", color: "hsl(220, 90%, 56%)" },
+
+  // Finance Tools
+  { id: "compound-interest", name: "Compound Interest Calculator", description: "Calculate compound vs simple interest", icon: CircleDollarSign, category: "finance", path: "/tools/compound-interest", color: "hsl(142, 71%, 45%)" },
+  { id: "tax-calculator", name: "Income Tax Calculator", description: "Calculate income tax based on tax slabs", icon: Receipt, category: "finance", path: "/tools/tax-calculator", color: "hsl(0, 84%, 60%)" },
+  { id: "savings-goal", name: "Savings Goal Calculator", description: "Plan how long to reach your savings goal", icon: Target, category: "finance", path: "/tools/savings-goal", color: "hsl(199, 89%, 48%)" },
+  { id: "profit-margin", name: "Profit Margin Calculator", description: "Calculate profit margin and markup", icon: TrendingUp, category: "finance", path: "/tools/profit-margin", color: "hsl(47, 95%, 55%)" },
+
+  // Social Media Tools
+  { id: "social-post-generator", name: "Social Post Generator", description: "Generate engaging social media posts", icon: MessageSquare, category: "social", path: "/tools/social-post-generator", color: "hsl(220, 90%, 56%)" },
+  { id: "hashtag-generator", name: "Hashtag Generator", description: "Generate trending hashtags for social media", icon: Hash, category: "social", path: "/tools/hashtag-generator", color: "hsl(263, 85%, 58%)" },
+  { id: "youtube-tag-generator", name: "YouTube Tag Generator", description: "Generate SEO tags for YouTube videos", icon: Youtube, category: "social", path: "/tools/youtube-tag-generator", color: "hsl(0, 84%, 60%)" },
+  { id: "tweet-formatter", name: "Tweet/Thread Formatter", description: "Format and split text into tweet threads", icon: Twitter, category: "social", path: "/tools/tweet-formatter", color: "hsl(199, 89%, 48%)" },
+
+  // Games & Fun Tools
+  { id: "memory-game", name: "Memory Card Game", description: "Test your memory by matching pairs", icon: Boxes, category: "games", path: "/tools/memory-game", color: "hsl(280, 90%, 55%)" },
+  { id: "number-guessing", name: "Number Guessing Game", description: "Guess the secret number with hints", icon: Puzzle, category: "games", path: "/tools/number-guessing", color: "hsl(142, 71%, 45%)" },
+  { id: "tic-tac-toe", name: "Tic Tac Toe", description: "Classic Tic Tac Toe for two players", icon: Swords, category: "games", path: "/tools/tic-tac-toe", color: "hsl(25, 95%, 53%)" },
+  { id: "snake-game", name: "Snake Game", description: "Classic snake game with arrow keys", icon: Joystick, category: "games", path: "/tools/snake-game", color: "hsl(340, 82%, 52%)" },
+  { id: "word-scramble", name: "Word Scramble Game", description: "Unscramble the letters to find the word", icon: Trophy, category: "games", path: "/tools/word-scramble", color: "hsl(47, 95%, 55%)" },
 ];
