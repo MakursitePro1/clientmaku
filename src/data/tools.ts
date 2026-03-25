@@ -72,4 +72,10 @@ export const tools: Tool[] = [
   { id: "fake-bd-smart-nid", name: "Fake BD Smart NID Card Maker", description: "Generate fake smart NID cards", icon: IdCard, category: "id-card", path: "/tools/fake-bd-smart-nid", color: "hsl(263, 85%, 58%)" },
   { id: "fake-pak-cnic", name: "Fake Pakistani CNIC Card Maker", description: "Generate fake Pakistani CNIC cards", icon: CreditCard, category: "id-card", path: "/tools/fake-pak-cnic", color: "hsl(142, 71%, 45%)" },
   { id: "student-id-card", name: "Student ID Card Maker", description: "Create student ID cards easily", icon: GraduationCap, category: "id-card", path: "/tools/student-id-card", color: "hsl(25, 95%, 53%)" },
+
+  // New Tools
+  { id: "json-formatter", name: "JSON Formatter", description: "Format, minify, and validate JSON data", icon: Braces, category: "developer", path: "/tools/json-formatter", color: "hsl(47, 95%, 55%)" },
+  { id: "html-to-pdf", name: "HTML to PDF", description: "Convert HTML content to PDF documents", icon: FileDown, category: "developer", path: "/tools/html-to-pdf", color: "hsl(340, 82%, 52%)" },
+  { id: "color-picker", name: "Color Picker", description: "Pick colors and convert between HEX, RGB, HSL formats", icon: Pipette, category: "utility", path: "/tools/color-picker", color: "hsl(280, 90%, 55%)" },
+  { id: "base64-encoder-decoder", name: "Base64 Encoder/Decoder", description: "Encode text to Base64 or decode Base64 to text", icon: Binary, category: "developer", path: "/tools/base64-encoder-decoder", color: "hsl(199, 89%, 48%)" },
 ];
