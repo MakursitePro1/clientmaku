@@ -7,7 +7,7 @@ import { SEOHead } from "./SEOHead";
 import { ScrollToTop } from "./ScrollToTop";
 import { FavoriteButton } from "./FavoriteButton";
 import { tools } from "@/data/tools";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -38,6 +38,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   const location = useLocation();
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const shareBtnRef = useRef<HTMLButtonElement>(null);
 
   const currentTool = useMemo(() => tools.find(t => t.path === location.pathname), [location.pathname]);
 
@@ -115,8 +116,9 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                   {currentTool && <FavoriteButton toolId={currentTool.id} size="lg" />}
 
                   {/* Share Button with dropdown */}
-                  <div className="relative z-50">
+                  <div className="relative">
                     <Button
+                      ref={shareBtnRef}
                       variant="outline"
                       size="sm"
                       className="rounded-xl border-2 border-border/60 hover:border-primary/30 gap-2"
@@ -128,15 +130,19 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                     <AnimatePresence>
                       {shareOpen && (
                         <>
-                          <div className="fixed inset-0 z-[60]" onClick={() => setShareOpen(false)} />
+                          <div className="fixed inset-0 z-[9998]" onClick={() => setShareOpen(false)} />
                           <motion.div
                             initial={{ opacity: 0, y: -8, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -8, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute top-full mt-2 left-0 rounded-2xl bg-card border border-border/50 shadow-2xl z-[70] p-3 backdrop-blur-xl"
+                            className="fixed rounded-2xl bg-card border border-border/50 shadow-2xl z-[9999] p-3 backdrop-blur-xl"
+                            style={{
+                              top: shareBtnRef.current ? shareBtnRef.current.getBoundingClientRect().bottom + 8 : 0,
+                              left: shareBtnRef.current ? shareBtnRef.current.getBoundingClientRect().left : 0,
+                            }}
                           >
-                            <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center justify-between mb-2 gap-8">
                               <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider">Share</p>
                               <button onClick={() => setShareOpen(false)} className="w-6 h-6 rounded-full hover:bg-accent/60 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
                                 <X className="w-3.5 h-3.5" />
