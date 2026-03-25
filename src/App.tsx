@@ -87,6 +87,10 @@ const App = () => (
             <Route path="/tools/fake-pak-cnic" element={<FakePakCnic />} />
             <Route path="/tools/student-id-card" element={<StudentIdCard />} />
             <Route path="/tools/website-screenshot" element={<WebsiteScreenshot />} />
+            <Route path="/tools/json-formatter" element={<JsonFormatter />} />
+            <Route path="/tools/html-to-pdf" element={<HtmlToPdf />} />
+            <Route path="/tools/color-picker" element={<ColorPicker />} />
+            <Route path="/tools/base64-encoder-decoder" element={<Base64EncoderDecoder />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
