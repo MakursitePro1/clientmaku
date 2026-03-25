@@ -237,4 +237,24 @@ export const tools: Tool[] = [
   { id: "word-scramble", name: "Word Scramble Game", description: "Unscramble the letters to find the word", icon: Trophy, category: "games", path: "/tools/word-scramble", color: "hsl(47, 95%, 55%)" },
   { id: "hangman-game", name: "Hangman Game", description: "Classic word guessing game", icon: Gamepad2, category: "games", path: "/tools/hangman-game", color: "hsl(263, 85%, 58%)" },
   { id: "reaction-time-test", name: "Reaction Time Test", description: "Test your reaction speed", icon: MousePointer, category: "games", path: "/tools/reaction-time-test", color: "hsl(142, 71%, 45%)" },
+  { id: "rock-paper-scissors", name: "Rock Paper Scissors", description: "Classic game against the computer", icon: Swords, category: "games", path: "/tools/rock-paper-scissors", color: "hsl(199, 89%, 48%)" },
+  { id: "game-2048", name: "2048 Game", description: "Slide tiles to combine and reach 2048", icon: Grid3X3, category: "games", path: "/tools/game-2048", color: "hsl(47, 95%, 55%)" },
+  { id: "color-guessing-game", name: "Color Guessing Game", description: "Guess the color from the HEX code", icon: Palette, category: "games", path: "/tools/color-guessing-game", color: "hsl(280, 90%, 55%)" },
+  { id: "math-quiz", name: "Math Quiz Game", description: "Test your mental math skills", icon: Calculator, category: "games", path: "/tools/math-quiz", color: "hsl(25, 95%, 53%)" },
+
+  // Additional Security Tools
+  { id: "password-security-analyzer", name: "Password Security Analyzer", description: "Analyze password strength and crack time", icon: Shield, category: "security", path: "/tools/password-security-analyzer", color: "hsl(0, 84%, 60%)" },
+  { id: "ip-blacklist-checker", name: "IP Blacklist Checker", description: "Check if an IP is on email blacklists", icon: Scan, category: "security", path: "/tools/ip-blacklist-checker", color: "hsl(199, 89%, 48%)" },
+  { id: "data-leak-checker", name: "Data Leak Checker", description: "Check if your email was in a data breach", icon: FileWarning, category: "security", path: "/tools/data-leak-checker", color: "hsl(47, 95%, 55%)" },
+
+  // Additional Social Media Tools
+  { id: "instagram-caption-gen", name: "Instagram Caption Generator", description: "Generate creative Instagram captions", icon: MessageSquare, category: "social", path: "/tools/instagram-caption-gen", color: "hsl(340, 82%, 52%)" },
+  { id: "linkedin-post-gen", name: "LinkedIn Post Generator", description: "Create engaging LinkedIn posts with frameworks", icon: Share2, category: "social", path: "/tools/linkedin-post-gen", color: "hsl(220, 90%, 56%)" },
+  { id: "social-image-resizer", name: "Social Media Image Resizer", description: "Resize images for all social platforms", icon: Maximize, category: "social", path: "/tools/social-image-resizer", color: "hsl(263, 85%, 58%)" },
+  { id: "bio-link-generator", name: "Bio Link Page Generator", description: "Create a link-in-bio page like Linktree", icon: LinkIcon, category: "social", path: "/tools/bio-link-generator", color: "hsl(142, 71%, 45%)" },
+
+  // Additional ID Card Tools
+  { id: "business-card-maker", name: "Business Card Maker", description: "Create professional business cards", icon: CreditCard, category: "id-card", path: "/tools/business-card-maker", color: "hsl(199, 89%, 48%)" },
+  { id: "employee-id-card", name: "Employee ID Card Maker", description: "Create employee identification cards", icon: IdCard, category: "id-card", path: "/tools/employee-id-card", color: "hsl(263, 85%, 58%)" },
+  { id: "event-badge-maker", name: "Event Badge Maker", description: "Create event badges and name tags", icon: Award, category: "id-card", path: "/tools/event-badge-maker", color: "hsl(25, 95%, 53%)" },
 ];

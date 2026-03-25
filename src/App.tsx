@@ -180,6 +180,26 @@ const SnakeGame = lazy(() => import("./pages/tools/SnakeGame"));
 const WordScramble = lazy(() => import("./pages/tools/WordScramble"));
 const HangmanGame = lazy(() => import("./pages/tools/HangmanGame"));
 const ReactionTimeTest = lazy(() => import("./pages/tools/ReactionTimeTest"));
+const RockPaperScissors = lazy(() => import("./pages/tools/RockPaperScissors"));
+const Game2048 = lazy(() => import("./pages/tools/Game2048"));
+const ColorGuessingGame = lazy(() => import("./pages/tools/ColorGuessingGame"));
+const MathQuizGame = lazy(() => import("./pages/tools/MathQuizGame"));
+
+// Additional Security
+const PasswordExpiryChecker = lazy(() => import("./pages/tools/PasswordExpiryChecker"));
+const IPBlacklistChecker = lazy(() => import("./pages/tools/IPBlacklistChecker"));
+const DataLeakChecker = lazy(() => import("./pages/tools/DataLeakChecker"));
+
+// Additional Social
+const InstagramCaptionGen = lazy(() => import("./pages/tools/InstagramCaptionGen"));
+const LinkedInPostGen = lazy(() => import("./pages/tools/LinkedInPostGen"));
+const SocialImageResizer = lazy(() => import("./pages/tools/SocialImageResizer"));
+const BioLinkGenerator = lazy(() => import("./pages/tools/BioLinkGenerator"));
+
+// Additional ID Card
+const BusinessCardMaker = lazy(() => import("./pages/tools/BusinessCardMaker"));
+const EmployeeIdCard = lazy(() => import("./pages/tools/EmployeeIdCard"));
+const EventBadgeMaker = lazy(() => import("./pages/tools/EventBadgeMaker"));
 
 const queryClient = new QueryClient();
 
