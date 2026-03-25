@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Target, Heart, Award, TrendingUp, Zap } from "lucide-react";
+import { tools, categories } from "@/data/tools";
 
 const features = [
   { icon: Target, title: "Mission-Driven", desc: "We focus on building the most useful tools for everyone." },
@@ -68,8 +69,8 @@ export function AboutSection() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { val: "33+", label: "Tools Available" },
-                    { val: "6", label: "Categories" },
+                    { val: `${tools.length}+`, label: "Tools Available" },
+                    { val: `${categories.length - 1}`, label: "Categories" },
                     { val: "100%", label: "Free" },
                     { val: "∞", label: "Usage Limit" },
                   ].map((s) => (

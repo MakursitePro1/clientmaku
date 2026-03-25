@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { tools } from "@/data/tools";
 
 export function Footer() {
   return (
@@ -17,7 +18,7 @@ export function Footer() {
               Start Using Free Tools Today
             </h2>
             <p className="opacity-90 max-w-xl mx-auto mb-8 text-lg">
-              33+ free tools ready to use instantly. No signup, no payment — just pure productivity.
+              {tools.length}+ free tools ready to use instantly. No signup, no payment — just pure productivity.
             </p>
             <Button
               size="lg"
