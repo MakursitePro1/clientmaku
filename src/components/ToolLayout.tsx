@@ -130,41 +130,39 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                         <>
                           <div className="fixed inset-0 z-[60]" onClick={() => setShareOpen(false)} />
                           <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                            initial={{ opacity: 0, y: -8, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                            exit={{ opacity: 0, y: -8, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute bottom-full mb-2 left-0 w-64 rounded-2xl bg-card border border-border/50 shadow-2xl z-[70] p-2 backdrop-blur-xl"
+                            className="absolute top-full mt-2 left-0 rounded-2xl bg-card border border-border/50 shadow-2xl z-[70] p-3 backdrop-blur-xl"
                           >
-                            <div className="px-3 py-2 border-b border-border/20 mb-1">
-                              <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider">Share this tool</p>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider">Share</p>
+                              <button onClick={() => setShareOpen(false)} className="w-6 h-6 rounded-full hover:bg-accent/60 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
                             </div>
-
-                            {shareOptions.map((option) => {
-                              const Icon = option.icon;
-                              return (
-                                <button
-                                  key={option.name}
-                                  onClick={() => handleShare(option)}
-                                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-accent/60 transition-colors group"
-                                >
-                                  <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style={{ backgroundColor: `${option.color}15`, color: option.color }}>
+                            <div className="flex items-center gap-2">
+                              {shareOptions.map((option) => {
+                                const Icon = option.icon;
+                                return (
+                                  <button
+                                    key={option.name}
+                                    onClick={() => handleShare(option)}
+                                    title={option.name}
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center hover:scale-110 transition-all"
+                                    style={{ backgroundColor: `${option.color}18`, color: option.color }}
+                                  >
                                     <Icon />
-                                  </div>
-                                  <span className="font-medium">{option.name}</span>
-                                </button>
-                              );
-                            })}
-
-                            <div className="border-t border-border/20 mt-1 pt-1">
+                                  </button>
+                                );
+                              })}
                               <button
                                 onClick={handleCopyLink}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-accent/60 transition-colors"
+                                title={copied ? "Copied!" : "Copy Link"}
+                                className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary hover:scale-110 transition-all"
                               >
-                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                </div>
-                                <span className="font-medium">{copied ? "Copied!" : "Copy Link"}</span>
+                                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                               </button>
                             </div>
                           </motion.div>
