@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X, Zap, Heart, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { name: "Home", path: "/", hash: "hero" },
   { name: "Tools", path: "/tools", hash: "" },
+  { name: "Favorites", path: "/favorites", hash: "" },
   { name: "About", path: "/", hash: "about" },
   { name: "FAQ", path: "/", hash: "faq" },
   { name: "Contact", path: "/", hash: "contact" },
@@ -19,6 +21,7 @@ export function Navbar() {
   const [activeHash, setActiveHash] = useState("hero");
   const [scrolled, setScrolled] = useState(false);
   const [isCompactNav, setIsCompactNav] = useState(false);
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     setScrolled(window.scrollY > 20);
