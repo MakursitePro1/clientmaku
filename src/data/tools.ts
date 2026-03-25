@@ -8,7 +8,7 @@ import {
   AlignLeft, Activity, Percent, Banknote, UtensilsCrossed,
   Timer, StickyNote, ListChecks, Brain, Shrink, Maximize,
   Volume2, Shuffle, Coins, Dices, Zap, CaseSensitive,
-  DollarSign, Replace, Tag
+  DollarSign, Replace, Tag, MapPin, FileCode, Link2
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -62,6 +62,7 @@ export const tools: Tool[] = [
   { id: "electricity-calculator", name: "Electricity Bill Calculator", description: "Calculate electricity consumption and costs", icon: Zap, category: "utility", path: "/tools/electricity-calculator", color: "hsl(47, 95%, 55%)" },
   { id: "discount-calculator", name: "Discount Calculator", description: "Calculate discount prices with optional tax", icon: Tag, category: "utility", path: "/tools/discount-calculator", color: "hsl(142, 71%, 45%)" },
   { id: "currency-converter", name: "Currency Converter", description: "Convert between world currencies", icon: DollarSign, category: "utility", path: "/tools/currency-converter", color: "hsl(170, 75%, 41%)" },
+  { id: "ip-address-lookup", name: "IP Address Lookup", description: "Find geolocation and details of any IP address", icon: MapPin, category: "utility", path: "/tools/ip-address-lookup", color: "hsl(199, 89%, 48%)" },
 
   // Text & Language Tools
   { id: "lorem-ipsum-generator", name: "Lorem Ipsum Generator", description: "Generate placeholder text for your designs", icon: FileText, category: "text-language", path: "/tools/lorem-ipsum-generator", color: "hsl(25, 95%, 53%)" },
@@ -77,6 +78,7 @@ export const tools: Tool[] = [
   { id: "text-replacer", name: "Find & Replace", description: "Find and replace text with regex support", icon: Replace, category: "text-language", path: "/tools/text-replacer", color: "hsl(25, 95%, 53%)" },
   { id: "notepad", name: "Notepad", description: "Simple note-taking app with local storage", icon: StickyNote, category: "text-language", path: "/tools/notepad", color: "hsl(47, 95%, 55%)" },
   { id: "todo-list", name: "Todo List", description: "Simple and effective task management", icon: ListChecks, category: "text-language", path: "/tools/todo-list", color: "hsl(142, 71%, 45%)" },
+  { id: "slug-generator", name: "Slug Generator", description: "Convert text into SEO-friendly URL slugs", icon: Link2, category: "text-language", path: "/tools/slug-generator", color: "hsl(220, 90%, 56%)" },
 
   // Image & Media Tools
   { id: "image-to-base64", name: "Image to Base64 Converter", description: "Convert images to Base64 encoded strings", icon: FileImage, category: "image-media", path: "/tools/image-to-base64", color: "hsl(280, 90%, 55%)" },
@@ -99,6 +101,8 @@ export const tools: Tool[] = [
   { id: "css-minifier", name: "CSS Minifier", description: "Minify or beautify your CSS code", icon: Minimize2, category: "developer", path: "/tools/css-minifier", color: "hsl(263, 85%, 58%)" },
   { id: "hash-generator", name: "Hash Generator", description: "Generate MD5, SHA-1, SHA-256, SHA-512 hashes", icon: Hash, category: "developer", path: "/tools/hash-generator", color: "hsl(0, 84%, 60%)" },
   { id: "timestamp-converter", name: "Timestamp Converter", description: "Convert between Unix timestamps and dates", icon: Clock, category: "developer", path: "/tools/timestamp-converter", color: "hsl(142, 71%, 45%)" },
+  { id: "meta-tag-generator", name: "Meta Tag Generator", description: "Generate SEO-friendly meta tags for websites", icon: FileCode, category: "developer", path: "/tools/meta-tag-generator", color: "hsl(280, 90%, 55%)" },
+  { id: "favicon-generator", name: "Favicon Generator", description: "Create favicons from text or images", icon: Image, category: "developer", path: "/tools/favicon-generator", color: "hsl(25, 95%, 53%)" },
 
   // ID Card Makers
   { id: "fake-bd-old-nid", name: "Fake BD Old NID Card Maker", description: "Generate fake old format BD NID cards", icon: CreditCard, category: "id-card", path: "/tools/fake-bd-old-nid", color: "hsl(142, 71%, 45%)" },
