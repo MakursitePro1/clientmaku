@@ -8,6 +8,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { cn } from "@/lib/utils";
 
 export default function ToolsPage() {
@@ -231,6 +232,7 @@ function ToolCard({ tool, index }: { tool: typeof tools[0]; index: number }) {
             <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors truncate">{tool.name}</h3>
             <p className="text-xs text-muted-foreground line-clamp-1 leading-relaxed">{tool.description}</p>
           </div>
+          <FavoriteButton toolId={tool.id} className="shrink-0 mt-0.5" />
           <ArrowRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary shrink-0 mt-1 transition-all group-hover:translate-x-1" />
         </div>
       </Link>

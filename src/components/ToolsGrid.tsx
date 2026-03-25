@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { tools, categories, type ToolCategory } from "@/data/tools";
+import { FavoriteButton } from "@/components/FavoriteButton";
 import { cn } from "@/lib/utils";
 
 const TOOLS_PER_PAGE = 24;
@@ -260,12 +261,7 @@ export function ToolsGrid() {
                         </span>
                         <ArrowRight className="ml-2 w-4 h-4 transition-all duration-300 group-hover:translate-x-2" />
                       </span>
-                      <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
-                        style={{ backgroundColor: `${tool.color.replace(')', ' / 0.1)')}` }}
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" style={{ color: tool.color }} />
-                      </div>
+                      <FavoriteButton toolId={tool.id} />
                     </div>
                   </div>
                 </Link>
