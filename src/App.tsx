@@ -4,9 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
 
 // Utility Tools
 const InternetSpeedTester = lazy(() => import("./pages/tools/InternetSpeedTester"));
@@ -258,6 +261,7 @@ const Loading = () => (
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <AuthProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -266,6 +270,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tools" element={<Suspense fallback={<Loading />}><ToolsPage /></Suspense>} />
+            <Route path="/auth" element={<Suspense fallback={<Loading />}><AuthPage /></Suspense>} />
+            <Route path="/favorites" element={<Suspense fallback={<Loading />}><FavoritesPage /></Suspense>} />
             {/* Utility */}
             <Route path="/tools/internet-speed-tester" element={<InternetSpeedTester />} />
             <Route path="/tools/courier-fraud-checker" element={<CourierFraudChecker />} />
@@ -496,6 +502,7 @@ const App = () => (
         </Suspense>
       </BrowserRouter>
     </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

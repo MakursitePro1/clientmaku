@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X, Zap, Heart, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { name: "Home", path: "/", hash: "hero" },
   { name: "Tools", path: "/tools", hash: "" },
+  { name: "Favorites", path: "/favorites", hash: "" },
   { name: "About", path: "/", hash: "about" },
   { name: "FAQ", path: "/", hash: "faq" },
   { name: "Contact", path: "/", hash: "contact" },
@@ -19,6 +21,7 @@ export function Navbar() {
   const [activeHash, setActiveHash] = useState("hero");
   const [scrolled, setScrolled] = useState(false);
   const [isCompactNav, setIsCompactNav] = useState(false);
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     setScrolled(window.scrollY > 20);
@@ -90,6 +93,7 @@ export function Navbar() {
 
   const isActive = (link: typeof navLinks[0]) => {
     if (link.path === "/tools") return location.pathname === "/tools";
+    if (link.path === "/favorites") return location.pathname === "/favorites";
     if (location.pathname !== "/") return false;
     return link.hash === activeHash;
   };
@@ -97,9 +101,9 @@ export function Navbar() {
   const handleNavClick = (link: typeof navLinks[0]) => {
     setIsOpen(false);
 
-    // Tools page - direct navigation
-    if (link.path === "/tools") {
-      navigate("/tools");
+    // Direct navigation pages
+    if (link.path === "/tools" || link.path === "/favorites") {
+      navigate(link.path);
       window.scrollTo({ top: 0 });
       return;
     }
@@ -173,15 +177,29 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className={cn("relative z-10 ml-auto", isCompactNav ? "hidden" : "block")}>
-            <Button
-              className="relative gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-all glow-shadow hover:scale-105 text-sm lg:text-base overflow-hidden group"
-              onClick={() => navigate("/tools")}
-            >
-              <span className="relative z-10">Get Started</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent animate-[shimmer_2.5s_ease-in-out_infinite]" />
-            </Button>
+          <div className={cn("relative z-10 ml-auto flex items-center gap-2", isCompactNav ? "hidden" : "flex")}>
+            {user ? (
+              <>
+                <button
+                  onClick={() => signOut()}
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Button
+                className="relative gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-all glow-shadow hover:scale-105 text-sm lg:text-base overflow-hidden group"
+                onClick={() => navigate("/auth")}
+              >
+                <span className="relative z-10 flex items-center gap-1.5">
+                  <LogIn className="w-4 h-4" /> Login
+                </span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent animate-[shimmer_2.5s_ease-in-out_infinite]" />
+              </Button>
+            )}
           </div>
 
           <button
@@ -209,15 +227,21 @@ export function Navbar() {
                 {link.name}
               </button>
             ))}
-            <Button
-              className="w-full gradient-bg text-primary-foreground rounded-xl font-semibold mt-2"
-              onClick={() => {
-                setIsOpen(false);
-                navigate("/tools");
-              }}
-            >
-              Get Started
-            </Button>
+            {user ? (
+              <Button
+                className="w-full rounded-xl font-semibold mt-2 bg-white/10 text-white hover:bg-white/20"
+                onClick={() => { setIsOpen(false); signOut(); }}
+              >
+                <LogOut className="w-4 h-4 mr-2" /> Logout
+              </Button>
+            ) : (
+              <Button
+                className="w-full gradient-bg text-primary-foreground rounded-xl font-semibold mt-2"
+                onClick={() => { setIsOpen(false); navigate("/auth"); }}
+              >
+                <LogIn className="w-4 h-4 mr-2" /> Login / Sign Up
+              </Button>
+            )}
           </div>
         )}
       </div>
