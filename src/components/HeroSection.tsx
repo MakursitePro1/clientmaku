@@ -208,26 +208,19 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.1] mb-6 tracking-tight"
+          className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.2] mb-6 tracking-tight"
         >
-          Your Ultimate{" "}
-          <span className="relative inline-block">
-            <span className="gradient-text">{typedText}</span>
-            <motion.span
-              className="inline-block w-[3px] h-[0.9em] bg-primary ml-1 align-middle rounded-full"
-              animate={{ opacity: [1, 0] }}
-              transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
-            />
+          <span className="block">Your Ultimate Collection</span>
+          <span className="block mt-2">
+            <span className="relative inline-block">
+              <span className="gradient-text">{typedText}</span>
+              <motion.span
+                className="inline-block w-[3px] h-[0.9em] bg-primary ml-1 align-middle rounded-full"
+                animate={{ opacity: [1, 0] }}
+                transition={{ duration: 0.6, repeat: Infinity, repeatType: "reverse" }}
+              />
+            </span>
           </span>
-          <br />
-          <motion.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="text-muted-foreground text-3xl sm:text-4xl md:text-5xl font-bold"
-          >
-            Collection
-          </motion.span>
         </motion.h1>
 
         {/* Description */}
@@ -272,29 +265,18 @@ export function HeroSection() {
         </motion.div>
 
         {/* Stats with animated counters */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
-        >
-          {getStats().map((stat, i) => (
-            <motion.div
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {getStats().map((stat) => (
+            <div
               key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 + i * 0.1 }}
-              whileHover={{ y: -4, boxShadow: "0 12px 40px -8px hsl(263 85% 58% / 0.2)" }}
-              className="group glass rounded-2xl p-6 border border-border/30 hover:border-primary/30 cursor-default transition-colors duration-300"
+              className="group glass rounded-2xl p-6 border border-border/30 hover:border-primary/30 cursor-default transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_-8px_hsl(263_85%_58%/0.2)]"
             >
-              <stat.icon className="w-6 h-6 text-primary mx-auto mb-3 opacity-60 group-hover:opacity-100 transition-opacity group-hover:scale-110 transition-transform duration-300" />
-              <div className="text-3xl font-extrabold gradient-text">
-                <AnimatedCounter target={stat.value} />
-              </div>
+              <stat.icon className="w-6 h-6 text-primary mx-auto mb-3 opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="text-3xl font-extrabold gradient-text">{stat.value}</div>
               <div className="text-sm text-muted-foreground mt-1 font-medium">{stat.label}</div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Scroll indicator */}
         <motion.div
