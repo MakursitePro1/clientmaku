@@ -51,6 +51,10 @@ export const categories: { id: ToolCategory; label: string; icon: any }[] = [
   { id: "id-card", label: "ID Card Makers", icon: IdCard },
   { id: "developer", label: "Developer Tools", icon: Code2 },
   { id: "utility", label: "Utility Tools", icon: Sparkles },
+  { id: "security", label: "Security & Privacy", icon: Shield },
+  { id: "finance", label: "Finance", icon: PiggyBank },
+  { id: "social", label: "Social Media", icon: Share2 },
+  { id: "games", label: "Games & Fun", icon: Gamepad2 },
 ];
 
 export const tools: Tool[] = [
