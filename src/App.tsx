@@ -40,6 +40,11 @@ const JsonFormatter = lazy(() => import("./pages/tools/JsonFormatter"));
 const HtmlToPdf = lazy(() => import("./pages/tools/HtmlToPdf"));
 const ColorPicker = lazy(() => import("./pages/tools/ColorPicker"));
 const Base64EncoderDecoder = lazy(() => import("./pages/tools/Base64EncoderDecoder"));
+const MarkdownEditor = lazy(() => import("./pages/tools/MarkdownEditor"));
+const CssMinifier = lazy(() => import("./pages/tools/CssMinifier"));
+const HashGenerator = lazy(() => import("./pages/tools/HashGenerator"));
+const UnitConverter = lazy(() => import("./pages/tools/UnitConverter"));
+const TimestampConverter = lazy(() => import("./pages/tools/TimestampConverter"));
 
 const queryClient = new QueryClient();
 
