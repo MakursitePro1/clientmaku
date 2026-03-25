@@ -54,7 +54,7 @@ export function Navbar() {
 
   useEffect(() => {
     const checkCompactNav = () => {
-      const isNarrowScreen = window.innerWidth < 768;
+      const isNarrowScreen = window.innerWidth < 1024;
       const isTouchDevice =
         window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
         navigator.maxTouchPoints > 0;
@@ -155,7 +155,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className={cn("items-center gap-1 bg-white/5 rounded-xl px-2 py-1 relative z-10 border border-white/5 mx-auto", isCompactNav ? "hidden" : "flex")}>
+          <div className={cn("items-center gap-1 bg-white/5 rounded-xl px-2 py-1 relative z-10 border border-white/5 mx-auto hidden lg:flex", isCompactNav ? "!hidden" : "")}>
             {navLinks.map((link) => (
               <button
                 key={link.name}
@@ -181,7 +181,7 @@ export function Navbar() {
           </div>
 
           {/* Desktop Right Side */}
-          <div className={cn("relative z-10 ml-auto flex items-center gap-3", isCompactNav ? "hidden" : "flex")}>
+          <div className={cn("relative z-10 ml-auto items-center gap-3 hidden lg:flex", isCompactNav ? "!hidden" : "")}>
             {/* Favorites Icon - Premium Colorful */}
             <motion.button
               onClick={() => navigate("/favorites")}
@@ -316,7 +316,7 @@ export function Navbar() {
           </div>
 
           {/* Mobile: Favorites + Toggle */}
-          <div className={cn("relative z-10 ml-auto flex items-center gap-1", isCompactNav ? "flex" : "hidden")}>
+          <div className={cn("relative z-10 ml-auto flex items-center gap-1 lg:hidden", isCompactNav ? "" : "!hidden")}>
             {/* Mobile Favorites Icon */}
             <motion.button
               onClick={() => navigate("/favorites")}
@@ -351,7 +351,7 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && isCompactNav && (
-          <div className="md:hidden mt-2 navbar-glass rounded-2xl p-4 space-y-2 animate-fade-in">
+          <div className="lg:hidden mt-2 navbar-glass rounded-2xl p-4 space-y-2 animate-fade-in">
             {navLinks.map((link) => (
               <button
                 key={link.name}
