@@ -95,6 +95,23 @@ const EmailValidator = lazy(() => import("./pages/tools/EmailValidator"));
 const TextToMorse = lazy(() => import("./pages/tools/TextToMorse"));
 const HexEditor = lazy(() => import("./pages/tools/HexEditor"));
 const TextEncryption = lazy(() => import("./pages/tools/TextEncryption"));
+const ColorMixer = lazy(() => import("./pages/tools/ColorMixer"));
+const InvestmentCalculator = lazy(() => import("./pages/tools/InvestmentCalculator"));
+const LoremPicsumGenerator = lazy(() => import("./pages/tools/LoremPicsumGenerator"));
+const HangmanGame = lazy(() => import("./pages/tools/HangmanGame"));
+const FancyTextGenerator = lazy(() => import("./pages/tools/FancyTextGenerator"));
+const CreditCardValidator = lazy(() => import("./pages/tools/CreditCardValidator"));
+const FuelCostCalculator = lazy(() => import("./pages/tools/FuelCostCalculator"));
+const SocialMediaBioGenerator = lazy(() => import("./pages/tools/SocialMediaBioGenerator"));
+const SqlFormatter = lazy(() => import("./pages/tools/SqlFormatter"));
+const DrawingBoard = lazy(() => import("./pages/tools/DrawingBoard"));
+const NumberBaseConverter = lazy(() => import("./pages/tools/NumberBaseConverter"));
+const DomainNameGenerator = lazy(() => import("./pages/tools/DomainNameGenerator"));
+const ImageCropper = lazy(() => import("./pages/tools/ImageCropper"));
+const UserAgentParser = lazy(() => import("./pages/tools/UserAgentParser"));
+const ReactionTimeTest = lazy(() => import("./pages/tools/ReactionTimeTest"));
+const PayrollCalculator = lazy(() => import("./pages/tools/PayrollCalculator"));
+const TextSummarizer = lazy(() => import("./pages/tools/TextSummarizer"));
 
 const queryClient = new QueryClient();
 
@@ -151,7 +168,6 @@ const App = () => (
             <Route path="/tools/hash-generator" element={<HashGenerator />} />
             <Route path="/tools/unit-converter" element={<UnitConverter />} />
             <Route path="/tools/timestamp-converter" element={<TimestampConverter />} />
-            {/* New 20 tools */}
             <Route path="/tools/word-counter" element={<WordCounter />} />
             <Route path="/tools/bmi-calculator" element={<BmiCalculator />} />
             <Route path="/tools/percentage-calculator" element={<PercentageCalculator />} />
@@ -201,6 +217,23 @@ const App = () => (
             <Route path="/tools/text-to-morse" element={<TextToMorse />} />
             <Route path="/tools/hex-editor" element={<HexEditor />} />
             <Route path="/tools/text-encryption" element={<TextEncryption />} />
+            <Route path="/tools/color-mixer" element={<ColorMixer />} />
+            <Route path="/tools/investment-calculator" element={<InvestmentCalculator />} />
+            <Route path="/tools/placeholder-image" element={<LoremPicsumGenerator />} />
+            <Route path="/tools/hangman-game" element={<HangmanGame />} />
+            <Route path="/tools/fancy-text-generator" element={<FancyTextGenerator />} />
+            <Route path="/tools/credit-card-validator" element={<CreditCardValidator />} />
+            <Route path="/tools/fuel-cost-calculator" element={<FuelCostCalculator />} />
+            <Route path="/tools/social-media-bio" element={<SocialMediaBioGenerator />} />
+            <Route path="/tools/sql-formatter" element={<SqlFormatter />} />
+            <Route path="/tools/drawing-board" element={<DrawingBoard />} />
+            <Route path="/tools/number-base-converter" element={<NumberBaseConverter />} />
+            <Route path="/tools/domain-name-generator" element={<DomainNameGenerator />} />
+            <Route path="/tools/image-cropper" element={<ImageCropper />} />
+            <Route path="/tools/user-agent-parser" element={<UserAgentParser />} />
+            <Route path="/tools/reaction-time-test" element={<ReactionTimeTest />} />
+            <Route path="/tools/payroll-calculator" element={<PayrollCalculator />} />
+            <Route path="/tools/text-summarizer" element={<TextSummarizer />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
