@@ -36,6 +36,10 @@ const GeminiWatermarkRemover = lazy(() => import("./pages/tools/GeminiWatermarkR
 const FakePakCnic = lazy(() => import("./pages/tools/FakePakCnic"));
 const StudentIdCard = lazy(() => import("./pages/tools/StudentIdCard"));
 const WebsiteScreenshot = lazy(() => import("./pages/tools/WebsiteScreenshot"));
+const JsonFormatter = lazy(() => import("./pages/tools/JsonFormatter"));
+const HtmlToPdf = lazy(() => import("./pages/tools/HtmlToPdf"));
+const ColorPicker = lazy(() => import("./pages/tools/ColorPicker"));
+const Base64EncoderDecoder = lazy(() => import("./pages/tools/Base64EncoderDecoder"));
 
 const queryClient = new QueryClient();
 
