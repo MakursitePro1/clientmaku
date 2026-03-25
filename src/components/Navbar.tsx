@@ -131,7 +131,7 @@ export function Navbar() {
       <div className="w-full px-2 sm:px-4 lg:px-8 pt-2 sm:pt-3 lg:pt-4 box-border">
         <div
           className={cn(
-            "relative w-full max-w-full box-border navbar-glass rounded-xl sm:rounded-2xl px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 transition-all duration-500",
+            "relative w-full max-w-full box-border navbar-glass rounded-xl sm:rounded-2xl px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 flex items-center gap-2 transition-all duration-500",
             scrolled ? "navbar-glass-scrolled" : ""
           )}
         >
@@ -156,7 +156,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className={cn("items-center gap-1 bg-white/5 rounded-xl px-2 py-1 relative z-10 border border-white/5", isCompactNav ? "hidden" : "flex")}>
+          <div className={cn("items-center gap-1 bg-white/5 rounded-xl px-2 py-1 relative z-10 border border-white/5 mx-auto", isCompactNav ? "hidden" : "flex")}>
             {navLinks.map((link) => (
               <button
                 key={link.name}
@@ -173,7 +173,7 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className={cn("relative z-10", isCompactNav ? "hidden" : "block")}>
+          <div className={cn("relative z-10 ml-auto", isCompactNav ? "hidden" : "block")}>
             <Button
               className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-all glow-shadow hover:scale-105 text-sm lg:text-base"
               onClick={() => navigate("/tools")}
