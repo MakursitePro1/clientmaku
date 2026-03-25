@@ -21,7 +21,7 @@ export default function PdfUnlock() {
     if (!pdfBytes) return;
     try {
       const { PDFDocument } = await import("pdf-lib");
-      const pdf = await PDFDocument.load(pdfBytes, { password, ignoreEncryption: true });
+      const pdf = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
       const newPdf = await PDFDocument.create();
       const pages = await newPdf.copyPages(pdf, pdf.getPageIndices());
       pages.forEach(p => newPdf.addPage(p));
