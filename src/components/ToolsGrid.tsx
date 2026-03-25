@@ -162,82 +162,109 @@ export function ToolsGrid() {
                 initial={{ opacity: 0, scale: 0.9, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4, delay: Math.min(index * 0.02, 0.4), type: "spring", stiffness: 120 }}
+                transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.5), type: "spring", stiffness: 120 }}
               >
                 <Link
                   to={tool.path}
-                  className="group relative block rounded-2xl overflow-hidden h-full transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_25px_60px_-15px_hsl(263_85%_58%/0.2),0_10px_25px_-10px_hsl(0_0%_0%/0.1)]"
+                  className="group relative block rounded-2xl overflow-hidden h-full transition-all duration-500 hover:-translate-y-3"
+                  style={{ boxShadow: `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}` }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 25px 60px -12px ${tool.color.replace(')', ' / 0.25)')}, 0 8px 20px -8px ${tool.color.replace(')', ' / 0.15)')}`; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}`; }}
                 >
-                  {/* Card background with glass effect */}
-                  <div className="absolute inset-0 bg-card/95 backdrop-blur-sm border border-border/40 rounded-2xl group-hover:border-primary/30 transition-colors duration-500" />
-                  
-                  {/* Animated top gradient bar */}
-                  <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl overflow-hidden">
+                  {/* Animated border gradient */}
+                  <div
+                    className="absolute inset-0 rounded-2xl opacity-40 group-hover:opacity-100 transition-opacity duration-700"
+                    style={{
+                      background: `linear-gradient(135deg, ${tool.color}, transparent 40%, transparent 60%, ${tool.color})`,
+                      padding: '1px',
+                    }}
+                  />
+                  <div className="absolute inset-[1px] rounded-2xl bg-card/98 backdrop-blur-md" />
+
+                  {/* Auto shimmer sweep */}
+                  <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
                     <div
-                      className="h-full w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ background: `linear-gradient(90deg, transparent 0%, ${tool.color} 50%, transparent 100%)` }}
+                      className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite]"
+                      style={{
+                        background: `linear-gradient(105deg, transparent 40%, ${tool.color.replace(')', ' / 0.07)')}, transparent 60%)`,
+                      }}
                     />
                   </div>
 
-                  {/* Hover glow effect */}
+                  {/* Top accent gradient bar - always visible */}
+                  <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl overflow-hidden">
+                    <div
+                      className="h-full w-full opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
+                    />
+                  </div>
+
+                  {/* Hover glow orbs */}
                   <div
-                    className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[80px] opacity-0 group-hover:opacity-20 transition-all duration-700"
+                    className="absolute -top-16 -right-16 w-48 h-48 rounded-full blur-[100px] opacity-0 group-hover:opacity-25 transition-all duration-700"
+                    style={{ background: tool.color }}
+                  />
+                  <div
+                    className="absolute -bottom-16 -left-16 w-32 h-32 rounded-full blur-[80px] opacity-0 group-hover:opacity-15 transition-all duration-700"
                     style={{ background: tool.color }}
                   />
 
-                  {/* Corner accent */}
-                  <div
-                    className="absolute top-0 right-0 w-24 h-24 opacity-0 group-hover:opacity-100 transition-all duration-500"
-                    style={{
-                      background: `radial-gradient(circle at top right, ${tool.color.replace(')', ' / 0.08)')}, transparent 70%)`,
-                    }}
-                  />
-
-                  <div className="relative z-10 p-6 flex flex-col h-full">
-                    {/* Icon with animated ring */}
+                  <div className="relative z-10 p-5 sm:p-6 flex flex-col h-full">
+                    {/* Icon with glow */}
                     <div className="relative mb-5">
                       <motion.div
-                        whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                        whileHover={{ rotate: [0, -8, 8, 0], scale: 1.15 }}
                         transition={{ duration: 0.5 }}
-                        className="w-14 h-14 rounded-2xl flex items-center justify-center relative overflow-hidden transition-all duration-500 group-hover:shadow-lg"
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center relative overflow-hidden transition-all duration-500"
                         style={{
-                          backgroundColor: tool.color.replace(')', ' / 0.1)'),
+                          background: `linear-gradient(135deg, ${tool.color.replace(')', ' / 0.15)')}, ${tool.color.replace(')', ' / 0.05)')})`,
                           color: tool.color,
                         }}
                       >
-                        {/* Inner shine */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <tool.icon className="w-7 h-7 relative z-10" />
+                        <div
+                          className="absolute inset-0 animate-[shimmer_2.5s_ease-in-out_infinite]"
+                          style={{ background: `linear-gradient(105deg, transparent 30%, ${tool.color.replace(')', ' / 0.2)')}, transparent 70%)` }}
+                        />
+                        <tool.icon className="w-7 h-7 relative z-10 drop-shadow-sm" />
                       </motion.div>
-                      
-                      {/* Floating dot indicator */}
-                      <motion.div
-                        className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100"
-                        style={{ backgroundColor: tool.color, boxShadow: `0 0 10px 2px ${tool.color}` }}
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
+                      {/* Pulsing glow dot */}
+                      <div
+                        className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse"
+                        style={{
+                          backgroundColor: tool.color,
+                          boxShadow: `0 0 10px 2px ${tool.color.replace(')', ' / 0.5)')}`,
+                        }}
                       />
                     </div>
 
                     {/* Content */}
-                    <h3 className="font-bold text-[15px] mb-2.5 leading-snug group-hover:text-primary transition-colors duration-300">
+                    <h3 className="font-bold text-[15px] mb-2 leading-snug group-hover:text-primary transition-colors duration-300">
                       {tool.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-auto pb-5 line-clamp-2 leading-relaxed group-hover:text-muted-foreground/80 transition-colors duration-300">
+                    <p className="text-sm text-muted-foreground mb-auto pb-4 line-clamp-2 leading-relaxed">
                       {tool.description}
                     </p>
 
-                    {/* Footer with action */}
-                    <div className="flex items-center justify-between pt-4 border-t border-border/20 group-hover:border-primary/15 transition-all duration-500">
-                      <span className="flex items-center text-sm font-semibold text-primary/60 group-hover:text-primary transition-all duration-300">
+                    {/* Footer */}
+                    <div
+                      className="flex items-center justify-between pt-3.5 border-t transition-all duration-500"
+                      style={{ borderColor: `${tool.color.replace(')', ' / 0.12)')}` }}
+                    >
+                      <span className="flex items-center text-sm font-semibold transition-all duration-300" style={{ color: tool.color }}>
                         <span className="relative">
                           Open Tool
-                          <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-primary group-hover:w-full transition-all duration-500" />
+                          <span
+                            className="absolute bottom-0 left-0 w-0 h-[2px] group-hover:w-full transition-all duration-500 rounded-full"
+                            style={{ backgroundColor: tool.color }}
+                          />
                         </span>
-                        <ArrowRight className="ml-2 w-4 h-4 transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-primary" />
+                        <ArrowRight className="ml-2 w-4 h-4 transition-all duration-300 group-hover:translate-x-2" />
                       </span>
-                      <div className="w-8 h-8 rounded-lg bg-accent/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:bg-primary/10">
-                        <ExternalLink className="w-3.5 h-3.5 text-primary/60" />
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+                        style={{ backgroundColor: `${tool.color.replace(')', ' / 0.1)')}` }}
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" style={{ color: tool.color }} />
                       </div>
                     </div>
                   </div>
