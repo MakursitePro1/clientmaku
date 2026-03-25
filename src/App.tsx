@@ -180,6 +180,26 @@ const SnakeGame = lazy(() => import("./pages/tools/SnakeGame"));
 const WordScramble = lazy(() => import("./pages/tools/WordScramble"));
 const HangmanGame = lazy(() => import("./pages/tools/HangmanGame"));
 const ReactionTimeTest = lazy(() => import("./pages/tools/ReactionTimeTest"));
+const RockPaperScissors = lazy(() => import("./pages/tools/RockPaperScissors"));
+const Game2048 = lazy(() => import("./pages/tools/Game2048"));
+const ColorGuessingGame = lazy(() => import("./pages/tools/ColorGuessingGame"));
+const MathQuizGame = lazy(() => import("./pages/tools/MathQuizGame"));
+
+// Additional Security
+const PasswordExpiryChecker = lazy(() => import("./pages/tools/PasswordExpiryChecker"));
+const IPBlacklistChecker = lazy(() => import("./pages/tools/IPBlacklistChecker"));
+const DataLeakChecker = lazy(() => import("./pages/tools/DataLeakChecker"));
+
+// Additional Social
+const InstagramCaptionGen = lazy(() => import("./pages/tools/InstagramCaptionGen"));
+const LinkedInPostGen = lazy(() => import("./pages/tools/LinkedInPostGen"));
+const SocialImageResizer = lazy(() => import("./pages/tools/SocialImageResizer"));
+const BioLinkGenerator = lazy(() => import("./pages/tools/BioLinkGenerator"));
+
+// Additional ID Card
+const BusinessCardMaker = lazy(() => import("./pages/tools/BusinessCardMaker"));
+const EmployeeIdCard = lazy(() => import("./pages/tools/EmployeeIdCard"));
+const EventBadgeMaker = lazy(() => import("./pages/tools/EventBadgeMaker"));
 
 const queryClient = new QueryClient();
 
@@ -363,6 +383,23 @@ const App = () => (
             <Route path="/tools/word-scramble" element={<WordScramble />} />
             <Route path="/tools/hangman-game" element={<HangmanGame />} />
             <Route path="/tools/reaction-time-test" element={<ReactionTimeTest />} />
+            <Route path="/tools/rock-paper-scissors" element={<RockPaperScissors />} />
+            <Route path="/tools/game-2048" element={<Game2048 />} />
+            <Route path="/tools/color-guessing-game" element={<ColorGuessingGame />} />
+            <Route path="/tools/math-quiz" element={<MathQuizGame />} />
+            {/* Additional Security */}
+            <Route path="/tools/password-security-analyzer" element={<PasswordExpiryChecker />} />
+            <Route path="/tools/ip-blacklist-checker" element={<IPBlacklistChecker />} />
+            <Route path="/tools/data-leak-checker" element={<DataLeakChecker />} />
+            {/* Additional Social */}
+            <Route path="/tools/instagram-caption-gen" element={<InstagramCaptionGen />} />
+            <Route path="/tools/linkedin-post-gen" element={<LinkedInPostGen />} />
+            <Route path="/tools/social-image-resizer" element={<SocialImageResizer />} />
+            <Route path="/tools/bio-link-generator" element={<BioLinkGenerator />} />
+            {/* Additional ID Card */}
+            <Route path="/tools/business-card-maker" element={<BusinessCardMaker />} />
+            <Route path="/tools/employee-id-card" element={<EmployeeIdCard />} />
+            <Route path="/tools/event-badge-maker" element={<EventBadgeMaker />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
