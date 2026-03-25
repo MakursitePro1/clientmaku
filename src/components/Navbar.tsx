@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
   { name: "Home", path: "/", hash: "hero" },
@@ -67,7 +68,6 @@ export function Navbar() {
     if (!isCompactNav) setIsOpen(false);
   }, [isCompactNav]);
 
-  // Close profile dropdown on click outside
   useEffect(() => {
     if (!profileOpen) return;
     const close = () => setProfileOpen(false);
@@ -173,74 +173,126 @@ export function Navbar() {
           </div>
 
           {/* Desktop Right Side */}
-          <div className={cn("relative z-10 ml-auto flex items-center gap-2", isCompactNav ? "hidden" : "flex")}>
-            {/* Favorites Icon with Count */}
-            <button
+          <div className={cn("relative z-10 ml-auto flex items-center gap-3", isCompactNav ? "hidden" : "flex")}>
+            {/* Favorites Icon - Premium Colorful */}
+            <motion.button
               onClick={() => navigate("/favorites")}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
               className={cn(
-                "relative p-2 rounded-xl transition-all duration-300 hover:scale-110 group",
+                "relative p-2.5 rounded-xl transition-all duration-300 group",
                 location.pathname === "/favorites"
-                  ? "bg-red-500/20 text-red-400"
-                  : "text-white/50 hover:text-red-400 hover:bg-white/10"
+                  ? "bg-gradient-to-br from-red-500/20 to-pink-500/20 border border-red-500/30"
+                  : "hover:bg-white/10"
               )}
               aria-label="Favorites"
             >
-              <Heart className={cn("w-5 h-5 transition-all", favorites.length > 0 && "fill-red-500 text-red-500")} />
-              {favorites.length > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-lg shadow-red-500/50 animate-in zoom-in">
-                  {favorites.length}
-                </span>
-              )}
-            </button>
+              {/* Animated glow ring */}
+              <span className={cn(
+                "absolute inset-0 rounded-xl transition-all duration-500",
+                favorites.length > 0
+                  ? "shadow-[0_0_15px_rgba(239,68,68,0.3),inset_0_0_15px_rgba(239,68,68,0.05)]"
+                  : ""
+              )} />
+              <Heart
+                className={cn(
+                  "w-5 h-5 relative z-10 transition-all duration-300",
+                  favorites.length > 0
+                    ? "fill-red-500 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+                    : "text-white/50 group-hover:text-red-400"
+                )}
+              />
+              {/* Count Badge */}
+              <AnimatePresence>
+                {favorites.length > 0 && (
+                  <motion.span
+                    key={favorites.length}
+                    initial={{ scale: 0, y: 5 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                    className="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] rounded-full bg-gradient-to-br from-red-500 to-pink-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-[0_2px_10px_rgba(239,68,68,0.5)] border border-red-400/30"
+                  >
+                    {favorites.length}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
 
             {user ? (
               <div className="relative">
-                <button
+                <motion.button
                   onClick={(e) => { e.stopPropagation(); setProfileOpen(!profileOpen); }}
-                  className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/10 transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 p-1 rounded-xl hover:bg-white/10 transition-all group"
                 >
-                  <Avatar className="w-8 h-8 border-2 border-primary/30">
-                    {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} /> : null}
-                    <AvatarFallback className="text-xs font-bold bg-primary/20 text-primary">
-                      {profile?.display_name ? getInitials(profile.display_name) : <User className="w-4 h-4" />}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-
-                {profileOpen && (
-                  <div
-                    className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-border/50 bg-card/95 backdrop-blur-xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-200"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="px-3 py-2 mb-1 border-b border-border/30">
-                      <p className="text-sm font-semibold truncate">{profile?.display_name || "User"}</p>
-                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                    </div>
-                    <button
-                      onClick={() => { setProfileOpen(false); navigate("/profile"); }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm hover:bg-accent transition-colors"
-                    >
-                      <Settings className="w-4 h-4 text-muted-foreground" /> Account Settings
-                    </button>
-                    <button
-                      onClick={() => { setProfileOpen(false); navigate("/favorites"); }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm hover:bg-accent transition-colors"
-                    >
-                      <Heart className="w-4 h-4 text-red-400" /> My Favorites
-                      {favorites.length > 0 && (
-                        <span className="ml-auto text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full font-semibold">{favorites.length}</span>
-                      )}
-                    </button>
-                    <div className="border-t border-border/30 mt-1 pt-1">
-                      <button
-                        onClick={() => { setProfileOpen(false); signOut(); }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm hover:bg-red-500/10 text-red-400 transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" /> Logout
-                      </button>
-                    </div>
+                  <div className="relative">
+                    {/* Animated ring around avatar */}
+                    <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-primary via-pink-500 to-orange-400 opacity-60 group-hover:opacity-100 blur-[2px] transition-opacity duration-300" />
+                    <Avatar className="w-8 h-8 relative border-2 border-white/20 group-hover:border-white/40 transition-colors">
+                      {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} /> : null}
+                      <AvatarFallback className="text-xs font-bold bg-gradient-to-br from-primary/30 to-pink-500/30 text-primary-foreground">
+                        {profile?.display_name ? getInitials(profile.display_name) : <User className="w-4 h-4" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    {/* Online indicator */}
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-black shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
                   </div>
-                )}
+                </motion.button>
+
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-border/50 bg-card/95 backdrop-blur-2xl shadow-2xl shadow-black/20 p-2 overflow-hidden"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Gradient top accent */}
+                      <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+
+                      <div className="relative px-3 py-3 mb-1 border-b border-border/30">
+                        <p className="text-sm font-bold truncate">{profile?.display_name || "User"}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                      <button
+                        onClick={() => { setProfileOpen(false); navigate("/profile"); }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm hover:bg-accent transition-colors group/item"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center group-hover/item:bg-primary/20 transition-colors">
+                          <Settings className="w-3.5 h-3.5 text-primary" />
+                        </div>
+                        Account Settings
+                      </button>
+                      <button
+                        onClick={() => { setProfileOpen(false); navigate("/favorites"); }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm hover:bg-accent transition-colors group/item"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center group-hover/item:bg-red-500/20 transition-colors">
+                          <Heart className="w-3.5 h-3.5 text-red-400 fill-red-400" />
+                        </div>
+                        My Favorites
+                        {favorites.length > 0 && (
+                          <span className="ml-auto text-xs bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-0.5 rounded-full font-bold shadow-sm">{favorites.length}</span>
+                        )}
+                      </button>
+                      <div className="border-t border-border/30 mt-1 pt-1">
+                        <button
+                          onClick={() => { setProfileOpen(false); signOut(); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm hover:bg-red-500/10 text-red-400 transition-colors group/item"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-red-500/10 flex items-center justify-center group-hover/item:bg-red-500/20 transition-colors">
+                            <LogOut className="w-3.5 h-3.5" />
+                          </div>
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <Button
@@ -255,14 +307,38 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile Toggle */}
-          <button
-            className={cn("text-white relative z-10 p-1 flex-shrink-0 ml-auto", isCompactNav ? "inline-flex" : "hidden")}
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle navigation menu"
-          >
-            {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
-          </button>
+          {/* Mobile: Favorites + Toggle */}
+          <div className={cn("relative z-10 ml-auto flex items-center gap-1", isCompactNav ? "flex" : "hidden")}>
+            {/* Mobile Favorites Icon */}
+            <motion.button
+              onClick={() => navigate("/favorites")}
+              whileTap={{ scale: 0.85 }}
+              className="relative p-2 rounded-lg"
+              aria-label="Favorites"
+            >
+              <Heart
+                className={cn(
+                  "w-5 h-5 transition-all",
+                  favorites.length > 0
+                    ? "fill-red-500 text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]"
+                    : "text-white/50"
+                )}
+              />
+              {favorites.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-gradient-to-br from-red-500 to-pink-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 shadow-lg">
+                  {favorites.length}
+                </span>
+              )}
+            </motion.button>
+
+            <button
+              className="text-white p-1 flex-shrink-0"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle navigation menu"
+            >
+              {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -283,11 +359,10 @@ export function Navbar() {
               </button>
             ))}
 
-            {/* Mobile Favorites */}
             <button
               onClick={() => { setIsOpen(false); navigate("/favorites"); }}
               className={cn(
-                "block w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-2",
+                "w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-2",
                 location.pathname === "/favorites"
                   ? "bg-primary text-primary-foreground font-semibold"
                   : "text-white/60 hover:text-white hover:bg-white/10"
@@ -296,7 +371,7 @@ export function Navbar() {
               <Heart className={cn("w-4 h-4", favorites.length > 0 && "fill-red-500 text-red-500")} />
               Favorites
               {favorites.length > 0 && (
-                <span className="ml-auto text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full font-semibold">{favorites.length}</span>
+                <span className="ml-auto text-xs bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-0.5 rounded-full font-bold">{favorites.length}</span>
               )}
             </button>
 
