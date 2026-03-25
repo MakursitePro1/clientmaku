@@ -15,7 +15,11 @@ import {
   LinkIcon, Table2, Paintbrush, Key,
   Blend, TrendingUp, ImageDown, Gamepad2, Sparkle, CreditCard as CreditCardIcon,
   Fuel, Users, Database, PenSquare, Hash as HashIcon, Globe2,
-  Crop, Bug, Zap as ZapIcon, FileSpreadsheet, Scissors, MousePointer
+  Crop, Bug, Zap as ZapIcon, FileSpreadsheet, Scissors, MousePointer,
+  Shield, Fingerprint, LockKeyhole, Scan, FileWarning,
+  PiggyBank, Receipt, Target, CircleDollarSign,
+  Share2, MessageSquare, Youtube, Twitter, Tv,
+  Joystick, Puzzle, Swords, Boxes, Trophy
 } from "lucide-react";
 
 export type ToolCategory = 
