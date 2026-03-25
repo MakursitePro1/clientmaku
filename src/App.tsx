@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound.tsx";
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 
 // Utility Tools
 const InternetSpeedTester = lazy(() => import("./pages/tools/InternetSpeedTester"));
