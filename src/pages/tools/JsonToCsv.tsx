@@ -24,7 +24,7 @@ export default function JsonToCsv() {
         const s = typeof val === "object" ? JSON.stringify(val) : String(val);
         return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
       };
-      const rows = data.map((obj: Record<string, unknown>) => headers.map((h) => escape(obj[h])).join(","));
+      const rows = data.map((obj: any) => headers.map((h: any) => escape(obj[h])).join(","));
       setCsv([headers.join(","), ...rows].join("\n"));
     } catch {
       setError("Invalid JSON input. Please provide a valid JSON array.");
