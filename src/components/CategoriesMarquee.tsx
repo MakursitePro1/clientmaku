@@ -1,36 +1,46 @@
 import { motion } from "framer-motion";
-import { categories } from "@/data/tools";
+import { categories, type ToolCategory } from "@/data/tools";
 import { cn } from "@/lib/utils";
 
 const categoryItems = categories.filter(c => c.id !== "all");
 
-// Duplicate items for seamless infinite scroll
 const row1 = [...categoryItems, ...categoryItems, ...categoryItems];
 const row2 = [...[...categoryItems].reverse(), ...[...categoryItems].reverse(), ...[...categoryItems].reverse()];
 
+function handleCategoryClick(categoryId: ToolCategory) {
+  const toolsSection = document.getElementById("tools");
+  if (toolsSection) {
+    toolsSection.scrollIntoView({ behavior: "smooth" });
+    // Dispatch a custom event so ToolsGrid can pick up the category
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("select-category", { detail: categoryId }));
+    }, 600);
+  }
+}
+
 function MarqueeRow({ items, direction = "left", speed = 35 }: { items: typeof row1; direction?: "left" | "right"; speed?: number }) {
   const totalWidth = items.length * 200;
-  
+
   return (
     <div className="relative overflow-hidden py-2">
-      {/* Fade edges */}
       <div className="absolute left-0 top-0 bottom-0 w-20 sm:w-32 z-10 pointer-events-none" style={{ background: "linear-gradient(to right, hsl(var(--background)), transparent)" }} />
       <div className="absolute right-0 top-0 bottom-0 w-20 sm:w-32 z-10 pointer-events-none" style={{ background: "linear-gradient(to left, hsl(var(--background)), transparent)" }} />
-      
+
       <motion.div
         className="flex gap-3 sm:gap-4 w-max"
         animate={{ x: direction === "left" ? [0, -totalWidth / 3] : [-totalWidth / 3, 0] }}
         transition={{ duration: speed, repeat: Infinity, ease: "linear", repeatType: "loop" }}
       >
         {items.map((cat, i) => (
-          <div
+          <button
             key={`${cat.id}-${i}`}
+            onClick={() => handleCategoryClick(cat.id)}
             className={cn(
               "group flex items-center gap-2.5 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl",
               "bg-card/80 backdrop-blur-sm border border-border/40",
               "hover:border-primary/40 hover:bg-accent/60 hover:shadow-lg",
-              "transition-all duration-300 cursor-default shrink-0",
-              "hover:-translate-y-0.5"
+              "transition-all duration-300 cursor-pointer shrink-0",
+              "hover:-translate-y-0.5 active:scale-95"
             )}
           >
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
@@ -39,7 +49,7 @@ function MarqueeRow({ items, direction = "left", speed = 35 }: { items: typeof r
             <span className="text-xs sm:text-sm font-semibold text-muted-foreground group-hover:text-foreground transition-colors whitespace-nowrap">
               {cat.label}
             </span>
-          </div>
+          </button>
         ))}
       </motion.div>
     </div>
@@ -50,7 +60,7 @@ export function CategoriesMarquee() {
   return (
     <section className="py-12 sm:py-16 relative overflow-hidden">
       <div className="absolute inset-0 cyber-grid opacity-20" />
-      
+
       <div className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 10 }}

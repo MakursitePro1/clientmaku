@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Search, Sparkles, ExternalLink } from "lucide-react";
@@ -9,6 +9,15 @@ import { cn } from "@/lib/utils";
 export function ToolsGrid() {
   const [activeCategory, setActiveCategory] = useState<ToolCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const category = (e as CustomEvent).detail as ToolCategory;
+      setActiveCategory(category);
+    };
+    window.addEventListener("select-category", handler);
+    return () => window.removeEventListener("select-category", handler);
+  }, []);
 
   const filteredTools = useMemo(() => tools.filter((tool) => {
     const matchesCategory = activeCategory === "all" || tool.category === activeCategory;
