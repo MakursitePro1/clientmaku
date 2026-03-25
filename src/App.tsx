@@ -70,6 +70,11 @@ const IpAddressLookup = lazy(() => import("./pages/tools/IpAddressLookup"));
 const MetaTagGenerator = lazy(() => import("./pages/tools/MetaTagGenerator"));
 const FaviconGenerator = lazy(() => import("./pages/tools/FaviconGenerator"));
 const SlugGenerator = lazy(() => import("./pages/tools/SlugGenerator"));
+const JsonToCsv = lazy(() => import("./pages/tools/JsonToCsv"));
+const ColorPaletteGenerator = lazy(() => import("./pages/tools/ColorPaletteGenerator"));
+const RegexCheatSheet = lazy(() => import("./pages/tools/RegexCheatSheet"));
+const CharacterMap = lazy(() => import("./pages/tools/CharacterMap"));
+const PdfMerger = lazy(() => import("./pages/tools/PdfMerger"));
 
 const queryClient = new QueryClient();
 
@@ -151,6 +156,11 @@ const App = () => (
             <Route path="/tools/meta-tag-generator" element={<MetaTagGenerator />} />
             <Route path="/tools/favicon-generator" element={<FaviconGenerator />} />
             <Route path="/tools/slug-generator" element={<SlugGenerator />} />
+            <Route path="/tools/json-to-csv" element={<JsonToCsv />} />
+            <Route path="/tools/color-palette-generator" element={<ColorPaletteGenerator />} />
+            <Route path="/tools/regex-cheat-sheet" element={<RegexCheatSheet />} />
+            <Route path="/tools/character-map" element={<CharacterMap />} />
+            <Route path="/tools/pdf-merger" element={<PdfMerger />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Zap, Code2, Image, Shield, Globe, Search, BarChart3, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { tools, categories } from "@/data/tools";
 
 const floatingIcons = [
   { icon: Globe, top: "12%", left: "8%", delay: 0, size: "w-10 h-10" },
@@ -12,11 +13,11 @@ const floatingIcons = [
   { icon: Sparkles, top: "35%", left: "3%", delay: 1.8, size: "w-6 h-6" },
 ];
 
-const stats = [
-  { value: "33+", label: "Free Tools", icon: Zap },
+const getStats = () => [
+  { value: `${tools.length}+`, label: "Free Tools", icon: Zap },
   { value: "100%", label: "Free to Use", icon: Shield },
   { value: "0", label: "Signup Required", icon: Globe },
-  { value: "24/7", label: "Available", icon: BarChart3 },
+  { value: `${categories.length - 1}`, label: "Categories", icon: BarChart3 },
 ];
 
 export function HeroSection() {
@@ -102,7 +103,7 @@ export function HeroSection() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-4"
         >
-          {stats.map((stat) => (
+          {getStats().map((stat) => (
             <div key={stat.label} className="group glass rounded-2xl p-6 border border-border/30 hover-lift hover:border-primary/30 cursor-default">
               <stat.icon className="w-6 h-6 text-primary mx-auto mb-3 opacity-60 group-hover:opacity-100 transition-opacity" />
               <div className="text-3xl font-extrabold gradient-text">{stat.value}</div>

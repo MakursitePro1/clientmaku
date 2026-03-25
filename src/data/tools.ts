@@ -8,7 +8,8 @@ import {
   AlignLeft, Activity, Percent, Banknote, UtensilsCrossed,
   Timer, StickyNote, ListChecks, Brain, Shrink, Maximize,
   Volume2, Shuffle, Coins, Dices, Zap, CaseSensitive,
-  DollarSign, Replace, Tag, MapPin, FileCode, Link2
+  DollarSign, Replace, Tag, MapPin, FileCode, Link2,
+  Palette, BookOpen, Grid3X3, FilePlus2
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -79,6 +80,7 @@ export const tools: Tool[] = [
   { id: "notepad", name: "Notepad", description: "Simple note-taking app with local storage", icon: StickyNote, category: "text-language", path: "/tools/notepad", color: "hsl(47, 95%, 55%)" },
   { id: "todo-list", name: "Todo List", description: "Simple and effective task management", icon: ListChecks, category: "text-language", path: "/tools/todo-list", color: "hsl(142, 71%, 45%)" },
   { id: "slug-generator", name: "Slug Generator", description: "Convert text into SEO-friendly URL slugs", icon: Link2, category: "text-language", path: "/tools/slug-generator", color: "hsl(220, 90%, 56%)" },
+  { id: "character-map", name: "Character Map", description: "Browse and copy Unicode characters and symbols", icon: Grid3X3, category: "text-language", path: "/tools/character-map", color: "hsl(263, 85%, 58%)" },
 
   // Image & Media Tools
   { id: "image-to-base64", name: "Image to Base64 Converter", description: "Convert images to Base64 encoded strings", icon: FileImage, category: "image-media", path: "/tools/image-to-base64", color: "hsl(280, 90%, 55%)" },
@@ -103,6 +105,10 @@ export const tools: Tool[] = [
   { id: "timestamp-converter", name: "Timestamp Converter", description: "Convert between Unix timestamps and dates", icon: Clock, category: "developer", path: "/tools/timestamp-converter", color: "hsl(142, 71%, 45%)" },
   { id: "meta-tag-generator", name: "Meta Tag Generator", description: "Generate SEO-friendly meta tags for websites", icon: FileCode, category: "developer", path: "/tools/meta-tag-generator", color: "hsl(280, 90%, 55%)" },
   { id: "favicon-generator", name: "Favicon Generator", description: "Create favicons from text or images", icon: Image, category: "developer", path: "/tools/favicon-generator", color: "hsl(25, 95%, 53%)" },
+  { id: "json-to-csv", name: "JSON to CSV", description: "Convert JSON data to CSV format", icon: FileText, category: "developer", path: "/tools/json-to-csv", color: "hsl(47, 95%, 55%)" },
+  { id: "regex-cheat-sheet", name: "Regex Cheat Sheet", description: "Quick reference for regular expressions", icon: BookOpen, category: "developer", path: "/tools/regex-cheat-sheet", color: "hsl(340, 82%, 52%)" },
+  { id: "color-palette-generator", name: "Color Palette Generator", description: "Generate beautiful color palettes instantly", icon: Palette, category: "developer", path: "/tools/color-palette-generator", color: "hsl(280, 90%, 55%)" },
+  { id: "pdf-merger", name: "PDF Merger", description: "Merge multiple PDF files into one document", icon: FilePlus2, category: "developer", path: "/tools/pdf-merger", color: "hsl(0, 84%, 60%)" },
 
   // ID Card Makers
   { id: "fake-bd-old-nid", name: "Fake BD Old NID Card Maker", description: "Generate fake old format BD NID cards", icon: CreditCard, category: "id-card", path: "/tools/fake-bd-old-nid", color: "hsl(142, 71%, 45%)" },
