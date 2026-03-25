@@ -111,7 +111,7 @@ export function Navbar() {
       <div className="w-full px-2 sm:px-4 lg:px-8 pt-2 sm:pt-3 lg:pt-4 box-border overflow-hidden">
         <div
           className={cn(
-            "navbar-glass rounded-xl sm:rounded-2xl px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between transition-all duration-500",
+            "w-full box-border navbar-glass rounded-xl sm:rounded-2xl px-3 sm:px-5 lg:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2 transition-all duration-500",
             scrolled ? "navbar-glass-scrolled" : ""
           )}
         >
@@ -125,14 +125,14 @@ export function Navbar() {
               e.preventDefault();
               handleNavClick({ name: "Home", path: "/", hash: "hero" });
             }}
-            className="flex items-center gap-2 sm:gap-2.5 relative z-10 min-w-0"
+            className="flex items-center gap-2 sm:gap-2.5 relative z-10 min-w-0 flex-1 pr-2"
           >
             <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl gradient-bg flex items-center justify-center glow-shadow flex-shrink-0">
               <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
             </div>
-            <span className="text-base sm:text-lg font-bold tracking-tight whitespace-nowrap">
+            <span className="text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap leading-none truncate">
               <span className="gradient-text">Cyber</span>
-              <span className="text-white"> Venom</span>
+              <span className="text-white max-[420px]:hidden"> Venom</span>
             </span>
           </Link>
 
@@ -163,7 +163,7 @@ export function Navbar() {
           </div>
 
           <button
-            className="md:hidden text-white relative z-10 p-1"
+            className="md:hidden text-white relative z-10 p-1 flex-shrink-0"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
