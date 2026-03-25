@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Target, Heart, Award, TrendingUp } from "lucide-react";
+import { Target, Heart, Award, TrendingUp, Zap } from "lucide-react";
 
 const features = [
   { icon: Target, title: "Mission-Driven", desc: "We focus on building the most useful tools for everyone." },
@@ -10,8 +10,9 @@ const features = [
 
 export function AboutSection() {
   return (
-    <section id="about" className="py-20 px-4">
-      <div className="max-w-7xl mx-auto">
+    <section id="about" className="py-24 px-4 relative">
+      <div className="absolute inset-0 cyber-grid opacity-30" />
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -19,20 +20,29 @@ export function AboutSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-sm font-semibold text-primary uppercase tracking-wider">About Us</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mt-3 mb-6">
-              We Are <span className="gradient-text">WebTools</span>
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/50 border border-primary/20 text-sm font-semibold text-primary mb-4">
+              <Zap className="w-3.5 h-3.5" /> About Us
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-3 mb-6 tracking-tight">
+              We Are <span className="gradient-text">Cyber Venom</span>
             </h2>
-            <p className="text-muted-foreground leading-relaxed mb-8">
-              WebTools is a comprehensive collection of free online tools designed for developers, designers, students, and everyday users. From image editors to code testers, converters to generators — we provide all types of tools to make your digital life easier.
+            <p className="text-muted-foreground leading-relaxed mb-8 text-lg">
+              Cyber Venom is a comprehensive collection of free online tools designed for developers, designers, students, and everyday users. From image editors to code testers, converters to generators — we provide all types of tools to make your digital life easier.
             </p>
-            <div className="grid grid-cols-2 gap-5">
-              {features.map((f) => (
-                <div key={f.title} className="bg-card rounded-2xl p-5 border border-border card-shadow">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {features.map((f, i) => (
+                <motion.div
+                  key={f.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="glass rounded-2xl p-5 border border-border/30 hover-lift hover:border-primary/30"
+                >
                   <f.icon className="w-8 h-8 text-primary mb-3" />
                   <h3 className="font-bold mb-1">{f.title}</h3>
                   <p className="text-sm text-muted-foreground">{f.desc}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
@@ -44,32 +54,30 @@ export function AboutSection() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="bg-card rounded-3xl p-8 border border-border card-shadow">
+            <div className="absolute -inset-4 gradient-bg rounded-3xl opacity-10 blur-2xl" />
+            <div className="relative glass rounded-3xl p-8 border border-border/30">
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center text-3xl font-extrabold text-primary-foreground">W</div>
+                  <div className="w-16 h-16 rounded-2xl gradient-bg flex items-center justify-center glow-shadow">
+                    <Zap className="w-8 h-8 text-primary-foreground" />
+                  </div>
                   <div>
-                    <h3 className="text-xl font-bold">WebTools Platform</h3>
-                    <p className="text-sm text-muted-foreground">Free Online Tools Collection</p>
+                    <h3 className="text-xl font-bold">Cyber Venom</h3>
+                    <p className="text-sm text-muted-foreground">Free Online Tools Platform</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-accent/50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-extrabold text-primary">29+</div>
-                    <div className="text-xs text-muted-foreground">Tools Available</div>
-                  </div>
-                  <div className="bg-accent/50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-extrabold text-primary">5</div>
-                    <div className="text-xs text-muted-foreground">Categories</div>
-                  </div>
-                  <div className="bg-accent/50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-extrabold text-primary">100%</div>
-                    <div className="text-xs text-muted-foreground">Free</div>
-                  </div>
-                  <div className="bg-accent/50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-extrabold text-primary">∞</div>
-                    <div className="text-xs text-muted-foreground">Usage Limit</div>
-                  </div>
+                  {[
+                    { val: "33+", label: "Tools Available" },
+                    { val: "6", label: "Categories" },
+                    { val: "100%", label: "Free" },
+                    { val: "∞", label: "Usage Limit" },
+                  ].map((s) => (
+                    <div key={s.label} className="bg-accent/30 rounded-xl p-4 text-center border border-border/20">
+                      <div className="text-2xl font-extrabold gradient-text">{s.val}</div>
+                      <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
