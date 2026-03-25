@@ -18,7 +18,7 @@ export default function TextSummarizer() {
 
     const scored = sentences.map(s => {
       const sWords = s.toLowerCase().match(/\b\w+\b/g) || [];
-      const score = sWords.reduce((acc, w) => acc + (wordFreq[w] || 0), 0) / Math.max(sWords.length, 1);
+      const score = sWords.reduce((acc: number, w: string) => acc + (wordFreq[w] || 0), 0) / Math.max(sWords.length, 1);
       return { sentence: s.trim(), score };
     });
 
