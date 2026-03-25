@@ -217,58 +217,78 @@ export function ToolsGrid() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="mt-14 flex flex-col items-center gap-5">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
-                disabled={currentPage === 1}
-                className="w-10 h-10 rounded-xl border border-border/40 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-16"
+          >
+            <div className="relative max-w-2xl mx-auto">
+              {/* Decorative line */}
+              <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent -translate-y-1/2" />
 
-              {getPageNumbers().map((page, i) => (
-                typeof page === "string" ? (
-                  <span key={`dots-${i}`} className="w-10 h-10 flex items-center justify-center text-muted-foreground/50 text-sm">…</span>
-                ) : (
+              <div className="relative flex flex-col items-center gap-5">
+                {/* Page buttons */}
+                <div className="flex items-center gap-1.5 sm:gap-2 bg-card/90 backdrop-blur-sm border border-border/40 rounded-2xl px-3 py-2.5 shadow-lg">
                   <button
-                    key={page}
-                    onClick={() => { setCurrentPage(page); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
-                    className={cn(
-                      "w-10 h-10 rounded-xl text-sm font-bold transition-all duration-300",
-                      currentPage === page
-                        ? "gradient-bg text-primary-foreground shadow-lg glow-shadow"
-                        : "border border-border/40 bg-card/80 text-muted-foreground hover:text-foreground hover:border-primary/30"
-                    )}
+                    onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
+                    disabled={currentPage === 1}
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-300"
                   >
-                    {page}
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
-                )
-              ))}
 
-              <button
-                onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
-                disabled={currentPage === totalPages}
-                className="w-10 h-10 rounded-xl border border-border/40 bg-card/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+                  <div className="w-px h-6 bg-border/40 mx-1" />
 
-            <div className="flex items-center gap-4">
-              <p className="text-sm text-muted-foreground">
-                Page <span className="font-bold text-foreground">{currentPage}</span> of <span className="font-bold text-foreground">{totalPages}</span>
-                <span className="mx-2">·</span>
-                <span className="font-semibold text-foreground">{filteredTools.length}</span> tools
-              </p>
-              <Link
-                to="/tools"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-              >
-                View All Tools <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+                  {getPageNumbers().map((page, i) => (
+                    typeof page === "string" ? (
+                      <span key={`dots-${i}`} className="w-6 flex items-center justify-center text-muted-foreground/40 text-xs">•••</span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => { setCurrentPage(page); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
+                        className={cn(
+                          "w-9 h-9 sm:w-10 sm:h-10 rounded-xl text-sm font-bold transition-all duration-300 relative overflow-hidden",
+                          currentPage === page
+                            ? "gradient-bg text-primary-foreground shadow-lg glow-shadow scale-110"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                        )}
+                      >
+                        {currentPage === page && (
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 animate-gradient" />
+                        )}
+                        <span className="relative z-10">{page}</span>
+                      </button>
+                    )
+                  ))}
+
+                  <div className="w-px h-6 bg-border/40 mx-1" />
+
+                  <button
+                    onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" }); }}
+                    disabled={currentPage === totalPages}
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-300"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Info + View All */}
+                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+                  <p className="text-sm text-muted-foreground">
+                    Showing <span className="font-bold text-foreground">{(currentPage - 1) * TOOLS_PER_PAGE + 1}-{Math.min(currentPage * TOOLS_PER_PAGE, filteredTools.length)}</span> of <span className="font-bold text-foreground">{filteredTools.length}</span> tools
+                  </p>
+                  <Link
+                    to="/tools"
+                    className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-primary/30 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/50 transition-all duration-300"
+                  >
+                    View All Tools
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </div>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </section>

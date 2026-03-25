@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { name: "Home", path: "/", hash: "hero" },
-  { name: "Tools", path: "/", hash: "tools" },
+  { name: "Tools", path: "/tools", hash: "" },
   { name: "About", path: "/", hash: "about" },
   { name: "FAQ", path: "/", hash: "faq" },
   { name: "Contact", path: "/", hash: "contact" },
@@ -47,12 +47,17 @@ export function Navbar() {
   }, [location.pathname]);
 
   const isActive = (link: typeof navLinks[0]) => {
+    if (link.path === "/tools") return location.pathname === "/tools";
     if (location.pathname !== "/") return false;
     return link.hash === activeHash;
   };
 
   const handleNavClick = (link: typeof navLinks[0]) => {
     setIsOpen(false);
+    if (link.path === "/tools") {
+      window.location.href = "/tools";
+      return;
+    }
     if (link.hash) {
       if (location.pathname === "/") {
         const el = document.getElementById(link.hash);
