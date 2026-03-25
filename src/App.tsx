@@ -383,6 +383,23 @@ const App = () => (
             <Route path="/tools/word-scramble" element={<WordScramble />} />
             <Route path="/tools/hangman-game" element={<HangmanGame />} />
             <Route path="/tools/reaction-time-test" element={<ReactionTimeTest />} />
+            <Route path="/tools/rock-paper-scissors" element={<RockPaperScissors />} />
+            <Route path="/tools/game-2048" element={<Game2048 />} />
+            <Route path="/tools/color-guessing-game" element={<ColorGuessingGame />} />
+            <Route path="/tools/math-quiz" element={<MathQuizGame />} />
+            {/* Additional Security */}
+            <Route path="/tools/password-security-analyzer" element={<PasswordExpiryChecker />} />
+            <Route path="/tools/ip-blacklist-checker" element={<IPBlacklistChecker />} />
+            <Route path="/tools/data-leak-checker" element={<DataLeakChecker />} />
+            {/* Additional Social */}
+            <Route path="/tools/instagram-caption-gen" element={<InstagramCaptionGen />} />
+            <Route path="/tools/linkedin-post-gen" element={<LinkedInPostGen />} />
+            <Route path="/tools/social-image-resizer" element={<SocialImageResizer />} />
+            <Route path="/tools/bio-link-generator" element={<BioLinkGenerator />} />
+            {/* Additional ID Card */}
+            <Route path="/tools/business-card-maker" element={<BusinessCardMaker />} />
+            <Route path="/tools/employee-id-card" element={<EmployeeIdCard />} />
+            <Route path="/tools/event-badge-maker" element={<EventBadgeMaker />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
