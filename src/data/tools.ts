@@ -12,7 +12,10 @@ import {
   Palette, BookOpen, Grid3X3, FilePlus2,
   Code, ScreenShare, PenLine, MessageCircle, Eye, CalendarClock,
   BarChart3, KeyRound, AtSign, Radio, Hexagon, FileType, ShieldCheck,
-  LinkIcon, Table2, Paintbrush, Key
+  LinkIcon, Table2, Paintbrush, Key,
+  Blend, TrendingUp, ImageDown, Gamepad2, Sparkle, CreditCard as CreditCardIcon,
+  Fuel, Users, Database, PenSquare, Hash as HashIcon, Globe2,
+  Crop, Bug, Zap as ZapIcon, FileSpreadsheet, Scissors, MousePointer
 } from "lucide-react";
 
 export type ToolCategory = 
