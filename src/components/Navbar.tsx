@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -15,9 +15,18 @@ const navLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeHash, setActiveHash] = useState("hero");
   const [scrolled, setScrolled] = useState(false);
 
+  useEffect(() => {
+    setScrolled(window.scrollY > 20);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Track active section on homepage
   useEffect(() => {
     if (location.pathname !== "/") {
       setActiveHash("");
@@ -25,7 +34,6 @@ export function Navbar() {
     }
 
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
       const sections = ["contact", "faq", "about", "tools", "hero"];
       let found = "hero";
       for (const id of sections) {
@@ -46,6 +54,20 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname]);
 
+  // Handle hash scrolling after navigation
+  useEffect(() => {
+    if (location.pathname === "/" && location.hash) {
+      const hash = location.hash.replace("#", "");
+      setTimeout(() => {
+        if (hash === "hero") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          document.getElementById(hash)?.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  }, [location.pathname, location.hash]);
+
   const isActive = (link: typeof navLinks[0]) => {
     if (link.path === "/tools") return location.pathname === "/tools";
     if (location.pathname !== "/") return false;
@@ -54,20 +76,32 @@ export function Navbar() {
 
   const handleNavClick = (link: typeof navLinks[0]) => {
     setIsOpen(false);
+
+    // Tools page - direct navigation
     if (link.path === "/tools") {
-      window.location.href = "/tools";
+      navigate("/tools");
+      window.scrollTo({ top: 0 });
       return;
     }
+
+    // Home link
+    if (link.hash === "hero") {
+      if (location.pathname === "/") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        navigate("/");
+        setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
+      }
+      return;
+    }
+
+    // Section links (About, FAQ, Contact)
     if (link.hash) {
       if (location.pathname === "/") {
         const el = document.getElementById(link.hash);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth" });
-        } else if (link.hash === "hero") {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }
+        if (el) el.scrollIntoView({ behavior: "smooth" });
       } else {
-        window.location.href = `/#${link.hash}`;
+        navigate(`/#${link.hash}`);
       }
     }
   };
@@ -81,12 +115,18 @@ export function Navbar() {
             scrolled ? "navbar-glass-scrolled" : ""
           )}
         >
-          {/* Shine effect overlay */}
           <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
             <div className="navbar-shine" />
           </div>
 
-          <Link to="/" onClick={() => { if (location.pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" }); }} className="flex items-center gap-2.5 relative z-10">
+          <Link
+            to="/"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick({ name: "Home", path: "/", hash: "hero" });
+            }}
+            className="flex items-center gap-2.5 relative z-10"
+          >
             <div className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center glow-shadow">
               <Zap className="w-5 h-5 text-primary-foreground" />
             </div>
@@ -116,13 +156,7 @@ export function Navbar() {
           <div className="hidden md:block relative z-10">
             <Button
               className="gradient-bg text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-all glow-shadow hover:scale-105"
-              onClick={() => {
-                if (location.pathname === "/") {
-                  document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" });
-                } else {
-                  window.location.href = "/#tools";
-                }
-              }}
+              onClick={() => navigate("/tools")}
             >
               Get Started
             </Button>
@@ -154,14 +188,7 @@ export function Navbar() {
             ))}
             <Button
               className="w-full gradient-bg text-primary-foreground rounded-xl font-semibold mt-2"
-              onClick={() => {
-                setIsOpen(false);
-                if (location.pathname === "/") {
-                  document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" });
-                } else {
-                  window.location.href = "/#tools";
-                }
-              }}
+              onClick={() => { setIsOpen(false); navigate("/tools"); }}
             >
               Get Started
             </Button>
