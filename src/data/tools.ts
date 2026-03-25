@@ -160,7 +160,4 @@ export const tools: Tool[] = [
   { id: "reaction-time-test", name: "Reaction Time Test", description: "Test your reaction speed", icon: MousePointer, category: "utility", path: "/tools/reaction-time-test", color: "hsl(142, 71%, 45%)" },
   { id: "payroll-calculator", name: "Payroll Calculator", description: "Calculate net salary with tax and deductions", icon: FileSpreadsheet, category: "utility", path: "/tools/payroll-calculator", color: "hsl(220, 90%, 56%)" },
   { id: "text-summarizer", name: "Text Summarizer", description: "Summarize long texts by extracting key sentences", icon: Scissors, category: "text-language", path: "/tools/text-summarizer", color: "hsl(340, 82%, 52%)" },
-  { id: "text-to-binary", name: "Text to Binary Converter", description: "Convert text to binary and binary to text", icon: Binary, category: "developer", path: "/tools/text-to-binary", color: "hsl(47, 95%, 55%)" },
-  { id: "json-to-yaml", name: "JSON to YAML Converter", description: "Convert JSON to YAML format", icon: FileType, category: "developer", path: "/tools/json-to-yaml", color: "hsl(0, 84%, 60%)" },
-  { id: "html-preview", name: "HTML Live Preview", description: "Write HTML and see live preview", icon: Code2, category: "developer", path: "/tools/html-preview", color: "hsl(263, 85%, 58%)" },
 ];
