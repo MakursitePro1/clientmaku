@@ -40,6 +40,11 @@ const JsonFormatter = lazy(() => import("./pages/tools/JsonFormatter"));
 const HtmlToPdf = lazy(() => import("./pages/tools/HtmlToPdf"));
 const ColorPicker = lazy(() => import("./pages/tools/ColorPicker"));
 const Base64EncoderDecoder = lazy(() => import("./pages/tools/Base64EncoderDecoder"));
+const MarkdownEditor = lazy(() => import("./pages/tools/MarkdownEditor"));
+const CssMinifier = lazy(() => import("./pages/tools/CssMinifier"));
+const HashGenerator = lazy(() => import("./pages/tools/HashGenerator"));
+const UnitConverter = lazy(() => import("./pages/tools/UnitConverter"));
+const TimestampConverter = lazy(() => import("./pages/tools/TimestampConverter"));
 
 const queryClient = new QueryClient();
 
@@ -91,6 +96,11 @@ const App = () => (
             <Route path="/tools/html-to-pdf" element={<HtmlToPdf />} />
             <Route path="/tools/color-picker" element={<ColorPicker />} />
             <Route path="/tools/base64-encoder-decoder" element={<Base64EncoderDecoder />} />
+            <Route path="/tools/markdown-editor" element={<MarkdownEditor />} />
+            <Route path="/tools/css-minifier" element={<CssMinifier />} />
+            <Route path="/tools/hash-generator" element={<HashGenerator />} />
+            <Route path="/tools/unit-converter" element={<UnitConverter />} />
+            <Route path="/tools/timestamp-converter" element={<TimestampConverter />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

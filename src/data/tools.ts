@@ -3,7 +3,8 @@ import {
   FileText, Link, Keyboard, Type, ImagePlus, Calculator, 
   Languages, Globe, Lock, Camera, QrCode, ScanLine, 
   CreditCard, IdCard, User, Sparkles, FileImage, Monitor,
-  Palette, PenTool, Search, Gauge, Braces, FileDown, Pipette, Binary
+  Palette, PenTool, Search, Gauge, Braces, FileDown, Pipette, Binary,
+  FileEdit, Minimize2, Hash, ArrowLeftRight, Clock
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -43,6 +44,8 @@ export const tools: Tool[] = [
   { id: "password-generator", name: "Password Generator", description: "Generate strong and secure passwords", icon: Lock, category: "utility", path: "/tools/password-generator", color: "hsl(340, 82%, 52%)" },
   { id: "qr-code-maker", name: "QR Code Maker", description: "Create QR codes for any text or URL", icon: QrCode, category: "utility", path: "/tools/qr-code-maker", color: "hsl(220, 90%, 56%)" },
   { id: "qr-code-scanner", name: "QR Code Scanner", description: "Scan and decode QR codes from images", icon: ScanLine, category: "utility", path: "/tools/qr-code-scanner", color: "hsl(170, 75%, 41%)" },
+  { id: "color-picker", name: "Color Picker", description: "Pick colors and convert between HEX, RGB, HSL formats", icon: Pipette, category: "utility", path: "/tools/color-picker", color: "hsl(280, 90%, 55%)" },
+  { id: "unit-converter", name: "Unit Converter", description: "Convert between different units of measurement", icon: ArrowLeftRight, category: "utility", path: "/tools/unit-converter", color: "hsl(25, 95%, 53%)" },
 
   // Text & Language Tools
   { id: "lorem-ipsum-generator", name: "Lorem Ipsum Generator", description: "Generate placeholder text for your designs", icon: FileText, category: "text-language", path: "/tools/lorem-ipsum-generator", color: "hsl(25, 95%, 53%)" },
@@ -51,6 +54,7 @@ export const tools: Tool[] = [
   { id: "typing-test", name: "Typing Test", description: "Test your typing speed and accuracy", icon: Keyboard, category: "text-language", path: "/tools/typing-test", color: "hsl(263, 85%, 58%)" },
   { id: "bangla-to-banglish", name: "Bangla to Banglish Converter", description: "Convert Bangla text to Banglish", icon: Languages, category: "text-language", path: "/tools/bangla-to-banglish", color: "hsl(142, 71%, 45%)" },
   { id: "banglish-to-bangla", name: "Banglish to Bangla Converter", description: "Convert Banglish text to Bangla", icon: Languages, category: "text-language", path: "/tools/banglish-to-bangla", color: "hsl(340, 82%, 52%)" },
+  { id: "markdown-editor", name: "Markdown Editor", description: "Write and preview Markdown with a live editor", icon: FileEdit, category: "text-language", path: "/tools/markdown-editor", color: "hsl(220, 90%, 56%)" },
 
   // Image & Media Tools
   { id: "image-to-base64", name: "Image to Base64 Converter", description: "Convert images to Base64 encoded strings", icon: FileImage, category: "image-media", path: "/tools/image-to-base64", color: "hsl(280, 90%, 55%)" },
@@ -65,6 +69,12 @@ export const tools: Tool[] = [
   { id: "regex-tester", name: "RegEx Tester", description: "Test and debug regular expressions", icon: Search, category: "developer", path: "/tools/regex-tester", color: "hsl(25, 95%, 53%)" },
   { id: "url-parser", name: "URL Parser", description: "Parse and analyze URL components", icon: Link, category: "developer", path: "/tools/url-parser", color: "hsl(220, 90%, 56%)" },
   { id: "bdix-server-tester", name: "BDIX Server Tester", description: "Test BDIX server connectivity", icon: Globe, category: "developer", path: "/tools/bdix-server-tester", color: "hsl(170, 75%, 41%)" },
+  { id: "json-formatter", name: "JSON Formatter", description: "Format, minify, and validate JSON data", icon: Braces, category: "developer", path: "/tools/json-formatter", color: "hsl(47, 95%, 55%)" },
+  { id: "html-to-pdf", name: "HTML to PDF", description: "Convert HTML content to PDF documents", icon: FileDown, category: "developer", path: "/tools/html-to-pdf", color: "hsl(340, 82%, 52%)" },
+  { id: "base64-encoder-decoder", name: "Base64 Encoder/Decoder", description: "Encode text to Base64 or decode Base64 to text", icon: Binary, category: "developer", path: "/tools/base64-encoder-decoder", color: "hsl(199, 89%, 48%)" },
+  { id: "css-minifier", name: "CSS Minifier", description: "Minify or beautify your CSS code", icon: Minimize2, category: "developer", path: "/tools/css-minifier", color: "hsl(263, 85%, 58%)" },
+  { id: "hash-generator", name: "Hash Generator", description: "Generate MD5, SHA-1, SHA-256, SHA-512 hashes", icon: Hash, category: "developer", path: "/tools/hash-generator", color: "hsl(0, 84%, 60%)" },
+  { id: "timestamp-converter", name: "Timestamp Converter", description: "Convert between Unix timestamps and dates", icon: Clock, category: "developer", path: "/tools/timestamp-converter", color: "hsl(142, 71%, 45%)" },
 
   // ID Card Makers
   { id: "fake-bd-old-nid", name: "Fake BD Old NID Card Maker", description: "Generate fake old format BD NID cards", icon: CreditCard, category: "id-card", path: "/tools/fake-bd-old-nid", color: "hsl(142, 71%, 45%)" },
@@ -72,10 +82,4 @@ export const tools: Tool[] = [
   { id: "fake-bd-smart-nid", name: "Fake BD Smart NID Card Maker", description: "Generate fake smart NID cards", icon: IdCard, category: "id-card", path: "/tools/fake-bd-smart-nid", color: "hsl(263, 85%, 58%)" },
   { id: "fake-pak-cnic", name: "Fake Pakistani CNIC Card Maker", description: "Generate fake Pakistani CNIC cards", icon: CreditCard, category: "id-card", path: "/tools/fake-pak-cnic", color: "hsl(142, 71%, 45%)" },
   { id: "student-id-card", name: "Student ID Card Maker", description: "Create student ID cards easily", icon: GraduationCap, category: "id-card", path: "/tools/student-id-card", color: "hsl(25, 95%, 53%)" },
-
-  // New Tools
-  { id: "json-formatter", name: "JSON Formatter", description: "Format, minify, and validate JSON data", icon: Braces, category: "developer", path: "/tools/json-formatter", color: "hsl(47, 95%, 55%)" },
-  { id: "html-to-pdf", name: "HTML to PDF", description: "Convert HTML content to PDF documents", icon: FileDown, category: "developer", path: "/tools/html-to-pdf", color: "hsl(340, 82%, 52%)" },
-  { id: "color-picker", name: "Color Picker", description: "Pick colors and convert between HEX, RGB, HSL formats", icon: Pipette, category: "utility", path: "/tools/color-picker", color: "hsl(280, 90%, 55%)" },
-  { id: "base64-encoder-decoder", name: "Base64 Encoder/Decoder", description: "Encode text to Base64 or decode Base64 to text", icon: Binary, category: "developer", path: "/tools/base64-encoder-decoder", color: "hsl(199, 89%, 48%)" },
 ];
