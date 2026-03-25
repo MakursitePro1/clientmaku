@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 
 // Utility Tools
 const InternetSpeedTester = lazy(() => import("./pages/tools/InternetSpeedTester"));
@@ -252,6 +253,7 @@ const App = () => (
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/tools" element={<Suspense fallback={<Loading />}><ToolsPage /></Suspense>} />
             {/* Utility */}
             <Route path="/tools/internet-speed-tester" element={<InternetSpeedTester />} />
             <Route path="/tools/courier-fraud-checker" element={<CourierFraudChecker />} />
