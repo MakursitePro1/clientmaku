@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Zap, Heart, LogIn, LogOut, User, Settings } from "lucide-react";
+import { Menu, X, Zap, Heart, LogIn, LogOut, User, Settings, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
   { name: "Home", path: "/", hash: "hero" },
-  { name: "Tools", path: "/tools", hash: "" },
+  { name: "Tools", path: "/tools", hash: "", highlight: true },
+  { name: "Blog", path: "/blog", hash: "" },
   { name: "About", path: "/", hash: "about" },
   { name: "FAQ", path: "/", hash: "faq" },
   { name: "Contact", path: "/", hash: "contact" },
@@ -105,14 +106,15 @@ export function Navbar() {
   }, [location.pathname, location.hash]);
 
   const isActive = (link: typeof navLinks[0]) => {
-    if (link.path === "/tools") return location.pathname === "/tools";
+    if (link.path === "/tools") return location.pathname === "/tools" || location.pathname.startsWith("/tools/");
+    if (link.path === "/blog") return location.pathname === "/blog" || location.pathname.startsWith("/blog/");
     if (location.pathname !== "/") return false;
     return link.hash === activeHash;
   };
 
   const handleNavClick = (link: typeof navLinks[0]) => {
     setIsOpen(false);
-    if (link.path === "/tools") { navigate(link.path); window.scrollTo({ top: 0 }); return; }
+    if (link.path && !link.hash) { navigate(link.path); window.scrollTo({ top: 0 }); return; }
     if (link.hash === "hero") {
       if (location.pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" });
       else { navigate("/"); setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100); }
@@ -159,12 +161,20 @@ export function Navbar() {
                 key={link.name}
                 onClick={() => handleNavClick(link)}
                 className={cn(
-                  "px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative whitespace-nowrap",
+                  "px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative whitespace-nowrap flex items-center gap-1.5",
                   isActive(link)
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
                     : "text-white/60 hover:text-white hover:bg-white/10"
                 )}
               >
+                {link.highlight && (
+                  <motion.span
+                    animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.15, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Wrench className="w-3.5 h-3.5" />
+                  </motion.span>
+                )}
                 {link.name}
               </button>
             ))}
