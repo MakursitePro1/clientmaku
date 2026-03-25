@@ -141,8 +141,6 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                               top: shareBtnRef.current ? shareBtnRef.current.getBoundingClientRect().bottom + 8 : 0,
                               left: shareBtnRef.current ? shareBtnRef.current.getBoundingClientRect().left : 0,
                             }}
-                              })(),
-                            }}
                           >
                             <div className="flex items-center justify-between mb-2 gap-8">
                               <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider">Share</p>
