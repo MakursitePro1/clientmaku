@@ -480,6 +480,17 @@ const App = () => (
             <Route path="/tools/business-card-maker" element={<BusinessCardMaker />} />
             <Route path="/tools/employee-id-card" element={<EmployeeIdCard />} />
             <Route path="/tools/event-badge-maker" element={<EventBadgeMaker />} />
+            {/* Email Tools */}
+            <Route path="/tools/email-signature-generator" element={<EmailSignatureGenerator />} />
+            <Route path="/tools/email-template-builder" element={<EmailTemplateBuilder />} />
+            <Route path="/tools/mailto-link-generator" element={<MailtoLinkGenerator />} />
+            <Route path="/tools/email-header-analyzer" element={<EmailHeaderAnalyzer />} />
+            <Route path="/tools/email-extractor" element={<EmailExtractor />} />
+            <Route path="/tools/email-obfuscator" element={<EmailObfuscator />} />
+            <Route path="/tools/email-subject-tester" element={<EmailSubjectTester />} />
+            <Route path="/tools/disposable-email-checker" element={<DisposableEmailChecker />} />
+            <Route path="/tools/bulk-email-validator" element={<BulkEmailValidator />} />
+            <Route path="/tools/email-formatter" element={<EmailFormatter />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
