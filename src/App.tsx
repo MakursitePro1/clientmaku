@@ -11,6 +11,10 @@ const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const BlogPage = lazy(() => import("./pages/BlogPage"));
+const BlogPostPage = lazy(() => import("./pages/BlogPostPage"));
+const PolicyPage = lazy(() => import("./pages/PolicyPage"));
+const CategoriesPage = lazy(() => import("./pages/CategoriesPage"));
 
 // Utility Tools
 const InternetSpeedTester = lazy(() => import("./pages/tools/InternetSpeedTester"));
@@ -274,6 +278,10 @@ const App = () => (
             <Route path="/auth" element={<Suspense fallback={<Loading />}><AuthPage /></Suspense>} />
             <Route path="/favorites" element={<Suspense fallback={<Loading />}><FavoritesPage /></Suspense>} />
             <Route path="/profile" element={<Suspense fallback={<Loading />}><ProfilePage /></Suspense>} />
+            <Route path="/blog" element={<Suspense fallback={<Loading />}><BlogPage /></Suspense>} />
+            <Route path="/blog/:slug" element={<Suspense fallback={<Loading />}><BlogPostPage /></Suspense>} />
+            <Route path="/policy" element={<Suspense fallback={<Loading />}><PolicyPage /></Suspense>} />
+            <Route path="/categories" element={<Suspense fallback={<Loading />}><CategoriesPage /></Suspense>} />
             {/* Utility */}
             <Route path="/tools/internet-speed-tester" element={<InternetSpeedTester />} />
             <Route path="/tools/courier-fraud-checker" element={<CourierFraudChecker />} />
