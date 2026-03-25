@@ -9,7 +9,10 @@ import {
   Timer, StickyNote, ListChecks, Brain, Shrink, Maximize,
   Volume2, Shuffle, Coins, Dices, Zap, CaseSensitive,
   DollarSign, Replace, Tag, MapPin, FileCode, Link2,
-  Palette, BookOpen, Grid3X3, FilePlus2
+  Palette, BookOpen, Grid3X3, FilePlus2,
+  Code, ScreenShare, PenLine, MessageCircle, Eye, CalendarClock,
+  BarChart3, KeyRound, AtSign, Radio, Hexagon, FileType, ShieldCheck,
+  LinkIcon, Table2, Paintbrush, Key
 } from "lucide-react";
 
 export type ToolCategory = 
