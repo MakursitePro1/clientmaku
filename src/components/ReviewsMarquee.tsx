@@ -47,7 +47,7 @@ function ReviewCard({ review }: { review: Review }) {
       </div>
       <div className="flex gap-0.5 mb-2.5">
         {Array.from({ length: 5 }, (_, i) => (
-          <Star key={i} className={cn("w-3.5 h-3.5", i < review.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30")} />
+          <Star key={i} className={cn("w-3.5 h-3.5", i < review.rating ? "fill-primary text-primary" : "text-muted-foreground/30")} />
         ))}
       </div>
       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">"{review.text}"</p>
