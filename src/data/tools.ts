@@ -58,6 +58,8 @@ export const categories: { id: ToolCategory; label: string; icon: any }[] = [
   { id: "all", label: "All Tools", icon: Gauge },
   { id: "text-language", label: "Text & Language", icon: Type },
   { id: "image-media", label: "Image & Media", icon: Image },
+  { id: "pdf-tools", label: "PDF Tools", icon: FileText },
+  { id: "design", label: "Design Tools", icon: Palette },
   { id: "id-card", label: "ID Card Makers", icon: IdCard },
   { id: "developer", label: "Developer Tools", icon: Code2 },
   { id: "utility", label: "Utility Tools", icon: Sparkles },
