@@ -156,6 +156,11 @@ const App = () => (
             <Route path="/tools/meta-tag-generator" element={<MetaTagGenerator />} />
             <Route path="/tools/favicon-generator" element={<FaviconGenerator />} />
             <Route path="/tools/slug-generator" element={<SlugGenerator />} />
+            <Route path="/tools/json-to-csv" element={<JsonToCsv />} />
+            <Route path="/tools/color-palette-generator" element={<ColorPaletteGenerator />} />
+            <Route path="/tools/regex-cheat-sheet" element={<RegexCheatSheet />} />
+            <Route path="/tools/character-map" element={<CharacterMap />} />
+            <Route path="/tools/pdf-merger" element={<PdfMerger />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
