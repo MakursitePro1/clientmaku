@@ -114,7 +114,7 @@ export function Navbar() {
 
   const handleNavClick = (link: typeof navLinks[0]) => {
     setIsOpen(false);
-    if (link.path === "/tools") { navigate(link.path); window.scrollTo({ top: 0 }); return; }
+    if (link.path && !link.hash) { navigate(link.path); window.scrollTo({ top: 0 }); return; }
     if (link.hash === "hero") {
       if (location.pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" });
       else { navigate("/"); setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100); }
