@@ -38,6 +38,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   const location = useLocation();
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const shareBtnRef = useRef<HTMLButtonElement>(null);
 
   const currentTool = useMemo(() => tools.find(t => t.path === location.pathname), [location.pathname]);
 
