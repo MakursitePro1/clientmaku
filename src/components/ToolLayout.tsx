@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "./Navbar";
+import { SEOHead } from "./SEOHead";
 
 interface ToolLayoutProps {
   title: string;
@@ -10,8 +11,11 @@ interface ToolLayoutProps {
 }
 
 export function ToolLayout({ title, description, children }: ToolLayoutProps) {
+  const location = useLocation();
+
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead title={title} description={description} path={location.pathname} type="website" />
       <Navbar />
       <div className="pt-28 pb-16 px-4">
         <div className="max-w-5xl mx-auto">
