@@ -299,4 +299,16 @@ export const tools: Tool[] = [
   { id: "svg-editor", name: "SVG Editor", description: "Create and edit SVG shapes visually", icon: Pen, category: "design", path: "/tools/svg-editor", color: "hsl(0, 84%, 60%)" },
   { id: "glassmorphism-generator", name: "Glassmorphism Generator", description: "Create frosted glass CSS effects", icon: Aperture, category: "design", path: "/tools/glassmorphism-generator", color: "hsl(220, 90%, 56%)" },
   { id: "text-art-generator", name: "ASCII Art Generator", description: "Convert text to ASCII art typography", icon: Brush, category: "design", path: "/tools/text-art-generator", color: "hsl(170, 75%, 41%)" },
+
+  // Email Tools
+  { id: "email-signature-generator", name: "Email Signature Generator", description: "Create professional HTML email signatures", icon: MailPlus, category: "email", path: "/tools/email-signature-generator", color: "hsl(263, 85%, 58%)" },
+  { id: "email-template-builder", name: "Email Template Builder", description: "Build responsive HTML email templates", icon: Mail, category: "email", path: "/tools/email-template-builder", color: "hsl(199, 89%, 48%)" },
+  { id: "mailto-link-generator", name: "Mailto Link Generator", description: "Generate mailto links with subject, body & CC", icon: Link2, category: "email", path: "/tools/mailto-link-generator", color: "hsl(142, 71%, 45%)" },
+  { id: "email-header-analyzer", name: "Email Header Analyzer", description: "Parse and analyze raw email headers", icon: MailSearch, category: "email", path: "/tools/email-header-analyzer", color: "hsl(25, 95%, 53%)" },
+  { id: "email-extractor", name: "Email Extractor", description: "Extract email addresses from any text", icon: AtSign, category: "email", path: "/tools/email-extractor", color: "hsl(340, 82%, 52%)" },
+  { id: "email-obfuscator", name: "Email Obfuscator", description: "Obfuscate emails to prevent spam bots", icon: MailX, category: "email", path: "/tools/email-obfuscator", color: "hsl(280, 90%, 55%)" },
+  { id: "email-subject-tester", name: "Subject Line Tester", description: "Analyze email subject lines for effectiveness", icon: MailWarning, category: "email", path: "/tools/email-subject-tester", color: "hsl(47, 95%, 55%)" },
+  { id: "disposable-email-checker", name: "Disposable Email Checker", description: "Check if an email uses a disposable domain", icon: MailCheck, category: "email", path: "/tools/disposable-email-checker", color: "hsl(0, 84%, 60%)" },
+  { id: "bulk-email-validator", name: "Bulk Email Validator", description: "Validate multiple email addresses at once", icon: ListChecks, category: "email", path: "/tools/bulk-email-validator", color: "hsl(220, 90%, 56%)" },
+  { id: "email-formatter", name: "Email Formatter", description: "Format and beautify email content", icon: FileEdit, category: "email", path: "/tools/email-formatter", color: "hsl(170, 75%, 41%)" },
 ];
