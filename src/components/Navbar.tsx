@@ -93,6 +93,7 @@ export function Navbar() {
 
   const isActive = (link: typeof navLinks[0]) => {
     if (link.path === "/tools") return location.pathname === "/tools";
+    if (link.path === "/favorites") return location.pathname === "/favorites";
     if (location.pathname !== "/") return false;
     return link.hash === activeHash;
   };
