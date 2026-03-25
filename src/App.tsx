@@ -66,6 +66,10 @@ const CaseConverter = lazy(() => import("./pages/tools/CaseConverter"));
 const CurrencyConverter = lazy(() => import("./pages/tools/CurrencyConverter"));
 const TextReplacer = lazy(() => import("./pages/tools/TextReplacer"));
 const DiscountCalculator = lazy(() => import("./pages/tools/DiscountCalculator"));
+const IpAddressLookup = lazy(() => import("./pages/tools/IpAddressLookup"));
+const MetaTagGenerator = lazy(() => import("./pages/tools/MetaTagGenerator"));
+const FaviconGenerator = lazy(() => import("./pages/tools/FaviconGenerator"));
+const SlugGenerator = lazy(() => import("./pages/tools/SlugGenerator"));
 
 const queryClient = new QueryClient();
 
@@ -143,6 +147,10 @@ const App = () => (
             <Route path="/tools/currency-converter" element={<CurrencyConverter />} />
             <Route path="/tools/text-replacer" element={<TextReplacer />} />
             <Route path="/tools/discount-calculator" element={<DiscountCalculator />} />
+            <Route path="/tools/ip-address-lookup" element={<IpAddressLookup />} />
+            <Route path="/tools/meta-tag-generator" element={<MetaTagGenerator />} />
+            <Route path="/tools/favicon-generator" element={<FaviconGenerator />} />
+            <Route path="/tools/slug-generator" element={<SlugGenerator />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
