@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "./Navbar";
 import { SEOHead } from "./SEOHead";
+import { FavoriteButton } from "./FavoriteButton";
 import { tools } from "@/data/tools";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -16,14 +17,14 @@ interface ToolLayoutProps {
 export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   const location = useLocation();
 
+  const currentTool = useMemo(() => tools.find(t => t.path === location.pathname), [location.pathname]);
+
   const relatedTools = useMemo(() => {
-    const currentTool = tools.find(t => t.path === location.pathname);
     if (!currentTool) return [];
-    // Same category, exclude self, max 4
     return tools
       .filter(t => t.category === currentTool.category && t.id !== currentTool.id)
       .slice(0, 4);
-  }, [location.pathname]);
+  }, [currentTool]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,15 +37,22 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
               <ArrowLeft className="mr-2 w-4 h-4" /> Back to Tools
             </Button>
           </Link>
-          <div className="mb-8">
-            <h1 className="text-3xl font-extrabold mb-2">{title}</h1>
-            <p className="text-muted-foreground">{description}</p>
+          <div className="mb-8 flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-extrabold mb-2">{title}</h1>
+              <p className="text-muted-foreground">{description}</p>
+            </div>
+            {currentTool && (
+              <FavoriteButton
+                toolId={currentTool.id}
+                className="mt-1 p-2.5 rounded-xl border border-border/50 bg-card hover:bg-accent"
+              />
+            )}
           </div>
           <div className="bg-card rounded-2xl border border-border p-6 sm:p-8 card-shadow">
             {children}
           </div>
 
-          {/* Related Tools */}
           {relatedTools.length > 0 && (
             <div className="mt-14">
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
@@ -75,6 +83,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                         <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors truncate">{tool.name}</h3>
                         <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{tool.description}</p>
                       </div>
+                      <FavoriteButton toolId={tool.id} />
                     </div>
                     <div className="flex items-center mt-3 pt-3 border-t border-border/30 group-hover:border-primary/20 transition-colors">
                       <span className="text-xs font-semibold text-primary/70 group-hover:text-primary flex items-center transition-colors">
