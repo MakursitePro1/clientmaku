@@ -47,12 +47,17 @@ export function Navbar() {
   }, [location.pathname]);
 
   const isActive = (link: typeof navLinks[0]) => {
+    if (link.path === "/tools") return location.pathname === "/tools";
     if (location.pathname !== "/") return false;
     return link.hash === activeHash;
   };
 
   const handleNavClick = (link: typeof navLinks[0]) => {
     setIsOpen(false);
+    if (link.path === "/tools") {
+      window.location.href = "/tools";
+      return;
+    }
     if (link.hash) {
       if (location.pathname === "/") {
         const el = document.getElementById(link.hash);
