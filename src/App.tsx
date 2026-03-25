@@ -236,6 +236,18 @@ const BusinessCardMaker = lazy(() => import("./pages/tools/BusinessCardMaker"));
 const EmployeeIdCard = lazy(() => import("./pages/tools/EmployeeIdCard"));
 const EventBadgeMaker = lazy(() => import("./pages/tools/EventBadgeMaker"));
 
+// Email Tools
+const EmailSignatureGenerator = lazy(() => import("./pages/tools/EmailSignatureGenerator"));
+const EmailTemplateBuilder = lazy(() => import("./pages/tools/EmailTemplateBuilder"));
+const MailtoLinkGenerator = lazy(() => import("./pages/tools/MailtoLinkGenerator"));
+const EmailHeaderAnalyzer = lazy(() => import("./pages/tools/EmailHeaderAnalyzer"));
+const EmailExtractor = lazy(() => import("./pages/tools/EmailExtractor"));
+const EmailObfuscator = lazy(() => import("./pages/tools/EmailObfuscator"));
+const EmailSubjectTester = lazy(() => import("./pages/tools/EmailSubjectTester"));
+const DisposableEmailChecker = lazy(() => import("./pages/tools/DisposableEmailChecker"));
+const BulkEmailValidator = lazy(() => import("./pages/tools/BulkEmailValidator"));
+const EmailFormatter = lazy(() => import("./pages/tools/EmailFormatter"));
+
 const queryClient = new QueryClient();
 
 const Loading = () => (
