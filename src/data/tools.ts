@@ -9,7 +9,10 @@ import {
   Timer, StickyNote, ListChecks, Brain, Shrink, Maximize,
   Volume2, Shuffle, Coins, Dices, Zap, CaseSensitive,
   DollarSign, Replace, Tag, MapPin, FileCode, Link2,
-  Palette, BookOpen, Grid3X3, FilePlus2
+  Palette, BookOpen, Grid3X3, FilePlus2,
+  Code, ScreenShare, PenLine, MessageCircle, Eye, CalendarClock,
+  BarChart3, KeyRound, AtSign, Radio, Hexagon, FileType, ShieldCheck,
+  LinkIcon, Table2, Paintbrush, Key
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -116,4 +119,25 @@ export const tools: Tool[] = [
   { id: "fake-bd-smart-nid", name: "Fake BD Smart NID Card Maker", description: "Generate fake smart NID cards", icon: IdCard, category: "id-card", path: "/tools/fake-bd-smart-nid", color: "hsl(263, 85%, 58%)" },
   { id: "fake-pak-cnic", name: "Fake Pakistani CNIC Card Maker", description: "Generate fake Pakistani CNIC cards", icon: CreditCard, category: "id-card", path: "/tools/fake-pak-cnic", color: "hsl(142, 71%, 45%)" },
   { id: "student-id-card", name: "Student ID Card Maker", description: "Create student ID cards easily", icon: GraduationCap, category: "id-card", path: "/tools/student-id-card", color: "hsl(25, 95%, 53%)" },
+  // Additional Tools
+  { id: "html-entity-converter", name: "HTML Entity Converter", description: "Encode and decode HTML entities", icon: Code, category: "developer", path: "/tools/html-entity-converter", color: "hsl(199, 89%, 48%)" },
+  { id: "screen-resolution", name: "Screen Resolution Checker", description: "Check your screen resolution and display info", icon: ScreenShare, category: "utility", path: "/tools/screen-resolution", color: "hsl(263, 85%, 58%)" },
+  { id: "text-to-handwriting", name: "Text to Handwriting", description: "Convert typed text into handwriting-style images", icon: PenLine, category: "text-language", path: "/tools/text-to-handwriting", color: "hsl(25, 95%, 53%)" },
+  { id: "whatsapp-link-generator", name: "WhatsApp Link Generator", description: "Create direct WhatsApp chat links", icon: MessageCircle, category: "utility", path: "/tools/whatsapp-link-generator", color: "hsl(142, 71%, 45%)" },
+  { id: "color-blindness-simulator", name: "Color Blindness Simulator", description: "See how images look to people with color blindness", icon: Eye, category: "image-media", path: "/tools/color-blindness-simulator", color: "hsl(280, 90%, 55%)" },
+  { id: "crontab-generator", name: "Crontab Generator", description: "Generate and understand cron expressions", icon: CalendarClock, category: "developer", path: "/tools/crontab-generator", color: "hsl(170, 75%, 41%)" },
+  { id: "barcode-generator", name: "Barcode Generator", description: "Generate barcodes from text", icon: BarChart3, category: "utility", path: "/tools/barcode-generator", color: "hsl(220, 90%, 56%)" },
+  { id: "privacy-policy-generator", name: "Privacy Policy Generator", description: "Generate a privacy policy for your website", icon: ShieldCheck, category: "developer", path: "/tools/privacy-policy-generator", color: "hsl(340, 82%, 52%)" },
+  { id: "url-shortener", name: "URL Shortener", description: "Shorten long URLs for easy sharing", icon: LinkIcon, category: "utility", path: "/tools/url-shortener", color: "hsl(199, 89%, 48%)" },
+  { id: "text-to-binary", name: "Text to Binary Converter", description: "Convert text to binary and binary to text", icon: Binary, category: "developer", path: "/tools/text-to-binary", color: "hsl(47, 95%, 55%)" },
+  { id: "json-to-yaml", name: "JSON to YAML Converter", description: "Convert JSON to YAML format", icon: FileType, category: "developer", path: "/tools/json-to-yaml", color: "hsl(0, 84%, 60%)" },
+  { id: "html-preview", name: "HTML Live Preview", description: "Write HTML and see live preview instantly", icon: Code2, category: "developer", path: "/tools/html-preview", color: "hsl(263, 85%, 58%)" },
+  { id: "csv-viewer", name: "CSV Viewer", description: "View and parse CSV data in a table", icon: Table2, category: "developer", path: "/tools/csv-viewer", color: "hsl(142, 71%, 45%)" },
+  { id: "image-color-extractor", name: "Image Color Extractor", description: "Extract dominant colors from any image", icon: Paintbrush, category: "image-media", path: "/tools/image-color-extractor", color: "hsl(340, 82%, 52%)" },
+  { id: "jwt-decoder", name: "JWT Decoder", description: "Decode and inspect JSON Web Tokens", icon: KeyRound, category: "developer", path: "/tools/jwt-decoder", color: "hsl(25, 95%, 53%)" },
+  { id: "password-strength-checker", name: "Password Strength Checker", description: "Check how strong your password is", icon: Key, category: "utility", path: "/tools/password-strength-checker", color: "hsl(142, 71%, 45%)" },
+  { id: "email-validator", name: "Email Validator", description: "Validate email address format and structure", icon: AtSign, category: "utility", path: "/tools/email-validator", color: "hsl(220, 90%, 56%)" },
+  { id: "text-to-morse", name: "Text to Morse Code", description: "Convert text to Morse code and vice versa", icon: Radio, category: "text-language", path: "/tools/text-to-morse", color: "hsl(47, 95%, 55%)" },
+  { id: "hex-editor", name: "Hex Editor", description: "Convert text to hexadecimal and back", icon: Hexagon, category: "developer", path: "/tools/hex-editor", color: "hsl(280, 90%, 55%)" },
+  { id: "text-encryption", name: "Text Encryption Tool", description: "Encrypt and decrypt text using Caesar cipher", icon: Lock, category: "developer", path: "/tools/text-encryption", color: "hsl(0, 84%, 60%)" },
 ];

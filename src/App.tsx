@@ -75,6 +75,26 @@ const ColorPaletteGenerator = lazy(() => import("./pages/tools/ColorPaletteGener
 const RegexCheatSheet = lazy(() => import("./pages/tools/RegexCheatSheet"));
 const CharacterMap = lazy(() => import("./pages/tools/CharacterMap"));
 const PdfMerger = lazy(() => import("./pages/tools/PdfMerger"));
+const HtmlEntityConverter = lazy(() => import("./pages/tools/HtmlEntityConverter"));
+const ScreenResolutionChecker = lazy(() => import("./pages/tools/ScreenResolutionChecker"));
+const TextToHandwriting = lazy(() => import("./pages/tools/TextToHandwriting"));
+const WhatsAppLinkGenerator = lazy(() => import("./pages/tools/WhatsAppLinkGenerator"));
+const ColorBlindnessSimulator = lazy(() => import("./pages/tools/ColorBlindnessSimulator"));
+const CrontabGenerator = lazy(() => import("./pages/tools/CrontabGenerator"));
+const BarcodeGenerator = lazy(() => import("./pages/tools/BarcodeGenerator"));
+const PrivacyPolicyGenerator = lazy(() => import("./pages/tools/PrivacyPolicyGenerator"));
+const UrlShortener = lazy(() => import("./pages/tools/UrlShortener"));
+const TextToBinary = lazy(() => import("./pages/tools/TextToBinary"));
+const JsonToYaml = lazy(() => import("./pages/tools/JsonToYaml"));
+const HtmlPreview = lazy(() => import("./pages/tools/HtmlPreview"));
+const CsvViewer = lazy(() => import("./pages/tools/CsvViewer"));
+const ImageColorExtractor = lazy(() => import("./pages/tools/ImageColorExtractor"));
+const JwtDecoder = lazy(() => import("./pages/tools/JwtDecoder"));
+const PasswordStrengthChecker = lazy(() => import("./pages/tools/PasswordStrengthChecker"));
+const EmailValidator = lazy(() => import("./pages/tools/EmailValidator"));
+const TextToMorse = lazy(() => import("./pages/tools/TextToMorse"));
+const HexEditor = lazy(() => import("./pages/tools/HexEditor"));
+const TextEncryption = lazy(() => import("./pages/tools/TextEncryption"));
 
 const queryClient = new QueryClient();
 
@@ -161,6 +181,26 @@ const App = () => (
             <Route path="/tools/regex-cheat-sheet" element={<RegexCheatSheet />} />
             <Route path="/tools/character-map" element={<CharacterMap />} />
             <Route path="/tools/pdf-merger" element={<PdfMerger />} />
+            <Route path="/tools/html-entity-converter" element={<HtmlEntityConverter />} />
+            <Route path="/tools/screen-resolution" element={<ScreenResolutionChecker />} />
+            <Route path="/tools/text-to-handwriting" element={<TextToHandwriting />} />
+            <Route path="/tools/whatsapp-link-generator" element={<WhatsAppLinkGenerator />} />
+            <Route path="/tools/color-blindness-simulator" element={<ColorBlindnessSimulator />} />
+            <Route path="/tools/crontab-generator" element={<CrontabGenerator />} />
+            <Route path="/tools/barcode-generator" element={<BarcodeGenerator />} />
+            <Route path="/tools/privacy-policy-generator" element={<PrivacyPolicyGenerator />} />
+            <Route path="/tools/url-shortener" element={<UrlShortener />} />
+            <Route path="/tools/text-to-binary" element={<TextToBinary />} />
+            <Route path="/tools/json-to-yaml" element={<JsonToYaml />} />
+            <Route path="/tools/html-preview" element={<HtmlPreview />} />
+            <Route path="/tools/csv-viewer" element={<CsvViewer />} />
+            <Route path="/tools/image-color-extractor" element={<ImageColorExtractor />} />
+            <Route path="/tools/jwt-decoder" element={<JwtDecoder />} />
+            <Route path="/tools/password-strength-checker" element={<PasswordStrengthChecker />} />
+            <Route path="/tools/email-validator" element={<EmailValidator />} />
+            <Route path="/tools/text-to-morse" element={<TextToMorse />} />
+            <Route path="/tools/hex-editor" element={<HexEditor />} />
+            <Route path="/tools/text-encryption" element={<TextEncryption />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
