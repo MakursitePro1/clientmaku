@@ -18,9 +18,9 @@ export function FavoriteButton({ toolId, className, size = "sm" }: FavoriteButto
   const fav = isFavorite(toolId);
 
   const sizeMap = {
-    sm: { button: "p-1.5", icon: "w-4 h-4" },
-    md: { button: "p-2.5", icon: "w-5 h-5" },
-    lg: { button: "p-3.5", icon: "w-6 h-6" },
+    sm: { button: "w-9 h-9", icon: "w-4 h-4", ring: "w-10 h-10" },
+    md: { button: "w-11 h-11", icon: "w-5 h-5", ring: "w-12 h-12" },
+    lg: { button: "w-14 h-14", icon: "w-6 h-6", ring: "w-16 h-16" },
   };
 
   const handleClick = async (e: React.MouseEvent) => {
@@ -36,26 +36,26 @@ export function FavoriteButton({ toolId, className, size = "sm" }: FavoriteButto
   return (
     <motion.button
       onClick={handleClick}
-      whileTap={{ scale: 0.8 }}
-      whileHover={{ scale: 1.2 }}
+      whileTap={{ scale: 0.85 }}
+      whileHover={{ scale: 1.1 }}
       className={cn(
-        "shrink-0 rounded-xl transition-all duration-300 relative group/fav",
+        "shrink-0 rounded-xl flex items-center justify-center relative transition-all duration-300",
         sizeMap[size].button,
         fav
-          ? "text-red-500"
-          : "text-muted-foreground/50 hover:text-red-400",
+          ? "bg-gradient-to-br from-red-500/20 to-pink-500/20 border-2 border-red-500/40 shadow-[0_0_20px_rgba(239,68,68,0.25)]"
+          : "bg-card/80 border-2 border-border/60 hover:border-red-400/40 hover:bg-red-500/5 shadow-sm",
         className
       )}
       aria-label={fav ? "Remove from favorites" : "Add to favorites"}
     >
-      {/* Glow ring behind icon when active */}
+      {/* Outer glow pulse when active */}
       <AnimatePresence>
         {fav && (
           <motion.span
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            className="absolute inset-0 rounded-xl bg-red-500/10 border border-red-500/20"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-0 rounded-xl border-2 border-red-500/30"
           />
         )}
       </AnimatePresence>
@@ -71,12 +71,12 @@ export function FavoriteButton({ toolId, className, size = "sm" }: FavoriteButto
                 animate={{
                   scale: [0, 1.5],
                   opacity: [1, 0],
-                  x: [0, Math.cos((deg * Math.PI) / 180) * 14],
-                  y: [0, Math.sin((deg * Math.PI) / 180) * 14],
+                  x: [0, Math.cos((deg * Math.PI) / 180) * 16],
+                  y: [0, Math.sin((deg * Math.PI) / 180) * 16],
                 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
-                className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-red-400"
-                style={{ marginLeft: -2, marginTop: -2 }}
+                className="absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full bg-red-400"
+                style={{ marginLeft: -3, marginTop: -3 }}
               />
             ))}
           </>
@@ -87,8 +87,9 @@ export function FavoriteButton({ toolId, className, size = "sm" }: FavoriteButto
         className={cn(
           sizeMap[size].icon,
           "relative z-10 transition-all duration-300",
-          fav && "fill-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.6)]",
-          !fav && "group-hover/fav:drop-shadow-[0_0_4px_rgba(239,68,68,0.3)]"
+          fav
+            ? "fill-red-500 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.7)]"
+            : "text-muted-foreground/70 group-hover:text-red-400"
         )}
       />
     </motion.button>

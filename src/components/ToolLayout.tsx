@@ -94,7 +94,6 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                 <FavoriteButton
                   toolId={currentTool.id}
                   size="lg"
-                  className="mt-1 rounded-2xl border border-border/50 bg-card hover:bg-accent shadow-sm"
                 />
               )}
             </div>

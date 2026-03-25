@@ -261,7 +261,7 @@ export function ToolsGrid() {
                         </span>
                         <ArrowRight className="ml-2 w-4 h-4 transition-all duration-300 group-hover:translate-x-2" />
                       </span>
-                      <FavoriteButton toolId={tool.id} />
+                      <FavoriteButton toolId={tool.id} size="md" />
                     </div>
                   </div>
                 </Link>
