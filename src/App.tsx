@@ -7,6 +7,14 @@ import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+
+// Admin
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminTools = lazy(() => import("./pages/admin/AdminTools"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+import { AdminGuard } from "@/components/AdminGuard";
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
@@ -507,6 +515,13 @@ const App = () => (
             <Route path="/tools/disposable-email-checker" element={<DisposableEmailChecker />} />
             <Route path="/tools/bulk-email-validator" element={<BulkEmailValidator />} />
             <Route path="/tools/email-formatter" element={<EmailFormatter />} />
+            {/* Admin Panel */}
+            <Route path="/admin" element={<Suspense fallback={<Loading />}><AdminGuard><AdminLayout /></AdminGuard></Suspense>}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="tools" element={<AdminTools />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
