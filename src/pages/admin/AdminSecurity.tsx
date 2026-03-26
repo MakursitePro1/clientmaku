@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,11 +8,12 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Shield, Lock, Key, Mail, UserPlus, AlertTriangle,
+  Shield, Lock, Key, Mail, AlertTriangle,
   CheckCircle, Eye, EyeOff, RefreshCw, Globe, Fingerprint,
-  Clock, Timer, Smartphone
+  Clock, Timer, Smartphone, UserPlus, X
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { QRCodeSVG } from "qrcode.react";
 
 const SESSION_TIMEOUT_KEY = "admin_session_timeout_hours";
 
@@ -32,16 +32,25 @@ export default function AdminSecurity() {
   const [loadingRoles, setLoadingRoles] = useState(true);
 
   // Security toggles
-  const [totpEnabled, setTotpEnabled] = useState(false);
   const [loginNotifications, setLoginNotifications] = useState(false);
 
   // Session timeout
   const [sessionTimeoutHours, setSessionTimeoutHours] = useState("12");
   const [savingTimeout, setSavingTimeout] = useState(false);
 
+  // TOTP
+  const [totpStatus, setTotpStatus] = useState<{ enabled: boolean; setup_pending: boolean }>({ enabled: false, setup_pending: false });
+  const [totpSetupData, setTotpSetupData] = useState<{ secret: string; uri: string } | null>(null);
+  const [totpCode, setTotpCode] = useState("");
+  const [totpVerifying, setTotpVerifying] = useState(false);
+  const [totpDisableCode, setTotpDisableCode] = useState("");
+  const [showDisableTotp, setShowDisableTotp] = useState(false);
+  const [totpLoading, setTotpLoading] = useState(true);
+
   useEffect(() => {
     fetchAdminEmails();
     fetchSecuritySettings();
+    fetchTotpStatus();
   }, []);
 
   const fetchAdminEmails = async () => {
@@ -68,15 +77,36 @@ export default function AdminSecurity() {
     const { data } = await supabase
       .from("site_settings")
       .select("key, value")
-      .in("key", ["totp_enabled", "login_notifications", SESSION_TIMEOUT_KEY]);
+      .in("key", ["login_notifications", SESSION_TIMEOUT_KEY]);
 
     if (data) {
       data.forEach((row: any) => {
-        if (row.key === "totp_enabled") setTotpEnabled(row.value === true || row.value === "true");
         if (row.key === "login_notifications") setLoginNotifications(row.value === true || row.value === "true");
         if (row.key === SESSION_TIMEOUT_KEY) setSessionTimeoutHours(String(row.value || "12"));
       });
     }
+  };
+
+  const fetchTotpStatus = async () => {
+    setTotpLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/totp-manage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ action: "status" }),
+      });
+      const result = await res.json();
+      setTotpStatus({ enabled: result.enabled, setup_pending: result.setup_pending });
+    } catch (err) {
+      console.error("TOTP status error:", err);
+    }
+    setTotpLoading(false);
   };
 
   const saveSetting = async (key: string, value: any) => {
@@ -86,12 +116,6 @@ export default function AdminSecurity() {
         { key, value: value as any, updated_at: new Date().toISOString(), updated_by: user?.id },
         { onConflict: "key" }
       );
-  };
-
-  const handleToggleTotp = async (val: boolean) => {
-    setTotpEnabled(val);
-    await saveSetting("totp_enabled", val);
-    toast({ title: "Updated", description: `Google Authenticator (TOTP) ${val ? "enabled" : "disabled"}.` });
   };
 
   const handleToggleLoginNotifications = async (val: boolean) => {
@@ -108,7 +132,6 @@ export default function AdminSecurity() {
     }
     setSavingTimeout(true);
     await saveSetting(SESSION_TIMEOUT_KEY, hours);
-    // Also save to localStorage for the session checker to use
     localStorage.setItem(SESSION_TIMEOUT_KEY, String(hours));
     setSavingTimeout(false);
     toast({ title: "Saved", description: `Session will expire after ${hours} hours of inactivity.` });
@@ -135,6 +158,99 @@ export default function AdminSecurity() {
     setChangingPassword(false);
   };
 
+  // TOTP Setup
+  const handleTotpSetup = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/totp-manage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ action: "setup" }),
+      });
+      const result = await res.json();
+      if (result.error) {
+        toast({ title: "Error", description: result.error, variant: "destructive" });
+        return;
+      }
+      setTotpSetupData(result);
+      setTotpStatus({ enabled: false, setup_pending: true });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleTotpVerify = async () => {
+    if (totpCode.length !== 6) {
+      toast({ title: "Error", description: "Enter a 6-digit code.", variant: "destructive" });
+      return;
+    }
+    setTotpVerifying(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/totp-manage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ action: "verify", code: totpCode }),
+      });
+      const result = await res.json();
+      if (result.valid) {
+        toast({ title: "Success!", description: "Google Authenticator has been activated." });
+        setTotpStatus({ enabled: true, setup_pending: false });
+        setTotpSetupData(null);
+        setTotpCode("");
+        // Mark session as TOTP verified
+        sessionStorage.setItem("totp_verified", "true");
+      } else {
+        toast({ title: "Invalid Code", description: "The code is incorrect. Please try again.", variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+    setTotpVerifying(false);
+  };
+
+  const handleTotpDisable = async () => {
+    if (totpDisableCode.length !== 6) {
+      toast({ title: "Error", description: "Enter a 6-digit code to disable.", variant: "destructive" });
+      return;
+    }
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/totp-manage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ action: "disable", code: totpDisableCode }),
+      });
+      const result = await res.json();
+      if (result.disabled) {
+        toast({ title: "Disabled", description: "Google Authenticator has been removed." });
+        setTotpStatus({ enabled: false, setup_pending: false });
+        setShowDisableTotp(false);
+        setTotpDisableCode("");
+        sessionStorage.removeItem("totp_verified");
+      } else {
+        toast({ title: "Error", description: result.error || "Invalid code.", variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -153,7 +269,6 @@ export default function AdminSecurity() {
                 <Fingerprint className="w-4 h-4 text-primary" />
                 Admin Account
               </CardTitle>
-              <p className="text-xs text-muted-foreground">Current admin account details</p>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
@@ -196,7 +311,6 @@ export default function AdminSecurity() {
                 <Lock className="w-4 h-4 text-primary" />
                 Change Password
               </CardTitle>
-              <p className="text-xs text-muted-foreground">Update your admin password</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
@@ -257,17 +371,166 @@ export default function AdminSecurity() {
         </motion.div>
       </div>
 
-      {/* Session Timeout */}
+      {/* Google Authenticator (TOTP) */}
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <Card className="border-border/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Smartphone className="w-4 h-4 text-primary" />
+              Google Authenticator (TOTP)
+              {totpLoading ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+              ) : totpStatus.enabled ? (
+                <Badge className="bg-green-500/10 text-green-600 text-[10px]">Active</Badge>
+              ) : (
+                <Badge variant="secondary" className="text-[10px]">Inactive</Badge>
+              )}
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Add an extra layer of security by requiring a 6-digit code from Google Authenticator
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!totpStatus.enabled && !totpSetupData && (
+              <div className="text-center py-4">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                  <Smartphone className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground">Two-Factor Authentication</h3>
+                <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+                  Protect your admin account by requiring a verification code from Google Authenticator each time you access the admin panel.
+                </p>
+                <Button onClick={handleTotpSetup} className="mt-4 gap-2">
+                  <Key className="w-4 h-4" />
+                  Setup Google Authenticator
+                </Button>
+              </div>
+            )}
+
+            {totpSetupData && !totpStatus.enabled && (
+              <div className="space-y-4">
+                <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                  {/* QR Code */}
+                  <div className="bg-white p-4 rounded-xl border shadow-sm">
+                    <QRCodeSVG value={totpSetupData.uri} size={200} />
+                  </div>
+                  {/* Instructions */}
+                  <div className="flex-1 space-y-3">
+                    <h3 className="font-semibold text-foreground">Setup Steps:</h3>
+                    <ol className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center shrink-0 mt-0.5">1</span>
+                        Install <strong className="text-foreground">Google Authenticator</strong> on your phone (iOS/Android)
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center shrink-0 mt-0.5">2</span>
+                        Open the app and tap the <strong className="text-foreground">+</strong> button
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center shrink-0 mt-0.5">3</span>
+                        Select <strong className="text-foreground">"Scan a QR code"</strong> and scan the code on the left
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center shrink-0 mt-0.5">4</span>
+                        Enter the 6-digit code below to verify
+                      </li>
+                    </ol>
+
+                    <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
+                      <p className="text-xs text-muted-foreground mb-1">Manual entry key (if QR scan doesn't work):</p>
+                      <code className="text-sm font-mono text-foreground break-all select-all">{totpSetupData.secret}</code>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Verification */}
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end pt-2 border-t border-border/50">
+                  <div className="flex-1 space-y-1.5 w-full">
+                    <label className="text-sm font-medium">Enter 6-digit code from Google Authenticator</label>
+                    <Input
+                      value={totpCode}
+                      onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="000000"
+                      className="text-center text-lg font-mono tracking-[0.5em] max-w-[200px]"
+                      maxLength={6}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => { setTotpSetupData(null); setTotpCode(""); }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleTotpVerify}
+                      disabled={totpVerifying || totpCode.length !== 6}
+                      className="gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      {totpVerifying ? "Verifying..." : "Verify & Activate"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {totpStatus.enabled && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-4 rounded-lg bg-green-500/5 border border-green-500/20">
+                  <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Google Authenticator is active</p>
+                    <p className="text-xs text-muted-foreground">A 6-digit code will be required each time you access the admin panel.</p>
+                  </div>
+                </div>
+
+                {!showDisableTotp ? (
+                  <Button
+                    variant="outline"
+                    className="text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
+                    onClick={() => setShowDisableTotp(true)}
+                  >
+                    <X className="w-4 h-4" /> Disable Google Authenticator
+                  </Button>
+                ) : (
+                  <div className="p-4 rounded-lg border border-destructive/30 bg-destructive/5 space-y-3">
+                    <p className="text-sm font-medium text-destructive">Enter your current 6-digit code to disable:</p>
+                    <div className="flex gap-3">
+                      <Input
+                        value={totpDisableCode}
+                        onChange={(e) => setTotpDisableCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        placeholder="000000"
+                        className="text-center font-mono tracking-[0.5em] max-w-[200px]"
+                        maxLength={6}
+                      />
+                      <Button
+                        variant="destructive"
+                        onClick={handleTotpDisable}
+                        disabled={totpDisableCode.length !== 6}
+                      >
+                        Disable
+                      </Button>
+                      <Button variant="outline" onClick={() => { setShowDisableTotp(false); setTotpDisableCode(""); }}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Session Timeout */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Timer className="w-4 h-4 text-primary" />
               Session Timeout
             </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Automatically log out the admin after a specified duration
-            </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
@@ -285,14 +548,10 @@ export default function AdminSecurity() {
                   placeholder="12"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Current: <span className="font-medium text-foreground">{sessionTimeoutHours} hours</span> — You will be automatically signed out after this period.
+                  Current: <span className="font-medium text-foreground">{sessionTimeoutHours} hours</span>
                 </p>
               </div>
-              <Button
-                onClick={handleSaveSessionTimeout}
-                disabled={savingTimeout}
-                className="gap-2 shrink-0"
-              >
+              <Button onClick={handleSaveSessionTimeout} disabled={savingTimeout} className="gap-2 shrink-0">
                 <Clock className="w-4 h-4" />
                 {savingTimeout ? "Saving..." : "Save Timeout"}
               </Button>
@@ -314,30 +573,16 @@ export default function AdminSecurity() {
         </Card>
       </motion.div>
 
-      {/* Security Features */}
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+      {/* Login Notifications */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Key className="w-4 h-4 text-primary" />
-              Security Features
+              <Mail className="w-4 h-4 text-primary" />
+              Notifications
             </CardTitle>
-            <p className="text-xs text-muted-foreground">Configure additional security layers</p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-card">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Smartphone className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Google Authenticator (TOTP)</p>
-                  <p className="text-xs text-muted-foreground">Require a 6-digit code from Google Authenticator app for admin login</p>
-                </div>
-              </div>
-              <Switch checked={totpEnabled} onCheckedChange={handleToggleTotp} />
-            </div>
-
+          <CardContent>
             <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-card">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
@@ -362,7 +607,6 @@ export default function AdminSecurity() {
               <UserPlus className="w-4 h-4 text-primary" />
               Admin Access Control
             </CardTitle>
-            <p className="text-xs text-muted-foreground">Manage which users have admin privileges</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -389,14 +633,13 @@ export default function AdminSecurity() {
                 </div>
               )}
             </div>
-
             <div className="pt-3 border-t border-border/50">
               <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
                   <div className="text-xs space-y-1">
                     <p className="font-medium text-amber-700 dark:text-amber-400">Security Notice</p>
-                    <p className="text-muted-foreground">The admin panel URL and credentials should never be shared publicly. Only authorized personnel should have access.</p>
+                    <p className="text-muted-foreground">The admin panel URL and credentials should never be shared publicly.</p>
                   </div>
                 </div>
               </div>
