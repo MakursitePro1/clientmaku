@@ -321,20 +321,25 @@ export function Navbar() {
           <div className={cn("relative z-10 ml-auto flex items-center gap-1 lg:hidden", isCompactNav ? "" : "!hidden")}>
             <motion.button
               onClick={() => navigate("/favorites")}
-              whileTap={{ scale: 0.85 }}
-              className="relative p-2 rounded-lg"
+              whileTap={{ scale: 0.9 }}
+              className={cn(
+                "relative p-2 rounded-lg border-2 transition-all",
+                favorites.length > 0
+                  ? "bg-red-50/80 border-red-300/40"
+                  : "bg-white/60 border-gray-200/60"
+              )}
               aria-label="Favorites"
             >
               <Heart
                 className={cn(
-                  "w-5 h-5 transition-all",
+                  "w-4.5 h-4.5 transition-all",
                   favorites.length > 0
-                    ? "fill-red-500 text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]"
+                    ? "fill-red-500 text-red-500"
                     : "text-gray-500"
                 )}
               />
               {favorites.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-gradient-to-br from-red-500 to-pink-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 shadow-lg">
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-gradient-to-br from-red-500 to-pink-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 shadow-lg">
                   {favorites.length}
                 </span>
               )}
