@@ -4,15 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-
-const contactInfo = [
-  { icon: MapPin, title: "Our Location", value: "Dhaka, Bangladesh", color: "from-violet-500 to-purple-600" },
-  { icon: Phone, title: "Phone Number", value: "+880 1754-839834", color: "from-pink-500 to-rose-600" },
-  { icon: Mail, title: "Email Address", value: "hello@cybervenom.com", color: "from-amber-500 to-orange-600" },
-  { icon: Clock, title: "Working Hours", value: "24/7 Available", color: "from-emerald-500 to-teal-600" },
-];
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 export function ContactSection() {
+  const { settings } = useSiteSettings();
+
+  const contactInfo = [
+    { icon: MapPin, title: "Our Location", value: settings.contact_address || "Dhaka, Bangladesh", color: "from-violet-500 to-purple-600" },
+    { icon: Phone, title: "Phone Number", value: settings.contact_phone || "+880 1754-839834", color: "from-pink-500 to-rose-600" },
+    { icon: Mail, title: "Email Address", value: settings.contact_email || "hello@cybervenom.com", color: "from-amber-500 to-orange-600" },
+    { icon: Clock, title: "Working Hours", value: "24/7 Available", color: "from-emerald-500 to-teal-600" },
+  ];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({ title: "✅ Message Sent!", description: "We'll get back to you as soon as possible." });
@@ -20,7 +23,6 @@ export function ContactSection() {
 
   return (
     <section id="contact" className="py-24 px-4 relative overflow-hidden">
-      {/* Background effects */}
       <motion.div
         className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full blur-[250px] opacity-20"
         style={{ background: "hsl(263 85% 58% / 0.08)" }}
@@ -35,7 +37,6 @@ export function ContactSection() {
       />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -61,7 +62,6 @@ export function ContactSection() {
         </motion.div>
 
         <div className="grid lg:grid-cols-5 gap-8">
-          {/* Contact info cards */}
           <div className="lg:col-span-2 space-y-4">
             {contactInfo.map((info, i) => (
               <motion.div
@@ -73,9 +73,7 @@ export function ContactSection() {
                 whileHover={{ x: 6, scale: 1.01 }}
                 className="group relative glass rounded-2xl p-5 border border-border/30 hover:border-primary/30 transition-all duration-500 cursor-default overflow-hidden"
               >
-                {/* Shimmer top line */}
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
                 <div className="flex items-center gap-4 relative z-10">
                   <motion.div
                     whileHover={{ rotate: [0, -10, 10, 0] }}
@@ -92,7 +90,6 @@ export function ContactSection() {
               </motion.div>
             ))}
 
-            {/* Extra info card */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -108,13 +105,12 @@ export function ContactSection() {
                   <h4 className="font-bold text-sm">We're Global</h4>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Our tools are used by <span className="text-primary font-semibold">200K+</span> people worldwide. Join the community!
+                  Our tools are used by <span className="text-primary font-semibold">{settings.stats_users_count}</span> people worldwide. Join the community!
                 </p>
               </div>
             </motion.div>
           </div>
 
-          {/* Contact form */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -127,10 +123,7 @@ export function ContactSection() {
               onSubmit={handleSubmit}
               className="relative glass-strong rounded-3xl p-8 md:p-10 border border-border/30 space-y-5 overflow-hidden"
             >
-              {/* Top shimmer */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-              
-              {/* Form header */}
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center glow-shadow">
                   <Send className="w-5 h-5 text-primary-foreground" />
@@ -144,56 +137,33 @@ export function ContactSection() {
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-muted-foreground">Full Name</label>
-                  <Input
-                    placeholder="John Doe"
-                    className="rounded-xl bg-card/60 border-border/40 focus:border-primary/40 focus:shadow-[0_0_20px_-6px_hsl(263_85%_58%/0.15)] transition-all h-12"
-                    required
-                  />
+                  <Input placeholder="John Doe" className="rounded-xl bg-card/60 border-border/40 focus:border-primary/40 focus:shadow-[0_0_20px_-6px_hsl(263_85%_58%/0.15)] transition-all h-12" required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-muted-foreground">Email</label>
-                  <Input
-                    type="email"
-                    placeholder="john@example.com"
-                    className="rounded-xl bg-card/60 border-border/40 focus:border-primary/40 focus:shadow-[0_0_20px_-6px_hsl(263_85%_58%/0.15)] transition-all h-12"
-                    required
-                  />
+                  <Input type="email" placeholder="john@example.com" className="rounded-xl bg-card/60 border-border/40 focus:border-primary/40 focus:shadow-[0_0_20px_-6px_hsl(263_85%_58%/0.15)] transition-all h-12" required />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-muted-foreground">Subject</label>
-                <Input
-                  placeholder="What's this about?"
-                  className="rounded-xl bg-card/60 border-border/40 focus:border-primary/40 focus:shadow-[0_0_20px_-6px_hsl(263_85%_58%/0.15)] transition-all h-12"
-                  required
-                />
+                <Input placeholder="What's this about?" className="rounded-xl bg-card/60 border-border/40 focus:border-primary/40 focus:shadow-[0_0_20px_-6px_hsl(263_85%_58%/0.15)] transition-all h-12" required />
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-muted-foreground">Message</label>
-                <Textarea
-                  placeholder="Tell us what's on your mind..."
-                  className="rounded-xl min-h-[140px] bg-card/60 border-border/40 focus:border-primary/40 focus:shadow-[0_0_20px_-6px_hsl(263_85%_58%/0.15)] transition-all resize-none"
-                  required
-                />
+                <Textarea placeholder="Tell us what's on your mind..." className="rounded-xl min-h-[140px] bg-card/60 border-border/40 focus:border-primary/40 focus:shadow-[0_0_20px_-6px_hsl(263_85%_58%/0.15)] transition-all resize-none" required />
               </div>
 
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  type="submit"
-                  className="w-full gradient-bg text-primary-foreground rounded-xl py-6 font-bold text-base glow-shadow relative overflow-hidden group"
-                >
+                <Button type="submit" className="w-full gradient-bg text-primary-foreground rounded-xl py-6 font-bold text-base glow-shadow relative overflow-hidden group">
                   <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                   <span className="relative flex items-center justify-center gap-2">
-                    <Send className="w-4 h-4" />
-                    Send Message
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <Send className="w-4 h-4" /> Send Message <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </Button>
               </motion.div>
 
-              {/* Bottom shimmer */}
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/15 to-transparent" />
             </form>
           </motion.div>

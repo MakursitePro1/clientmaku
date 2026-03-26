@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, ArrowUpRight, Sparkles, Grid3X3, BookOpen, Shield, Info } from "lucide-react";
-import { motion } from "framer-motion";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 const navLinks = [
   { name: "Category", path: "/categories", icon: Grid3X3 },
@@ -11,6 +11,7 @@ const navLinks = [
 
 export function Footer() {
   const navigate = useNavigate();
+  const { settings } = useSiteSettings();
 
   const handleNav = (link: typeof navLinks[0]) => {
     if (link.path) {
@@ -32,17 +33,14 @@ export function Footer() {
 
   return (
     <footer className="relative px-4 pb-8 pt-6">
-      {/* Top gradient divider */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] max-w-3xl h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
       <div className="max-w-6xl mx-auto">
         <div className="relative rounded-3xl border-2 border-primary/15 bg-card/60 backdrop-blur-2xl overflow-hidden shadow-2xl shadow-primary/5">
-          {/* Decorative gradient blobs */}
           <div className="absolute top-0 left-0 w-[300px] h-[200px] bg-primary/[0.04] rounded-full blur-[100px] pointer-events-none" />
           <div className="absolute bottom-0 right-0 w-[250px] h-[200px] bg-pink-500/[0.04] rounded-full blur-[100px] pointer-events-none" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[200px] bg-primary/[0.02] rounded-full blur-[120px] pointer-events-none" />
 
-          {/* Top accent bar — animated gradient */}
           <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
 
           <div className="relative z-10 px-6 sm:px-10 lg:px-14 py-10 sm:py-12">
@@ -51,25 +49,33 @@ export function Footer() {
               {/* Brand Column */}
               <div className="md:col-span-5 flex flex-col gap-4">
                 <Link to="/" className="flex items-center gap-3 group w-fit">
-                  <img
-                    src="/logo.jpg"
-                    alt="Cyber Venom"
-                    className="w-12 h-12 rounded-2xl object-cover shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow ring-2 ring-primary/10 group-hover:ring-primary/30"
-                  />
+                  {settings.site_logo_url ? (
+                    <img
+                      src={settings.site_logo_url}
+                      alt={settings.site_name}
+                      className="w-12 h-12 rounded-2xl object-cover shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow ring-2 ring-primary/10 group-hover:ring-primary/30"
+                    />
+                  ) : (
+                    <img
+                      src="/logo.jpg"
+                      alt={settings.site_name}
+                      className="w-12 h-12 rounded-2xl object-cover shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow ring-2 ring-primary/10 group-hover:ring-primary/30"
+                    />
+                  )}
                   <div>
                     <span className="text-xl font-extrabold tracking-tight block">
-                      <span className="gradient-text">Cyber</span>
-                      <span className="text-foreground"> Venom</span>
+                      <span className="gradient-text">{settings.navbar_brand_text}</span>
+                      <span className="text-foreground"> {settings.navbar_brand_accent}</span>
                     </span>
-                    <span className="text-[10px] text-muted-foreground/50 font-medium tracking-wider uppercase">Free Online Tools</span>
+                    <span className="text-[10px] text-muted-foreground/50 font-medium tracking-wider uppercase">{settings.site_tagline}</span>
                   </div>
                 </Link>
                 <p className="text-sm text-muted-foreground/70 max-w-xs leading-relaxed">
-                  200+ free, fast, and powerful web tools for developers, designers, and everyone. Built with ❤️ for the community.
+                  {settings.footer_text || "200+ free, fast, and powerful web tools for developers, designers, and everyone. Built with ❤️ for the community."}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-xs font-semibold text-primary">
-                    <Sparkles className="w-3 h-3" /> 200+ Tools
+                    <Sparkles className="w-3 h-3" /> {settings.stats_tools_count} Tools
                   </span>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-xs font-semibold text-emerald-500">
                     100% Free
@@ -77,7 +83,7 @@ export function Footer() {
                 </div>
               </div>
 
-              {/* Quick Links — Navigate Column */}
+              {/* Quick Links */}
               <div className="md:col-span-3">
                 <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-5">Navigate</h3>
                 <nav className="flex flex-col gap-1">
@@ -97,7 +103,7 @@ export function Footer() {
                 </nav>
               </div>
 
-              {/* Newsletter / CTA Column */}
+              {/* CTA Column */}
               <div className="md:col-span-4">
                 <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-5">Get Started</h3>
                 <p className="text-sm text-muted-foreground/60 mb-4 leading-relaxed">
@@ -126,7 +132,7 @@ export function Footer() {
             {/* Bottom Bar */}
             <div className="mt-10 pt-6 border-t border-border/20 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-muted-foreground/50 flex items-center gap-1.5">
-                All rights reserved by <span className="font-semibold gradient-text">Cyber Venom</span>
+                {settings.footer_copyright || "All rights reserved by"} <span className="font-semibold gradient-text">{settings.site_name}</span>
               </p>
               <a
                 href="https://www.makursite.com/"
