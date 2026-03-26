@@ -6,6 +6,7 @@ import { Footer } from "./Footer";
 import { SEOHead } from "./SEOHead";
 import { ScrollToTop } from "./ScrollToTop";
 import { FavoriteButton } from "./FavoriteButton";
+import { AdSlotDisplay } from "./AdSlotDisplay";
 import { tools } from "@/data/tools";
 import { useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -182,6 +183,13 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
           </div>
         </div>
 
+        {/* ===== AD: BEFORE TOOL ===== */}
+        <div className="px-4 pb-4">
+          <div className="max-w-5xl mx-auto">
+            <AdSlotDisplay placement="before_tool" className="rounded-2xl" />
+          </div>
+        </div>
+
         {/* ===== TOOL CONTENT ===== */}
         <div className="px-4 pb-16">
           <div className="max-w-5xl mx-auto">
@@ -190,12 +198,30 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                 <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${toolColor}, ${toolColor.replace(')', ' / 0.3)')}, transparent)` }} />
               )}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full blur-[100px] opacity-[0.04] pointer-events-none" style={{ background: toolColor }} />
-              <div className="relative z-10 p-6 sm:p-8 lg:p-10">{children}</div>
+              <div className="relative z-10 p-6 sm:p-8 lg:p-10">
+                {children}
+                {/* AD: INSIDE TOOL CARD BOTTOM */}
+                <AdSlotDisplay placement="in_content" className="mt-6 pt-6 border-t border-border/30" />
+              </div>
             </motion.div>
           </div>
         </div>
 
+        {/* ===== AD: AFTER TOOL ===== */}
+        <div className="px-4 pb-4">
+          <div className="max-w-5xl mx-auto">
+            <AdSlotDisplay placement="after_tool" className="rounded-2xl" />
+          </div>
+        </div>
+
         {/* ===== RELATED TOOLS ===== */}
+        {relatedTools.length > 0 && (
+          <div className="px-4 pb-6">
+            <div className="max-w-5xl mx-auto">
+              <AdSlotDisplay placement="sidebar_top" className="rounded-2xl mb-6" />
+            </div>
+          </div>
+        )}
         {relatedTools.length > 0 && (
           <div className="px-4 pb-20">
             <div className="max-w-5xl mx-auto">
