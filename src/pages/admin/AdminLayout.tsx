@@ -15,6 +15,7 @@ const sidebarLinks = [
   { name: "Dashboard", path: ADMIN_BASE, icon: LayoutDashboard },
   { name: "Tools", path: `${ADMIN_BASE}/tools`, icon: Wrench },
   { name: "Users", path: `${ADMIN_BASE}/users`, icon: Users },
+  { name: "Security", path: `${ADMIN_BASE}/security`, icon: Shield },
   { name: "Settings", path: `${ADMIN_BASE}/settings`, icon: Settings },
 ];
 
