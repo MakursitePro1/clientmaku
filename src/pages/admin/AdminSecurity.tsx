@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useNavigate } from "react-router-dom";
 import {
   Shield, Lock, Key, Mail, AlertTriangle,
   CheckCircle, Eye, EyeOff, RefreshCw, Globe, Fingerprint,
-  Clock, Timer, Smartphone, UserPlus, X
+  Clock, Timer, Smartphone, UserPlus, X, Pencil
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
@@ -20,6 +22,8 @@ const SESSION_TIMEOUT_KEY = "admin_session_timeout_hours";
 export default function AdminSecurity() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { settings } = useSiteSettings();
+  const navigate = useNavigate();
 
   // Password change
   const [newPassword, setNewPassword] = useState("");
@@ -46,6 +50,14 @@ export default function AdminSecurity() {
   const [totpDisableCode, setTotpDisableCode] = useState("");
   const [showDisableTotp, setShowDisableTotp] = useState(false);
   const [totpLoading, setTotpLoading] = useState(true);
+
+  // Email change
+  const [newEmail, setNewEmail] = useState("");
+  const [changingEmail, setChangingEmail] = useState(false);
+
+  // Admin slug change
+  const [newSlug, setNewSlug] = useState("");
+  const [changingSlug, setChangingSlug] = useState(false);
 
   useEffect(() => {
     fetchAdminEmails();
@@ -251,6 +263,47 @@ export default function AdminSecurity() {
     }
   };
 
+  // Email change handler
+  const handleChangeEmail = async () => {
+    if (!newEmail || !newEmail.includes("@")) {
+      toast({ title: "Error", description: "Please enter a valid email.", variant: "destructive" });
+      return;
+    }
+    setChangingEmail(true);
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "A confirmation email has been sent to the new address. Please verify to complete the change." });
+      setNewEmail("");
+    }
+    setChangingEmail(false);
+  };
+
+  // Admin slug change handler
+  const handleChangeSlug = async () => {
+    const slug = newSlug.trim().replace(/[^a-zA-Z0-9-_]/g, "");
+    if (!slug || slug.length < 4) {
+      toast({ title: "Error", description: "Slug must be at least 4 characters (letters, numbers, hyphens).", variant: "destructive" });
+      return;
+    }
+    setChangingSlug(true);
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: "admin_slug", value: slug as any, updated_at: new Date().toISOString(), updated_by: user?.id },
+        { onConflict: "key" }
+      );
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `Admin URL changed to /${slug}. Redirecting...` });
+      setNewSlug("");
+      setTimeout(() => navigate(`/${slug}/security`), 1500);
+    }
+    setChangingSlug(false);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -273,18 +326,32 @@ export default function AdminSecurity() {
             <CardContent className="space-y-3">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-xs text-muted-foreground">Email</p>
                   <p className="text-sm font-medium text-foreground truncate">{user?.email || "N/A"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Key className="w-4 h-4 text-muted-foreground shrink-0" />
-                <div>
-                  <p className="text-xs text-muted-foreground">User ID</p>
-                  <p className="text-sm font-mono text-foreground">{user?.id?.slice(0, 12)}...</p>
+
+              {/* Change Email */}
+              <div className="space-y-2 p-3 rounded-lg border border-border/50">
+                <label className="text-xs font-medium flex items-center gap-1.5">
+                  <Pencil className="w-3 h-3 text-muted-foreground" />
+                  Change Email
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="New email address..."
+                    className="text-sm"
+                  />
+                  <Button size="sm" onClick={handleChangeEmail} disabled={changingEmail || !newEmail}>
+                    {changingEmail ? "..." : "Update"}
+                  </Button>
                 </div>
               </div>
+
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <Shield className="w-4 h-4 text-muted-foreground shrink-0" />
                 <div>
@@ -292,12 +359,34 @@ export default function AdminSecurity() {
                   <Badge className="bg-primary/10 text-primary text-xs">Admin</Badge>
                 </div>
               </div>
+
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground">Admin Panel URL</p>
-                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/admingorohid306</code>
+                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/{settings.admin_slug || "admingorohid306"}</code>
                 </div>
+              </div>
+
+              {/* Change Admin Slug */}
+              <div className="space-y-2 p-3 rounded-lg border border-border/50">
+                <label className="text-xs font-medium flex items-center gap-1.5">
+                  <Pencil className="w-3 h-3 text-muted-foreground" />
+                  Change Admin URL
+                </label>
+                <div className="flex gap-2 items-center">
+                  <span className="text-sm text-muted-foreground">/</span>
+                  <Input
+                    value={newSlug}
+                    onChange={(e) => setNewSlug(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
+                    placeholder={settings.admin_slug || "admingorohid306"}
+                    className="text-sm"
+                  />
+                  <Button size="sm" onClick={handleChangeSlug} disabled={changingSlug || !newSlug.trim()}>
+                    {changingSlug ? "..." : "Update"}
+                  </Button>
+                </div>
+                <p className="text-[10px] text-muted-foreground">Only letters, numbers, hyphens allowed</p>
               </div>
             </CardContent>
           </Card>

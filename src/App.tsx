@@ -10,7 +10,6 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 // Admin
-const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminTools = lazy(() => import("./pages/admin/AdminTools"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
@@ -21,7 +20,7 @@ const AdminAds = lazy(() => import("./pages/admin/AdminAds"));
 const AdminRoles = lazy(() => import("./pages/admin/AdminRoles"));
 const AdminSEO = lazy(() => import("./pages/admin/AdminSEO"));
 const AdminCustomTools = lazy(() => import("./pages/admin/AdminCustomTools"));
-import { AdminGuard } from "@/components/AdminGuard";
+import { AdminSlugChecker } from "@/components/AdminRouteWrapper";
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
@@ -525,8 +524,8 @@ const App = () => (
             <Route path="/tools/disposable-email-checker" element={<DisposableEmailChecker />} />
             <Route path="/tools/bulk-email-validator" element={<BulkEmailValidator />} />
             <Route path="/tools/email-formatter" element={<EmailFormatter />} />
-            {/* Admin Panel */}
-            <Route path="/admingorohid306" element={<Suspense fallback={<Loading />}><AdminGuard><AdminLayout /></AdminGuard></Suspense>}>
+            {/* Admin Panel - Dynamic Slug */}
+            <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
               <Route path="tools" element={<AdminTools />} />
               <Route path="blog" element={<AdminBlog />} />
