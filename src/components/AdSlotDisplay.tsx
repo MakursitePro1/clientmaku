@@ -27,12 +27,10 @@ const fetchAds = async (): Promise<AdSlot[]> => {
       .select("id, ad_code, placement, display_order")
       .eq("is_enabled", true)
       .order("display_order", { ascending: true });
-    {
-      cachedAds = (data as AdSlot[]) || [];
-      // Invalidate cache after 5 minutes
-      setTimeout(() => { cachedAds = null; fetchPromise = null; }, 5 * 60 * 1000);
-      return cachedAds;
-    });
+    cachedAds = (data as AdSlot[]) || [];
+    setTimeout(() => { cachedAds = null; fetchPromise = null; }, 5 * 60 * 1000);
+    return cachedAds;
+  })();
   
   return fetchPromise;
 };
