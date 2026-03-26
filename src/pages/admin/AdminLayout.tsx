@@ -20,7 +20,7 @@ export default function AdminLayout() {
   const { settings } = useSiteSettings();
   useSessionTimeout();
 
-  const ADMIN_BASE = `/${settings.admin_slug || "admingorohid306"}`;
+  const ADMIN_BASE = `/${settings.admin_slug || "makuadmingowebs99"}`;
 
   const sidebarLinks = [
     { name: "Dashboard", path: ADMIN_BASE, icon: LayoutDashboard },
