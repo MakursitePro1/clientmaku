@@ -9,7 +9,7 @@ interface SEOHeadProps {
 }
 
 const SITE_NAME = "Cyber Venom";
-const BASE_URL = "https://makuwebtools.lovable.app";
+const BASE_URL = typeof window !== "undefined" ? window.location.origin : "";
 
 // Global cache for page SEO
 let seoCache: Record<string, any> = {};
