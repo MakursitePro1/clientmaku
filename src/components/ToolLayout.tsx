@@ -230,6 +230,34 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
           </div>
         </div>
 
+        {/* ===== SEO LONG DESCRIPTION ===== */}
+        {toolSeo?.long_description && (
+          <div className="px-4 pb-8">
+            <div className="max-w-5xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="rounded-2xl border-2 border-border/30 bg-card/50 p-6 sm:p-8"
+              >
+                <h2 className="text-lg font-bold text-foreground mb-4">About {title}</h2>
+                <div
+                  className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground"
+                  dangerouslySetInnerHTML={{ __html: toolSeo.long_description }}
+                />
+              </motion.div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== STRUCTURED DATA ===== */}
+        {toolSeo?.structured_data && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSeo.structured_data) }}
+          />
+        )}
+
         {/* ===== RELATED TOOLS ===== */}
         {relatedTools.length > 0 && (
           <div className="px-4 pb-6">
