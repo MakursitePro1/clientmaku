@@ -8,10 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Save, Globe, FileText, MessageCircle, Palette, Layout,
-  Shield, Key, Lock, Mail, Phone, MapPin, Facebook, Twitter,
-  Instagram, Youtube, Linkedin, Github, ExternalLink, Type,
-  Image, MessageSquare, Star, HelpCircle, Users, Megaphone
+  Save, Globe, FileText, MessageCircle, Layout,
+  ExternalLink, Type, Mail, Phone, MapPin, Facebook, Twitter,
+  Instagram, Youtube, Linkedin, Github, Star, Megaphone
 } from "lucide-react";
 import { motion } from "framer-motion";
 
