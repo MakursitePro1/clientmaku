@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useNavigate } from "react-router-dom";
 import {
   Shield, Lock, Key, Mail, AlertTriangle,
   CheckCircle, Eye, EyeOff, RefreshCw, Globe, Fingerprint,
-  Clock, Timer, Smartphone, UserPlus, X
+  Clock, Timer, Smartphone, UserPlus, X, Pencil
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
