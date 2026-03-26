@@ -1,0 +1,151 @@
+import { useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  LayoutDashboard, Wrench, Users, Settings, ChevronLeft, ChevronRight,
+  LogOut, Home, Shield, Menu, X
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+
+const sidebarLinks = [
+  { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
+  { name: "Tools Management", path: "/admin/tools", icon: Wrench },
+  { name: "Users", path: "/admin/users", icon: Users },
+  { name: "Site Settings", path: "/admin/settings", icon: Settings },
+];
+
+export default function AdminLayout() {
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const isActive = (path: string) => {
+    if (path === "/admin") return location.pathname === "/admin";
+    return location.pathname.startsWith(path);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const SidebarContent = () => (
+    <>
+      {/* Logo */}
+      <div className="p-4 border-b border-border/50">
+        <Link to="/admin" className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Shield className="w-5 h-5 text-primary" />
+          </div>
+          {!collapsed && (
+            <div>
+              <h1 className="font-bold text-foreground text-sm">Admin Panel</h1>
+              <p className="text-[10px] text-muted-foreground">Cyber Venom</p>
+            </div>
+          )}
+        </Link>
+      </div>
+
+      {/* Nav Links */}
+      <nav className="flex-1 p-3 space-y-1">
+        {sidebarLinks.map((link) => (
+          <Link
+            key={link.path}
+            to={link.path}
+            onClick={() => setMobileOpen(false)}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+              isActive(link.path)
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            )}
+          >
+            <link.icon className="w-4 h-4 shrink-0" />
+            {!collapsed && <span>{link.name}</span>}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Bottom Actions */}
+      <div className="p-3 border-t border-border/50 space-y-1">
+        <Link
+          to="/"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
+        >
+          <Home className="w-4 h-4 shrink-0" />
+          {!collapsed && <span>Back to Site</span>}
+        </Link>
+        <button
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all"
+        >
+          <LogOut className="w-4 h-4 shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="min-h-screen flex bg-background">
+      {/* Desktop Sidebar */}
+      <aside
+        className={cn(
+          "hidden md:flex flex-col border-r border-border/50 bg-card transition-all duration-300 sticky top-0 h-screen",
+          collapsed ? "w-[68px]" : "w-[240px]"
+        )}
+      >
+        <SidebarContent />
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute -right-3 top-20 w-6 h-6 rounded-full border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground shadow-sm"
+        >
+          {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+        </button>
+      </aside>
+
+      {/* Mobile Header + Sidebar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-card border-b border-border/50 flex items-center px-4">
+        <Button variant="ghost" size="icon" onClick={() => setMobileOpen(!mobileOpen)}>
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </Button>
+        <div className="flex items-center gap-2 ml-3">
+          <Shield className="w-5 h-5 text-primary" />
+          <span className="font-bold text-sm">Admin Panel</span>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="md:hidden fixed inset-0 bg-black/50 z-40"
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="md:hidden fixed top-14 left-0 bottom-0 w-[260px] bg-card border-r border-border/50 z-50 flex flex-col"
+            >
+              <SidebarContent />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Main Content */}
+      <main className="flex-1 min-w-0 md:p-6 p-4 pt-18 md:pt-6">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
