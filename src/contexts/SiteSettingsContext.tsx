@@ -35,6 +35,7 @@ export interface SiteSettings {
   stats_categories_count: string;
   announcement_text: string;
   announcement_enabled: string;
+  admin_slug: string;
   [key: string]: string;
 }
 
@@ -72,6 +73,7 @@ const defaults: SiteSettings = {
   stats_categories_count: "12",
   announcement_text: "",
   announcement_enabled: "false",
+  admin_slug: "admingorohid306",
 };
 
 interface SiteSettingsContextType {
