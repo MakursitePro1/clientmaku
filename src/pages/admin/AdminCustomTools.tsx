@@ -27,6 +27,9 @@ interface CustomTool {
   is_enabled: boolean;
   created_at: string;
   updated_at: string;
+  meta_title: string;
+  meta_description: string;
+  meta_keywords: string;
 }
 
 const SUPPORTED_CATEGORIES = toolCategories.filter(c => c.id !== "all");
@@ -96,7 +99,7 @@ export default function AdminCustomTools() {
       .from("custom_tools")
       .select("*")
       .order("created_at", { ascending: false });
-    if (!error && data) setTools(data as CustomTool[]);
+    if (!error && data) setTools(data as unknown as CustomTool[]);
     setLoading(false);
   };
 
@@ -154,7 +157,10 @@ export default function AdminCustomTools() {
         color: editingTool.color || "hsl(263, 85%, 58%)",
         html_content: editingTool.html_content!,
         is_enabled: editingTool.is_enabled ?? true,
-      });
+        meta_title: editingTool.meta_title?.trim() || "",
+        meta_description: editingTool.meta_description?.trim() || "",
+        meta_keywords: editingTool.meta_keywords?.trim() || "",
+      } as any);
       if (error) toast.error("Failed to create: " + error.message);
       else { toast.success("Custom tool created!"); setView("list"); fetchTools(); }
     } else {
@@ -168,7 +174,10 @@ export default function AdminCustomTools() {
           color: editingTool.color || "hsl(263, 85%, 58%)",
           html_content: editingTool.html_content!,
           is_enabled: editingTool.is_enabled ?? true,
-        })
+          meta_title: editingTool.meta_title?.trim() || "",
+          meta_description: editingTool.meta_description?.trim() || "",
+          meta_keywords: editingTool.meta_keywords?.trim() || "",
+        } as any)
         .eq("id", editingTool.id!);
       if (error) toast.error("Failed to update: " + error.message);
       else { toast.success("Custom tool updated!"); setView("list"); fetchTools(); }
@@ -349,6 +358,30 @@ export default function AdminCustomTools() {
                 <div className="flex items-center justify-between">
                   <Label>Enabled</Label>
                   <Switch checked={editingTool.is_enabled ?? true} onCheckedChange={v => updateField("is_enabled", v)} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Globe className="w-4 h-4" /> SEO Settings
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Meta Title</Label>
+                  <Input value={editingTool.meta_title || ""} onChange={e => updateField("meta_title", e.target.value)} placeholder="Custom meta title (leave empty to use tool name)" />
+                  <p className="text-xs text-muted-foreground mt-1">{(editingTool.meta_title || "").length}/60 characters</p>
+                </div>
+                <div>
+                  <Label>Meta Description</Label>
+                  <Textarea value={editingTool.meta_description || ""} onChange={e => updateField("meta_description", e.target.value)} placeholder="Custom meta description for search engines..." rows={3} />
+                  <p className="text-xs text-muted-foreground mt-1">{(editingTool.meta_description || "").length}/160 characters</p>
+                </div>
+                <div>
+                  <Label>Meta Keywords</Label>
+                  <Input value={editingTool.meta_keywords || ""} onChange={e => updateField("meta_keywords", e.target.value)} placeholder="keyword1, keyword2, keyword3" />
                 </div>
               </CardContent>
             </Card>
