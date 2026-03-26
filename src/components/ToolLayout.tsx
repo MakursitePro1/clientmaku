@@ -22,7 +22,7 @@ interface ToolLayoutProps {
 
 const shareOptions = [
   { name: "Facebook", icon: Facebook, color: "#1877F2", getUrl: (url: string, title: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
-  { name: "Twitter", icon: Twitter, color: "#1DA1F2", getUrl: (url: string, title: string) => `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + " — Free on Cyber Venom!")}` },
+  { name: "Twitter", icon: Twitter, color: "#1DA1F2", getUrl: (url: string, title: string) => `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + " — Free on Makursite!")}` },
   { name: "LinkedIn", icon: Linkedin, color: "#0A66C2", getUrl: (url: string, title: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}` },
   { name: "WhatsApp", icon: () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">

@@ -53,14 +53,14 @@ export default function AuthPage() {
 
             <div className="relative z-10">
               <div className="flex items-center justify-center mb-6">
-                <img src="/logo.jpg" alt="Cyber Venom" className="w-12 h-12 rounded-2xl object-cover glow-shadow" />
+                <img src="/logo.jpg" alt="Makursite" className="w-12 h-12 rounded-2xl object-cover glow-shadow" />
               </div>
 
               <h1 className="text-2xl font-bold text-center mb-1">
                 {isSignUp ? "Create Account" : "Welcome Back"}
               </h1>
               <p className="text-sm text-muted-foreground text-center mb-6">
-                {isSignUp ? "Join Cyber Venom today" : "Login to your account"}
+                {isSignUp ? "Join Makursite today" : "Login to your account"}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">

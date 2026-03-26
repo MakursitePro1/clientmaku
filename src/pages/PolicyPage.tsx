@@ -42,7 +42,7 @@ You can control cookie settings through your browser. Disabling essential cookie
   {
     icon: FileText,
     title: "Terms of Service",
-    content: `By using Cyber Venom, you agree to the following:
+    content: `By using Makursite, you agree to the following:
 • All tools are provided "as is" without warranty
 • You will not use our tools for illegal or harmful purposes
 • You are responsible for the content you create using our tools
@@ -54,7 +54,7 @@ We strive to keep all 200+ tools free and accessible to everyone.`
   {
     icon: AlertTriangle,
     title: "Disclaimer",
-    content: `Cyber Venom provides web tools for informational and utility purposes:
+    content: `Makursite provides web tools for informational and utility purposes:
 • We do not guarantee 100% accuracy of calculations or conversions
 • Generated content (IDs, passwords, etc.) should be used responsibly
 • We are not responsible for any loss or damage resulting from tool usage
@@ -65,7 +65,7 @@ We strive to keep all 200+ tools free and accessible to everyone.`
     icon: Mail,
     title: "Contact Us",
     content: `If you have any questions about our Privacy Policy, Terms of Service, or any other concerns, please reach out to us:
-• Email: contact@cybervenom.com
+• Email: contact@makursite.com
 • Use the Contact form on our website
 • Response time: within 48 hours
 
@@ -76,7 +76,7 @@ We value your feedback and are committed to addressing any concerns promptly.`
 const PolicyPage = () => {
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Privacy Policy & Terms" description="Read Cyber Venom's privacy policy, terms of service, cookie policy, and disclaimer. We value your privacy." path="/policy" />
+      <SEOHead title="Privacy Policy & Terms" description="Read Makursite's privacy policy, terms of service, cookie policy, and disclaimer. We value your privacy." path="/policy" />
       <Navbar />
 
       {/* Hero */}
