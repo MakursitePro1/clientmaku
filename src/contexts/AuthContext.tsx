@@ -35,6 +35,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       setLoading(false);
       setInitialized(true);
+    }).catch(() => {
+      setSession(null);
+      setUser(null);
+      setLoading(false);
+      setInitialized(true);
     });
 
     return () => subscription.unsubscribe();
