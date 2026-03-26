@@ -125,11 +125,6 @@ export default function AdminSettings() {
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Admin credentials
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [changingPassword, setChangingPassword] = useState(false);
-
   useEffect(() => {
     const fetchSettings = async () => {
       const { data } = await supabase.from("site_settings").select("key, value");
@@ -158,28 +153,7 @@ export default function AdminSettings() {
         );
     }
     setSaving(false);
-    toast({ title: "✅ সেভ হয়েছে!", description: "সকল সেটিংস সফলভাবে আপডেট হয়েছে।" });
-  };
-
-  const handleChangePassword = async () => {
-    if (!newPassword || newPassword.length < 6) {
-      toast({ title: "Error", description: "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।", variant: "destructive" });
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast({ title: "Error", description: "পাসওয়ার্ড মিলছে না।", variant: "destructive" });
-      return;
-    }
-    setChangingPassword(true);
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "✅ সফল!", description: "পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে।" });
-      setNewPassword("");
-      setConfirmPassword("");
-    }
-    setChangingPassword(false);
+    toast({ title: "✅ Saved!", description: "All settings have been updated successfully." });
   };
 
   const updateField = (field: keyof SiteSettings, value: string) => {
@@ -194,7 +168,6 @@ export default function AdminSettings() {
     { id: "social", label: "Social", icon: ExternalLink },
     { id: "seo", label: "SEO", icon: Megaphone },
     { id: "navbar", label: "Navbar", icon: Type },
-    { id: "credentials", label: "Admin", icon: Shield },
   ];
 
   const sections: Record<string, SettingSection[]> = {
@@ -202,11 +175,11 @@ export default function AdminSettings() {
       {
         title: "Site Identity",
         icon: Globe,
-        description: "ওয়েবসাইটের মূল তথ্য",
+        description: "Core website information",
         fields: [
           { key: "site_name", label: "Site Name", type: "input", placeholder: "Cyber Venom" },
           { key: "site_tagline", label: "Tagline", type: "input", placeholder: "Free Online Web Tools" },
-          { key: "site_description", label: "Site Description", type: "textarea", placeholder: "ওয়েবসাইটের বর্ণনা..." },
+          { key: "site_description", label: "Site Description", type: "textarea", placeholder: "Describe your website..." },
           { key: "site_logo_url", label: "Logo URL", type: "url", placeholder: "https://..." },
           { key: "favicon_url", label: "Favicon URL", type: "url", placeholder: "https://..." },
         ],
@@ -214,7 +187,7 @@ export default function AdminSettings() {
       {
         title: "Stats Display",
         icon: Star,
-        description: "হোমপেজে দেখানো পরিসংখ্যান",
+        description: "Statistics shown on homepage",
         fields: [
           { key: "stats_tools_count", label: "Total Tools Text", type: "input", placeholder: "210+" },
           { key: "stats_users_count", label: "Happy Users Text", type: "input", placeholder: "200K+" },
@@ -224,7 +197,7 @@ export default function AdminSettings() {
       {
         title: "Announcement Banner",
         icon: Megaphone,
-        description: "ওয়েবসাইটে ব্যানার নোটিশ দেখান",
+        description: "Display a banner notice on the website",
         fields: [
           { key: "announcement_text", label: "Announcement Text", type: "input", placeholder: "Important notice..." },
           { key: "announcement_enabled", label: "Enabled (true/false)", type: "input", placeholder: "false" },
@@ -235,11 +208,11 @@ export default function AdminSettings() {
       {
         title: "Hero Section",
         icon: Layout,
-        description: "হোমপেজের হিরো সেকশন কাস্টমাইজ",
+        description: "Customize the homepage hero section",
         fields: [
           { key: "hero_title", label: "Hero Title", type: "input", placeholder: "Your Ultimate Collection" },
           { key: "hero_subtitle", label: "Hero Subtitle (Animated)", type: "input", placeholder: "Web Tools" },
-          { key: "hero_description", label: "Hero Description", type: "textarea", placeholder: "বর্ণনা..." },
+          { key: "hero_description", label: "Hero Description", type: "textarea", placeholder: "Description text..." },
           { key: "hero_cta_text", label: "CTA Button Text", type: "input", placeholder: "Explore Tools" },
           { key: "hero_cta_link", label: "CTA Button Link", type: "input", placeholder: "/tools" },
         ],
@@ -249,19 +222,19 @@ export default function AdminSettings() {
       {
         title: "About Section",
         icon: FileText,
-        description: "About পেজের কন্টেন্ট",
+        description: "About page content",
         fields: [
           { key: "about_title", label: "About Title", type: "input", placeholder: "About Us" },
-          { key: "about_text", label: "About Description", type: "textarea", placeholder: "আমাদের সম্পর্কে..." },
-          { key: "about_mission", label: "Mission Statement", type: "textarea", placeholder: "আমাদের মিশন..." },
+          { key: "about_text", label: "About Description", type: "textarea", placeholder: "About your website..." },
+          { key: "about_mission", label: "Mission Statement", type: "textarea", placeholder: "Our mission..." },
         ],
       },
       {
         title: "Footer",
         icon: FileText,
-        description: "ফুটার এরিয়া কাস্টমাইজ",
+        description: "Customize the footer area",
         fields: [
-          { key: "footer_text", label: "Footer Description", type: "textarea", placeholder: "ফুটারের টেক্সট..." },
+          { key: "footer_text", label: "Footer Description", type: "textarea", placeholder: "Footer text..." },
           { key: "footer_copyright", label: "Copyright Text", type: "input", placeholder: "© 2024 Cyber Venom" },
         ],
       },
@@ -270,11 +243,11 @@ export default function AdminSettings() {
       {
         title: "Contact Information",
         icon: MessageCircle,
-        description: "যোগাযোগের তথ্য",
+        description: "Contact details for the website",
         fields: [
           { key: "contact_email", label: "Contact Email", type: "input", placeholder: "contact@cybervenom.com", icon: Mail },
           { key: "contact_phone", label: "Phone Number", type: "input", placeholder: "+880...", icon: Phone },
-          { key: "contact_address", label: "Address", type: "textarea", placeholder: "ঠিকানা...", icon: MapPin },
+          { key: "contact_address", label: "Address", type: "textarea", placeholder: "Your address...", icon: MapPin },
           { key: "contact_form_email", label: "Form Submission Email", type: "input", placeholder: "forms@cybervenom.com", icon: Mail },
         ],
       },
@@ -283,7 +256,7 @@ export default function AdminSettings() {
       {
         title: "Social Media Links",
         icon: ExternalLink,
-        description: "সোশ্যাল মিডিয়া লিংক সেটআপ",
+        description: "Set up your social media links",
         fields: [
           { key: "social_facebook", label: "Facebook URL", type: "url", placeholder: "https://facebook.com/...", icon: Facebook },
           { key: "social_twitter", label: "Twitter/X URL", type: "url", placeholder: "https://x.com/...", icon: Twitter },
@@ -298,10 +271,10 @@ export default function AdminSettings() {
       {
         title: "SEO Settings",
         icon: Megaphone,
-        description: "সার্চ ইঞ্জিন অপ্টিমাইজেশন",
+        description: "Search engine optimization settings",
         fields: [
           { key: "seo_title", label: "Meta Title", type: "input", placeholder: "Page Title" },
-          { key: "seo_description", label: "Meta Description", type: "textarea", placeholder: "সার্চ ইঞ্জিনে দেখানো বর্ণনা..." },
+          { key: "seo_description", label: "Meta Description", type: "textarea", placeholder: "Description shown in search engines..." },
           { key: "seo_keywords", label: "Keywords (comma separated)", type: "input", placeholder: "web tools, online tools..." },
           { key: "seo_og_image", label: "OG Image URL", type: "url", placeholder: "https://..." },
         ],
@@ -311,7 +284,7 @@ export default function AdminSettings() {
       {
         title: "Navbar Branding",
         icon: Type,
-        description: "নেভবারের ব্র্যান্ডিং কাস্টমাইজ",
+        description: "Customize the navbar branding",
         fields: [
           { key: "navbar_brand_text", label: "Brand Text (Part 1)", type: "input", placeholder: "Cyber" },
           { key: "navbar_brand_accent", label: "Brand Accent (Part 2)", type: "input", placeholder: "Venom" },
@@ -350,7 +323,7 @@ export default function AdminSettings() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Site Settings</h1>
-          <p className="text-muted-foreground text-sm mt-1">ওয়েবসাইটের সকল সেটিংস এখান থেকে নিয়ন্ত্রণ করুন</p>
+          <p className="text-muted-foreground text-sm mt-1">Manage all website settings from here</p>
         </div>
         <Button onClick={handleSave} disabled={saving} className="gap-2 shrink-0">
           <Save className="w-4 h-4" />
@@ -397,101 +370,6 @@ export default function AdminSettings() {
             ))}
           </TabsContent>
         ))}
-
-        {/* Admin Credentials Tab */}
-        <TabsContent value="credentials" className="space-y-4 mt-4">
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
-            <Card className="border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-primary" />
-                  Admin Account Info
-                </CardTitle>
-                <p className="text-xs text-muted-foreground">বর্তমান এডমিন অ্যাকাউন্টের তথ্য</p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="text-sm font-medium text-foreground">{user?.email || "N/A"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <Key className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">User ID</p>
-                    <p className="text-sm font-mono text-foreground">{user?.id?.slice(0, 8)}...</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                  <Shield className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Role</p>
-                    <p className="text-sm font-medium text-primary">Admin</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Card className="border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-primary" />
-                  Change Password
-                </CardTitle>
-                <p className="text-xs text-muted-foreground">এডমিন পাসওয়ার্ড পরিবর্তন করুন</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium">New Password</label>
-                  <Input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="নতুন পাসওয়ার্ড লিখুন..."
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Confirm Password</label>
-                  <Input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="পাসওয়ার্ড নিশ্চিত করুন..."
-                  />
-                </div>
-                <Button
-                  onClick={handleChangePassword}
-                  disabled={changingPassword || !newPassword}
-                  variant="outline"
-                  className="gap-2"
-                >
-                  <Lock className="w-4 h-4" />
-                  {changingPassword ? "Changing..." : "Change Password"}
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Card className="border-border/50 border-amber-500/30 bg-amber-500/5">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2 text-amber-600">
-                  <HelpCircle className="w-4 h-4" />
-                  Admin Panel Info
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>• Admin URL: <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/admingorohid306</code></p>
-                <p>• এই URL শুধুমাত্র admin role যুক্ত ইউজার অ্যাক্সেস করতে পারবে।</p>
-                <p>• পাসওয়ার্ড পরিবর্তন করলে পুনরায় লগইন করতে হতে পারে।</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </TabsContent>
       </Tabs>
     </div>
   );
