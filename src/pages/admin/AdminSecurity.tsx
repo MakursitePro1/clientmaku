@@ -51,6 +51,14 @@ export default function AdminSecurity() {
   const [showDisableTotp, setShowDisableTotp] = useState(false);
   const [totpLoading, setTotpLoading] = useState(true);
 
+  // Email change
+  const [newEmail, setNewEmail] = useState("");
+  const [changingEmail, setChangingEmail] = useState(false);
+
+  // Admin slug change
+  const [newSlug, setNewSlug] = useState("");
+  const [changingSlug, setChangingSlug] = useState(false);
+
   useEffect(() => {
     fetchAdminEmails();
     fetchSecuritySettings();
