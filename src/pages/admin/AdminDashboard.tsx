@@ -71,9 +71,9 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent className="space-y-2">
             {[
-              { label: "Manage Tools", href: "/admin/tools" },
-              { label: "View Users", href: "/admin/users" },
-              { label: "Site Settings", href: "/admin/settings" },
+              { label: "Manage Tools", href: "/admingorohid306/tools" },
+              { label: "View Users", href: "/admingorohid306/users" },
+              { label: "Site Settings", href: "/admingorohid306/settings" },
             ].map((action) => (
               <a
                 key={action.label}

@@ -9,11 +9,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
+const ADMIN_BASE = "/admingorohid306";
+
 const sidebarLinks = [
-  { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
-  { name: "Tools Management", path: "/admin/tools", icon: Wrench },
-  { name: "Users", path: "/admin/users", icon: Users },
-  { name: "Site Settings", path: "/admin/settings", icon: Settings },
+  { name: "Dashboard", path: ADMIN_BASE, icon: LayoutDashboard },
+  { name: "Tools Management", path: `${ADMIN_BASE}/tools`, icon: Wrench },
+  { name: "Users", path: `${ADMIN_BASE}/users`, icon: Users },
+  { name: "Site Settings", path: `${ADMIN_BASE}/settings`, icon: Settings },
 ];
 
 export default function AdminLayout() {
@@ -24,7 +26,7 @@ export default function AdminLayout() {
   const { signOut } = useAuth();
 
   const isActive = (path: string) => {
-    if (path === "/admin") return location.pathname === "/admin";
+    if (path === ADMIN_BASE) return location.pathname === ADMIN_BASE;
     return location.pathname.startsWith(path);
   };
 
