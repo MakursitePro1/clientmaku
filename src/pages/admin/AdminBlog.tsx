@@ -19,6 +19,7 @@ import {
   Save, Image, Tag, Clock, User, Calendar, Globe, FileEdit
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ImageUploadField } from "@/components/ImageUploadField";
 
 interface BlogPost {
   id: string;
@@ -331,18 +332,11 @@ export default function AdminBlog() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Input
+                <ImageUploadField
                   value={editingPost.featured_image || ""}
-                  onChange={(e) => updateField("featured_image", e.target.value)}
-                  placeholder="Image URL..."
+                  onChange={(url) => updateField("featured_image", url)}
+                  placeholder="Upload or paste image URL..."
                 />
-                {editingPost.featured_image && (
-                  <img
-                    src={editingPost.featured_image}
-                    alt="Preview"
-                    className="w-full h-32 object-cover rounded-lg border"
-                  />
-                )}
               </CardContent>
             </Card>
 
