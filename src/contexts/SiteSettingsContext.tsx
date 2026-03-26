@@ -73,7 +73,7 @@ const defaults: SiteSettings = {
   stats_categories_count: "12",
   announcement_text: "",
   announcement_enabled: "false",
-  admin_slug: "admingorohid306",
+  admin_slug: "makuadmingowebs99",
 };
 
 interface SiteSettingsContextType {

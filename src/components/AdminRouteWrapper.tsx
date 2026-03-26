@@ -24,7 +24,7 @@ export function AdminSlugChecker() {
     return <Loading />;
   }
 
-  const expectedSlug = settings.admin_slug || "admingorohid306";
+  const expectedSlug = settings.admin_slug || "makuadmingowebs99";
 
   if (adminSlug !== expectedSlug) {
     return <NotFound />;
