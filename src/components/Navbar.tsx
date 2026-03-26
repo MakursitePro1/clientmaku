@@ -163,12 +163,12 @@ export function Navbar() {
             )}
             <span className="text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap leading-none">
               <span className="gradient-text">{settings.navbar_brand_text}</span>
-              <span className="text-white"> {settings.navbar_brand_accent}</span>
+              <span className="text-gray-800"> {settings.navbar_brand_accent}</span>
             </span>
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className={cn("items-center gap-1 bg-white/5 rounded-xl px-2 py-1 relative z-10 border border-white/5 mx-auto hidden lg:flex", isCompactNav ? "!hidden" : "")}>
+          <div className={cn("items-center gap-1 bg-black/5 rounded-xl px-2 py-1 relative z-10 border border-black/5 mx-auto hidden lg:flex", isCompactNav ? "!hidden" : "")}>
             {navLinks.map((link) => (
               <button
                 key={link.name}
@@ -177,7 +177,7 @@ export function Navbar() {
                   "px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 relative whitespace-nowrap flex items-center gap-1.5",
                   isActive(link)
                     ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-                    : "text-white/60 hover:text-white hover:bg-white/10"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-black/5"
                 )}
               >
                 {link.highlight && (
@@ -218,7 +218,7 @@ export function Navbar() {
                   "w-5 h-5 relative z-10 transition-all duration-300",
                   favorites.length > 0
                     ? "fill-red-500 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]"
-                    : "text-white/50 group-hover:text-red-400"
+                    : "text-gray-400 group-hover:text-red-400"
                 )}
               />
               <AnimatePresence>
@@ -247,13 +247,13 @@ export function Navbar() {
                 >
                   <div className="relative">
                     <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-primary via-pink-500 to-orange-400 opacity-60 group-hover:opacity-100 blur-[2px] transition-opacity duration-300" />
-                    <Avatar className="w-8 h-8 relative border-2 border-white/20 group-hover:border-white/40 transition-colors">
+                    <Avatar className="w-8 h-8 relative border-2 border-gray-200 group-hover:border-gray-300 transition-colors">
                       {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} /> : null}
                       <AvatarFallback className="text-xs font-bold bg-gradient-to-br from-primary/30 to-pink-500/30 text-primary-foreground">
                         {profile?.display_name ? getInitials(profile.display_name) : <User className="w-4 h-4" />}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-black shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
                   </div>
                 </motion.button>
 
@@ -334,7 +334,7 @@ export function Navbar() {
                   "w-5 h-5 transition-all",
                   favorites.length > 0
                     ? "fill-red-500 text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]"
-                    : "text-white/50"
+                    : "text-gray-500"
                 )}
               />
               {favorites.length > 0 && (
@@ -345,7 +345,7 @@ export function Navbar() {
             </motion.button>
 
             <button
-              className="text-white p-1 flex-shrink-0"
+              className="text-gray-700 p-1 flex-shrink-0"
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Toggle navigation menu"
             >
@@ -365,7 +365,7 @@ export function Navbar() {
                   "block w-full text-left px-4 py-3 rounded-lg transition-all duration-200",
                   isActive(link)
                     ? "bg-primary text-primary-foreground font-semibold"
-                    : "text-white/60 hover:text-white hover:bg-white/10"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-black/5"
                 )}
               >
                 {link.name}
@@ -378,7 +378,7 @@ export function Navbar() {
                 "w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-2",
                 location.pathname === "/favorites"
                   ? "bg-primary text-primary-foreground font-semibold"
-                  : "text-white/60 hover:text-white hover:bg-white/10"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-black/5"
               )}
             >
               <Heart className={cn("w-4 h-4", favorites.length > 0 ? "fill-red-500 text-red-500" : "")} />
@@ -388,12 +388,12 @@ export function Navbar() {
               )}
             </button>
 
-            <div className="pt-2 border-t border-white/10">
+            <div className="pt-2 border-t border-black/10">
               {user ? (
                 <div className="space-y-1">
                   <button
                     onClick={() => { setIsOpen(false); navigate("/profile"); }}
-                    className="w-full text-left px-4 py-3 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2"
+                    className="w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-black/5 transition-all flex items-center gap-2"
                   >
                     <User className="w-4 h-4" /> Profile
                   </button>
