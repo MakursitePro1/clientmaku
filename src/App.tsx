@@ -516,7 +516,7 @@ const App = () => (
             <Route path="/tools/bulk-email-validator" element={<BulkEmailValidator />} />
             <Route path="/tools/email-formatter" element={<EmailFormatter />} />
             {/* Admin Panel */}
-            <Route path="/admin" element={<Suspense fallback={<Loading />}><AdminGuard><AdminLayout /></AdminGuard></Suspense>}>
+            <Route path="/admingorohid306" element={<Suspense fallback={<Loading />}><AdminGuard><AdminLayout /></AdminGuard></Suspense>}>
               <Route index element={<AdminDashboard />} />
               <Route path="tools" element={<AdminTools />} />
               <Route path="users" element={<AdminUsers />} />
