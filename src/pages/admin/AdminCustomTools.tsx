@@ -27,6 +27,9 @@ interface CustomTool {
   is_enabled: boolean;
   created_at: string;
   updated_at: string;
+  meta_title: string;
+  meta_description: string;
+  meta_keywords: string;
 }
 
 const SUPPORTED_CATEGORIES = toolCategories.filter(c => c.id !== "all");
