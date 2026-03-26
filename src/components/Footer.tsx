@@ -126,9 +126,7 @@ export function Footer() {
             {/* Bottom Bar */}
             <div className="mt-10 pt-6 border-t border-border/20 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-muted-foreground/50 flex items-center gap-1.5">
-                © {new Date().getFullYear()} Cyber Venom — Made with
-                <Heart className="w-3 h-3 text-red-400/60 fill-red-400/60" />
-                for the community
+                All rights reserved by <span className="font-semibold gradient-text">Cyber Venom</span>
               </p>
               <a
                 href="https://www.makursite.com/"
