@@ -130,13 +130,15 @@ export function Footer() {
                 <Heart className="w-3 h-3 text-red-400/60 fill-red-400/60" />
                 for the community
               </p>
-              <div className="flex items-center gap-4">
-                <Link to="/policy" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors uppercase tracking-wider font-medium">Privacy Policy</Link>
-                <span className="w-1 h-1 rounded-full bg-muted-foreground/20" />
-                <Link to="/blog" className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors uppercase tracking-wider font-medium">Blog</Link>
-                <span className="w-1 h-1 rounded-full bg-muted-foreground/20" />
-                <span className="text-[10px] text-muted-foreground/30 font-medium tracking-wider uppercase">Powered by Lovable</span>
-              </div>
+              <a
+                href="https://www.makursite.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide gradient-text hover:opacity-80 transition-opacity"
+              >
+                <Sparkles className="w-3 h-3 text-primary" />
+                Developed By Makursite.com
+              </a>
             </div>
           </div>
         </div>
