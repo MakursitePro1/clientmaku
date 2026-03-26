@@ -197,27 +197,23 @@ export function Navbar() {
           <div className={cn("relative z-10 ml-auto items-center gap-3 hidden lg:flex", isCompactNav ? "!hidden" : "")}>
             <motion.button
               onClick={() => navigate("/favorites")}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className={cn(
-                "relative p-2.5 rounded-xl transition-all duration-300 group",
+                "relative p-2.5 rounded-xl border-2 transition-all duration-300 group",
                 location.pathname === "/favorites"
-                  ? "bg-gradient-to-br from-red-500/20 to-pink-500/20 border border-red-500/30"
-                  : "hover:bg-white/10"
+                  ? "bg-gradient-to-br from-red-500/15 to-pink-500/15 border-red-400/40 shadow-md shadow-red-500/10"
+                  : favorites.length > 0
+                    ? "bg-red-50/80 border-red-300/40 hover:border-red-400/60 hover:bg-red-50"
+                    : "bg-white/60 border-gray-200/60 hover:border-gray-300 hover:bg-white/80"
               )}
               aria-label="Favorites"
             >
-              <span className={cn(
-                "absolute inset-0 rounded-xl transition-all duration-500",
-                favorites.length > 0
-                  ? "shadow-[0_0_15px_rgba(239,68,68,0.3),inset_0_0_15px_rgba(239,68,68,0.05)]"
-                  : ""
-              )} />
               <Heart
                 className={cn(
                   "w-5 h-5 relative z-10 transition-all duration-300",
                   favorites.length > 0
-                    ? "fill-red-500 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+                    ? "fill-red-500 text-red-500"
                     : "text-gray-400 group-hover:text-red-400"
                 )}
               />
@@ -325,20 +321,25 @@ export function Navbar() {
           <div className={cn("relative z-10 ml-auto flex items-center gap-1 lg:hidden", isCompactNav ? "" : "!hidden")}>
             <motion.button
               onClick={() => navigate("/favorites")}
-              whileTap={{ scale: 0.85 }}
-              className="relative p-2 rounded-lg"
+              whileTap={{ scale: 0.9 }}
+              className={cn(
+                "relative p-2 rounded-lg border-2 transition-all",
+                favorites.length > 0
+                  ? "bg-red-50/80 border-red-300/40"
+                  : "bg-white/60 border-gray-200/60"
+              )}
               aria-label="Favorites"
             >
               <Heart
                 className={cn(
-                  "w-5 h-5 transition-all",
+                  "w-4.5 h-4.5 transition-all",
                   favorites.length > 0
-                    ? "fill-red-500 text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]"
+                    ? "fill-red-500 text-red-500"
                     : "text-gray-500"
                 )}
               />
               {favorites.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] rounded-full bg-gradient-to-br from-red-500 to-pink-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 shadow-lg">
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] rounded-full bg-gradient-to-br from-red-500 to-pink-500 text-white text-[9px] font-bold flex items-center justify-center px-0.5 shadow-lg">
                   {favorites.length}
                 </span>
               )}
