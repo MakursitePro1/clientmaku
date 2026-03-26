@@ -364,7 +364,7 @@ export default function AdminSecurity() {
                 <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground">Admin Panel URL</p>
-                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/{settings.admin_slug || "admingorohid306"}</code>
+                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/{settings.admin_slug || "makuadmingowebs99"}</code>
                 </div>
               </div>
 
@@ -379,7 +379,7 @@ export default function AdminSecurity() {
                   <Input
                     value={newSlug}
                     onChange={(e) => setNewSlug(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
-                    placeholder={settings.admin_slug || "admingorohid306"}
+                    placeholder={settings.admin_slug || "makuadmingowebs99"}
                     className="text-sm"
                   />
                   <Button size="sm" onClick={handleChangeSlug} disabled={changingSlug || !newSlug.trim()}>
