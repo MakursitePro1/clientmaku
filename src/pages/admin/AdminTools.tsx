@@ -205,22 +205,22 @@ export default function AdminTools() {
 
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => setView("list")}>
+            <Button variant="ghost" size="icon" onClick={() => setView("list")} className="shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white" style={{ backgroundColor: seoTool.color }}>
-                <seoTool.icon className="w-5 h-5" />
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 text-white" style={{ backgroundColor: seoTool.color }}>
+                <seoTool.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">SEO: {seoTool.name}</h1>
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-xl font-bold text-foreground truncate">SEO: {seoTool.name}</h1>
                 <p className="text-xs text-muted-foreground">Configure full SEO for this tool page</p>
               </div>
             </div>
           </div>
-          <Button onClick={handleSeoSave} disabled={seoSaving} className="gap-2">
+          <Button onClick={handleSeoSave} disabled={seoSaving} className="gap-2 w-full sm:w-auto">
             <Save className="w-4 h-4" />
             {seoSaving ? "Saving..." : "Save SEO"}
           </Button>
@@ -561,36 +561,33 @@ export default function AdminTools() {
             transition={{ delay: Math.min(i * 0.02, 0.5) }}
           >
             <Card className={`border-border/50 transition-all ${!isEnabled(tool.id) ? "opacity-50" : ""}`}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white"
-                    style={{ backgroundColor: tool.color }}
-                  >
-                    <tool.icon className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-medium text-sm text-foreground truncate">{tool.name}</h3>
-                      <Badge variant="secondary" className="text-[10px] shrink-0">{tool.category}</Badge>
-                      {isFeatured(tool.id) && (
-                        <Badge className="text-[10px] bg-amber-500/10 text-amber-600 border-0 shrink-0">
-                          <Star className="w-2.5 h-2.5 mr-0.5" /> Featured
-                        </Badge>
-                      )}
-                      {hasSeo(tool.id) ? (
-                        <Badge className="text-[10px] bg-green-500/10 text-green-600 border-0 shrink-0">
-                          <CheckCircle className="w-2.5 h-2.5 mr-0.5" /> SEO
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-[10px] shrink-0 text-muted-foreground">
-                          <AlertTriangle className="w-2.5 h-2.5 mr-0.5" /> No SEO
-                        </Badge>
-                      )}
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 text-white"
+                      style={{ backgroundColor: tool.color }}
+                    >
+                      <tool.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
-                    <p className="text-xs text-muted-foreground truncate mt-0.5">{tool.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h3 className="font-medium text-sm text-foreground truncate">{tool.name}</h3>
+                        <Badge variant="secondary" className="text-[10px] shrink-0 hidden sm:inline-flex">{tool.category}</Badge>
+                        {hasSeo(tool.id) ? (
+                          <Badge className="text-[10px] bg-green-500/10 text-green-600 border-0 shrink-0">
+                            <CheckCircle className="w-2.5 h-2.5 mr-0.5" /> SEO
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-[10px] shrink-0 text-muted-foreground">
+                            <AlertTriangle className="w-2.5 h-2.5 mr-0.5" /> No SEO
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">{tool.description}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-3 shrink-0 pl-12 sm:pl-0">
                     <Button
                       variant="outline"
                       size="sm"
@@ -599,16 +596,16 @@ export default function AdminTools() {
                     >
                       <Settings2 className="w-3.5 h-3.5" /> SEO
                     </Button>
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-[10px] text-muted-foreground">Featured</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground hidden sm:block">Featured</span>
                       <Switch
                         checked={isFeatured(tool.id)}
                         onCheckedChange={() => toggleSetting(tool.id, "is_featured")}
                         disabled={saving === tool.id}
                       />
                     </div>
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-[10px] text-muted-foreground">Enabled</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground hidden sm:block">Enabled</span>
                       <Switch
                         checked={isEnabled(tool.id)}
                         onCheckedChange={() => toggleSetting(tool.id, "is_enabled")}

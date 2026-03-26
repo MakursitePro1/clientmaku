@@ -333,10 +333,10 @@ export default function AdminSettings() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Site Settings</h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage all website settings from here</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Site Settings</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-1">Manage all website settings from here</p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="gap-2 shrink-0">
+        <Button onClick={handleSave} disabled={saving} className="gap-2 shrink-0 w-full sm:w-auto">
           <Save className="w-4 h-4" />
           {saving ? "Saving..." : "Save All Changes"}
         </Button>
