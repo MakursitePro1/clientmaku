@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Sparkles, Share2, ExternalLink, Facebook, Twitter, Linkedin, Copy, Check, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, Share2, Facebook, Twitter, Linkedin, Copy, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
@@ -45,7 +45,6 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
 
   const currentTool = useMemo(() => tools.find(t => t.path === location.pathname), [location.pathname]);
 
-  // Fetch tool SEO data
   useEffect(() => {
     if (!currentTool) return;
     supabase
@@ -67,12 +66,12 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   const seoTitle = toolSeo?.meta_title || title;
   const seoDescription = toolSeo?.meta_description || description;
   const toolColor = currentTool?.color || "hsl(var(--primary))";
-  const pageUrl = window.location.href;
+  const pageUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(pageUrl);
     setCopied(true);
-    toast.success("Link copied to clipboard!");
+    toast.success("Link copied!");
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -82,90 +81,80 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-accent/20">
       <SEOHead title={seoTitle} description={seoDescription} path={location.pathname} type="website" />
       <Navbar />
 
       <div className="relative">
-        {/* ===== HERO SECTION ===== */}
-        <div className="relative pt-24 pb-8 px-4 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-0 cyber-grid opacity-[0.06]" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-[180px] opacity-[0.12]" style={{ background: toolColor }} />
-            <div className="absolute top-20 right-1/4 w-[300px] h-[300px] rounded-full blur-[120px] opacity-[0.06]" style={{ background: toolColor }} />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-          </div>
-
-          <div className="max-w-5xl mx-auto relative z-10">
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-              <Link to="/tools">
-                <Button variant="ghost" className="mb-6 -ml-2 text-muted-foreground hover:text-foreground group rounded-xl">
-                  <ArrowLeft className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Tools
-                </Button>
+        {/* ===== COMPACT HEADER ===== */}
+        <div className="pt-20 sm:pt-24 pb-2 px-4">
+          <div className="max-w-4xl mx-auto">
+            {/* Back Button */}
+            <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="mb-4">
+              <Link to="/tools" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors group">
+                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+                <span>Back to Tools</span>
               </Link>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="flex flex-col sm:flex-row items-start gap-5 mb-8">
-              {currentTool && (
-                <motion.div initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="relative">
+            {/* Tool Header Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="rounded-2xl bg-card border border-border/50 p-4 sm:p-5 shadow-sm"
+            >
+              <div className="flex items-center gap-3 sm:gap-4">
+                {/* Icon */}
+                {currentTool && (
                   <div
-                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl flex items-center justify-center relative overflow-hidden shadow-2xl"
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shrink-0"
                     style={{
-                      background: `linear-gradient(135deg, ${toolColor.replace(')', ' / 0.2)')}, ${toolColor.replace(')', ' / 0.08)')})`,
+                      background: `linear-gradient(135deg, ${toolColor.replace(')', ' / 0.15)')}, ${toolColor.replace(')', ' / 0.05)')})`,
                       color: toolColor,
-                      boxShadow: `0 20px 60px ${toolColor.replace(')', ' / 0.25)')}, 0 0 0 1px ${toolColor.replace(')', ' / 0.1)')}`
                     }}
                   >
-                    <div className="absolute inset-0 animate-[shimmer_3s_ease-in-out_infinite]" style={{ background: `linear-gradient(105deg, transparent 30%, ${toolColor.replace(')', ' / 0.15)')}, transparent 70%)` }} />
-                    <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(circle at 30% 30%, white, transparent 60%)" }} />
-                    <currentTool.icon className="w-10 h-10 sm:w-12 sm:h-12 relative z-10 drop-shadow-sm" />
+                    <currentTool.icon className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full animate-pulse" style={{ backgroundColor: toolColor, boxShadow: `0 0 14px 3px ${toolColor.replace(')', ' / 0.5)')}` }} />
-                </motion.div>
-              )}
+                )}
 
-              <div className="flex-1 min-w-0">
-                <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-2 leading-tight">{title}</motion.h1>
-                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="text-muted-foreground text-base sm:text-lg max-w-2xl leading-relaxed">{description}</motion.p>
+                {/* Title & Description */}
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground leading-tight truncate">
+                    {title}
+                  </h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 line-clamp-1">
+                    {description}
+                  </p>
+                </div>
 
                 {/* Action Buttons */}
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-3 mt-5">
-                  {currentTool && <FavoriteButton toolId={currentTool.id} size="lg" />}
+                <div className="flex items-center gap-2 shrink-0">
+                  {currentTool && <FavoriteButton toolId={currentTool.id} size="sm" />}
 
-                  {/* Share Button with dropdown */}
                   <div className="relative">
-                    <Button
+                    <button
                       ref={shareBtnRef}
-                      variant="outline"
-                      size="sm"
-                      className="rounded-xl border-2 border-border/60 hover:border-primary/30 gap-2"
                       onClick={() => setShareOpen(!shareOpen)}
+                      className="w-9 h-9 rounded-xl border border-border/60 bg-background/80 hover:bg-accent/50 flex items-center justify-center transition-colors"
+                      title="Share"
                     >
-                      <Share2 className="w-4 h-4" /> Share
-                    </Button>
+                      <Share2 className="w-4 h-4 text-muted-foreground" />
+                    </button>
 
                     <AnimatePresence>
                       {shareOpen && (
                         <>
                           <div className="fixed inset-0 z-[9998]" onClick={() => setShareOpen(false)} />
                           <motion.div
-                            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                            initial={{ opacity: 0, y: -6, scale: 0.96 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -8, scale: 0.95 }}
-                            transition={{ duration: 0.2 }}
-                            className="fixed rounded-2xl bg-card border border-border/50 shadow-2xl z-[9999] p-3 backdrop-blur-xl"
-                            style={{
-                              top: shareBtnRef.current ? shareBtnRef.current.getBoundingClientRect().bottom + 8 : 0,
-                              left: shareBtnRef.current ? shareBtnRef.current.getBoundingClientRect().left : 0,
-                            }}
+                            exit={{ opacity: 0, y: -6, scale: 0.96 }}
+                            transition={{ duration: 0.15 }}
+                            className="absolute right-0 top-full mt-2 rounded-xl bg-card border border-border/50 shadow-xl z-[9999] p-2.5 min-w-[200px]"
                           >
-                            <div className="flex items-center justify-between mb-2 gap-8">
-                              <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-wider">Share</p>
-                              <button onClick={() => setShareOpen(false)} className="w-6 h-6 rounded-full hover:bg-accent/60 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                            <div className="flex items-center gap-2">
+                            <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest px-1 mb-2">Share</p>
+                            <div className="flex items-center gap-1.5">
                               {shareOptions.map((option) => {
                                 const Icon = option.icon;
                                 return (
@@ -173,8 +162,8 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                                     key={option.name}
                                     onClick={() => handleShare(option)}
                                     title={option.name}
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center hover:scale-110 transition-all"
-                                    style={{ backgroundColor: `${option.color}18`, color: option.color }}
+                                    className="w-8 h-8 rounded-lg flex items-center justify-center hover:scale-110 transition-all"
+                                    style={{ backgroundColor: `${option.color}14`, color: option.color }}
                                   >
                                     <Icon />
                                   </button>
@@ -183,9 +172,9 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                               <button
                                 onClick={handleCopyLink}
                                 title={copied ? "Copied!" : "Copy Link"}
-                                className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary hover:scale-110 transition-all"
+                                className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:scale-110 transition-all"
                               >
-                                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                               </button>
                             </div>
                           </motion.div>
@@ -193,31 +182,36 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                       )}
                     </AnimatePresence>
                   </div>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           </div>
         </div>
 
         {/* ===== AD: BEFORE TOOL ===== */}
-        <div className="px-4 pb-4">
-          <div className="max-w-5xl mx-auto">
-            <AdSlotDisplay placement="before_tool" className="rounded-2xl" />
+        <div className="px-4 py-2">
+          <div className="max-w-4xl mx-auto">
+            <AdSlotDisplay placement="before_tool" className="rounded-xl" />
           </div>
         </div>
 
-        {/* ===== TOOL CONTENT ===== */}
-        <div className="px-4 pb-16">
-          <div className="max-w-5xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="relative rounded-3xl border-2 border-border/40 bg-card shadow-xl overflow-hidden">
+        {/* ===== TOOL CONTENT CARD ===== */}
+        <div className="px-4 pb-8">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+              className="rounded-2xl border border-border/50 bg-card shadow-sm overflow-hidden"
+            >
+              {/* Top accent line */}
               {currentTool && (
-                <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${toolColor}, ${toolColor.replace(')', ' / 0.3)')}, transparent)` }} />
+                <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${toolColor}, ${toolColor.replace(')', ' / 0.2)')}, transparent)` }} />
               )}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full blur-[100px] opacity-[0.04] pointer-events-none" style={{ background: toolColor }} />
-              <div className="relative z-10 p-6 sm:p-8 lg:p-10">
+
+              <div className="p-4 sm:p-6 lg:p-8">
                 {children}
-                {/* AD: INSIDE TOOL CARD BOTTOM */}
-                <AdSlotDisplay placement="in_content" className="mt-6 pt-6 border-t border-border/30" />
+                <AdSlotDisplay placement="in_content" className="mt-6 pt-5 border-t border-border/20" />
               </div>
             </motion.div>
           </div>
@@ -225,24 +219,24 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
 
         {/* ===== AD: AFTER TOOL ===== */}
         <div className="px-4 pb-4">
-          <div className="max-w-5xl mx-auto">
-            <AdSlotDisplay placement="after_tool" className="rounded-2xl" />
+          <div className="max-w-4xl mx-auto">
+            <AdSlotDisplay placement="after_tool" className="rounded-xl" />
           </div>
         </div>
 
         {/* ===== SEO LONG DESCRIPTION ===== */}
         {toolSeo?.long_description && (
-          <div className="px-4 pb-8">
-            <div className="max-w-5xl mx-auto">
+          <div className="px-4 pb-6">
+            <div className="max-w-4xl mx-auto">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="rounded-2xl border-2 border-border/30 bg-card/50 p-6 sm:p-8"
+                transition={{ delay: 0.2 }}
+                className="rounded-2xl border border-border/40 bg-card/60 p-5 sm:p-6"
               >
-                <h2 className="text-lg font-bold text-foreground mb-4">About {title}</h2>
+                <h2 className="text-base font-bold text-foreground mb-3">About {title}</h2>
                 <div
-                  className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground"
+                  className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground/80 leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: toolSeo.long_description }}
                 />
               </motion.div>
@@ -260,50 +254,42 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
 
         {/* ===== RELATED TOOLS ===== */}
         {relatedTools.length > 0 && (
-          <div className="px-4 pb-6">
-            <div className="max-w-5xl mx-auto">
-              <AdSlotDisplay placement="sidebar_top" className="rounded-2xl mb-6" />
+          <div className="px-4 pb-4">
+            <div className="max-w-4xl mx-auto">
+              <AdSlotDisplay placement="sidebar_top" className="rounded-xl" />
             </div>
           </div>
         )}
+
         {relatedTools.length > 0 && (
-          <div className="px-4 pb-20">
-            <div className="max-w-5xl mx-auto">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center shadow-lg shadow-primary/20">
-                    <Sparkles className="w-5 h-5 text-primary-foreground" />
+          <div className="px-4 pb-16">
+            <div className="max-w-4xl mx-auto">
+              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                <div className="flex items-center gap-2.5 mb-5">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-primary" />
                   </div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">Similar Tools</h2>
+                  <h2 className="text-lg font-bold tracking-tight">Similar Tools</h2>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {relatedTools.map((tool, i) => (
-                    <motion.div key={tool.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.05 }}>
+                    <motion.div key={tool.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 + i * 0.04 }}>
                       <Link
                         to={tool.path}
-                        className="group relative block rounded-2xl border-2 border-border/40 bg-card overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-xl h-full"
-                        style={{ boxShadow: `0 4px 20px -8px ${tool.color.replace(')', ' / 0.1)')}` }}
+                        className="group flex items-center gap-3 p-3.5 rounded-xl border border-border/40 bg-card hover:border-border hover:shadow-md transition-all duration-300"
                       >
-                        <div className="h-[2px] w-full opacity-50 group-hover:opacity-100 transition-opacity" style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }} />
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: `radial-gradient(circle at 50% 0%, ${tool.color.replace(')', ' / 0.06)')}, transparent 70%)` }} />
-                        <div className="p-5 relative z-10">
-                          <div className="flex items-start gap-3.5 mb-4">
-                            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-sm" style={{ backgroundColor: tool.color.replace(')', ' / 0.12)'), color: tool.color }}>
-                              <tool.icon className="w-5 h-5" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <h3 className="font-bold text-sm mb-1 group-hover:text-primary transition-colors truncate">{tool.name}</h3>
-                              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{tool.description}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between pt-3 border-t border-border/30 group-hover:border-primary/20 transition-colors">
-                            <span className="text-xs font-semibold flex items-center gap-1 transition-colors" style={{ color: tool.color }}>
-                              Open <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                            </span>
-                            <FavoriteButton toolId={tool.id} />
-                          </div>
+                        <div
+                          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                          style={{ backgroundColor: tool.color.replace(')', ' / 0.1)'), color: tool.color }}
+                        >
+                          <tool.icon className="w-5 h-5" />
                         </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">{tool.name}</h3>
+                          <p className="text-xs text-muted-foreground/70 truncate">{tool.description}</p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
                       </Link>
                     </motion.div>
                   ))}
