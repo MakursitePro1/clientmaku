@@ -326,18 +326,32 @@ export default function AdminSecurity() {
             <CardContent className="space-y-3">
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-xs text-muted-foreground">Email</p>
                   <p className="text-sm font-medium text-foreground truncate">{user?.email || "N/A"}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                <Key className="w-4 h-4 text-muted-foreground shrink-0" />
-                <div>
-                  <p className="text-xs text-muted-foreground">User ID</p>
-                  <p className="text-sm font-mono text-foreground">{user?.id?.slice(0, 12)}...</p>
+
+              {/* Change Email */}
+              <div className="space-y-2 p-3 rounded-lg border border-border/50">
+                <label className="text-xs font-medium flex items-center gap-1.5">
+                  <Pencil className="w-3 h-3 text-muted-foreground" />
+                  Change Email
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="New email address..."
+                    className="text-sm"
+                  />
+                  <Button size="sm" onClick={handleChangeEmail} disabled={changingEmail || !newEmail}>
+                    {changingEmail ? "..." : "Update"}
+                  </Button>
                 </div>
               </div>
+
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <Shield className="w-4 h-4 text-muted-foreground shrink-0" />
                 <div>
@@ -345,12 +359,34 @@ export default function AdminSecurity() {
                   <Badge className="bg-primary/10 text-primary text-xs">Admin</Badge>
                 </div>
               </div>
+
               <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground">Admin Panel URL</p>
-                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/admingorohid306</code>
+                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/{settings.admin_slug || "admingorohid306"}</code>
                 </div>
+              </div>
+
+              {/* Change Admin Slug */}
+              <div className="space-y-2 p-3 rounded-lg border border-border/50">
+                <label className="text-xs font-medium flex items-center gap-1.5">
+                  <Pencil className="w-3 h-3 text-muted-foreground" />
+                  Change Admin URL
+                </label>
+                <div className="flex gap-2 items-center">
+                  <span className="text-sm text-muted-foreground">/</span>
+                  <Input
+                    value={newSlug}
+                    onChange={(e) => setNewSlug(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
+                    placeholder={settings.admin_slug || "admingorohid306"}
+                    className="text-sm"
+                  />
+                  <Button size="sm" onClick={handleChangeSlug} disabled={changingSlug || !newSlug.trim()}>
+                    {changingSlug ? "..." : "Update"}
+                  </Button>
+                </div>
+                <p className="text-[10px] text-muted-foreground">Only letters, numbers, hyphens allowed</p>
               </div>
             </CardContent>
           </Card>
