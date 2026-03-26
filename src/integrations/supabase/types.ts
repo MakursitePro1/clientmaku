@@ -110,6 +110,51 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_tools: {
+        Row: {
+          category: string
+          color: string
+          created_at: string
+          created_by: string | null
+          description: string
+          html_content: string
+          icon_name: string
+          id: string
+          is_enabled: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          html_content?: string
+          icon_name?: string
+          id?: string
+          is_enabled?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          html_content?: string
+          icon_name?: string
+          id?: string
+          is_enabled?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
