@@ -4,6 +4,7 @@ import { Menu, X, Zap, Heart, LogIn, LogOut, User, Settings, Wrench } from "luci
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +30,7 @@ export function Navbar() {
   const [profile, setProfile] = useState<{ display_name: string; avatar_url: string | null } | null>(null);
   const { user, signOut } = useAuth();
   const { favorites } = useFavorites();
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     if (user) {
@@ -130,6 +132,13 @@ export function Navbar() {
 
   return (
     <nav className="fixed inset-x-0 top-0 z-50 w-full max-w-full overflow-x-clip">
+      {/* Announcement Bar */}
+      {settings.announcement_enabled === "true" && settings.announcement_text && (
+        <div className="w-full bg-primary/90 text-primary-foreground text-center text-xs py-1.5 px-4 font-medium">
+          {settings.announcement_text}
+        </div>
+      )}
+
       <div className="w-full px-2 sm:px-4 lg:px-8 pt-2 sm:pt-3 lg:pt-4 box-border">
         <div
           className={cn(
@@ -147,10 +156,14 @@ export function Navbar() {
             onClick={(e) => { e.preventDefault(); handleNavClick({ name: "Home", path: "/", hash: "hero" }); }}
             className="flex items-center gap-2 sm:gap-2.5 relative z-10 flex-shrink-0"
           >
-            <img src="/logo.jpg" alt="Cyber Venom" className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover glow-shadow flex-shrink-0" />
+            {settings.site_logo_url ? (
+              <img src={settings.site_logo_url} alt={settings.site_name} className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover glow-shadow flex-shrink-0" />
+            ) : (
+              <img src="/logo.jpg" alt={settings.site_name} className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover glow-shadow flex-shrink-0" />
+            )}
             <span className="text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap leading-none">
-              <span className="gradient-text">Cyber</span>
-              <span className="text-white"> Venom</span>
+              <span className="gradient-text">{settings.navbar_brand_text}</span>
+              <span className="text-white"> {settings.navbar_brand_accent}</span>
             </span>
           </Link>
 
@@ -182,7 +195,6 @@ export function Navbar() {
 
           {/* Desktop Right Side */}
           <div className={cn("relative z-10 ml-auto items-center gap-3 hidden lg:flex", isCompactNav ? "!hidden" : "")}>
-            {/* Favorites Icon - Premium Colorful */}
             <motion.button
               onClick={() => navigate("/favorites")}
               whileHover={{ scale: 1.15 }}
@@ -195,7 +207,6 @@ export function Navbar() {
               )}
               aria-label="Favorites"
             >
-              {/* Animated glow ring */}
               <span className={cn(
                 "absolute inset-0 rounded-xl transition-all duration-500",
                 favorites.length > 0
@@ -210,7 +221,6 @@ export function Navbar() {
                     : "text-white/50 group-hover:text-red-400"
                 )}
               />
-              {/* Count Badge */}
               <AnimatePresence>
                 {favorites.length > 0 && (
                   <motion.span
@@ -236,7 +246,6 @@ export function Navbar() {
                   className="flex items-center gap-2 p-1 rounded-xl hover:bg-white/10 transition-all group"
                 >
                   <div className="relative">
-                    {/* Animated ring around avatar */}
                     <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-primary via-pink-500 to-orange-400 opacity-60 group-hover:opacity-100 blur-[2px] transition-opacity duration-300" />
                     <Avatar className="w-8 h-8 relative border-2 border-white/20 group-hover:border-white/40 transition-colors">
                       {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} /> : null}
@@ -244,7 +253,6 @@ export function Navbar() {
                         {profile?.display_name ? getInitials(profile.display_name) : <User className="w-4 h-4" />}
                       </AvatarFallback>
                     </Avatar>
-                    {/* Online indicator */}
                     <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-black shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
                   </div>
                 </motion.button>
@@ -259,9 +267,7 @@ export function Navbar() {
                       className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-border/50 bg-card/95 backdrop-blur-2xl shadow-2xl shadow-black/20 p-2 overflow-hidden"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {/* Gradient top accent */}
                       <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
-
                       <div className="relative px-3 py-3 mb-1 border-b border-border/30">
                         <p className="text-sm font-bold truncate">{profile?.display_name || "User"}</p>
                         <p className="text-xs text-muted-foreground truncate">{user.email}</p>
@@ -317,7 +323,6 @@ export function Navbar() {
 
           {/* Mobile: Favorites + Toggle */}
           <div className={cn("relative z-10 ml-auto flex items-center gap-1 lg:hidden", isCompactNav ? "" : "!hidden")}>
-            {/* Mobile Favorites Icon */}
             <motion.button
               onClick={() => navigate("/favorites")}
               whileTap={{ scale: 0.85 }}
@@ -376,36 +381,38 @@ export function Navbar() {
                   : "text-white/60 hover:text-white hover:bg-white/10"
               )}
             >
-              <Heart className={cn("w-4 h-4", favorites.length > 0 && "fill-red-500 text-red-500")} />
+              <Heart className={cn("w-4 h-4", favorites.length > 0 ? "fill-red-500 text-red-500" : "")} />
               Favorites
               {favorites.length > 0 && (
                 <span className="ml-auto text-xs bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-0.5 rounded-full font-bold">{favorites.length}</span>
               )}
             </button>
 
-            {user ? (
-              <>
+            <div className="pt-2 border-t border-white/10">
+              {user ? (
+                <div className="space-y-1">
+                  <button
+                    onClick={() => { setIsOpen(false); navigate("/profile"); }}
+                    className="w-full text-left px-4 py-3 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-all flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" /> Profile
+                  </button>
+                  <button
+                    onClick={() => { setIsOpen(false); signOut(); }}
+                    className="w-full text-left px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-all flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
+                </div>
+              ) : (
                 <Button
-                  className="w-full rounded-xl font-semibold mt-1 bg-white/10 text-white hover:bg-white/20"
-                  onClick={() => { setIsOpen(false); navigate("/profile"); }}
+                  className="w-full gradient-bg text-primary-foreground rounded-xl font-semibold"
+                  onClick={() => { setIsOpen(false); navigate("/auth"); }}
                 >
-                  <User className="w-4 h-4 mr-2" /> Profile
+                  <LogIn className="w-4 h-4 mr-2" /> Login
                 </Button>
-                <Button
-                  className="w-full rounded-xl font-semibold mt-1 bg-white/10 text-white hover:bg-white/20"
-                  onClick={() => { setIsOpen(false); signOut(); }}
-                >
-                  <LogOut className="w-4 h-4 mr-2" /> Logout
-                </Button>
-              </>
-            ) : (
-              <Button
-                className="w-full gradient-bg text-primary-foreground rounded-xl font-semibold mt-2"
-                onClick={() => { setIsOpen(false); navigate("/auth"); }}
-              >
-                <LogIn className="w-4 h-4 mr-2" /> Login / Sign Up
-              </Button>
-            )}
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ArrowRight, Play, Zap, Code2, Image, Shield, Globe, Search, BarChart3, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { tools, categories } from "@/data/tools";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 
 const floatingIcons = [
   { icon: Globe, top: "12%", left: "8%", delay: 0, size: "w-10 h-10" },
@@ -14,7 +14,7 @@ const floatingIcons = [
   { icon: Sparkles, top: "35%", left: "3%", delay: 1.8, size: "w-6 h-6" },
 ];
 
-const typingWords = [
+const defaultTypingWords = [
   "Web Tools",
   "Image Editors",
   "Code Formatters",
@@ -25,16 +25,8 @@ const typingWords = [
   "Dev Utilities",
 ];
 
-const getStats = () => [
-  { value: `${tools.length}+`, label: "Free Tools", icon: Zap },
-  { value: "100%", label: "Free to Use", icon: Shield },
-  { value: "200K+", label: "Happy Users", icon: Globe },
-  { value: `${categories.length - 1}`, label: "Categories", icon: BarChart3 },
-];
-
-// Particles component
 function Particles() {
-  const particles = useMemo(() => 
+  const particles = useMemo(() =>
     Array.from({ length: 50 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
@@ -75,7 +67,6 @@ function Particles() {
   );
 }
 
-// Typing effect hook
 function useTypingEffect(words: string[], typingSpeed = 100, deletingSpeed = 60, pauseTime = 2000) {
   const [displayText, setDisplayText] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
@@ -105,7 +96,6 @@ function useTypingEffect(words: string[], typingSpeed = 100, deletingSpeed = 60,
   return displayText;
 }
 
-// Counter animation
 function AnimatedCounter({ target, duration = 2 }: { target: string; duration?: number }) {
   const numericPart = parseInt(target.replace(/[^0-9]/g, ""));
   const suffix = target.replace(/[0-9]/g, "");
@@ -132,14 +122,20 @@ function AnimatedCounter({ target, duration = 2 }: { target: string; duration?: 
 }
 
 export function HeroSection() {
-  const typedText = useTypingEffect(typingWords);
+  const { settings } = useSiteSettings();
+  const typedText = useTypingEffect(defaultTypingWords);
+
+  const stats = [
+    { value: settings.stats_tools_count, label: "Free Tools", icon: Zap },
+    { value: "100%", label: "Free to Use", icon: Shield },
+    { value: settings.stats_users_count, label: "Happy Users", icon: Globe },
+    { value: settings.stats_categories_count, label: "Categories", icon: BarChart3 },
+  ];
 
   return (
     <section id="hero" className="relative flex items-start justify-center pt-28 pb-6 md:pt-32 md:pb-8 lg:pt-36 lg:pb-10 overflow-hidden">
-      {/* Cyber grid background */}
       <div className="absolute inset-0 cyber-grid" />
 
-      {/* Animated gradient orbs */}
       <motion.div
         className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full blur-[150px]"
         style={{ background: "hsl(263 85% 58% / 0.08)" }}
@@ -159,10 +155,8 @@ export function HeroSection() {
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
 
-      {/* Particles */}
       <Particles />
 
-      {/* Scan line effect */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
           className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"
@@ -171,7 +165,6 @@ export function HeroSection() {
         />
       </div>
 
-      {/* Floating icons */}
       {floatingIcons.map((item, i) => (
         <motion.div
           key={i}
@@ -196,21 +189,23 @@ export function HeroSection() {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 animate-gradient" />
           <Zap className="w-4 h-4 text-primary animate-pulse-glow relative z-10" />
-          <span className="text-sm font-semibold gradient-text relative z-10">Cyber Venom — Free Online Web Tools</span>
+          <span className="text-sm font-semibold gradient-text relative z-10">
+            {settings.site_name} — {settings.site_tagline}
+          </span>
           <span className="relative z-10 flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/60"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
           </span>
         </motion.div>
 
-        {/* Heading with typing effect */}
+        {/* Heading */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] mb-6 tracking-tight"
         >
-          <span className="block">Your Ultimate Collection</span>
+          <span className="block">{settings.hero_title}</span>
           <span className="block mt-2 min-h-[1.2em]">
             <span className="relative inline-block">
               <motion.span
@@ -238,8 +233,7 @@ export function HeroSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Image editors, code testers, converters, generators — all in one place.
-          <span className="text-foreground font-medium"> Completely free, no signup required.</span>
+          {settings.hero_description}
         </motion.p>
 
         {/* CTA Buttons */}
@@ -253,11 +247,17 @@ export function HeroSection() {
             <Button
               size="lg"
               className="gradient-bg text-primary-foreground rounded-2xl px-10 py-6 font-bold text-base transition-all glow-shadow relative overflow-hidden group"
-              onClick={() => document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => {
+                if (settings.hero_cta_link.startsWith("#") || settings.hero_cta_link === "/tools") {
+                  document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" });
+                } else {
+                  window.location.href = settings.hero_cta_link;
+                }
+              }}
             >
               <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               <span className="relative flex items-center">
-                Explore Tools <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                {settings.hero_cta_text} <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
             </Button>
           </motion.div>
@@ -272,9 +272,9 @@ export function HeroSection() {
           </motion.div>
         </motion.div>
 
-        {/* Stats with animated counters */}
+        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {getStats().map((stat) => (
+          {stats.map((stat) => (
             <div
               key={stat.label}
               className="group glass rounded-2xl p-6 border border-border/30 hover:border-primary/30 cursor-default transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_-8px_hsl(263_85%_58%/0.2)]"
