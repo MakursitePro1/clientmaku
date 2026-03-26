@@ -278,6 +278,7 @@ const Loading = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+    <SiteSettingsProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
