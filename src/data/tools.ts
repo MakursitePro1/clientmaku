@@ -215,6 +215,12 @@ export const tools: Tool[] = [
   { id: "private-notepad", name: "Private Encrypted Notepad", description: "Write notes encrypted with your password", icon: Shield, category: "security", path: "/tools/private-notepad", color: "hsl(142, 71%, 45%)" },
   { id: "browser-fingerprint", name: "Browser Fingerprint Viewer", description: "See what info your browser reveals about you", icon: Fingerprint, category: "security", path: "/tools/browser-fingerprint", color: "hsl(220, 90%, 56%)" },
   { id: "credit-card-validator", name: "Credit Card Validator", description: "Validate credit card numbers using Luhn algorithm", icon: CreditCard, category: "security", path: "/tools/credit-card-validator", color: "hsl(340, 82%, 52%)" },
+  { id: "cc-generator", name: "CC Generator", description: "Generate test credit card numbers for development", icon: CreditCardIcon, category: "security", path: "/tools/cc-generator", color: "hsl(263, 85%, 58%)" },
+  { id: "bin-checker", name: "BIN Checker", description: "Look up Bank Identification Number details", icon: Scan, category: "security", path: "/tools/bin-checker", color: "hsl(199, 89%, 48%)" },
+
+  // Utility Tools - Communication
+  { id: "temp-mail", name: "Temp Mail", description: "Get a temporary disposable email address instantly", icon: Mail, category: "utility", path: "/tools/temp-mail", color: "hsl(25, 95%, 53%)" },
+  { id: "temp-number", name: "Temp Number", description: "Get a temporary phone number for receiving SMS", icon: Radio, category: "utility", path: "/tools/temp-number", color: "hsl(142, 71%, 45%)" },
 
   // Finance Tools
   { id: "compound-interest", name: "Compound Interest Calculator", description: "Calculate compound vs simple interest", icon: CircleDollarSign, category: "finance", path: "/tools/compound-interest", color: "hsl(142, 71%, 45%)" },

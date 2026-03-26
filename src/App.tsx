@@ -209,6 +209,10 @@ const PhishingLinkChecker = lazy(() => import("./pages/tools/PhishingLinkChecker
 const PrivateNotepad = lazy(() => import("./pages/tools/PrivateNotepad"));
 const BrowserFingerprint = lazy(() => import("./pages/tools/BrowserFingerprint"));
 const CreditCardValidator = lazy(() => import("./pages/tools/CreditCardValidator"));
+const CreditCardGenerator = lazy(() => import("./pages/tools/CreditCardGenerator"));
+const BinChecker = lazy(() => import("./pages/tools/BinChecker"));
+const TempMail = lazy(() => import("./pages/tools/TempMail"));
+const TempNumber = lazy(() => import("./pages/tools/TempNumber"));
 
 // Finance
 const CompoundInterestCalc = lazy(() => import("./pages/tools/CompoundInterestCalc"));
@@ -471,6 +475,10 @@ const App = () => (
             <Route path="/tools/private-notepad" element={<PrivateNotepad />} />
             <Route path="/tools/browser-fingerprint" element={<BrowserFingerprint />} />
             <Route path="/tools/credit-card-validator" element={<CreditCardValidator />} />
+            <Route path="/tools/cc-generator" element={<CreditCardGenerator />} />
+            <Route path="/tools/bin-checker" element={<BinChecker />} />
+            <Route path="/tools/temp-mail" element={<TempMail />} />
+            <Route path="/tools/temp-number" element={<TempNumber />} />
             {/* Finance */}
             <Route path="/tools/compound-interest" element={<CompoundInterestCalc />} />
             <Route path="/tools/tax-calculator" element={<TaxCalculator />} />
