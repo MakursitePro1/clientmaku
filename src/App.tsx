@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
+import { FavoritesProvider } from "@/hooks/useFavorites";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -282,6 +283,7 @@ const Loading = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
+    <FavoritesProvider>
     <SiteSettingsProvider>
     <TooltipProvider>
       <Toaster />
@@ -543,6 +545,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
     </SiteSettingsProvider>
+    </FavoritesProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
