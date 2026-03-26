@@ -40,9 +40,22 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   const location = useLocation();
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [toolSeo, setToolSeo] = useState<any>(null);
   const shareBtnRef = useRef<HTMLButtonElement>(null);
 
   const currentTool = useMemo(() => tools.find(t => t.path === location.pathname), [location.pathname]);
+
+  // Fetch tool SEO data
+  useEffect(() => {
+    if (!currentTool) return;
+    supabase
+      .from("tool_seo")
+      .select("*")
+      .eq("tool_id", currentTool.id)
+      .eq("is_enabled", true)
+      .maybeSingle()
+      .then(({ data }) => { if (data) setToolSeo(data); });
+  }, [currentTool?.id]);
 
   const relatedTools = useMemo(() => {
     if (!currentTool) return [];
@@ -51,6 +64,8 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
       .slice(0, 4);
   }, [currentTool]);
 
+  const seoTitle = toolSeo?.meta_title || title;
+  const seoDescription = toolSeo?.meta_description || description;
   const toolColor = currentTool?.color || "hsl(var(--primary))";
   const pageUrl = window.location.href;
 
@@ -62,13 +77,13 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   };
 
   const handleShare = (option: typeof shareOptions[0]) => {
-    window.open(option.getUrl(pageUrl, title), "_blank", "noopener,noreferrer,width=600,height=400");
+    window.open(option.getUrl(pageUrl, seoTitle), "_blank", "noopener,noreferrer,width=600,height=400");
     setShareOpen(false);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={title} description={description} path={location.pathname} type="website" />
+      <SEOHead title={seoTitle} description={seoDescription} path={location.pathname} type="website" />
       <Navbar />
 
       <div className="relative">
