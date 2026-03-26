@@ -20,6 +20,7 @@ const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
 const AdminAds = lazy(() => import("./pages/admin/AdminAds"));
 const AdminRoles = lazy(() => import("./pages/admin/AdminRoles"));
 const AdminSEO = lazy(() => import("./pages/admin/AdminSEO"));
+const AdminCustomTools = lazy(() => import("./pages/admin/AdminCustomTools"));
 import { AdminGuard } from "@/components/AdminGuard";
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
@@ -29,6 +30,7 @@ const BlogPage = lazy(() => import("./pages/BlogPage"));
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage"));
 const PolicyPage = lazy(() => import("./pages/PolicyPage"));
 const CategoriesPage = lazy(() => import("./pages/CategoriesPage"));
+const CustomToolPage = lazy(() => import("./pages/tools/CustomToolPage"));
 
 // Utility Tools
 const InternetSpeedTester = lazy(() => import("./pages/tools/InternetSpeedTester"));
@@ -297,6 +299,7 @@ const App = () => (
             <Route path="/blog/:slug" element={<Suspense fallback={<Loading />}><BlogPostPage /></Suspense>} />
             <Route path="/policy" element={<Suspense fallback={<Loading />}><PolicyPage /></Suspense>} />
             <Route path="/categories" element={<Suspense fallback={<Loading />}><CategoriesPage /></Suspense>} />
+            <Route path="/tools/custom/:slug" element={<Suspense fallback={<Loading />}><CustomToolPage /></Suspense>} />
             {/* Utility */}
             <Route path="/tools/internet-speed-tester" element={<InternetSpeedTester />} />
             <Route path="/tools/courier-fraud-checker" element={<CourierFraudChecker />} />
@@ -529,6 +532,7 @@ const App = () => (
               <Route path="blog" element={<AdminBlog />} />
               <Route path="ads" element={<AdminAds />} />
               <Route path="seo" element={<AdminSEO />} />
+              <Route path="custom-tools" element={<AdminCustomTools />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="roles" element={<AdminRoles />} />
               <Route path="security" element={<AdminSecurity />} />
