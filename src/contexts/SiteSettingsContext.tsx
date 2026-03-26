@@ -91,21 +91,32 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      const { data } = await supabase
-        .from("site_settings")
-        .select("key, value");
-
-      if (data && data.length > 0) {
-        const merged = { ...defaults };
-        data.forEach((row: any) => {
-          if (row.key in merged) {
-            merged[row.key] = typeof row.value === "string" ? row.value : String(row.value ?? "");
-          }
-        });
-        setSettings(merged);
-      }
+    // Safety timeout - ensure loading resolves even if DB query hangs
+    const timeout = setTimeout(() => {
       setLoading(false);
+    }, 8000);
+
+    const fetchSettings = async () => {
+      try {
+        const { data } = await supabase
+          .from("site_settings")
+          .select("key, value");
+
+        if (data && data.length > 0) {
+          const merged = { ...defaults };
+          data.forEach((row: any) => {
+            if (row.key in merged) {
+              merged[row.key] = typeof row.value === "string" ? row.value : String(row.value ?? "");
+            }
+          });
+          setSettings(merged);
+        }
+      } catch (err) {
+        console.error("Failed to fetch site settings:", err);
+      } finally {
+        setLoading(false);
+        clearTimeout(timeout);
+      }
     };
 
     fetchSettings();

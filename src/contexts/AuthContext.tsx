@@ -20,6 +20,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
+    // Safety timeout - ensure loading resolves even if auth hangs
+    const timeout = setTimeout(() => {
+      setLoading(false);
+      setInitialized(true);
+    }, 10000);
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
@@ -35,14 +41,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       setLoading(false);
       setInitialized(true);
+      clearTimeout(timeout);
     }).catch(() => {
       setSession(null);
       setUser(null);
       setLoading(false);
       setInitialized(true);
+      clearTimeout(timeout);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const signUp = async (email: string, password: string, displayName: string) => {
