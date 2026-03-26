@@ -524,8 +524,8 @@ const App = () => (
             <Route path="/tools/disposable-email-checker" element={<DisposableEmailChecker />} />
             <Route path="/tools/bulk-email-validator" element={<BulkEmailValidator />} />
             <Route path="/tools/email-formatter" element={<EmailFormatter />} />
-            {/* Admin Panel */}
-            <Route path="/admingorohid306" element={<Suspense fallback={<Loading />}><AdminGuard><AdminLayout /></AdminGuard></Suspense>}>
+            {/* Admin Panel - Dynamic Slug */}
+            <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
               <Route path="tools" element={<AdminTools />} />
               <Route path="blog" element={<AdminBlog />} />
