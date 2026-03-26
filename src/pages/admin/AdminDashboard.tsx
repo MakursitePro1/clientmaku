@@ -38,6 +38,8 @@ const CHART_COLORS = [
 ];
 
 export default function AdminDashboard() {
+  const { settings } = useSiteSettings();
+  const adminBase = `/${settings.admin_slug || "makuadmingowebs99"}`;
   const [stats, setStats] = useState<DashboardStats>({
     users: 0, favorites: 0, blogPosts: 0, customTools: 0,
     enabledTools: 0, disabledTools: 0, admins: 0,
@@ -411,12 +413,12 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="space-y-2">
               {[
-                { label: "Manage Tools", href: "/admingorohid306/tools", icon: Wrench },
-                { label: "Custom Tools", href: "/admingorohid306/custom-tools", icon: FileCode },
-                { label: "Blog Posts", href: "/admingorohid306/blog", icon: Globe },
-                { label: "SEO Settings", href: "/admingorohid306/seo", icon: TrendingUp },
-                { label: "View Users", href: "/admingorohid306/users", icon: Users },
-                { label: "Site Settings", href: "/admingorohid306/settings", icon: Settings },
+                { label: "Manage Tools", href: `${adminBase}/tools`, icon: Wrench },
+                { label: "Custom Tools", href: `${adminBase}/custom-tools`, icon: FileCode },
+                { label: "Blog Posts", href: `${adminBase}/blog`, icon: Globe },
+                { label: "SEO Settings", href: `${adminBase}/seo`, icon: TrendingUp },
+                { label: "View Users", href: `${adminBase}/users`, icon: Users },
+                { label: "Site Settings", href: `${adminBase}/settings`, icon: Settings },
               ].map((action) => (
                 <a
                   key={action.label}
