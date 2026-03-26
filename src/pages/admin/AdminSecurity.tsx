@@ -8,32 +8,35 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Shield, Lock, Key, Mail, UserPlus, UserMinus, AlertTriangle,
-  CheckCircle, Eye, EyeOff, RefreshCw, Globe, Fingerprint
+  Shield, Lock, Key, Mail, UserPlus, AlertTriangle,
+  CheckCircle, Eye, EyeOff, RefreshCw, Globe, Fingerprint,
+  Clock, Timer, Smartphone
 } from "lucide-react";
 import { motion } from "framer-motion";
+
+const SESSION_TIMEOUT_KEY = "admin_session_timeout_hours";
 
 export default function AdminSecurity() {
   const { user } = useAuth();
   const { toast } = useToast();
 
   // Password change
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Admin email management
-  const [adminEmail, setAdminEmail] = useState("");
+  // Admin list
   const [adminEmails, setAdminEmails] = useState<string[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
 
-  // Security settings from site_settings
-  const [googleAuthEnabled, setGoogleAuthEnabled] = useState(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  // Security toggles
+  const [totpEnabled, setTotpEnabled] = useState(false);
   const [loginNotifications, setLoginNotifications] = useState(false);
-  const [savingSecurity, setSavingSecurity] = useState(false);
+
+  // Session timeout
+  const [sessionTimeoutHours, setSessionTimeoutHours] = useState("12");
+  const [savingTimeout, setSavingTimeout] = useState(false);
 
   useEffect(() => {
     fetchAdminEmails();
@@ -64,19 +67,18 @@ export default function AdminSecurity() {
     const { data } = await supabase
       .from("site_settings")
       .select("key, value")
-      .in("key", ["google_auth_enabled", "two_factor_enabled", "login_notifications"]);
+      .in("key", ["totp_enabled", "login_notifications", SESSION_TIMEOUT_KEY]);
 
     if (data) {
       data.forEach((row: any) => {
-        const val = row.value === true || row.value === "true";
-        if (row.key === "google_auth_enabled") setGoogleAuthEnabled(val);
-        if (row.key === "two_factor_enabled") setTwoFactorEnabled(val);
-        if (row.key === "login_notifications") setLoginNotifications(val);
+        if (row.key === "totp_enabled") setTotpEnabled(row.value === true || row.value === "true");
+        if (row.key === "login_notifications") setLoginNotifications(row.value === true || row.value === "true");
+        if (row.key === SESSION_TIMEOUT_KEY) setSessionTimeoutHours(String(row.value || "12"));
       });
     }
   };
 
-  const saveSecuritySetting = async (key: string, value: boolean) => {
+  const saveSetting = async (key: string, value: any) => {
     await supabase
       .from("site_settings")
       .upsert(
@@ -85,22 +87,30 @@ export default function AdminSecurity() {
       );
   };
 
-  const handleToggleGoogleAuth = async (val: boolean) => {
-    setGoogleAuthEnabled(val);
-    await saveSecuritySetting("google_auth_enabled", val);
-    toast({ title: "Updated", description: `Google Auth ${val ? "enabled" : "disabled"}.` });
-  };
-
-  const handleToggleTwoFactor = async (val: boolean) => {
-    setTwoFactorEnabled(val);
-    await saveSecuritySetting("two_factor_enabled", val);
-    toast({ title: "Updated", description: `Two-Factor Auth ${val ? "enabled" : "disabled"}.` });
+  const handleToggleTotp = async (val: boolean) => {
+    setTotpEnabled(val);
+    await saveSetting("totp_enabled", val);
+    toast({ title: "Updated", description: `Google Authenticator (TOTP) ${val ? "enabled" : "disabled"}.` });
   };
 
   const handleToggleLoginNotifications = async (val: boolean) => {
     setLoginNotifications(val);
-    await saveSecuritySetting("login_notifications", val);
+    await saveSetting("login_notifications", val);
     toast({ title: "Updated", description: `Login notifications ${val ? "enabled" : "disabled"}.` });
+  };
+
+  const handleSaveSessionTimeout = async () => {
+    const hours = parseInt(sessionTimeoutHours);
+    if (isNaN(hours) || hours < 1 || hours > 720) {
+      toast({ title: "Error", description: "Session timeout must be between 1 and 720 hours.", variant: "destructive" });
+      return;
+    }
+    setSavingTimeout(true);
+    await saveSetting(SESSION_TIMEOUT_KEY, hours);
+    // Also save to localStorage for the session checker to use
+    localStorage.setItem(SESSION_TIMEOUT_KEY, String(hours));
+    setSavingTimeout(false);
+    toast({ title: "Saved", description: `Session will expire after ${hours} hours of inactivity.` });
   };
 
   const handleChangePassword = async () => {
@@ -120,7 +130,6 @@ export default function AdminSecurity() {
       toast({ title: "Success", description: "Password changed successfully." });
       setNewPassword("");
       setConfirmPassword("");
-      setCurrentPassword("");
     }
     setChangingPassword(false);
   };
@@ -130,7 +139,7 @@ export default function AdminSecurity() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Security & Access</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Manage admin credentials, authentication methods, and security settings
+          Manage admin credentials, session timeout, and security settings
         </p>
       </div>
 
@@ -247,56 +256,95 @@ export default function AdminSecurity() {
         </motion.div>
       </div>
 
-      {/* Authentication Methods */}
+      {/* Session Timeout */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <Card className="border-border/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Timer className="w-4 h-4 text-primary" />
+              Session Timeout
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Automatically log out the admin after a specified duration
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+              <div className="flex-1 space-y-1.5 w-full">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                  Timeout Duration (hours)
+                </label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="720"
+                  value={sessionTimeoutHours}
+                  onChange={(e) => setSessionTimeoutHours(e.target.value)}
+                  placeholder="12"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Current: <span className="font-medium text-foreground">{sessionTimeoutHours} hours</span> — You will be automatically signed out after this period.
+                </p>
+              </div>
+              <Button
+                onClick={handleSaveSessionTimeout}
+                disabled={savingTimeout}
+                className="gap-2 shrink-0"
+              >
+                <Clock className="w-4 h-4" />
+                {savingTimeout ? "Saving..." : "Save Timeout"}
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[6, 12, 24, 48, 72].map((h) => (
+                <Button
+                  key={h}
+                  variant={sessionTimeoutHours === String(h) ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => setSessionTimeoutHours(String(h))}
+                >
+                  {h}h
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Security Features */}
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Card className="border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <Key className="w-4 h-4 text-primary" />
-              Authentication Methods
+              Security Features
             </CardTitle>
-            <p className="text-xs text-muted-foreground">Configure how users sign in to your site</p>
+            <p className="text-xs text-muted-foreground">Configure additional security layers</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-card">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                  </svg>
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Smartphone className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Google Sign-In</p>
-                  <p className="text-xs text-muted-foreground">Allow users to sign in with Google</p>
+                  <p className="text-sm font-medium text-foreground">Google Authenticator (TOTP)</p>
+                  <p className="text-xs text-muted-foreground">Require a 6-digit code from Google Authenticator app for admin login</p>
                 </div>
               </div>
-              <Switch checked={googleAuthEnabled} onCheckedChange={handleToggleGoogleAuth} />
+              <Switch checked={totpEnabled} onCheckedChange={handleToggleTotp} />
             </div>
 
             <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-card">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <Fingerprint className="w-5 h-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">Two-Factor Authentication</p>
-                  <p className="text-xs text-muted-foreground">Add extra layer of security</p>
-                </div>
-              </div>
-              <Switch checked={twoFactorEnabled} onCheckedChange={handleToggleTwoFactor} />
-            </div>
-
-            <div className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-card">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-green-500" />
+                <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">Login Notifications</p>
-                  <p className="text-xs text-muted-foreground">Get notified on new sign-ins</p>
+                  <p className="text-xs text-muted-foreground">Get an email notification on each new sign-in</p>
                 </div>
               </div>
               <Switch checked={loginNotifications} onCheckedChange={handleToggleLoginNotifications} />
@@ -325,11 +373,11 @@ export default function AdminSecurity() {
               ) : (
                 <div className="space-y-2">
                   {adminEmails.length > 0 ? (
-                    adminEmails.map((email, i) => (
+                    adminEmails.map((name, i) => (
                       <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Shield className="w-4 h-4 text-primary" />
-                          <span className="text-sm font-medium">{email}</span>
+                          <span className="text-sm font-medium">{name}</span>
                         </div>
                         <Badge variant="secondary" className="text-xs">Admin</Badge>
                       </div>
@@ -342,15 +390,12 @@ export default function AdminSecurity() {
             </div>
 
             <div className="pt-3 border-t border-border/50">
-              <p className="text-xs text-muted-foreground mb-3">
-                Admin access is controlled through the database. Only users with the "admin" role in the user_roles table can access this panel.
-              </p>
               <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-                  <div className="text-xs text-amber-700 dark:text-amber-400 space-y-1">
-                    <p className="font-medium">Security Notice</p>
-                    <p>The admin panel URL and credentials should never be shared publicly. Only authorized personnel should have access.</p>
+                  <div className="text-xs space-y-1">
+                    <p className="font-medium text-amber-700 dark:text-amber-400">Security Notice</p>
+                    <p className="text-muted-foreground">The admin panel URL and credentials should never be shared publicly. Only authorized personnel should have access.</p>
                   </div>
                 </div>
               </div>

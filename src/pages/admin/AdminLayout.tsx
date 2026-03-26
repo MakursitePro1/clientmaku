@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import {
   LayoutDashboard, Wrench, Users, Settings, ChevronLeft, ChevronRight,
-  LogOut, Home, Shield, Menu, X, FileText
+  LogOut, Home, Shield, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +26,7 @@ export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  useSessionTimeout();
 
   const isActive = (path: string) => {
     if (path === ADMIN_BASE) return location.pathname === ADMIN_BASE;
