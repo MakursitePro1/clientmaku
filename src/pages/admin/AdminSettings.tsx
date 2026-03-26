@@ -4,47 +4,141 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Settings, Save, Globe, FileText, MessageCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Save, Globe, FileText, MessageCircle, Palette, Layout,
+  Shield, Key, Lock, Mail, Phone, MapPin, Facebook, Twitter,
+  Instagram, Youtube, Linkedin, Github, ExternalLink, Type,
+  Image, MessageSquare, Star, HelpCircle, Users, Megaphone
+} from "lucide-react";
 import { motion } from "framer-motion";
 
 interface SiteSettings {
+  // General
   site_name: string;
+  site_tagline: string;
   site_description: string;
+  site_logo_url: string;
+  favicon_url: string;
+  // Contact
   contact_email: string;
   contact_phone: string;
+  contact_address: string;
+  contact_form_email: string;
+  // Hero Section
   hero_title: string;
   hero_subtitle: string;
+  hero_description: string;
+  hero_cta_text: string;
+  hero_cta_link: string;
+  // About Section
+  about_title: string;
   about_text: string;
+  about_mission: string;
+  // Footer
   footer_text: string;
+  footer_copyright: string;
+  // Social Links
+  social_facebook: string;
+  social_twitter: string;
+  social_instagram: string;
+  social_youtube: string;
+  social_linkedin: string;
+  social_github: string;
+  // SEO
+  seo_title: string;
+  seo_description: string;
+  seo_keywords: string;
+  seo_og_image: string;
+  // Navbar
+  navbar_brand_text: string;
+  navbar_brand_accent: string;
+  // Stats
+  stats_tools_count: string;
+  stats_users_count: string;
+  stats_categories_count: string;
+  // Announcements
+  announcement_text: string;
+  announcement_enabled: string;
 }
 
 const defaultSettings: SiteSettings = {
-  site_name: "Makur Web Tools",
-  site_description: "Free online tools for everyone",
-  contact_email: "contact@makursite.com",
+  site_name: "Cyber Venom",
+  site_tagline: "Free Online Web Tools",
+  site_description: "Your ultimate collection of free online web tools",
+  site_logo_url: "",
+  favicon_url: "",
+  contact_email: "contact@cybervenom.com",
   contact_phone: "+880 1754-839834",
-  hero_title: "",
-  hero_subtitle: "",
+  contact_address: "",
+  contact_form_email: "",
+  hero_title: "Your Ultimate Collection",
+  hero_subtitle: "Web Tools",
+  hero_description: "Image editors, code testers, converters, generators — all in one place. Completely free, no signup required.",
+  hero_cta_text: "Explore Tools",
+  hero_cta_link: "/tools",
+  about_title: "About Us",
   about_text: "",
+  about_mission: "",
   footer_text: "",
+  footer_copyright: "© 2024 Cyber Venom. All rights reserved.",
+  social_facebook: "",
+  social_twitter: "",
+  social_instagram: "",
+  social_youtube: "",
+  social_linkedin: "",
+  social_github: "",
+  seo_title: "Cyber Venom — Free Online Web Tools",
+  seo_description: "210+ free online tools for developers, designers, and everyone.",
+  seo_keywords: "web tools, online tools, free tools, developer tools",
+  seo_og_image: "",
+  navbar_brand_text: "Cyber",
+  navbar_brand_accent: "Venom",
+  stats_tools_count: "210+",
+  stats_users_count: "200K+",
+  stats_categories_count: "12",
+  announcement_text: "",
+  announcement_enabled: "false",
+};
+
+type SettingField = {
+  key: keyof SiteSettings;
+  label: string;
+  type: "input" | "textarea" | "url";
+  placeholder?: string;
+  icon?: any;
+};
+
+type SettingSection = {
+  title: string;
+  icon: any;
+  description: string;
+  fields: SettingField[];
 };
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("general");
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Admin credentials
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const { data } = await supabase
-        .from("site_settings")
-        .select("key, value");
+      const { data } = await supabase.from("site_settings").select("key, value");
       if (data) {
         const loaded = { ...defaultSettings };
         data.forEach((row: any) => {
           if (row.key in loaded) {
-            (loaded as any)[row.key] = typeof row.value === "string" ? row.value : JSON.stringify(row.value);
+            const val = row.value;
+            (loaded as any)[row.key] = typeof val === "string" ? val : (val !== null ? String(val) : "");
           }
         });
         setSettings(loaded);
@@ -55,101 +149,350 @@ export default function AdminSettings() {
 
   const handleSave = async () => {
     setSaving(true);
-    const entries = Object.entries(settings);
-    for (const [key, value] of entries) {
+    for (const [key, value] of Object.entries(settings)) {
       await supabase
         .from("site_settings")
         .upsert(
-          { key, value: JSON.stringify(value), updated_at: new Date().toISOString() },
+          { key, value: value as any, updated_at: new Date().toISOString(), updated_by: user?.id },
           { onConflict: "key" }
         );
     }
     setSaving(false);
-    toast({ title: "Saved!", description: "Site settings updated successfully." });
+    toast({ title: "✅ সেভ হয়েছে!", description: "সকল সেটিংস সফলভাবে আপডেট হয়েছে।" });
+  };
+
+  const handleChangePassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast({ title: "Error", description: "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Error", description: "পাসওয়ার্ড মিলছে না।", variant: "destructive" });
+      return;
+    }
+    setChangingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "✅ সফল!", description: "পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে।" });
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+    setChangingPassword(false);
   };
 
   const updateField = (field: keyof SiteSettings, value: string) => {
     setSettings((prev) => ({ ...prev, [field]: value }));
   };
 
-  const settingSections = [
-    {
-      title: "General",
-      icon: Globe,
-      fields: [
-        { key: "site_name" as const, label: "Site Name", type: "input" },
-        { key: "site_description" as const, label: "Site Description", type: "input" },
-      ],
-    },
-    {
-      title: "Contact",
-      icon: MessageCircle,
-      fields: [
-        { key: "contact_email" as const, label: "Contact Email", type: "input" },
-        { key: "contact_phone" as const, label: "Contact Phone", type: "input" },
-      ],
-    },
-    {
-      title: "Content",
-      icon: FileText,
-      fields: [
-        { key: "hero_title" as const, label: "Hero Title", type: "input" },
-        { key: "hero_subtitle" as const, label: "Hero Subtitle", type: "input" },
-        { key: "about_text" as const, label: "About Section Text", type: "textarea" },
-        { key: "footer_text" as const, label: "Footer Text", type: "input" },
-      ],
-    },
+  const tabs = [
+    { id: "general", label: "General", icon: Globe },
+    { id: "hero", label: "Hero", icon: Layout },
+    { id: "content", label: "Content", icon: FileText },
+    { id: "contact", label: "Contact", icon: MessageCircle },
+    { id: "social", label: "Social", icon: ExternalLink },
+    { id: "seo", label: "SEO", icon: Megaphone },
+    { id: "navbar", label: "Navbar", icon: Type },
+    { id: "credentials", label: "Admin", icon: Shield },
   ];
+
+  const sections: Record<string, SettingSection[]> = {
+    general: [
+      {
+        title: "Site Identity",
+        icon: Globe,
+        description: "ওয়েবসাইটের মূল তথ্য",
+        fields: [
+          { key: "site_name", label: "Site Name", type: "input", placeholder: "Cyber Venom" },
+          { key: "site_tagline", label: "Tagline", type: "input", placeholder: "Free Online Web Tools" },
+          { key: "site_description", label: "Site Description", type: "textarea", placeholder: "ওয়েবসাইটের বর্ণনা..." },
+          { key: "site_logo_url", label: "Logo URL", type: "url", placeholder: "https://..." },
+          { key: "favicon_url", label: "Favicon URL", type: "url", placeholder: "https://..." },
+        ],
+      },
+      {
+        title: "Stats Display",
+        icon: Star,
+        description: "হোমপেজে দেখানো পরিসংখ্যান",
+        fields: [
+          { key: "stats_tools_count", label: "Total Tools Text", type: "input", placeholder: "210+" },
+          { key: "stats_users_count", label: "Happy Users Text", type: "input", placeholder: "200K+" },
+          { key: "stats_categories_count", label: "Categories Count", type: "input", placeholder: "12" },
+        ],
+      },
+      {
+        title: "Announcement Banner",
+        icon: Megaphone,
+        description: "ওয়েবসাইটে ব্যানার নোটিশ দেখান",
+        fields: [
+          { key: "announcement_text", label: "Announcement Text", type: "input", placeholder: "Important notice..." },
+          { key: "announcement_enabled", label: "Enabled (true/false)", type: "input", placeholder: "false" },
+        ],
+      },
+    ],
+    hero: [
+      {
+        title: "Hero Section",
+        icon: Layout,
+        description: "হোমপেজের হিরো সেকশন কাস্টমাইজ",
+        fields: [
+          { key: "hero_title", label: "Hero Title", type: "input", placeholder: "Your Ultimate Collection" },
+          { key: "hero_subtitle", label: "Hero Subtitle (Animated)", type: "input", placeholder: "Web Tools" },
+          { key: "hero_description", label: "Hero Description", type: "textarea", placeholder: "বর্ণনা..." },
+          { key: "hero_cta_text", label: "CTA Button Text", type: "input", placeholder: "Explore Tools" },
+          { key: "hero_cta_link", label: "CTA Button Link", type: "input", placeholder: "/tools" },
+        ],
+      },
+    ],
+    content: [
+      {
+        title: "About Section",
+        icon: FileText,
+        description: "About পেজের কন্টেন্ট",
+        fields: [
+          { key: "about_title", label: "About Title", type: "input", placeholder: "About Us" },
+          { key: "about_text", label: "About Description", type: "textarea", placeholder: "আমাদের সম্পর্কে..." },
+          { key: "about_mission", label: "Mission Statement", type: "textarea", placeholder: "আমাদের মিশন..." },
+        ],
+      },
+      {
+        title: "Footer",
+        icon: FileText,
+        description: "ফুটার এরিয়া কাস্টমাইজ",
+        fields: [
+          { key: "footer_text", label: "Footer Description", type: "textarea", placeholder: "ফুটারের টেক্সট..." },
+          { key: "footer_copyright", label: "Copyright Text", type: "input", placeholder: "© 2024 Cyber Venom" },
+        ],
+      },
+    ],
+    contact: [
+      {
+        title: "Contact Information",
+        icon: MessageCircle,
+        description: "যোগাযোগের তথ্য",
+        fields: [
+          { key: "contact_email", label: "Contact Email", type: "input", placeholder: "contact@cybervenom.com", icon: Mail },
+          { key: "contact_phone", label: "Phone Number", type: "input", placeholder: "+880...", icon: Phone },
+          { key: "contact_address", label: "Address", type: "textarea", placeholder: "ঠিকানা...", icon: MapPin },
+          { key: "contact_form_email", label: "Form Submission Email", type: "input", placeholder: "forms@cybervenom.com", icon: Mail },
+        ],
+      },
+    ],
+    social: [
+      {
+        title: "Social Media Links",
+        icon: ExternalLink,
+        description: "সোশ্যাল মিডিয়া লিংক সেটআপ",
+        fields: [
+          { key: "social_facebook", label: "Facebook URL", type: "url", placeholder: "https://facebook.com/...", icon: Facebook },
+          { key: "social_twitter", label: "Twitter/X URL", type: "url", placeholder: "https://x.com/...", icon: Twitter },
+          { key: "social_instagram", label: "Instagram URL", type: "url", placeholder: "https://instagram.com/...", icon: Instagram },
+          { key: "social_youtube", label: "YouTube URL", type: "url", placeholder: "https://youtube.com/...", icon: Youtube },
+          { key: "social_linkedin", label: "LinkedIn URL", type: "url", placeholder: "https://linkedin.com/...", icon: Linkedin },
+          { key: "social_github", label: "GitHub URL", type: "url", placeholder: "https://github.com/...", icon: Github },
+        ],
+      },
+    ],
+    seo: [
+      {
+        title: "SEO Settings",
+        icon: Megaphone,
+        description: "সার্চ ইঞ্জিন অপ্টিমাইজেশন",
+        fields: [
+          { key: "seo_title", label: "Meta Title", type: "input", placeholder: "Page Title" },
+          { key: "seo_description", label: "Meta Description", type: "textarea", placeholder: "সার্চ ইঞ্জিনে দেখানো বর্ণনা..." },
+          { key: "seo_keywords", label: "Keywords (comma separated)", type: "input", placeholder: "web tools, online tools..." },
+          { key: "seo_og_image", label: "OG Image URL", type: "url", placeholder: "https://..." },
+        ],
+      },
+    ],
+    navbar: [
+      {
+        title: "Navbar Branding",
+        icon: Type,
+        description: "নেভবারের ব্র্যান্ডিং কাস্টমাইজ",
+        fields: [
+          { key: "navbar_brand_text", label: "Brand Text (Part 1)", type: "input", placeholder: "Cyber" },
+          { key: "navbar_brand_accent", label: "Brand Accent (Part 2)", type: "input", placeholder: "Venom" },
+        ],
+      },
+    ],
+  };
+
+  const renderField = (field: SettingField) => (
+    <div key={field.key} className="space-y-1.5">
+      <label className="text-sm font-medium text-foreground flex items-center gap-2">
+        {field.icon && <field.icon className="w-3.5 h-3.5 text-muted-foreground" />}
+        {field.label}
+      </label>
+      {field.type === "textarea" ? (
+        <Textarea
+          value={settings[field.key]}
+          onChange={(e) => updateField(field.key, e.target.value)}
+          placeholder={field.placeholder}
+          rows={3}
+          className="resize-none"
+        />
+      ) : (
+        <Input
+          value={settings[field.key]}
+          onChange={(e) => updateField(field.key, e.target.value)}
+          placeholder={field.placeholder}
+          type={field.type === "url" ? "url" : "text"}
+        />
+      )}
+    </div>
+  );
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Site Settings</h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage your website content and configuration</p>
+          <p className="text-muted-foreground text-sm mt-1">ওয়েবসাইটের সকল সেটিংস এখান থেকে নিয়ন্ত্রণ করুন</p>
         </div>
-        <Button onClick={handleSave} disabled={saving} className="gap-2">
+        <Button onClick={handleSave} disabled={saving} className="gap-2 shrink-0">
           <Save className="w-4 h-4" />
-          {saving ? "Saving..." : "Save All"}
+          {saving ? "Saving..." : "Save All Changes"}
         </Button>
       </div>
 
-      {settingSections.map((section, i) => (
-        <motion.div
-          key={section.title}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1 }}
-        >
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <section.icon className="w-4 h-4 text-primary" />
-                {section.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {section.fields.map((field) => (
-                <div key={field.key}>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">{field.label}</label>
-                  {field.type === "textarea" ? (
-                    <Textarea
-                      value={settings[field.key]}
-                      onChange={(e) => updateField(field.key, e.target.value)}
-                      rows={4}
-                    />
-                  ) : (
-                    <Input
-                      value={settings[field.key]}
-                      onChange={(e) => updateField(field.key, e.target.value)}
-                    />
-                  )}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="flex flex-wrap h-auto gap-1 bg-muted/50 p-1 rounded-lg">
+          {tabs.map((tab) => (
+            <TabsTrigger
+              key={tab.id}
+              value={tab.id}
+              className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
+            >
+              <tab.icon className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{tab.label}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {Object.entries(sections).map(([tabId, secs]) => (
+          <TabsContent key={tabId} value={tabId} className="space-y-4 mt-4">
+            {secs.map((section, i) => (
+              <motion.div
+                key={section.title}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08 }}
+              >
+                <Card className="border-border/50">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <section.icon className="w-4 h-4 text-primary" />
+                      {section.title}
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground">{section.description}</p>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {section.fields.map(renderField)}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </TabsContent>
+        ))}
+
+        {/* Admin Credentials Tab */}
+        <TabsContent value="credentials" className="space-y-4 mt-4">
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
+            <Card className="border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-primary" />
+                  Admin Account Info
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">বর্তমান এডমিন অ্যাকাউন্টের তথ্য</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Email</p>
+                    <p className="text-sm font-medium text-foreground">{user?.email || "N/A"}</p>
+                  </div>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
-      ))}
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                  <Key className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">User ID</p>
+                    <p className="text-sm font-mono text-foreground">{user?.id?.slice(0, 8)}...</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                  <Shield className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Role</p>
+                    <p className="text-sm font-medium text-primary">Admin</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <Card className="border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-primary" />
+                  Change Password
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">এডমিন পাসওয়ার্ড পরিবর্তন করুন</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">New Password</label>
+                  <Input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="নতুন পাসওয়ার্ড লিখুন..."
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Confirm Password</label>
+                  <Input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="পাসওয়ার্ড নিশ্চিত করুন..."
+                  />
+                </div>
+                <Button
+                  onClick={handleChangePassword}
+                  disabled={changingPassword || !newPassword}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <Lock className="w-4 h-4" />
+                  {changingPassword ? "Changing..." : "Change Password"}
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <Card className="border-border/50 border-amber-500/30 bg-amber-500/5">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2 text-amber-600">
+                  <HelpCircle className="w-4 h-4" />
+                  Admin Panel Info
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm text-muted-foreground">
+                <p>• Admin URL: <code className="text-xs bg-muted px-1.5 py-0.5 rounded">/admingorohid306</code></p>
+                <p>• এই URL শুধুমাত্র admin role যুক্ত ইউজার অ্যাক্সেস করতে পারবে।</p>
+                <p>• পাসওয়ার্ড পরিবর্তন করলে পুনরায় লগইন করতে হতে পারে।</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

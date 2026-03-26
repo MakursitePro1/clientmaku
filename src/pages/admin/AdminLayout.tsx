@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Wrench, Users, Settings, ChevronLeft, ChevronRight,
-  LogOut, Home, Shield, Menu, X
+  LogOut, Home, Shield, Menu, X, FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,9 +13,9 @@ const ADMIN_BASE = "/admingorohid306";
 
 const sidebarLinks = [
   { name: "Dashboard", path: ADMIN_BASE, icon: LayoutDashboard },
-  { name: "Tools Management", path: `${ADMIN_BASE}/tools`, icon: Wrench },
+  { name: "Tools", path: `${ADMIN_BASE}/tools`, icon: Wrench },
   { name: "Users", path: `${ADMIN_BASE}/users`, icon: Users },
-  { name: "Site Settings", path: `${ADMIN_BASE}/settings`, icon: Settings },
+  { name: "Settings", path: `${ADMIN_BASE}/settings`, icon: Settings },
 ];
 
 export default function AdminLayout() {
