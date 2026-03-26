@@ -26,7 +26,7 @@ export default function AdminLayout() {
   const { signOut } = useAuth();
 
   const isActive = (path: string) => {
-    if (path === "/admin") return location.pathname === "/admin";
+    if (path === ADMIN_BASE) return location.pathname === ADMIN_BASE;
     return location.pathname.startsWith(path);
   };
 
