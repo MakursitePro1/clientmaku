@@ -121,6 +121,9 @@ export type Database = {
           icon_name: string
           id: string
           is_enabled: boolean
+          meta_description: string
+          meta_keywords: string
+          meta_title: string
           name: string
           slug: string
           updated_at: string
@@ -135,6 +138,9 @@ export type Database = {
           icon_name?: string
           id?: string
           is_enabled?: boolean
+          meta_description?: string
+          meta_keywords?: string
+          meta_title?: string
           name: string
           slug: string
           updated_at?: string
@@ -149,6 +155,9 @@ export type Database = {
           icon_name?: string
           id?: string
           is_enabled?: boolean
+          meta_description?: string
+          meta_keywords?: string
+          meta_title?: string
           name?: string
           slug?: string
           updated_at?: string
