@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SEOHead } from "@/components/SEOHead";
 
 interface CustomTool {
   id: string;
@@ -15,6 +16,9 @@ interface CustomTool {
   category: string;
   html_content: string;
   color: string;
+  meta_title: string;
+  meta_description: string;
+  meta_keywords: string;
 }
 
 export default function CustomToolPage() {
@@ -65,6 +69,11 @@ export default function CustomToolPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title={tool.meta_title || tool.name}
+        description={tool.meta_description || tool.description}
+        path={`/tools/custom/${tool.slug}`}
+      />
       <Navbar />
       <ScrollToTop />
       <div className="max-w-6xl mx-auto px-4 py-8">
