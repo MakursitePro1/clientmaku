@@ -91,7 +91,7 @@ const PolicyPage = () => {
             Privacy Policy & <span className="gradient-text">Terms</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-muted-foreground max-w-2xl mx-auto">
-            Your privacy matters to us. Read our policies to understand how we handle your data and what terms apply when using Cyber Venom.
+            Your privacy matters to us. Read our policies to understand how we handle your data and what terms apply when using Makursite.
           </motion.p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-xs text-muted-foreground/50 mt-4">
             Last updated: March 20, 2025

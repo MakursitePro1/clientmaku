@@ -16,7 +16,7 @@ function jsonToYaml(obj: any, indent = 0): string {
 }
 
 export default function JsonToYaml() {
-  const [input, setInput] = useState('{\n  "name": "Cyber Venom",\n  "version": "1.0",\n  "features": ["tools", "speed", "design"]\n}');
+  const [input, setInput] = useState('{\n  "name": "Makursite",\n  "version": "1.0",\n  "features": ["tools", "speed", "design"]\n}');
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
 

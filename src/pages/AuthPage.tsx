@@ -38,7 +38,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={isSignUp ? "Sign Up — Cyber Venom" : "Login — Cyber Venom"} description="Login or create your account" path="/auth" />
+      <SEOHead title={isSignUp ? "Sign Up — Makursite" : "Login — Makursite"} description="Login or create your account" path="/auth" />
       <Navbar />
       <div className="pt-28 pb-20 px-4 flex items-center justify-center min-h-screen">
         <motion.div
