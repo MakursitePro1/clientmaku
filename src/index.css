@@ -153,16 +153,22 @@
   }
 
   .navbar-glass {
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 245, 235, 0.88), rgba(255, 255, 255, 0.92));
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 165, 50, 0.15);
     position: relative;
+    box-shadow: 
+      0 4px 24px rgba(255, 140, 50, 0.08),
+      0 1px 3px rgba(0, 0, 0, 0.04);
   }
 
   .navbar-glass-scrolled {
-    background: rgba(0, 0, 0, 0.95);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 60px -20px hsl(263 85% 58% / 0.15);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 240, 225, 0.92), rgba(255, 255, 255, 0.96));
+    box-shadow: 
+      0 8px 40px rgba(255, 140, 50, 0.12),
+      0 2px 8px rgba(0, 0, 0, 0.06),
+      0 0 60px -10px rgba(255, 160, 60, 0.15);
   }
 
   .navbar-shine {
@@ -174,9 +180,9 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.03),
-      rgba(255, 255, 255, 0.06),
-      rgba(255, 255, 255, 0.03),
+      rgba(255, 165, 50, 0.06),
+      rgba(255, 120, 30, 0.1),
+      rgba(255, 165, 50, 0.06),
       transparent
     );
     animation: navbar-shine-move 4s ease-in-out infinite;
