@@ -187,20 +187,15 @@ export function ToolsGrid() {
               >
                 <Link
                   to={tool.path}
-                  className="group relative block rounded-2xl overflow-hidden h-full transition-all duration-500 hover:-translate-y-3"
-                  style={{ boxShadow: `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}` }}
+                  className="group animated-border relative block rounded-2xl overflow-hidden h-full transition-all duration-500 hover:-translate-y-3"
+                  style={{
+                    boxShadow: `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}`,
+                    '--tool-color': tool.color,
+                  } as React.CSSProperties}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 25px 60px -12px ${tool.color.replace(')', ' / 0.25)')}, 0 8px 20px -8px ${tool.color.replace(')', ' / 0.15)')}`; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}`; }}
                 >
-                  {/* Animated border gradient */}
-                  <div
-                    className="absolute inset-0 rounded-2xl opacity-40 group-hover:opacity-100 transition-opacity duration-700"
-                    style={{
-                      background: `linear-gradient(135deg, ${tool.color}, transparent 40%, transparent 60%, ${tool.color})`,
-                      padding: '1px',
-                    }}
-                  />
-                  <div className="absolute inset-[1px] rounded-2xl bg-card/98 backdrop-blur-md" />
+                  <div className="absolute inset-[1.5px] rounded-2xl bg-card/98 backdrop-blur-md" />
 
                   {/* Auto shimmer sweep */}
                   <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
