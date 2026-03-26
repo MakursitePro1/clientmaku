@@ -13,6 +13,7 @@ import {
   Instagram, Youtube, Linkedin, Github, Star, Megaphone
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { ImageUploadField } from "@/components/ImageUploadField";
 
 interface SiteSettings {
   // General
@@ -105,7 +106,7 @@ const defaultSettings: SiteSettings = {
 type SettingField = {
   key: keyof SiteSettings;
   label: string;
-  type: "input" | "textarea" | "url";
+  type: "input" | "textarea" | "url" | "image";
   placeholder?: string;
   icon?: any;
 };
@@ -179,8 +180,8 @@ export default function AdminSettings() {
           { key: "site_name", label: "Site Name", type: "input", placeholder: "Cyber Venom" },
           { key: "site_tagline", label: "Tagline", type: "input", placeholder: "Free Online Web Tools" },
           { key: "site_description", label: "Site Description", type: "textarea", placeholder: "Describe your website..." },
-          { key: "site_logo_url", label: "Logo URL", type: "url", placeholder: "https://..." },
-          { key: "favicon_url", label: "Favicon URL", type: "url", placeholder: "https://..." },
+          { key: "site_logo_url", label: "Logo Image", type: "image", placeholder: "Upload or paste URL..." },
+          { key: "favicon_url", label: "Favicon Image", type: "image", placeholder: "Upload or paste URL..." },
         ],
       },
       {
@@ -275,7 +276,7 @@ export default function AdminSettings() {
           { key: "seo_title", label: "Meta Title", type: "input", placeholder: "Page Title" },
           { key: "seo_description", label: "Meta Description", type: "textarea", placeholder: "Description shown in search engines..." },
           { key: "seo_keywords", label: "Keywords (comma separated)", type: "input", placeholder: "web tools, online tools..." },
-          { key: "seo_og_image", label: "OG Image URL", type: "url", placeholder: "https://..." },
+          { key: "seo_og_image", label: "OG Image", type: "image", placeholder: "Upload or paste URL..." },
         ],
       },
     ],
@@ -294,25 +295,36 @@ export default function AdminSettings() {
 
   const renderField = (field: SettingField) => (
     <div key={field.key} className="space-y-1.5">
-      <label className="text-sm font-medium text-foreground flex items-center gap-2">
-        {field.icon && <field.icon className="w-3.5 h-3.5 text-muted-foreground" />}
-        {field.label}
-      </label>
-      {field.type === "textarea" ? (
-        <Textarea
+      {field.type === "image" ? (
+        <ImageUploadField
+          label={field.label}
           value={settings[field.key]}
-          onChange={(e) => updateField(field.key, e.target.value)}
+          onChange={(url) => updateField(field.key, url)}
           placeholder={field.placeholder}
-          rows={3}
-          className="resize-none"
         />
       ) : (
-        <Input
-          value={settings[field.key]}
-          onChange={(e) => updateField(field.key, e.target.value)}
-          placeholder={field.placeholder}
-          type={field.type === "url" ? "url" : "text"}
-        />
+        <>
+          <label className="text-sm font-medium text-foreground flex items-center gap-2">
+            {field.icon && <field.icon className="w-3.5 h-3.5 text-muted-foreground" />}
+            {field.label}
+          </label>
+          {field.type === "textarea" ? (
+            <Textarea
+              value={settings[field.key]}
+              onChange={(e) => updateField(field.key, e.target.value)}
+              placeholder={field.placeholder}
+              rows={3}
+              className="resize-none"
+            />
+          ) : (
+            <Input
+              value={settings[field.key]}
+              onChange={(e) => updateField(field.key, e.target.value)}
+              placeholder={field.placeholder}
+              type={field.type === "url" ? "url" : "text"}
+            />
+          )}
+        </>
       )}
     </div>
   );

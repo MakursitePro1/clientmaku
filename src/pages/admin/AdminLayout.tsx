@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import {
   LayoutDashboard, Wrench, Users, Settings, ChevronLeft, ChevronRight,
-  LogOut, Home, Shield, Menu, X, FileText, Megaphone
+  LogOut, Home, Shield, Menu, X, FileText, Megaphone, UserCog
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +18,7 @@ const sidebarLinks = [
   { name: "Blog", path: `${ADMIN_BASE}/blog`, icon: FileText },
   { name: "Ads", path: `${ADMIN_BASE}/ads`, icon: Megaphone },
   { name: "Users", path: `${ADMIN_BASE}/users`, icon: Users },
+  { name: "Admin Roles", path: `${ADMIN_BASE}/roles`, icon: UserCog },
   { name: "Security", path: `${ADMIN_BASE}/security`, icon: Shield },
   { name: "Settings", path: `${ADMIN_BASE}/settings`, icon: Settings },
 ];
