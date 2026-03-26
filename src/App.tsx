@@ -525,6 +525,7 @@ const App = () => (
               <Route index element={<AdminDashboard />} />
               <Route path="tools" element={<AdminTools />} />
               <Route path="blog" element={<AdminBlog />} />
+              <Route path="ads" element={<AdminAds />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="security" element={<AdminSecurity />} />
               <Route path="settings" element={<AdminSettings />} />
