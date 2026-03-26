@@ -19,6 +19,7 @@ const AdminSecurity = lazy(() => import("./pages/admin/AdminSecurity"));
 const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
 const AdminAds = lazy(() => import("./pages/admin/AdminAds"));
 const AdminRoles = lazy(() => import("./pages/admin/AdminRoles"));
+const AdminSEO = lazy(() => import("./pages/admin/AdminSEO"));
 import { AdminGuard } from "@/components/AdminGuard";
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
