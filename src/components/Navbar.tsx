@@ -134,7 +134,7 @@ export function Navbar() {
     <nav className="fixed inset-x-0 top-0 z-50 w-full max-w-full overflow-x-clip">
       {/* Announcement Bar */}
       {settings.announcement_enabled === "true" && settings.announcement_text && (
-        <div className="w-full bg-primary/90 text-primary-foreground text-center text-xs py-1.5 px-4 font-medium">
+        <div className="w-full bg-gradient-to-r from-orange-50 via-amber-50 to-orange-50 text-gray-700 text-center text-xs py-1.5 px-4 font-medium border-b border-orange-100/60">
           {settings.announcement_text}
         </div>
       )}
