@@ -21,12 +21,13 @@ const fetchAds = async (): Promise<AdSlot[]> => {
   if (cachedAds) return cachedAds;
   if (fetchPromise) return fetchPromise;
   
-  fetchPromise = supabase
-    .from("ad_slots")
-    .select("id, ad_code, placement, display_order")
-    .eq("is_enabled", true)
-    .order("display_order", { ascending: true })
-    .then(({ data }) => {
+  fetchPromise = (async () => {
+    const { data } = await supabase
+      .from("ad_slots")
+      .select("id, ad_code, placement, display_order")
+      .eq("is_enabled", true)
+      .order("display_order", { ascending: true });
+    {
       cachedAds = (data as AdSlot[]) || [];
       // Invalidate cache after 5 minutes
       setTimeout(() => { cachedAds = null; fetchPromise = null; }, 5 * 60 * 1000);
