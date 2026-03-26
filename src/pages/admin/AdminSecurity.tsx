@@ -263,6 +263,47 @@ export default function AdminSecurity() {
     }
   };
 
+  // Email change handler
+  const handleChangeEmail = async () => {
+    if (!newEmail || !newEmail.includes("@")) {
+      toast({ title: "Error", description: "Please enter a valid email.", variant: "destructive" });
+      return;
+    }
+    setChangingEmail(true);
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "A confirmation email has been sent to the new address. Please verify to complete the change." });
+      setNewEmail("");
+    }
+    setChangingEmail(false);
+  };
+
+  // Admin slug change handler
+  const handleChangeSlug = async () => {
+    const slug = newSlug.trim().replace(/[^a-zA-Z0-9-_]/g, "");
+    if (!slug || slug.length < 4) {
+      toast({ title: "Error", description: "Slug must be at least 4 characters (letters, numbers, hyphens).", variant: "destructive" });
+      return;
+    }
+    setChangingSlug(true);
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: "admin_slug", value: slug as any, updated_at: new Date().toISOString(), updated_by: user?.id },
+        { onConflict: "key" }
+      );
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `Admin URL changed to /${slug}. Redirecting...` });
+      setNewSlug("");
+      setTimeout(() => navigate(`/${slug}/security`), 1500);
+    }
+    setChangingSlug(false);
+  };
+
   return (
     <div className="space-y-6">
       <div>
