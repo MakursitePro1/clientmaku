@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImageUploadField } from "@/components/ImageUploadField";
+import { RichTextEditor } from "@/components/RichTextEditor";
 
 interface BlogPost {
   id: string;
@@ -253,13 +254,11 @@ export default function AdminBlog() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Content (HTML supported)</label>
-                  <Textarea
-                    value={editingPost.content || ""}
-                    onChange={(e) => updateField("content", e.target.value)}
-                    placeholder="Write your post content here... HTML tags are supported."
-                    rows={16}
-                    className="font-mono text-sm"
+                  <label className="text-sm font-medium">Content</label>
+                  <RichTextEditor
+                    content={editingPost.content || ""}
+                    onChange={(html) => updateField("content", html)}
+                    placeholder="Write your blog post content here..."
                   />
                 </div>
               </CardContent>
