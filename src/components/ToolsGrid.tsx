@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Star, FileCode } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { tools, categories, type ToolCategory } from "@/data/tools";
+import { tools as staticTools, categories, type ToolCategory, type Tool } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const TOOLS_PER_PAGE = 24;
 
@@ -13,6 +14,25 @@ export function ToolsGrid() {
   const [activeCategory, setActiveCategory] = useState<ToolCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [customTools, setCustomTools] = useState<Tool[]>([]);
+
+  useEffect(() => {
+    supabase.from("custom_tools").select("*").eq("is_enabled", true).then(({ data }) => {
+      if (data) {
+        setCustomTools(data.map((t: any) => ({
+          id: `custom-${t.slug}`,
+          name: t.name,
+          description: t.description || "Custom tool",
+          icon: FileCode,
+          category: (t.category || "utility") as ToolCategory,
+          path: `/tools/custom/${t.slug}`,
+          color: t.color || "hsl(263, 85%, 58%)",
+        })));
+      }
+    });
+  }, []);
+
+  const tools = useMemo(() => [...staticTools, ...customTools], [customTools]);
 
   useEffect(() => {
     const handler = (e: Event) => {
