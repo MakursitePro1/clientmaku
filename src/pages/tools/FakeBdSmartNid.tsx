@@ -394,7 +394,7 @@ export default function FakeBdSmartNid() {
     ctx.fillStyle = "#1a1a1a";
     ctx.font = "bold 16px 'Courier New', monospace";
     ctx.textAlign = "left";
-    ctx.letterSpacing = "2px";
+    // letterSpacing not universally supported, skip it
 
     const nidClean = nidNo.replace(/\s/g, "");
     const nameClean = nameEn.replace(/\./g, "").replace(/\s+/g, "<");
