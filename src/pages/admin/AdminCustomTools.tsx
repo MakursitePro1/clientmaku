@@ -99,7 +99,7 @@ export default function AdminCustomTools() {
       .from("custom_tools")
       .select("*")
       .order("created_at", { ascending: false });
-    if (!error && data) setTools(data as CustomTool[]);
+    if (!error && data) setTools(data as unknown as CustomTool[]);
     setLoading(false);
   };
 
@@ -157,7 +157,10 @@ export default function AdminCustomTools() {
         color: editingTool.color || "hsl(263, 85%, 58%)",
         html_content: editingTool.html_content!,
         is_enabled: editingTool.is_enabled ?? true,
-      });
+        meta_title: editingTool.meta_title?.trim() || "",
+        meta_description: editingTool.meta_description?.trim() || "",
+        meta_keywords: editingTool.meta_keywords?.trim() || "",
+      } as any);
       if (error) toast.error("Failed to create: " + error.message);
       else { toast.success("Custom tool created!"); setView("list"); fetchTools(); }
     } else {
@@ -171,7 +174,10 @@ export default function AdminCustomTools() {
           color: editingTool.color || "hsl(263, 85%, 58%)",
           html_content: editingTool.html_content!,
           is_enabled: editingTool.is_enabled ?? true,
-        })
+          meta_title: editingTool.meta_title?.trim() || "",
+          meta_description: editingTool.meta_description?.trim() || "",
+          meta_keywords: editingTool.meta_keywords?.trim() || "",
+        } as any)
         .eq("id", editingTool.id!);
       if (error) toast.error("Failed to update: " + error.message);
       else { toast.success("Custom tool updated!"); setView("list"); fetchTools(); }
