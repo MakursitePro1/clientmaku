@@ -22,6 +22,8 @@ const SESSION_TIMEOUT_KEY = "admin_session_timeout_hours";
 export default function AdminSecurity() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { settings } = useSiteSettings();
+  const navigate = useNavigate();
 
   // Password change
   const [newPassword, setNewPassword] = useState("");
