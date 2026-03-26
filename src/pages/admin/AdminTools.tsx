@@ -205,22 +205,22 @@ export default function AdminTools() {
 
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => setView("list")}>
+            <Button variant="ghost" size="icon" onClick={() => setView("list")} className="shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 text-white" style={{ backgroundColor: seoTool.color }}>
-                <seoTool.icon className="w-5 h-5" />
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 text-white" style={{ backgroundColor: seoTool.color }}>
+                <seoTool.icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">SEO: {seoTool.name}</h1>
+              <div className="min-w-0">
+                <h1 className="text-base sm:text-xl font-bold text-foreground truncate">SEO: {seoTool.name}</h1>
                 <p className="text-xs text-muted-foreground">Configure full SEO for this tool page</p>
               </div>
             </div>
           </div>
-          <Button onClick={handleSeoSave} disabled={seoSaving} className="gap-2">
+          <Button onClick={handleSeoSave} disabled={seoSaving} className="gap-2 w-full sm:w-auto">
             <Save className="w-4 h-4" />
             {seoSaving ? "Saving..." : "Save SEO"}
           </Button>
