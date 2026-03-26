@@ -8,7 +8,8 @@ import { ScrollToTop } from "./ScrollToTop";
 import { FavoriteButton } from "./FavoriteButton";
 import { AdSlotDisplay } from "./AdSlotDisplay";
 import { tools } from "@/data/tools";
-import { useMemo, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -39,9 +40,22 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   const location = useLocation();
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [toolSeo, setToolSeo] = useState<any>(null);
   const shareBtnRef = useRef<HTMLButtonElement>(null);
 
   const currentTool = useMemo(() => tools.find(t => t.path === location.pathname), [location.pathname]);
+
+  // Fetch tool SEO data
+  useEffect(() => {
+    if (!currentTool) return;
+    supabase
+      .from("tool_seo")
+      .select("*")
+      .eq("tool_id", currentTool.id)
+      .eq("is_enabled", true)
+      .maybeSingle()
+      .then(({ data }) => { if (data) setToolSeo(data); });
+  }, [currentTool?.id]);
 
   const relatedTools = useMemo(() => {
     if (!currentTool) return [];
@@ -50,6 +64,8 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
       .slice(0, 4);
   }, [currentTool]);
 
+  const seoTitle = toolSeo?.meta_title || title;
+  const seoDescription = toolSeo?.meta_description || description;
   const toolColor = currentTool?.color || "hsl(var(--primary))";
   const pageUrl = window.location.href;
 
@@ -61,13 +77,13 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   };
 
   const handleShare = (option: typeof shareOptions[0]) => {
-    window.open(option.getUrl(pageUrl, title), "_blank", "noopener,noreferrer,width=600,height=400");
+    window.open(option.getUrl(pageUrl, seoTitle), "_blank", "noopener,noreferrer,width=600,height=400");
     setShareOpen(false);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={title} description={description} path={location.pathname} type="website" />
+      <SEOHead title={seoTitle} description={seoDescription} path={location.pathname} type="website" />
       <Navbar />
 
       <div className="relative">
@@ -213,6 +229,34 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
             <AdSlotDisplay placement="after_tool" className="rounded-2xl" />
           </div>
         </div>
+
+        {/* ===== SEO LONG DESCRIPTION ===== */}
+        {toolSeo?.long_description && (
+          <div className="px-4 pb-8">
+            <div className="max-w-5xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="rounded-2xl border-2 border-border/30 bg-card/50 p-6 sm:p-8"
+              >
+                <h2 className="text-lg font-bold text-foreground mb-4">About {title}</h2>
+                <div
+                  className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground"
+                  dangerouslySetInnerHTML={{ __html: toolSeo.long_description }}
+                />
+              </motion.div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== STRUCTURED DATA ===== */}
+        {toolSeo?.structured_data && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSeo.structured_data) }}
+          />
+        )}
 
         {/* ===== RELATED TOOLS ===== */}
         {relatedTools.length > 0 && (

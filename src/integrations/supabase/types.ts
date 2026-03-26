@@ -248,6 +248,78 @@ export type Database = {
         }
         Relationships: []
       }
+      tool_seo: {
+        Row: {
+          canonical_url: string
+          custom_slug: string
+          focus_keyword: string
+          id: string
+          is_enabled: boolean
+          long_description: string
+          meta_description: string
+          meta_keywords: string
+          meta_title: string
+          og_description: string
+          og_image: string
+          og_title: string
+          og_type: string
+          robots: string
+          structured_data: Json | null
+          tool_id: string
+          twitter_card: string
+          twitter_description: string
+          twitter_title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          canonical_url?: string
+          custom_slug?: string
+          focus_keyword?: string
+          id?: string
+          is_enabled?: boolean
+          long_description?: string
+          meta_description?: string
+          meta_keywords?: string
+          meta_title?: string
+          og_description?: string
+          og_image?: string
+          og_title?: string
+          og_type?: string
+          robots?: string
+          structured_data?: Json | null
+          tool_id: string
+          twitter_card?: string
+          twitter_description?: string
+          twitter_title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          canonical_url?: string
+          custom_slug?: string
+          focus_keyword?: string
+          id?: string
+          is_enabled?: boolean
+          long_description?: string
+          meta_description?: string
+          meta_keywords?: string
+          meta_title?: string
+          og_description?: string
+          og_image?: string
+          og_title?: string
+          og_type?: string
+          robots?: string
+          structured_data?: Json | null
+          tool_id?: string
+          twitter_card?: string
+          twitter_description?: string
+          twitter_title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       tool_settings: {
         Row: {
           display_order: number | null
