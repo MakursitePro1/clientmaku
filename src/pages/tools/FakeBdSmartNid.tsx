@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function FakeBdSmartNid() {
@@ -20,6 +19,7 @@ export default function FakeBdSmartNid() {
   const [issueDate, setIssueDate] = useState("30 Nov 2015");
   const [addressBn, setAddressBn] = useState("বাসা/হোল্ডিং: ৩৬, গ্রাম/রাস্তা: রোড নং-২, ধানমন্ডি আবাসিক এলাকা, ডাকঘর: জিগাতলা - ১২০৯, ধানমন্ডি, ঢাকা দক্ষিণ সিটি কর্পোরেশন, ঢাকা");
   const [photo, setPhoto] = useState<string | null>(null);
+  const [activeSide, setActiveSide] = useState<"front" | "back">("front");
 
   const frontCanvasRef = useRef<HTMLCanvasElement>(null);
   const backCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -525,18 +525,31 @@ export default function FakeBdSmartNid() {
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="front" className="w-full">
-          <TabsList className="w-full grid grid-cols-2 rounded-xl">
-            <TabsTrigger value="front" className="rounded-xl">Front Side</TabsTrigger>
-            <TabsTrigger value="back" className="rounded-xl">Back Side</TabsTrigger>
-          </TabsList>
-          <TabsContent value="front" className="mt-4">
+        <div className="space-y-4">
+          <div className="w-full grid grid-cols-2 gap-2 rounded-xl bg-muted p-1">
+            <Button
+              type="button"
+              variant={activeSide === "front" ? "default" : "ghost"}
+              onClick={() => setActiveSide("front")}
+              className="rounded-lg"
+            >
+              Front Side
+            </Button>
+            <Button
+              type="button"
+              variant={activeSide === "back" ? "default" : "ghost"}
+              onClick={() => setActiveSide("back")}
+              className="rounded-lg"
+            >
+              Back Side
+            </Button>
+          </div>
+          {activeSide === "front" ? (
             <canvas ref={frontCanvasRef} className="w-full rounded-2xl border border-border shadow-lg" />
-          </TabsContent>
-          <TabsContent value="back" className="mt-4">
+          ) : (
             <canvas ref={backCanvasRef} className="w-full rounded-2xl border border-border shadow-lg" />
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     </ToolLayout>
   );
