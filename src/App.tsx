@@ -14,6 +14,7 @@ const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminTools = lazy(() => import("./pages/admin/AdminTools"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminSecurity = lazy(() => import("./pages/admin/AdminSecurity"));
 import { AdminGuard } from "@/components/AdminGuard";
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
@@ -520,6 +521,7 @@ const App = () => (
               <Route index element={<AdminDashboard />} />
               <Route path="tools" element={<AdminTools />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="security" element={<AdminSecurity />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
