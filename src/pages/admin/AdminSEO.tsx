@@ -302,7 +302,7 @@ export default function AdminSEO() {
                   <Input
                     value={editing.meta_title || ""}
                     onChange={(e) => updateField("meta_title", e.target.value)}
-                    placeholder="Page Title — Cyber Venom"
+                    placeholder="Page Title — Makursite"
                     maxLength={70}
                   />
                   <div className="flex justify-between">

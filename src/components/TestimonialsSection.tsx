@@ -197,7 +197,7 @@ export function TestimonialsSection() {
             Loved by <span className="gradient-text">200K+</span> Users
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground mt-3 max-w-md mx-auto leading-relaxed">
-            Real people, real love — see why thousands trust Cyber Venom tools every day 💜
+            Real people, real love — see why thousands trust Makursite tools every day 💜
           </p>
 
           {/* Mini stats */}

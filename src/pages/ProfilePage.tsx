@@ -82,7 +82,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Profile — Cyber Venom" description="Manage your profile" path="/profile" />
+      <SEOHead title="Profile — Makursite" description="Manage your profile" path="/profile" />
       <Navbar />
 
       <div className="pt-28 pb-20 px-4 relative">

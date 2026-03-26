@@ -4,7 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const faqs = [
-  { q: "Are all tools free to use?", a: "Yes! All tools on Cyber Venom are completely free to use. No hidden charges, no premium plans — just free tools.", emoji: "🆓" },
+  { q: "Are all tools free to use?", a: "Yes! All tools on Makursite are completely free to use. No hidden charges, no premium plans — just free tools.", emoji: "🆓" },
   { q: "Do I need to sign up to use the tools?", a: "No signup required! You can use all tools instantly without creating an account.", emoji: "🚀" },
   { q: "Is my data safe when using these tools?", a: "Absolutely. Most tools process data directly in your browser. We do not store or share your personal data.", emoji: "🔒" },
   { q: "Can I suggest new tools?", a: "Of course! We welcome suggestions. Use the contact form below to share your ideas for new tools.", emoji: "💡" },

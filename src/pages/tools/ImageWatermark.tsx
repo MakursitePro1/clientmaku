@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 export default function ImageWatermark() {
   const [image, setImage] = useState<string | null>(null);
-  const [text, setText] = useState("Cyber Venom");
+  const [text, setText] = useState("Makursite");
   const [opacity, setOpacity] = useState(30);
   const [fontSize, setFontSize] = useState(40);
   const canvasRef = useRef<HTMLCanvasElement>(null);
