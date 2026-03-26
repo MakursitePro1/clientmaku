@@ -38,7 +38,7 @@ export default function CustomToolPage() {
       .maybeSingle()
       .then(({ data, error }) => {
         if (error || !data) setNotFound(true);
-        else setTool(data as CustomTool);
+        else setTool(data as unknown as CustomTool);
         setLoading(false);
       });
   }, [slug]);
