@@ -131,6 +131,72 @@ export type Database = {
         }
         Relationships: []
       }
+      page_seo: {
+        Row: {
+          canonical_url: string
+          id: string
+          is_enabled: boolean
+          meta_description: string
+          meta_keywords: string
+          meta_title: string
+          og_description: string
+          og_image: string
+          og_title: string
+          og_type: string
+          page_name: string
+          page_path: string
+          robots: string
+          structured_data: Json | null
+          twitter_card: string
+          twitter_description: string
+          twitter_title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          canonical_url?: string
+          id?: string
+          is_enabled?: boolean
+          meta_description?: string
+          meta_keywords?: string
+          meta_title?: string
+          og_description?: string
+          og_image?: string
+          og_title?: string
+          og_type?: string
+          page_name?: string
+          page_path: string
+          robots?: string
+          structured_data?: Json | null
+          twitter_card?: string
+          twitter_description?: string
+          twitter_title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          canonical_url?: string
+          id?: string
+          is_enabled?: boolean
+          meta_description?: string
+          meta_keywords?: string
+          meta_title?: string
+          og_description?: string
+          og_image?: string
+          og_title?: string
+          og_type?: string
+          page_name?: string
+          page_path?: string
+          robots?: string
+          structured_data?: Json | null
+          twitter_card?: string
+          twitter_description?: string
+          twitter_title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
