@@ -197,27 +197,23 @@ export function Navbar() {
           <div className={cn("relative z-10 ml-auto items-center gap-3 hidden lg:flex", isCompactNav ? "!hidden" : "")}>
             <motion.button
               onClick={() => navigate("/favorites")}
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className={cn(
-                "relative p-2.5 rounded-xl transition-all duration-300 group",
+                "relative p-2.5 rounded-xl border-2 transition-all duration-300 group",
                 location.pathname === "/favorites"
-                  ? "bg-gradient-to-br from-red-500/20 to-pink-500/20 border border-red-500/30"
-                  : "hover:bg-white/10"
+                  ? "bg-gradient-to-br from-red-500/15 to-pink-500/15 border-red-400/40 shadow-md shadow-red-500/10"
+                  : favorites.length > 0
+                    ? "bg-red-50/80 border-red-300/40 hover:border-red-400/60 hover:bg-red-50"
+                    : "bg-white/60 border-gray-200/60 hover:border-gray-300 hover:bg-white/80"
               )}
               aria-label="Favorites"
             >
-              <span className={cn(
-                "absolute inset-0 rounded-xl transition-all duration-500",
-                favorites.length > 0
-                  ? "shadow-[0_0_15px_rgba(239,68,68,0.3),inset_0_0_15px_rgba(239,68,68,0.05)]"
-                  : ""
-              )} />
               <Heart
                 className={cn(
                   "w-5 h-5 relative z-10 transition-all duration-300",
                   favorites.length > 0
-                    ? "fill-red-500 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]"
+                    ? "fill-red-500 text-red-500"
                     : "text-gray-400 group-hover:text-red-400"
                 )}
               />
