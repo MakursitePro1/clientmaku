@@ -45,7 +45,7 @@ const defaults: SiteSettings = {
   site_description: "Your ultimate collection of free online web tools",
   site_logo_url: "",
   contact_email: "hello@makursite.com",
-  contact_phone: "+880 1754-839834",
+  contact_phone: "+880 1635-915989",
   contact_address: "Dhaka, Bangladesh",
   hero_title: "Your Ultimate Collection",
   hero_subtitle: "Web Tools",
