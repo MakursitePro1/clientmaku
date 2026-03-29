@@ -114,24 +114,28 @@ export default function HashGenerator() {
   return (
     <ToolLayout title="Hash Generator" description="Generate MD5, SHA-1, SHA-256, SHA-384, SHA-512 hashes with comparison tool">
       <div className="space-y-6 max-w-2xl mx-auto">
-        <div className="space-y-2">
+        <div className="tool-section-card p-4 space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold">Input Text</label>
-            <span className="text-xs text-muted-foreground">{inputStats.chars} chars • {inputStats.words} words • {inputStats.bytes} bytes</span>
+            <label className="text-sm font-bold flex items-center gap-1.5"><Hash className="w-4 h-4 text-primary" /> Input Text</label>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="tool-badge">{inputStats.chars} chars</span>
+              <span className="tool-badge">{inputStats.words} words</span>
+              <span className="tool-badge">{inputStats.bytes} bytes</span>
+            </div>
           </div>
           <Textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            className="min-h-[120px] rounded-xl bg-card border-border/50 resize-none font-mono text-sm"
+            className="min-h-[120px] rounded-xl bg-background border-primary/10 resize-none font-mono text-sm tool-input-colorful"
             placeholder="Enter text to hash..."
           />
         </div>
 
         <div className="flex gap-3">
-          <Button onClick={generateAll} disabled={loading} className="gradient-bg text-primary-foreground rounded-xl font-semibold gap-2 flex-1">
+          <button onClick={generateAll} disabled={loading} className="tool-btn-primary flex-1 py-3 px-6 flex items-center justify-center gap-2 text-sm">
             <Hash className="w-4 h-4" /> {loading ? "Generating..." : "Generate All Hashes"}
-          </Button>
-          <Button onClick={() => { setInput(""); setHashes({}); setCompareHash(""); }} variant="outline" className="rounded-xl gap-2">
+          </button>
+          <Button onClick={() => { setInput(""); setHashes({}); setCompareHash(""); }} variant="outline" className="rounded-xl gap-2 border-2 border-primary/20 hover:border-primary/40">
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>

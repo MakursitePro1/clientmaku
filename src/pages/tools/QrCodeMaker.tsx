@@ -95,9 +95,9 @@ export default function QrCodeMaker() {
     <ToolLayout title="QR Code Maker" description="Create QR codes for URLs, WiFi, vCards, SMS and more">
       <div className="space-y-6 max-w-2xl mx-auto">
         <Tabs value={mode} onValueChange={(v) => setMode(v as QRMode)}>
-          <TabsList className="grid grid-cols-5 w-full rounded-xl">
+          <TabsList className="grid grid-cols-5 w-full rounded-2xl p-1.5 bg-gradient-to-r from-primary/5 via-accent/30 to-primary/5 border border-primary/10 h-auto">
             {(["url", "text", "wifi", "vcard", "sms"] as QRMode[]).map((m) => (
-              <TabsTrigger key={m} value={m} className="rounded-lg gap-1 text-xs sm:text-sm">
+              <TabsTrigger key={m} value={m} className="rounded-xl gap-1.5 text-xs sm:text-sm py-2.5 data-[state=active]:gradient-bg data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 font-bold">
                 {modeIcons[m]} {m === "url" ? "URL" : m === "wifi" ? "WiFi" : m === "vcard" ? "vCard" : m === "sms" ? "SMS" : "Text"}
               </TabsTrigger>
             ))}
@@ -175,14 +175,14 @@ export default function QrCodeMaker() {
         {/* QR Preview */}
         {qrData && (
           <div className="flex flex-col items-center gap-4">
-            <div id="qr-code-svg" className="rounded-2xl p-6 inline-block border border-border/50" style={{ backgroundColor: bgColor }}>
+            <div id="qr-code-svg" className="tool-result-card rounded-2xl p-6 inline-block" style={{ backgroundColor: bgColor }}>
               <QRCodeSVG value={qrData} size={sizeNum} fgColor={fgColor} bgColor={bgColor} level="H" includeMargin />
             </div>
-            <div className="flex gap-2">
-              <Button onClick={() => download("png")} className="gradient-bg text-primary-foreground rounded-xl font-semibold gap-2">
-                <Download className="w-4 h-4" /> PNG
-              </Button>
-              <Button onClick={() => download("svg")} variant="outline" className="rounded-xl font-semibold gap-2">
+            <div className="flex gap-3">
+              <button onClick={() => download("png")} className="tool-btn-primary px-6 py-3 flex items-center gap-2 text-sm">
+                <Download className="w-4 h-4" /> Download PNG
+              </button>
+              <Button onClick={() => download("svg")} variant="outline" className="rounded-xl font-bold gap-2 border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5">
                 <Download className="w-4 h-4" /> SVG
               </Button>
             </div>

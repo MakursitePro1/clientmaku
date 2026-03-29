@@ -158,10 +158,10 @@ export default function TypingTest() {
               <SelectItem value="hard">🔥 Hard</SelectItem>
             </SelectContent>
           </Select>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {durations.map(d => (
               <button key={d} onClick={() => { setDuration(d); setTimeLeft(d); if (started) reset(); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${duration === d ? "bg-primary text-primary-foreground" : "bg-accent/50 text-muted-foreground"}`}>
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${duration === d ? "gradient-bg text-white shadow-lg shadow-primary/25" : "bg-card border border-border/30 text-muted-foreground hover:border-primary/30 hover:text-primary"}`}>
                 {d < 60 ? `${d}s` : `${d/60}m`}
               </button>
             ))}
@@ -186,11 +186,11 @@ export default function TypingTest() {
               key={s.label}
               animate={s.highlight ? { scale: [1, 1.02, 1] } : {}}
               transition={{ duration: 0.5, repeat: s.highlight ? Infinity : 0 }}
-              className={`rounded-2xl p-4 text-center border ${s.highlight ? "border-destructive/50 bg-destructive/5" : "border-border/30 bg-accent/50"}`}
+              className={`tool-stat-card ${s.highlight ? "!border-destructive/50 !bg-destructive/5" : ""}`}
             >
-              <s.icon className={`w-4 h-4 mx-auto mb-1 ${s.highlight ? "text-destructive" : "text-primary"}`} />
-              <div className="text-[10px] text-muted-foreground">{s.label}</div>
-              <div className="text-xl font-extrabold">{s.val}</div>
+              <s.icon className={`w-5 h-5 mx-auto mb-1.5 ${s.highlight ? "text-destructive" : "text-primary"}`} />
+              <div className="stat-label">{s.label}</div>
+              <div className="stat-value text-xl">{s.val}</div>
             </motion.div>
           ))}
         </div>

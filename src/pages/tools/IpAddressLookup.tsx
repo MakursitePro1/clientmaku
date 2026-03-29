@@ -104,10 +104,10 @@ export default function IpAddressLookup() {
               onKeyDown={e => e.key === "Enter" && lookup()}
             />
           </div>
-          <Button onClick={() => lookup()} disabled={loading} className="gradient-bg text-primary-foreground rounded-xl font-semibold shrink-0 gap-1.5">
+          <button onClick={() => lookup()} disabled={loading} className="tool-btn-primary shrink-0 px-5 py-2.5 flex items-center gap-1.5 text-sm disabled:opacity-50">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             Lookup
-          </Button>
+          </button>
         </div>
 
         <Button variant="outline" className="rounded-xl gap-1.5" onClick={() => lookup("")} disabled={loading}>
@@ -127,7 +127,7 @@ export default function IpAddressLookup() {
               className="space-y-4"
             >
               {/* IP Header */}
-              <div className="rounded-2xl bg-gradient-to-r from-primary/10 to-accent/20 border border-primary/20 p-5 text-center">
+              <div className="tool-result-card text-center">
                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">IP Address</p>
                 <p className="text-3xl font-black text-primary mt-1 font-mono">{info.ip}</p>
                 <p className="text-sm text-muted-foreground mt-1">{info.city}, {info.region}, {info.country}</p>

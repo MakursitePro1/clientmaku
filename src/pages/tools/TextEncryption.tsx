@@ -128,11 +128,11 @@ export default function TextEncryption() {
     <ToolLayout title="Encryption / Decryption Tool" description="Encrypt and decrypt text with 10 methods including AES-256 and Morse code">
       <div className="space-y-5 max-w-2xl mx-auto">
         {/* Mode Toggle */}
-        <div className="flex gap-2 p-1 bg-accent/30 rounded-xl">
-          <button onClick={() => setMode("encrypt")} className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-all ${mode === "encrypt" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"}`}>
+        <div className="flex gap-2 p-1.5 bg-gradient-to-r from-primary/5 via-accent/30 to-primary/5 rounded-2xl border border-primary/10">
+          <button onClick={() => setMode("encrypt")} className={`flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-300 ${mode === "encrypt" ? "gradient-bg text-white shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"}`}>
             <Lock className="w-3.5 h-3.5" /> Encrypt
           </button>
-          <button onClick={() => setMode("decrypt")} className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-all ${mode === "decrypt" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"}`}>
+          <button onClick={() => setMode("decrypt")} className={`flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-300 ${mode === "decrypt" ? "gradient-bg text-white shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"}`}>
             <Unlock className="w-3.5 h-3.5" /> Decrypt
           </button>
         </div>
@@ -141,7 +141,7 @@ export default function TextEncryption() {
         <div className="grid grid-cols-5 gap-2">
           {methods.map(m => (
             <button key={m.id} onClick={() => setMethod(m.id)}
-              className={`p-2.5 rounded-xl text-center transition-all border ${method === m.id ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/30" : "border-border/50 bg-card text-muted-foreground hover:text-foreground hover:border-primary/30"}`}>
+              className={`p-3 rounded-xl text-center transition-all duration-300 border-2 ${method === m.id ? "border-primary/40 gradient-bg text-white shadow-lg shadow-primary/20" : "border-border/30 bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 hover:shadow-md"}`}>
               <span className="text-lg block">{m.icon}</span>
               <div className="text-[10px] font-bold mt-0.5">{m.label}</div>
             </button>
@@ -171,10 +171,10 @@ export default function TextEncryption() {
           <Textarea value={input} onChange={e => setInput(e.target.value)} placeholder={mode === "encrypt" ? "Enter text to encrypt..." : "Enter text to decrypt..."} className="min-h-[100px] rounded-xl font-mono text-sm" />
 
           <div className="flex gap-2">
-            <Button onClick={process} className="flex-1 gradient-bg text-primary-foreground rounded-xl font-bold gap-1.5">
+            <button onClick={process} className="tool-btn-primary flex-1 py-3 px-6 flex items-center justify-center gap-2 text-sm">
               {mode === "encrypt" ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
               {mode === "encrypt" ? "Encrypt" : "Decrypt"}
-            </Button>
+            </button>
             <Button onClick={swap} variant="outline" className="rounded-xl" title="Swap">
               <ArrowLeftRight className="w-4 h-4" />
             </Button>

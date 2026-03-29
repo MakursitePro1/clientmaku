@@ -81,13 +81,13 @@ export default function TempMail() {
     <ToolLayout title="Temp Mail" description="Get a temporary disposable email address instantly">
       <div className="space-y-4 max-w-2xl mx-auto">
         {/* Email Address */}
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
+        <div className="tool-result-card flex items-center gap-2">
           <Mail className="w-5 h-5 text-primary shrink-0" />
-          <span className="font-mono text-sm sm:text-base font-semibold flex-1 truncate">{email}</span>
-          <Button variant="ghost" size="icon" onClick={copyEmail} className="shrink-0 h-8 w-8">
+          <span className="font-mono text-sm sm:text-base font-bold flex-1 truncate gradient-text">{email}</span>
+          <Button variant="ghost" size="icon" onClick={copyEmail} className="shrink-0 h-8 w-8 hover:text-primary">
             <Copy className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={generateEmail} className="shrink-0 h-8 w-8">
+          <Button variant="ghost" size="icon" onClick={generateEmail} className="shrink-0 h-8 w-8 hover:text-primary">
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
@@ -112,7 +112,7 @@ export default function TempMail() {
         </div>
 
         {/* Inbox / Email View */}
-        <div className="min-h-[300px] rounded-xl border border-border/50 bg-card overflow-hidden">
+        <div className="min-h-[300px] tool-section-card overflow-hidden">
           {selected ? (
             <div className="p-4 space-y-3">
               <button onClick={() => setSelected(null)} className="text-xs text-primary hover:underline">← Back to Inbox</button>

@@ -86,14 +86,14 @@ export default function UrlShortener() {
                 onKeyDown={e => e.key === "Enter" && shorten()}
               />
             </div>
-            <Button
+            <button
               onClick={shorten}
               disabled={loading || !isValidUrl}
-              className="gradient-bg text-primary-foreground rounded-xl font-bold shrink-0 gap-1.5"
+              className="tool-btn-primary shrink-0 px-5 py-2.5 flex items-center gap-1.5 text-sm disabled:opacity-50"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Link className="w-4 h-4" />}
               {loading ? "Shortening..." : "Shorten"}
-            </Button>
+            </button>
           </div>
           {url && !isValidUrl && (
             <p className="text-xs text-destructive">Please enter a valid URL (include https://)</p>

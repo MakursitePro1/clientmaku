@@ -105,9 +105,9 @@ export default function PasswordGenerator() {
     <ToolLayout title="Password Generator" description="Generate ultra-secure passwords with advanced options">
       <div className="space-y-6 max-w-xl mx-auto">
         {/* Mode Toggle */}
-        <div className="flex gap-2 p-1 bg-accent/30 rounded-xl">
+        <div className="flex gap-2 p-1.5 bg-gradient-to-r from-primary/5 via-accent/30 to-primary/5 rounded-2xl border border-primary/10">
           {(["random", "passphrase"] as const).map(m => (
-            <button key={m} onClick={() => setMode(m)} className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${mode === m ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+            <button key={m} onClick={() => setMode(m)} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${mode === m ? "gradient-bg text-white shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground hover:bg-accent/40"}`}>
               {m === "random" ? "🔐 Random" : "📝 Passphrase"}
             </button>
           ))}
@@ -125,15 +125,16 @@ export default function PasswordGenerator() {
         {/* Options */}
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: "Uppercase (A-Z)", checked: uppercase, set: setUppercase },
-            { label: "Lowercase (a-z)", checked: lowercase, set: setLowercase },
-            { label: "Numbers (0-9)", checked: numbers, set: setNumbers },
-            { label: "Symbols (!@#$)", checked: symbols, set: setSymbols },
-            { label: "No Ambiguous (0O, 1lI)", checked: excludeAmbiguous, set: setExcludeAmbiguous },
+            { label: "Uppercase (A-Z)", checked: uppercase, set: setUppercase, emoji: "🔤" },
+            { label: "Lowercase (a-z)", checked: lowercase, set: setLowercase, emoji: "🔡" },
+            { label: "Numbers (0-9)", checked: numbers, set: setNumbers, emoji: "🔢" },
+            { label: "Symbols (!@#$)", checked: symbols, set: setSymbols, emoji: "✨" },
+            { label: "No Ambiguous", checked: excludeAmbiguous, set: setExcludeAmbiguous, emoji: "👁️" },
           ].map(opt => (
-            <label key={opt.label} className="flex items-center gap-2 cursor-pointer text-sm">
+            <label key={opt.label} className={`flex items-center gap-2.5 cursor-pointer text-sm p-3 rounded-xl border transition-all duration-300 ${opt.checked ? "border-primary/30 bg-primary/5 shadow-sm" : "border-border/40 hover:border-primary/20 hover:bg-accent/20"}`}>
               <Checkbox checked={opt.checked} onCheckedChange={c => opt.set(!!c)} />
-              {opt.label}
+              <span>{opt.emoji}</span>
+              <span className="font-medium">{opt.label}</span>
             </label>
           ))}
         </div>
@@ -153,14 +154,14 @@ export default function PasswordGenerator() {
           </div>
         </div>
 
-        <Button onClick={generate} className="w-full gradient-bg text-primary-foreground rounded-xl font-bold" size="lg">
-          <RefreshCw className="w-4 h-4 mr-2" /> Generate Password{quantity > 1 ? "s" : ""}
-        </Button>
+        <button onClick={generate} className="tool-btn-primary w-full py-3.5 px-6 text-base flex items-center justify-center gap-2">
+          <RefreshCw className="w-5 h-5" /> Generate Password{quantity > 1 ? "s" : ""}
+        </button>
 
         {/* Result */}
         {password && (
           <div className="space-y-3">
-            <div className="bg-accent/50 rounded-2xl p-5">
+            <div className="tool-result-card">
               <div className="flex items-center gap-2 mb-3">
                 <code className="text-lg font-mono font-bold break-all flex-1 select-all">
                   {showPassword ? password : "•".repeat(password.length)}
