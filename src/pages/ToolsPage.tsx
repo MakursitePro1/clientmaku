@@ -224,7 +224,7 @@ export default function ToolsPage() {
                         className="absolute top-full mt-2 left-0 right-0 sm:left-auto sm:right-0 sm:w-80 rounded-2xl bg-card border-2 border-primary/20 shadow-2xl z-50 p-2 max-h-[60vh] overflow-y-auto"
                       >
                         {categories.map(cat => {
-                          const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
+                          const count = getCategoryCount(cat.id);
                           const isActive = activeCategory === cat.id;
                           return (
                             <button
