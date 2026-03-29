@@ -3,7 +3,8 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Shield, ShieldAlert, ShieldCheck, Copy, Download } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Shield, ShieldAlert, ShieldCheck, Copy, Download, Search, Clock, AlertTriangle, CheckCircle2, Server } from "lucide-react";
 
 const knownBlacklists = [
   { name: "Spamhaus ZEN", desc: "Combined zone (SBL, XBL, PBL)" },
@@ -49,19 +50,19 @@ export default function IPBlacklistChecker() {
         clearInterval(interval);
         setResults(res);
         setLoading(false);
-        const listed = res.filter(r => r.status === "listed").length;
+        const listed = res!.filter(r => r.status === "listed").length;
         if (listed > 0) toast.error(`IP listed on ${listed} blacklist(s)!`);
         else toast.success("IP is clean on all blacklists!");
         return;
       }
       const bl = knownBlacklists[done];
-      res.push({
+      res!.push({
         ...bl,
         status: Math.random() > 0.92 ? "listed" : Math.random() > 0.97 ? "timeout" : "clean",
       });
       done++;
       setProgress(Math.round((done / totalChecks) * 100));
-      setResults([...res]);
+      setResults([...res!]);
     }, 150);
   };
 
@@ -86,74 +87,131 @@ export default function IPBlacklistChecker() {
   return (
     <ToolLayout title="IP Blacklist Checker" description="Check if an IP address is listed on 20+ email blacklists">
       <div className="space-y-5 max-w-2xl mx-auto">
-        <div className="flex gap-3">
-          <Input placeholder="Enter IP address (e.g. 8.8.8.8)" value={ip} onChange={e => setIp(e.target.value)}
-            className="rounded-xl flex-1 font-mono" onKeyDown={e => e.key === "Enter" && check()} />
-          <Button onClick={check} disabled={loading} className="tool-btn-primary shrink-0 px-5 py-2.5 flex items-center gap-1.5 text-sm">
-            <Shield className="w-4 h-4" /> {loading ? `${progress}%` : "Check"}
-          </Button>
+        {/* Input */}
+        <div className="tool-section-card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Shield className="w-4 h-4 text-primary" />
+            <h3 className="text-sm font-bold">IP Address</h3>
+          </div>
+          <div className="flex gap-3">
+            <Input placeholder="Enter IP address (e.g. 8.8.8.8)" value={ip} onChange={e => setIp(e.target.value)}
+              className="rounded-xl flex-1 font-mono tool-input-colorful" onKeyDown={e => e.key === "Enter" && check()} />
+            <button onClick={check} disabled={loading} className="tool-btn-primary shrink-0 px-5 py-2.5 flex items-center gap-1.5 text-sm">
+              <Search className="w-4 h-4" /> {loading ? `${progress}%` : "Check"}
+            </button>
+          </div>
         </div>
 
         {/* Progress */}
         {loading && (
-          <div className="w-full bg-muted rounded-full h-2">
-            <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${progress}%` }} />
+          <div className="space-y-2">
+            <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+              <motion.div
+                className="h-3 rounded-full"
+                style={{ background: "var(--gradient-primary)" }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+            <p className="text-xs text-center text-muted-foreground">Checking {progress}% — {Math.round(progress / 100 * knownBlacklists.length)}/{knownBlacklists.length} blacklists</p>
           </div>
         )}
 
-        {results && (
-          <>
-            {/* Summary */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-green-500/10 rounded-xl p-4 text-center border border-green-500/20">
-                <ShieldCheck className="w-6 h-6 mx-auto text-green-600 mb-1" />
-                <p className="text-2xl font-bold text-green-600">{clean}</p>
-                <p className="text-xs text-muted-foreground">Clean</p>
-              </div>
-              <div className="bg-destructive/10 rounded-xl p-4 text-center border border-destructive/20">
-                <ShieldAlert className="w-6 h-6 mx-auto text-destructive mb-1" />
-                <p className="text-2xl font-bold text-destructive">{listed}</p>
-                <p className="text-xs text-muted-foreground">Listed</p>
-              </div>
-              <div className="bg-yellow-500/10 rounded-xl p-4 text-center border border-yellow-500/20">
-                <Shield className="w-6 h-6 mx-auto text-yellow-600 mb-1" />
-                <p className="text-2xl font-bold text-yellow-600">{timeout}</p>
-                <p className="text-xs text-muted-foreground">Timeout</p>
-              </div>
+        {/* Always-visible info */}
+        {!results && !loading && (
+          <div className="tool-section-card overflow-hidden">
+            <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10 flex items-center gap-2">
+              <Server className="w-4 h-4 text-primary" />
+              <span className="text-xs font-bold gradient-text">Checking {knownBlacklists.length} Blacklists</span>
             </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 divide-x divide-y divide-border/20">
+              {knownBlacklists.slice(0, 8).map((bl, i) => (
+                <div key={i} className="p-3 text-center hover:bg-primary/5 transition-colors">
+                  <p className="text-xs font-bold truncate">{bl.name}</p>
+                  <p className="text-[9px] text-muted-foreground truncate">{bl.desc}</p>
+                </div>
+              ))}
+            </div>
+            <div className="p-2 text-center border-t border-border/20">
+              <span className="text-[10px] text-muted-foreground">+ {knownBlacklists.length - 8} more blacklists</span>
+            </div>
+          </div>
+        )}
 
-            {/* Results list */}
-            <div className="bg-card rounded-xl border border-border/50 overflow-hidden">
-              <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10 flex items-center justify-between">
-                <span className="text-xs font-bold">Detailed Results ({results.length}/{knownBlacklists.length})</span>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" onClick={exportReport} className="h-7 text-xs gap-1">
+        <AnimatePresence>
+          {results && (
+            <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              {/* Summary */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="tool-stat-card !border-green-500/20">
+                  <ShieldCheck className="w-6 h-6 mx-auto text-green-600 mb-1" />
+                  <div className="stat-value !text-green-600">{clean}</div>
+                  <div className="stat-label">Clean</div>
+                </div>
+                <div className="tool-stat-card !border-destructive/20">
+                  <ShieldAlert className="w-6 h-6 mx-auto text-destructive mb-1" />
+                  <div className="stat-value !text-destructive">{listed}</div>
+                  <div className="stat-label">Listed</div>
+                </div>
+                <div className="tool-stat-card !border-yellow-500/20">
+                  <Clock className="w-6 h-6 mx-auto text-yellow-600 mb-1" />
+                  <div className="stat-value !text-yellow-600">{timeout}</div>
+                  <div className="stat-label">Timeout</div>
+                </div>
+              </div>
+
+              {/* Reputation Score */}
+              <div className="tool-result-card text-center">
+                <p className="text-xs font-bold text-muted-foreground mb-2">IP Reputation Score</p>
+                <div className="text-4xl font-black gradient-text">{Math.round((clean / knownBlacklists.length) * 100)}%</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {listed === 0 ? <span className="text-green-600 font-bold">✅ Clean — No blacklists detected</span> :
+                    <span className="text-destructive font-bold">⚠️ Listed on {listed} blacklist(s)</span>}
+                </p>
+              </div>
+
+              {/* Results list */}
+              <div className="tool-section-card overflow-hidden">
+                <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10 flex items-center justify-between">
+                  <span className="text-xs font-bold gradient-text">Detailed Results ({results.length}/{knownBlacklists.length})</span>
+                  <Button variant="ghost" size="sm" onClick={exportReport} className="h-7 text-xs gap-1 hover:text-primary">
                     <Download className="w-3 h-3" /> Export
                   </Button>
                 </div>
+                <div className="divide-y divide-border/20 max-h-96 overflow-y-auto">
+                  {results.map((r, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: i * 0.02 }}
+                      className="flex items-center justify-between px-4 py-3 hover:bg-primary/5 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        {r.status === "clean" ? <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" /> :
+                          r.status === "listed" ? <AlertTriangle className="w-4 h-4 text-destructive shrink-0" /> :
+                            <Clock className="w-4 h-4 text-yellow-500 shrink-0" />}
+                        <div>
+                          <span className="text-sm font-bold">{r.name}</span>
+                          <span className="text-xs text-muted-foreground ml-2 hidden sm:inline">{r.desc}</span>
+                        </div>
+                      </div>
+                      <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${
+                        r.status === "clean" ? "bg-green-500/10 text-green-600" :
+                          r.status === "listed" ? "bg-destructive/10 text-destructive" :
+                            "bg-yellow-500/10 text-yellow-600"}`}>
+                        {r.status === "clean" ? "✓ Clean" : r.status === "listed" ? "✗ Listed" : "⏱ Timeout"}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-              <div className="divide-y divide-border/20 max-h-96 overflow-y-auto">
-                {results.map((r, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-2.5 hover:bg-accent/10 transition-colors">
-                    <div>
-                      <span className="text-sm font-medium">{r.name}</span>
-                      <span className="text-xs text-muted-foreground ml-2 hidden sm:inline">{r.desc}</span>
-                    </div>
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                      r.status === "clean" ? "bg-green-500/10 text-green-600" : 
-                      r.status === "listed" ? "bg-destructive/10 text-destructive" : 
-                      "bg-yellow-500/10 text-yellow-600"}`}>
-                      {r.status === "clean" ? "✓ Clean" : r.status === "listed" ? "✗ Listed" : "⏱ Timeout"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <p className="text-xs text-muted-foreground text-center">
-          ⚠️ This is a simulated check for demonstration purposes. For real blacklist lookups, use dedicated DNSBL APIs.
+        <p className="text-xs text-muted-foreground text-center tool-badge mx-auto">
+          ⚠️ Simulated check for demonstration purposes
         </p>
       </div>
     </ToolLayout>
