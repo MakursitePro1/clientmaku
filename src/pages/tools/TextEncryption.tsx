@@ -128,11 +128,11 @@ export default function TextEncryption() {
     <ToolLayout title="Encryption / Decryption Tool" description="Encrypt and decrypt text with 10 methods including AES-256 and Morse code">
       <div className="space-y-5 max-w-2xl mx-auto">
         {/* Mode Toggle */}
-        <div className="flex gap-2 p-1 bg-accent/30 rounded-xl">
-          <button onClick={() => setMode("encrypt")} className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-all ${mode === "encrypt" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"}`}>
+        <div className="flex gap-2 p-1.5 bg-gradient-to-r from-primary/5 via-accent/30 to-primary/5 rounded-2xl border border-primary/10">
+          <button onClick={() => setMode("encrypt")} className={`flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-300 ${mode === "encrypt" ? "gradient-bg text-white shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"}`}>
             <Lock className="w-3.5 h-3.5" /> Encrypt
           </button>
-          <button onClick={() => setMode("decrypt")} className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5 transition-all ${mode === "decrypt" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"}`}>
+          <button onClick={() => setMode("decrypt")} className={`flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all duration-300 ${mode === "decrypt" ? "gradient-bg text-white shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"}`}>
             <Unlock className="w-3.5 h-3.5" /> Decrypt
           </button>
         </div>

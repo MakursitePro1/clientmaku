@@ -135,10 +135,10 @@ export default function AgeCalculator() {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: i * 0.1 }}
-                    className="bg-accent/50 rounded-2xl p-5 text-center border border-border/30"
+                    className="tool-stat-card"
                   >
-                    <div className={`text-4xl font-extrabold ${s.color}`}>{s.val}</div>
-                    <div className="text-sm text-muted-foreground font-medium">{s.label}</div>
+                    <div className="stat-value">{s.val}</div>
+                    <div className="stat-label">{s.label}</div>
                   </motion.div>
                 ))}
               </div>
