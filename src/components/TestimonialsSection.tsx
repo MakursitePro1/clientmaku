@@ -220,8 +220,8 @@ export function TestimonialsSection() {
 
         {/* Marquee rows */}
         <div className="flex flex-col gap-4 sm:gap-5">
-          <MarqueeRow items={row1} direction="left" speed={45} />
-          <MarqueeRow items={row2} direction="right" speed={50} />
+          <MarqueeRow items={row1} direction="left" speed={90} />
+          <MarqueeRow items={row2} direction="right" speed={100} />
         </div>
       </div>
     </section>
