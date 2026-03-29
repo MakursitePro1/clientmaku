@@ -5,8 +5,8 @@ import { tools } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
 
 const popularToolIds = [
-  "qr-code-maker", "password-generator", "age-calculator",
-  "internet-speed-tester", "qr-code-scanner"
+  "internet-speed-tester", "password-generator", "qr-code-maker",
+  "hash-generator", "encryption-tool", "typing-test"
 ];
 
 const popularTools = popularToolIds.map(id => tools.find(t => t.id === id)).filter(Boolean) as typeof tools;

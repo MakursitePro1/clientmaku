@@ -4,8 +4,9 @@ import { tools } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
 
 const importantToolIds = [
-  "internet-speed-tester", "password-generator", "qr-code-maker",
-  "age-calculator", "qr-code-scanner"
+  "bin-checker", "ip-blacklist-checker", "whois-lookup",
+  "age-calculator", "barcode-generator", "ip-address-lookup",
+  "temp-mail", "url-shortener", "case-converter", "random-name-generator"
 ];
 
 const importantTools = importantToolIds.map(id => tools.find(t => t.id === id)).filter(Boolean) as typeof tools;
