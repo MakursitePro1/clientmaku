@@ -186,11 +186,11 @@ export default function TypingTest() {
               key={s.label}
               animate={s.highlight ? { scale: [1, 1.02, 1] } : {}}
               transition={{ duration: 0.5, repeat: s.highlight ? Infinity : 0 }}
-              className={`rounded-2xl p-4 text-center border ${s.highlight ? "border-destructive/50 bg-destructive/5" : "border-border/30 bg-accent/50"}`}
+              className={`tool-stat-card ${s.highlight ? "!border-destructive/50 !bg-destructive/5" : ""}`}
             >
-              <s.icon className={`w-4 h-4 mx-auto mb-1 ${s.highlight ? "text-destructive" : "text-primary"}`} />
-              <div className="text-[10px] text-muted-foreground">{s.label}</div>
-              <div className="text-xl font-extrabold">{s.val}</div>
+              <s.icon className={`w-5 h-5 mx-auto mb-1.5 ${s.highlight ? "text-destructive" : "text-primary"}`} />
+              <div className="stat-label">{s.label}</div>
+              <div className="stat-value text-xl">{s.val}</div>
             </motion.div>
           ))}
         </div>
