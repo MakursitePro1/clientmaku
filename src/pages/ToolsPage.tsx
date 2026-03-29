@@ -105,15 +105,7 @@ export default function ToolsPage() {
               className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4"
             >
               Explore All{" "}
-              <span className="relative">
-                <span className="gradient-text">Tools</span>
-                <motion.span
-                  className="absolute -bottom-2 left-0 right-0 h-1 rounded-full gradient-bg"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.5, duration: 0.6 }}
-                />
-              </span>
+              <span className="gradient-text">Tools</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 15 }}
