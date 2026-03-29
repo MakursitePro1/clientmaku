@@ -184,7 +184,7 @@ export default function QrCodeScanner() {
               exit={{ opacity: 0 }}
               className="rounded-2xl border border-border/50 bg-card overflow-hidden"
             >
-              <div className="p-3 bg-accent/30 border-b border-border/30 flex items-center gap-2">
+              <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10 flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
                 <span className="text-xs font-bold">Decoded Result</span>
                 <span className={`ml-auto text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 ${typeIcons[latestResult.type].color}`}>
@@ -251,7 +251,7 @@ export default function QrCodeScanner() {
         {/* Scan History */}
         {results.length > 1 && (
           <div className="rounded-xl border border-border/30 bg-card overflow-hidden">
-            <div className="p-3 bg-accent/30 border-b border-border/30 flex items-center justify-between">
+            <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10 flex items-center justify-between">
               <span className="text-xs font-bold">📋 Scan History ({results.length})</span>
               <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setResults([])}>Clear</Button>
             </div>

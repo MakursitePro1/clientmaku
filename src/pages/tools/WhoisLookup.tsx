@@ -116,7 +116,7 @@ export default function WhoisLookup() {
               onKeyDown={e => e.key === "Enter" && lookup()}
             />
           </div>
-          <Button onClick={lookup} disabled={loading || !domain.trim()} className="rounded-xl gap-1.5 gradient-bg text-primary-foreground shrink-0">
+          <Button onClick={lookup} disabled={loading || !domain.trim()} className="tool-btn-primary shrink-0 px-5 py-2.5 flex items-center gap-1.5 text-sm">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             Lookup
           </Button>
@@ -148,7 +148,7 @@ export default function WhoisLookup() {
 
               {/* Info Cards */}
               <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
-                <div className="p-3 bg-accent/30 border-b border-border/30">
+                <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10">
                   <h3 className="text-xs font-bold">📋 WHOIS Details</h3>
                 </div>
                 <div className="divide-y divide-border/20">
@@ -181,7 +181,7 @@ export default function WhoisLookup() {
         {/* History */}
         {history.length > 0 && (
           <div className="rounded-xl border border-border/30 bg-card overflow-hidden">
-            <div className="p-3 bg-accent/30 border-b border-border/30 flex items-center justify-between">
+            <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10 flex items-center justify-between">
               <span className="text-xs font-bold">📋 Lookup History</span>
               <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setHistory([])}>Clear</Button>
             </div>

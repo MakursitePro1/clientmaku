@@ -133,7 +133,7 @@ export default function RandomAddressGenerator() {
           </Select>
         </div>
         
-        <Button onClick={generate} className="w-full rounded-xl gap-2 gradient-bg text-primary-foreground" size="lg">
+        <Button onClick={generate} className="tool-btn-primary w-full py-3.5 flex items-center justify-center gap-2" size="lg">
           <MapPin className="w-4 h-4" /> Generate Addresses
         </Button>
 

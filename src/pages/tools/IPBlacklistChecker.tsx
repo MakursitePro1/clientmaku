@@ -89,7 +89,7 @@ export default function IPBlacklistChecker() {
         <div className="flex gap-3">
           <Input placeholder="Enter IP address (e.g. 8.8.8.8)" value={ip} onChange={e => setIp(e.target.value)}
             className="rounded-xl flex-1 font-mono" onKeyDown={e => e.key === "Enter" && check()} />
-          <Button onClick={check} disabled={loading} className="gradient-bg text-primary-foreground rounded-xl gap-1.5 shrink-0">
+          <Button onClick={check} disabled={loading} className="tool-btn-primary shrink-0 px-5 py-2.5 flex items-center gap-1.5 text-sm">
             <Shield className="w-4 h-4" /> {loading ? `${progress}%` : "Check"}
           </Button>
         </div>
@@ -124,7 +124,7 @@ export default function IPBlacklistChecker() {
 
             {/* Results list */}
             <div className="bg-card rounded-xl border border-border/50 overflow-hidden">
-              <div className="p-3 bg-accent/30 border-b border-border/30 flex items-center justify-between">
+              <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10 flex items-center justify-between">
                 <span className="text-xs font-bold">Detailed Results ({results.length}/{knownBlacklists.length})</span>
                 <div className="flex gap-2">
                   <Button variant="ghost" size="sm" onClick={exportReport} className="h-7 text-xs gap-1">
