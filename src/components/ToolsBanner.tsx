@@ -123,8 +123,8 @@ export function ToolsBanner() {
                 className="flex items-center gap-6 mt-5 justify-center lg:justify-start"
               >
                 {[
-                  { label: "Tools", value: "200+" },
-                  { label: "Categories", value: "15+" },
+                  { label: "Tools", value: `${tools.length}+` },
+                  { label: "Categories", value: `${categories.length - 1}` },
                   { label: "Users", value: "50K+" },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
