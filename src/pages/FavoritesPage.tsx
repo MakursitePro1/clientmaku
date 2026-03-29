@@ -48,7 +48,7 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Favorites — Makursite" description="Your favorite tools collection" path="/favorites" />
+      <SEOHead title="Favorites — Cyber Venom" description="Your favorite tools collection" path="/favorites" />
       <Navbar />
 
       <div className="pt-28 pb-20 px-4 relative">

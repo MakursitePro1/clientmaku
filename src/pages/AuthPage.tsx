@@ -38,7 +38,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={isSignUp ? "Sign Up — Makursite" : "Login — Makursite"} description="Login or create your account" path="/auth" />
+      <SEOHead title={isSignUp ? "Sign Up — Cyber Venom" : "Login — Cyber Venom"} description="Login or create your account" path="/auth" />
       <Navbar />
       <div className="pt-28 pb-20 px-4 flex items-center justify-center min-h-screen">
         <motion.div
@@ -53,14 +53,14 @@ export default function AuthPage() {
 
             <div className="relative z-10">
               <div className="flex items-center justify-center mb-6">
-                <img src="/logo.jpg" alt="Makursite" className="w-12 h-12 rounded-2xl object-cover glow-shadow" />
+                <img src="/logo.jpg" alt="Cyber Venom" className="w-12 h-12 rounded-2xl object-cover glow-shadow" />
               </div>
 
               <h1 className="text-2xl font-bold text-center mb-1">
                 {isSignUp ? "Create Account" : "Welcome Back"}
               </h1>
               <p className="text-sm text-muted-foreground text-center mb-6">
-                {isSignUp ? "Join Makursite today" : "Login to your account"}
+                {isSignUp ? "Join Cyber Venom today" : "Login to your account"}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">

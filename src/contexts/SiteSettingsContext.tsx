@@ -40,11 +40,11 @@ export interface SiteSettings {
 }
 
 const defaults: SiteSettings = {
-  site_name: "Makursite",
+  site_name: "Cyber Venom",
   site_tagline: "Free Online Web Tools",
   site_description: "Your ultimate collection of free online web tools",
   site_logo_url: "",
-  contact_email: "hello@makursite.com",
+  contact_email: "hello@cybervenom.com",
   contact_phone: "+880 1635-915989",
   contact_address: "Dhaka, Bangladesh",
   hero_title: "Your Ultimate Collection",
@@ -62,7 +62,7 @@ const defaults: SiteSettings = {
   social_youtube: "",
   social_linkedin: "",
   social_github: "",
-  seo_title: "Makursite — Free Online Web Tools",
+  seo_title: "Cyber Venom — Free Online Web Tools",
   seo_description: "210+ free online tools for developers, designers, and everyone.",
   seo_keywords: "web tools, online tools, free tools, developer tools",
   seo_og_image: "",

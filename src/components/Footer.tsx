@@ -135,13 +135,13 @@ export function Footer() {
                 {settings.footer_copyright || "All rights reserved by"} <span className="font-semibold gradient-text">{settings.site_name}</span>
               </p>
               <a
-                href="https://www.makursite.com/"
+                href="https://www.cybervenom.com/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide gradient-text hover:opacity-80 transition-opacity"
               >
                 <Sparkles className="w-3 h-3 text-primary" />
-                Developed By Makursite.com
+                Developed By Cyber Venom.com
               </a>
             </div>
           </div>

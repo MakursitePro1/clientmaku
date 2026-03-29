@@ -25,7 +25,7 @@ function convert(text: string, fontMap: string) {
 }
 
 export default function FancyTextGenerator() {
-  const [input, setInput] = useState("Makursite");
+  const [input, setInput] = useState("Cyber Venom");
 
   return (
     <ToolLayout title="Fancy Text Generator" description="Convert text into stylish Unicode fonts">
