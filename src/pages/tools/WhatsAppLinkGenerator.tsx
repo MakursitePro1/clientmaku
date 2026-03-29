@@ -102,12 +102,12 @@ export default function WhatsAppLinkGenerator() {
               <button
                 key={t.label}
                 onClick={() => setMessage(t.text)}
-                className={`p-3 rounded-xl text-left border transition-all hover:border-green-500/40 hover:bg-green-500/5 ${
-                  message === t.text ? "border-green-500/50 bg-green-500/10" : "border-border/50 bg-card"
+                className={`p-3.5 rounded-xl text-left border-2 transition-all duration-300 hover:shadow-md ${
+                  message === t.text ? "border-green-500/50 bg-green-500/10 shadow-lg shadow-green-500/10" : "border-border/30 bg-card hover:border-green-500/30 hover:bg-green-500/5"
                 }`}
               >
                 <span className="text-lg">{t.emoji}</span>
-                <p className="text-xs font-semibold mt-1">{t.label}</p>
+                <p className="text-xs font-bold mt-1">{t.label}</p>
               </button>
             ))}
           </div>
