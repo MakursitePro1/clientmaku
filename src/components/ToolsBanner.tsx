@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Wrench, Zap, ArrowRight, Sparkles, Star, Layers, Code2, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { tools, categories } from "@/data/tools";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 
 const floatingIcons = [
   { icon: Code2, x: "8%", y: "20%", delay: 0, size: 20 },
@@ -14,6 +14,8 @@ const floatingIcons = [
 ];
 
 export function ToolsBanner() {
+  const { totalTools, totalCategories } = useToolCatalog();
+
   return (
     <section className="px-4 pb-10 pt-4">
       <div className="max-w-6xl mx-auto">
@@ -88,7 +90,7 @@ export function ToolsBanner() {
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-bold text-primary mb-5"
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                200+ FREE TOOLS AVAILABLE
+                {totalTools} FREE TOOLS AVAILABLE
               </motion.div>
 
               <motion.h2
@@ -123,8 +125,8 @@ export function ToolsBanner() {
                 className="flex items-center gap-6 mt-5 justify-center lg:justify-start"
               >
                 {[
-                  { label: "Tools", value: `${tools.length}+` },
-                  { label: "Categories", value: `${categories.length - 1}` },
+                  { label: "Tools", value: `${totalTools}` },
+                  { label: "Categories", value: `${totalCategories}` },
                   { label: "Users", value: "50K+" },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">

@@ -175,7 +175,7 @@ export default function ToolsPage() {
               <div className="relative flex-1 w-full group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary/60 group-focus-within:text-primary transition-colors" />
                 <Input
-                  placeholder="Search 200+ tools..."
+                  placeholder={`Search ${totalTools} tools...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-12 pr-10 py-6 rounded-xl bg-background border-2 border-primary/15 text-base focus:border-primary/40 focus:ring-2 focus:ring-primary/20 transition-all"
