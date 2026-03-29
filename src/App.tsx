@@ -75,6 +75,9 @@ const TextDiff = lazy(() => import("./pages/tools/TextDiff"));
 const LoanCalculator = lazy(() => import("./pages/tools/LoanCalculator"));
 const TextEncoderDecoder = lazy(() => import("./pages/tools/TextEncoderDecoder"));
 const ImageToBase64 = lazy(() => import("./pages/tools/ImageToBase64"));
+const CyberChef = lazy(() => import("./pages/tools/CyberChef"));
+const YouTubeIdCard = lazy(() => import("./pages/tools/YouTubeIdCard"));
+const DnsLookup = lazy(() => import("./pages/tools/DnsLookup"));
 
 const queryClient = new QueryClient();
 
