@@ -46,6 +46,11 @@ const UrlShortener = lazy(() => import("./pages/tools/UrlShortener"));
 const TempNumber = lazy(() => import("./pages/tools/TempNumber"));
 const TempMail = lazy(() => import("./pages/tools/TempMail"));
 const CaseConverter = lazy(() => import("./pages/tools/CaseConverter"));
+const BinChecker = lazy(() => import("./pages/tools/BinChecker"));
+const IPBlacklistChecker = lazy(() => import("./pages/tools/IPBlacklistChecker"));
+const RandomNameGenerator = lazy(() => import("./pages/tools/RandomNameGenerator"));
+const RandomAddressGenerator = lazy(() => import("./pages/tools/RandomAddressGenerator"));
+const HashGenerator = lazy(() => import("./pages/tools/HashGenerator"));
 
 const queryClient = new QueryClient();
 
