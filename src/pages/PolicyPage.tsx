@@ -4,8 +4,12 @@ import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { motion } from "framer-motion";
 import { Shield, FileText, Eye, Cookie, AlertTriangle, Mail } from "lucide-react";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 
-const sections = [
+const PolicyPage = () => {
+  const { totalTools } = useToolCatalog();
+
+  const sections = [
   {
     icon: Eye,
     title: "Information We Collect",
@@ -49,7 +53,7 @@ You can control cookie settings through your browser. Disabling essential cookie
 • We reserve the right to modify or discontinue any tool at any time
 • Accounts that violate our terms may be suspended or terminated
 
-We strive to keep all 200+ tools free and accessible to everyone.`
+We strive to keep all ${totalTools} tools free and accessible to everyone.`
   },
   {
     icon: AlertTriangle,
@@ -73,7 +77,6 @@ We value your feedback and are committed to addressing any concerns promptly.`
   }
 ];
 
-const PolicyPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead title="Privacy Policy & Terms" description="Read Cyber Venom's privacy policy, terms of service, cookie policy, and disclaimer. We value your privacy." path="/policy" />
