@@ -148,13 +148,13 @@ export default function BinChecker() {
             value={bin}
             onChange={e => { setBin(e.target.value); setSearched(false); }}
             placeholder="Enter first 6-8 digits of card..."
-            className="rounded-xl font-mono text-lg tracking-wider"
+            className="rounded-xl font-mono text-lg tracking-wider tool-input-colorful"
             maxLength={8}
             onKeyDown={e => e.key === "Enter" && check()}
           />
-          <Button onClick={check} className="rounded-xl px-5" disabled={bin.replace(/\D/g, "").length < 6}>
-            <Search className="w-4 h-4" />
-          </Button>
+          <button onClick={check} className="tool-btn-primary px-5 py-2.5 flex items-center gap-1.5 text-sm" disabled={bin.replace(/\D/g, "").length < 6}>
+            <Search className="w-4 h-4" /> Check
+          </button>
         </div>
 
         {searched && result && (
