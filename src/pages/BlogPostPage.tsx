@@ -33,6 +33,16 @@ const BlogPostPage = () => {
   const [related, setRelated] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const { totalTools, totalCategories } = useToolCatalog();
+
+  // Replace hardcoded counts in blog content with dynamic values
+  const dynamicContent = useMemo(() => {
+    if (!post?.content) return "";
+    return post.content
+      .replace(/200\+?\s*(free\s+)?tools/gi, `${totalTools}+ free tools`)
+      .replace(/over\s+200\s*(free\s+)?tools/gi, `over ${totalTools} free tools`)
+      .replace(/\b200\+?\s*tools/gi, `${totalTools}+ tools`);
+  }, [post?.content, totalTools]);
 
   useEffect(() => {
     if (!slug) return;
