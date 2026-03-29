@@ -49,7 +49,7 @@ export const blogPosts: BlogPost[] = [
 <p>Write and preview Markdown content in real-time with our feature-rich editor. Perfect for README files, documentation, and blog posts.</p>
 
 <h2>Conclusion</h2>
-<p>These tools represent just a fraction of what Cyber Venom offers. With 200+ free tools and counting, we're committed to making web development faster, easier, and more accessible for everyone.</p>`,
+<p>These tools represent just a fraction of what we offer. With free tools and counting, we're committed to making web development faster, easier, and more accessible for everyone.</p>`,
     category: "Development",
     author: "Cyber Venom Team",
     date: "2025-03-20",
