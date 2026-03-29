@@ -106,7 +106,7 @@ export function AboutSection() {
                 whileHover={{ scale: 1.03 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <img src="/logo.jpg" alt={settings.site_name} className="w-16 h-16 rounded-2xl object-cover glow-shadow" />
+                <img src="/logo.png" alt={settings.site_name} className="w-16 h-16 rounded-2xl object-cover glow-shadow" />
                 <div>
                   <h3 className="text-xl font-bold">{settings.site_name}</h3>
                   <p className="text-sm text-muted-foreground">{settings.site_tagline}</p>

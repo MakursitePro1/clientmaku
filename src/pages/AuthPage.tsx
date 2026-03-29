@@ -53,7 +53,7 @@ export default function AuthPage() {
 
             <div className="relative z-10">
               <div className="flex items-center justify-center mb-6">
-                <img src="/logo.jpg" alt="Cyber Venom" className="w-12 h-12 rounded-2xl object-cover glow-shadow" />
+                <img src="/logo.png" alt="Cyber Venom" className="w-12 h-12 rounded-2xl object-cover glow-shadow" />
               </div>
 
               <h1 className="text-2xl font-bold text-center mb-1">

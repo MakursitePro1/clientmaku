@@ -57,7 +57,7 @@ export function Footer() {
                     />
                   ) : (
                     <img
-                      src="/logo.jpg"
+                      src="/logo.png"
                       alt={settings.site_name}
                       className="w-12 h-12 rounded-2xl object-cover shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow ring-2 ring-primary/10 group-hover:ring-primary/30"
                     />
