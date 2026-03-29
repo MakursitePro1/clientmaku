@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Wrench, Zap, ArrowRight, Sparkles, Star, Layers, Code2, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { tools, categories } from "@/data/tools";
 
 const floatingIcons = [
   { icon: Code2, x: "8%", y: "20%", delay: 0, size: 20 },
@@ -122,8 +123,8 @@ export function ToolsBanner() {
                 className="flex items-center gap-6 mt-5 justify-center lg:justify-start"
               >
                 {[
-                  { label: "Tools", value: "200+" },
-                  { label: "Categories", value: "15+" },
+                  { label: "Tools", value: `${tools.length}+` },
+                  { label: "Categories", value: `${categories.length - 1}` },
                   { label: "Users", value: "50K+" },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
