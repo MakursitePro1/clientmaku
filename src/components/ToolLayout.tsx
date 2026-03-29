@@ -258,7 +258,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                 <div className="absolute top-0 left-0 w-[200px] h-[100px] rounded-full blur-[80px] pointer-events-none opacity-10"
                   style={{ backgroundColor: toolColor }} />
 
-                <div className="p-4 sm:p-6 lg:p-8 relative">
+              <div className="p-4 sm:p-6 lg:p-8 relative" style={{ '--tool-color': toolColor } as React.CSSProperties}>
                   {children}
                   <AdSlotDisplay placement="in_content" className="mt-6 pt-5 border-t border-border/20" />
                 </div>
