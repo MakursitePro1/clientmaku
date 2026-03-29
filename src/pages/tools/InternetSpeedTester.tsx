@@ -1,7 +1,179 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
-import { Download, Upload, Activity, Wifi, Globe, Gauge } from "lucide-react";
+import { Download, Upload, Activity, Wifi, Globe, Gauge, Zap, Server, Clock, Shield } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const TICK_COUNT = 40;
+const START_ANGLE = -225;
+const END_ANGLE = 45;
+const TOTAL_ARC = END_ANGLE - START_ANGLE;
+
+function SpeedGauge({ value, maxSpeed, phase, testing }: { value: number; maxSpeed: number; phase: string; testing: boolean }) {
+  const pct = Math.min(value / maxSpeed, 1);
+  const cx = 150, cy = 150, r = 120, r2 = 105;
+  const rad = (d: number) => (d * Math.PI) / 180;
+
+  const polarToCart = (angle: number, radius: number) => ({
+    x: cx + radius * Math.cos(rad(angle)),
+    y: cy + radius * Math.sin(rad(angle)),
+  });
+
+  const arcPath = (startDeg: number, endDeg: number, radius: number) => {
+    const s = polarToCart(startDeg, radius);
+    const e = polarToCart(endDeg, radius);
+    const largeArc = endDeg - startDeg > 180 ? 1 : 0;
+    return `M ${s.x} ${s.y} A ${radius} ${radius} 0 ${largeArc} 1 ${e.x} ${e.y}`;
+  };
+
+  const needleAngle = START_ANGLE + TOTAL_ARC * pct;
+  const needleTip = polarToCart(needleAngle, r - 30);
+
+  // Color based on speed
+  const getColor = (p: number) => {
+    if (p < 0.25) return "#ef4444";
+    if (p < 0.5) return "#f59e0b";
+    if (p < 0.75) return "#22c55e";
+    return "#7c3aed";
+  };
+
+  const activeColor = getColor(pct);
+
+  return (
+    <div className="relative">
+      {/* Glow behind gauge */}
+      {testing && (
+        <motion.div
+          animate={{ opacity: [0.2, 0.5, 0.2], scale: [0.95, 1.05, 0.95] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute inset-0 rounded-full blur-3xl"
+          style={{ background: `radial-gradient(circle, ${activeColor}20 0%, transparent 70%)` }}
+        />
+      )}
+
+      <svg viewBox="0 0 300 210" className="w-full max-w-[320px] mx-auto relative">
+        <defs>
+          <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%">
+            <stop offset="0%" stopColor="#ef4444" />
+            <stop offset="33%" stopColor="#f59e0b" />
+            <stop offset="66%" stopColor="#22c55e" />
+            <stop offset="100%" stopColor="#7c3aed" />
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          <filter id="needleGlow">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+
+        {/* Background track */}
+        <path d={arcPath(START_ANGLE, END_ANGLE, r)} fill="none" stroke="hsl(var(--muted))" strokeWidth="8" strokeLinecap="round" opacity="0.3" />
+
+        {/* Tick marks */}
+        {Array.from({ length: TICK_COUNT + 1 }).map((_, i) => {
+          const angle = START_ANGLE + (TOTAL_ARC / TICK_COUNT) * i;
+          const isMajor = i % 10 === 0;
+          const isActive = i / TICK_COUNT <= pct;
+          const inner = polarToCart(angle, isMajor ? r + 8 : r + 4);
+          const outer = polarToCart(angle, r + (isMajor ? 18 : 12));
+          return (
+            <line
+              key={i}
+              x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y}
+              stroke={isActive ? activeColor : "hsl(var(--muted-foreground))"}
+              strokeWidth={isMajor ? 2 : 1}
+              opacity={isActive ? 0.9 : 0.15}
+              strokeLinecap="round"
+            />
+          );
+        })}
+
+        {/* Speed labels */}
+        {[0, 25, 50, 75, 100].map((val, i) => {
+          const angle = START_ANGLE + (TOTAL_ARC / 4) * i;
+          const p = polarToCart(angle, r + 28);
+          const label = Math.round(val * maxSpeed / 100);
+          return (
+            <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle"
+              className="fill-muted-foreground text-[8px] font-medium" opacity="0.5"
+            >{label}</text>
+          );
+        })}
+
+        {/* Active arc */}
+        {value > 0 && (
+          <motion.path
+            d={arcPath(START_ANGLE, needleAngle, r)}
+            fill="none"
+            stroke="url(#gaugeGrad)"
+            strokeWidth="8"
+            strokeLinecap="round"
+            filter="url(#glow)"
+            initial={false}
+            animate={{ strokeDashoffset: 0 }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+
+        {/* Inner decorative arc */}
+        <path d={arcPath(START_ANGLE, END_ANGLE, r2)} fill="none" stroke="hsl(var(--muted))" strokeWidth="1" opacity="0.1" />
+
+        {/* Needle */}
+        <motion.g
+          animate={{ rotate: needleAngle - START_ANGLE }}
+          transition={{ type: "spring", stiffness: 60, damping: 15 }}
+          style={{ transformOrigin: `${cx}px ${cy}px` }}
+        >
+          <line
+            x1={cx} y1={cy}
+            x2={cx + (r - 30)} y2={cy}
+            stroke={activeColor}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            filter="url(#needleGlow)"
+            style={{ transform: `rotate(${START_ANGLE}deg)`, transformOrigin: `${cx}px ${cy}px` }}
+          />
+        </motion.g>
+
+        {/* Center hub */}
+        <circle cx={cx} cy={cy} r="8" fill={activeColor} opacity="0.2" />
+        <circle cx={cx} cy={cy} r="5" fill={activeColor} />
+        <circle cx={cx} cy={cy} r="2" fill="hsl(var(--background))" />
+
+        {/* Speed text */}
+        <text x={cx} y={cy - 25} textAnchor="middle" className="fill-foreground font-black" style={{ fontSize: "42px" }}>
+          {value > 0 ? value.toFixed(1) : "—"}
+        </text>
+        <text x={cx} y={cy - 5} textAnchor="middle" className="fill-muted-foreground font-semibold" style={{ fontSize: "10px" }}>
+          Mbps
+        </text>
+
+        {/* Phase indicator */}
+        <text x={cx} y={cy + 18} textAnchor="middle" style={{ fontSize: "9px" }}>
+          <tspan className={testing ? "fill-primary" : "fill-muted-foreground"}>
+            {phase === "ping" ? "⏱ Measuring Latency..." :
+             phase === "download" ? "⬇ Testing Download..." :
+             phase === "upload" ? "⬆ Testing Upload..." :
+             phase === "done" ? "✅ Test Complete" : "Ready to Test"}
+          </tspan>
+        </text>
+      </svg>
+
+      {/* Pulse ring when testing */}
+      {testing && (
+        <motion.div
+          className="absolute inset-0 rounded-full border-2 pointer-events-none"
+          style={{ borderColor: activeColor }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0, 0.3] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
+      )}
+    </div>
+  );
+}
 
 export default function InternetSpeedTester() {
   const [testing, setTesting] = useState(false);
@@ -14,6 +186,8 @@ export default function InternetSpeedTester() {
   const [ip, setIp] = useState("—");
   const [isp, setIsp] = useState("—");
   const [connType, setConnType] = useState("—");
+  const [serverLoc, setServerLoc] = useState("—");
+  const [testHistory, setTestHistory] = useState<{dl: number; ul: number; ping: number; time: string}[]>([]);
   const cancelRef = useRef(false);
 
   useEffect(() => {
@@ -22,7 +196,14 @@ export default function InternetSpeedTester() {
     fetch("https://ipapi.co/json/").then(r => r.json()).then(d => {
       setIp(d.ip || "—");
       setIsp(d.org || "—");
+      setServerLoc(`${d.city || ""}, ${d.country_name || ""}`);
     }).catch(() => {});
+
+    // Load history
+    try {
+      const h = JSON.parse(localStorage.getItem("cv_speed_history") || "[]");
+      setTestHistory(h);
+    } catch {}
   }, []);
 
   const runTest = useCallback(async () => {
@@ -30,167 +211,266 @@ export default function InternetSpeedTester() {
     setTesting(true);
     setDownload(null); setUpload(null); setPing(null); setJitter(null); setLiveSpeed(0);
 
-    // Ping
+    // Ping - fast, only 3 pings
     setPhase("ping");
     const pings: number[] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
       if (cancelRef.current) return reset();
       const s = performance.now();
       try { await fetch(`https://www.google.com/favicon.ico?_=${Date.now()}_${i}`, { mode: "no-cors", cache: "no-store" }); } catch {}
       pings.push(performance.now() - s);
     }
-    setPing(Math.round(pings.reduce((a, b) => a + b) / pings.length));
-    setJitter(Math.round(pings.slice(1).reduce((s, p, i) => s + Math.abs(p - pings[i]), 0) / (pings.length - 1)));
+    const avgPing = Math.round(pings.reduce((a, b) => a + b) / pings.length);
+    const avgJitter = Math.round(pings.slice(1).reduce((s, p, i) => s + Math.abs(p - pings[i]), 0) / (pings.length - 1));
+    setPing(avgPing);
+    setJitter(avgJitter);
 
-    // Download
+    // Download - parallel fetches for speed
     setPhase("download");
     const dlUrls = [
       "https://upload.wikimedia.org/wikipedia/commons/3/3f/Fronalpstock_big.jpg",
       "https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
-      "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png",
     ];
-    const dlSpeeds: number[] = [];
-    for (const url of dlUrls) {
-      if (cancelRef.current) return reset();
+
+    const dlStart = performance.now();
+    let totalBytes = 0;
+    const dlPromises = dlUrls.map(async (url) => {
+      if (cancelRef.current) return;
       try {
-        const s = performance.now();
         const res = await fetch(url + "?_=" + Date.now(), { cache: "no-store" });
         const blob = await res.blob();
-        const spd = (blob.size * 8) / ((performance.now() - s) / 1000) / 1e6;
-        dlSpeeds.push(spd);
-        setLiveSpeed(spd);
+        totalBytes += blob.size;
+        const elapsed = (performance.now() - dlStart) / 1000;
+        const speed = (totalBytes * 8) / elapsed / 1e6;
+        setLiveSpeed(speed);
       } catch {
         try {
-          const s = performance.now();
-          await fetch(`https://picsum.photos/1200/800?random=${Math.random()}&_=${Date.now()}`, { mode: "no-cors", cache: "no-store" });
-          const spd = (400000 * 8) / ((performance.now() - s) / 1000) / 1e6;
-          dlSpeeds.push(spd);
-          setLiveSpeed(spd);
+          await fetch(`https://picsum.photos/1200/800?random=${Math.random()}`, { mode: "no-cors", cache: "no-store" });
+          totalBytes += 400000;
+          const elapsed = (performance.now() - dlStart) / 1000;
+          setLiveSpeed((totalBytes * 8) / elapsed / 1e6);
         } catch {}
       }
-    }
-    const avgDl = dlSpeeds.length ? +(dlSpeeds.reduce((a, b) => a + b) / dlSpeeds.length).toFixed(2) : 0;
+    });
+    await Promise.all(dlPromises);
+    const dlElapsed = (performance.now() - dlStart) / 1000;
+    const avgDl = totalBytes > 0 ? +((totalBytes * 8) / dlElapsed / 1e6).toFixed(2) : 0;
     setDownload(avgDl);
+    setLiveSpeed(avgDl);
 
-    // Upload
+    // Upload - parallel for speed
     setPhase("upload");
-    const ulSpeeds: number[] = [];
-    for (const size of [256000, 512000, 1000000]) {
-      if (cancelRef.current) return reset();
-      const s = performance.now();
-      try { await fetch("https://httpbin.org/post", { method: "POST", body: new Blob([new ArrayBuffer(size)]), mode: "no-cors", cache: "no-store" }); } catch {}
-      const spd = (size * 8) / ((performance.now() - s) / 1000) / 1e6;
-      ulSpeeds.push(spd);
-      setLiveSpeed(spd);
-    }
-    setUpload(ulSpeeds.length ? +(ulSpeeds.reduce((a, b) => a + b) / ulSpeeds.length).toFixed(2) : 0);
+    const ulStart = performance.now();
+    let ulTotal = 0;
+    const ulSizes = [512000, 1000000];
+    const ulPromises = ulSizes.map(async (size) => {
+      if (cancelRef.current) return;
+      try {
+        await fetch("https://httpbin.org/post", { method: "POST", body: new Blob([new ArrayBuffer(size)]), mode: "no-cors", cache: "no-store" });
+      } catch {}
+      ulTotal += size;
+      const elapsed = (performance.now() - ulStart) / 1000;
+      setLiveSpeed((ulTotal * 8) / elapsed / 1e6);
+    });
+    await Promise.all(ulPromises);
+    const ulElapsed = (performance.now() - ulStart) / 1000;
+    const avgUl = ulTotal > 0 ? +((ulTotal * 8) / ulElapsed / 1e6).toFixed(2) : 0;
+    setUpload(avgUl);
+
+    // Save history
+    const entry = { dl: avgDl, ul: avgUl, ping: avgPing, time: new Date().toLocaleString() };
+    const hist = [entry, ...testHistory].slice(0, 5);
+    setTestHistory(hist);
+    localStorage.setItem("cv_speed_history", JSON.stringify(hist));
 
     setPhase("done");
     setTesting(false);
-  }, []);
+    setLiveSpeed(avgDl);
+  }, [testHistory]);
 
   const reset = () => { setTesting(false); setPhase("idle"); setLiveSpeed(0); };
   const cancel = () => { cancelRef.current = true; reset(); };
 
-  // Gauge
   const maxSpeed = Math.max(100, (download || 0) * 1.5, liveSpeed * 1.5);
   const gaugeVal = phase === "done" ? (download || 0) : liveSpeed;
-  const pct = Math.min(gaugeVal / maxSpeed, 1);
-  const startA = -210, endA = 30, totalArc = endA - startA;
-  const curA = startA + totalArc * pct;
-  const rad = (d: number) => (d * Math.PI) / 180;
-  const cx = 140, cy = 140, r = 110;
 
-  const arc = (s: number, e: number) => {
-    const [x1, y1] = [cx + r * Math.cos(rad(s)), cy + r * Math.sin(rad(s))];
-    const [x2, y2] = [cx + r * Math.cos(rad(e)), cy + r * Math.sin(rad(e))];
-    return `M ${x1} ${y1} A ${r} ${r} 0 ${e - s > 180 ? 1 : 0} 1 ${x2} ${y2}`;
+  const getQuality = (dl: number) => {
+    if (dl >= 50) return { label: "Excellent", color: "text-green-400", emoji: "🚀" };
+    if (dl >= 25) return { label: "Very Good", color: "text-green-500", emoji: "✅" };
+    if (dl >= 10) return { label: "Good", color: "text-yellow-500", emoji: "👍" };
+    if (dl >= 5) return { label: "Fair", color: "text-orange-500", emoji: "⚠️" };
+    return { label: "Slow", color: "text-red-500", emoji: "🐌" };
   };
 
-  const na = rad(curA);
-  const [nx, ny] = [cx + (r - 25) * Math.cos(na), cy + (r - 25) * Math.sin(na)];
-
   return (
-    <ToolLayout title="Internet Speed Tester" description="Analyze your internet connection speed accurately">
-      <div className="max-w-lg mx-auto space-y-5">
+    <ToolLayout title="Internet Speed Tester" description="Analyze your internet connection speed with advanced metrics">
+      <div className="max-w-xl mx-auto space-y-6">
 
-        {/* Gauge Card */}
-        <div className="rounded-2xl border border-border/40 bg-card p-6 text-center">
-          <svg viewBox="0 0 280 190" className="w-full max-w-[280px] mx-auto">
-            <defs>
-              <linearGradient id="sg" x1="0%" y1="0%" x2="100%">
-                <stop offset="0%" stopColor="hsl(262,83%,58%)" />
-                <stop offset="100%" stopColor="hsl(var(--primary))" />
-              </linearGradient>
-            </defs>
-            <path d={arc(startA, endA)} fill="none" stroke="hsl(var(--muted))" strokeWidth="10" strokeLinecap="round" />
-            {gaugeVal > 0 && <path d={arc(startA, curA)} fill="none" stroke="url(#sg)" strokeWidth="10" strokeLinecap="round" className="transition-all duration-200" />}
-            <line x1={cx} y1={cy} x2={nx} y2={ny} stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinecap="round" className="transition-all duration-200" />
-            <circle cx={cx} cy={cy} r="5" fill="hsl(var(--primary))" />
-            <circle cx={cx} cy={cy} r="2" fill="hsl(var(--background))" />
-            <text x={cx} y={cy - 10} textAnchor="middle" className="fill-foreground text-[36px] font-black">{gaugeVal > 0 ? gaugeVal.toFixed(1) : "—"}</text>
-            <text x={cx} y={cy + 10} textAnchor="middle" className="fill-muted-foreground text-[9px] font-medium">Mbps</text>
-            <text x={cx} y={cy + 30} textAnchor="middle" className="fill-muted-foreground text-[10px]">
-              {phase === "ping" ? "Testing ping..." : phase === "download" ? "⬇ Download..." : phase === "upload" ? "⬆ Upload..." : phase === "done" ? "Complete" : "Ready"}
-            </text>
-          </svg>
+        {/* Gauge */}
+        <div className="relative rounded-2xl border border-border/40 bg-gradient-to-b from-card to-accent/10 p-6 text-center overflow-hidden">
+          {/* Background grid */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)",
+            backgroundSize: "20px 20px"
+          }} />
 
-          {/* Results row */}
-          <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-border/30">
-            <div>
-              <div className="text-[11px] text-muted-foreground font-medium flex items-center justify-center gap-1"><Download className="w-3 h-3" />Download</div>
-              <div className="text-xl font-black">{download !== null ? `${download}` : "—"} <span className="text-xs font-normal text-muted-foreground">Mbps</span></div>
-            </div>
-            <div className="border-l border-border/30">
-              <div className="text-[11px] text-muted-foreground font-medium flex items-center justify-center gap-1"><Upload className="w-3 h-3" />Upload</div>
-              <div className="text-xl font-black">{upload !== null ? `${upload}` : "—"} <span className="text-xs font-normal text-muted-foreground">Mbps</span></div>
-            </div>
+          <SpeedGauge value={gaugeVal} maxSpeed={maxSpeed} phase={phase} testing={testing} />
+
+          {/* Download / Upload Results */}
+          <div className="grid grid-cols-2 gap-4 mt-2 pt-4 border-t border-border/20">
+            <motion.div
+              className="relative rounded-xl bg-accent/30 p-3 overflow-hidden"
+              animate={phase === "download" ? { borderColor: ["hsl(var(--primary))", "transparent"] } : {}}
+              transition={{ duration: 1, repeat: phase === "download" ? Infinity : 0 }}
+            >
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <Download className="w-4 h-4 text-blue-500" />
+                <span className="text-[11px] font-semibold text-muted-foreground">Download</span>
+              </div>
+              <div className="text-2xl font-black">
+                {download !== null ? download : "—"}
+                <span className="text-xs font-normal text-muted-foreground ml-1">Mbps</span>
+              </div>
+            </motion.div>
+            <motion.div
+              className="relative rounded-xl bg-accent/30 p-3 overflow-hidden"
+              animate={phase === "upload" ? { borderColor: ["hsl(var(--primary))", "transparent"] } : {}}
+              transition={{ duration: 1, repeat: phase === "upload" ? Infinity : 0 }}
+            >
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <Upload className="w-4 h-4 text-green-500" />
+                <span className="text-[11px] font-semibold text-muted-foreground">Upload</span>
+              </div>
+              <div className="text-2xl font-black">
+                {upload !== null ? upload : "—"}
+                <span className="text-xs font-normal text-muted-foreground ml-1">Mbps</span>
+              </div>
+            </motion.div>
           </div>
 
-          <div className="mt-4">
+          {/* Start Button */}
+          <div className="mt-5">
             {testing ? (
-              <Button variant="outline" onClick={cancel} className="rounded-full px-8 text-primary border-primary/30">Cancel</Button>
-            ) : (
-              <Button onClick={runTest} className="gradient-bg text-primary-foreground rounded-full px-8 py-5 font-bold shadow-lg shadow-primary/20">
-                <Gauge className="w-4 h-4 mr-2" />{phase === "done" ? "Test Again" : "Start Test"}
+              <Button variant="outline" onClick={cancel} className="rounded-full px-10 py-5 text-primary border-primary/30 font-bold">
+                Cancel Test
               </Button>
+            ) : (
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Button
+                  onClick={runTest}
+                  className="gradient-bg text-primary-foreground rounded-full px-10 py-6 font-bold text-base shadow-xl shadow-primary/25"
+                >
+                  <Zap className="w-5 h-5 mr-2" />
+                  {phase === "done" ? "Test Again" : "Start Speed Test"}
+                </Button>
+              </motion.div>
             )}
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-2">
+        {/* Quality Badge */}
+        <AnimatePresence>
+          {phase === "done" && download !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="rounded-xl border border-border/30 bg-card p-4 text-center"
+            >
+              {(() => {
+                const q = getQuality(download);
+                return (
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-3xl">{q.emoji}</span>
+                    <div>
+                      <p className={`text-lg font-bold ${q.color}`}>{q.label} Connection</p>
+                      <p className="text-xs text-muted-foreground">
+                        {download >= 25 ? "Great for HD streaming & gaming" :
+                         download >= 10 ? "Good for browsing & SD streaming" :
+                         "May experience buffering on video"}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Detailed Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { icon: Activity, label: "Ping", val: ping !== null ? `${ping}ms` : "—" },
-            { icon: Wifi, label: "Jitter", val: jitter !== null ? `${jitter}ms` : "—" },
-            { icon: Download, label: "Down", val: download !== null ? `${download}` : "—" },
-            { icon: Upload, label: "Up", val: upload !== null ? `${upload}` : "—" },
+            { icon: Activity, label: "Ping", val: ping !== null ? `${ping}ms` : "—", color: "text-yellow-500", desc: "Latency" },
+            { icon: Wifi, label: "Jitter", val: jitter !== null ? `${jitter}ms` : "—", color: "text-orange-500", desc: "Stability" },
+            { icon: Download, label: "Download", val: download !== null ? `${download}` : "—", color: "text-blue-500", desc: "Mbps" },
+            { icon: Upload, label: "Upload", val: upload !== null ? `${upload}` : "—", color: "text-green-500", desc: "Mbps" },
           ].map(s => (
-            <div key={s.label} className="bg-card rounded-xl border border-border/30 p-3 text-center">
-              <s.icon className="w-3.5 h-3.5 mx-auto mb-1 text-primary" />
-              <div className="text-[10px] text-muted-foreground font-medium">{s.label}</div>
-              <div className="text-sm font-bold">{s.val}</div>
-            </div>
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card rounded-xl border border-border/30 p-3 text-center group hover:border-primary/30 transition-colors"
+            >
+              <s.icon className={`w-4 h-4 mx-auto mb-1.5 ${s.color} group-hover:scale-110 transition-transform`} />
+              <div className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{s.label}</div>
+              <div className="text-lg font-black mt-0.5">{s.val}</div>
+              <div className="text-[9px] text-muted-foreground/50">{s.desc}</div>
+            </motion.div>
           ))}
         </div>
 
         {/* Network Info */}
         <div className="rounded-xl border border-border/30 bg-card p-4">
-          <h3 className="text-xs font-bold mb-3 flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-primary" />Network Info</h3>
-          <div className="space-y-2 text-xs">
+          <h3 className="text-xs font-bold mb-3 flex items-center gap-1.5">
+            <Globe className="w-3.5 h-3.5 text-primary" />
+            Network Information
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             {[
-              ["IP Address", ip],
-              ["ISP", isp],
-              ["Connection", connType],
-              ["Protocol", location.protocol === "https:" ? "HTTPS" : "HTTP"],
-            ].map(([l, v]) => (
-              <div key={l} className="flex justify-between py-1.5 px-2.5 rounded-lg bg-accent/30">
-                <span className="text-muted-foreground">{l}</span>
-                <span className="font-bold truncate ml-2 max-w-[200px]">{v}</span>
+              { icon: Globe, label: "IP Address", value: ip },
+              { icon: Server, label: "ISP", value: isp },
+              { icon: Wifi, label: "Connection", value: connType },
+              { icon: Shield, label: "Protocol", value: location.protocol === "https:" ? "HTTPS (Secure)" : "HTTP" },
+              { icon: Activity, label: "Location", value: serverLoc },
+              { icon: Clock, label: "Last Test", value: testHistory[0]?.time || "Never" },
+            ].map(({ icon: Icon, label, value }) => (
+              <div key={label} className="flex items-center gap-2.5 py-2 px-3 rounded-lg bg-accent/20">
+                <Icon className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
+                <span className="text-muted-foreground/70">{label}</span>
+                <span className="font-bold truncate ml-auto text-right max-w-[140px]">{value}</span>
               </div>
             ))}
           </div>
         </div>
+
+        {/* Test History */}
+        {testHistory.length > 0 && (
+          <div className="rounded-xl border border-border/30 bg-card p-4">
+            <h3 className="text-xs font-bold mb-3 flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-primary" />
+              Test History
+            </h3>
+            <div className="space-y-2">
+              {testHistory.map((h, i) => (
+                <div key={i} className="flex items-center gap-3 text-xs py-2 px-3 rounded-lg bg-accent/20">
+                  <span className="text-muted-foreground/50 text-[10px] w-24 shrink-0">{h.time}</span>
+                  <div className="flex items-center gap-1 text-blue-500">
+                    <Download className="w-3 h-3" />
+                    <span className="font-bold">{h.dl}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-green-500">
+                    <Upload className="w-3 h-3" />
+                    <span className="font-bold">{h.ul}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-yellow-500 ml-auto">
+                    <Activity className="w-3 h-3" />
+                    <span className="font-bold">{h.ping}ms</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </ToolLayout>
   );
