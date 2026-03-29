@@ -36,10 +36,6 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover={{ y: -8, scale: 1.02 }}
       className="shrink-0 w-[280px] sm:w-[320px] group"
     >
@@ -72,22 +68,15 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
         {/* Rating with cute style */}
         <div className="flex items-center gap-1 mb-3">
           {Array.from({ length: 5 }, (_, i) => (
-            <motion.div
+            <Star
               key={i}
-              initial={{ opacity: 0, scale: 0 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 + i * 0.08, type: "spring", stiffness: 400 }}
-            >
-              <Star
-                className={cn(
-                  "w-3.5 h-3.5 transition-colors",
-                  i < testimonial.rating
-                    ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.4)]"
-                    : "text-muted-foreground/20"
-                )}
-              />
-            </motion.div>
+              className={cn(
+                "w-3.5 h-3.5 transition-colors",
+                i < testimonial.rating
+                  ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.4)]"
+                  : "text-muted-foreground/20"
+              )}
+            />
           ))}
           <span className="text-[10px] text-muted-foreground/60 ml-1 font-medium">{testimonial.rating}.0</span>
         </div>
