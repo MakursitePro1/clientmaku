@@ -67,7 +67,7 @@ export default function WhatsAppLinkGenerator() {
     <ToolLayout title="WhatsApp Link Generator" description="Create direct WhatsApp chat links with QR codes and message templates">
       <div className="space-y-6 max-w-2xl mx-auto">
         {/* Phone Input */}
-        <div className="rounded-2xl border border-border/50 bg-card p-5 space-y-4">
+        <div className="tool-section-card p-5 space-y-4">
           <div className="flex items-center gap-2 mb-1">
             <Phone className="w-4 h-4 text-green-500" />
             <h3 className="text-sm font-bold">Phone Number</h3>
