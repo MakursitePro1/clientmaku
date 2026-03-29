@@ -60,7 +60,6 @@ export default function RegexTester() {
 
   return (
     <ToolLayout
-      toolId="regex-tester"
       title="Regex Tester"
       description="Test, debug & visualize regular expressions in real-time"
      
