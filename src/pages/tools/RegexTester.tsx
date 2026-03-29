@@ -62,8 +62,6 @@ export default function RegexTester() {
     <ToolLayout
       title="Regex Tester"
       description="Test, debug & visualize regular expressions in real-time"
-     
-     
     >
       <div className="space-y-6">
         {/* Presets */}
