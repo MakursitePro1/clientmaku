@@ -127,7 +127,7 @@ export default function IpAddressLookup() {
               className="space-y-4"
             >
               {/* IP Header */}
-              <div className="rounded-2xl bg-gradient-to-r from-primary/10 to-accent/20 border border-primary/20 p-5 text-center">
+              <div className="tool-result-card text-center">
                 <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">IP Address</p>
                 <p className="text-3xl font-black text-primary mt-1 font-mono">{info.ip}</p>
                 <p className="text-sm text-muted-foreground mt-1">{info.city}, {info.region}, {info.country}</p>
