@@ -51,7 +51,7 @@ export default function PasswordGenerator() {
 
     if (excludeAmbiguous) chars = chars.replace(/[ilLI|`oO0]/g, "");
     if (excludeChars) {
-      for (const c of excludeChars) chars = chars.replaceAll(c, "");
+      for (const c of excludeChars) chars = chars.split(c).join("");
     }
 
     const results: string[] = [];
