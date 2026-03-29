@@ -103,7 +103,7 @@ export function ToolsGrid() {
             <div className="relative">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/60 group-focus-within:text-primary transition-colors" />
               <Input
-                placeholder="Search from 200+ tools..."
+                placeholder={`Search from ${totalTools} tools...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-13 pr-20 py-7 rounded-2xl bg-card/80 backdrop-blur-sm border-border/40 text-base focus:border-primary/40 transition-all shadow-sm focus:shadow-[0_0_30px_-8px_hsl(263_85%_58%/0.15)]"
