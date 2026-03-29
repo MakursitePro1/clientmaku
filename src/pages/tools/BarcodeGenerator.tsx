@@ -19,7 +19,7 @@ function encodeCode128(text: string): string {
 }
 
 export default function BarcodeGenerator() {
-  const [text, setText] = useState("MAKURSITE-2024");
+  const [text, setText] = useState("CYBERVENOM-2024");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const generate = () => {
