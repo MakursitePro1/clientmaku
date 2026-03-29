@@ -95,6 +95,11 @@ const App = () => (
             <Route path="/tools/temp-number" element={<TempNumber />} />
             <Route path="/tools/temp-mail" element={<TempMail />} />
             <Route path="/tools/case-converter" element={<CaseConverter />} />
+            <Route path="/tools/bin-checker" element={<BinChecker />} />
+            <Route path="/tools/ip-blacklist-checker" element={<IPBlacklistChecker />} />
+            <Route path="/tools/random-name-generator" element={<RandomNameGenerator />} />
+            <Route path="/tools/random-address-generator" element={<RandomAddressGenerator />} />
+            <Route path="/tools/hash-generator" element={<HashGenerator />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
