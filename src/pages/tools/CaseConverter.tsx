@@ -149,12 +149,12 @@ const CaseConverter = () => {
         </div>
 
         {/* Stats */}
-        <div className="bg-card rounded-xl border border-border/50 overflow-hidden">
-          <div className="p-3 bg-accent/30 border-b border-border/30 flex items-center gap-1.5">
+        <div className="tool-section-card overflow-hidden">
+          <div className="p-3 bg-gradient-to-r from-primary/10 via-accent/30 to-primary/10 border-b border-primary/10 flex items-center gap-2">
             <FileText className="w-4 h-4 text-primary" />
-            <span className="text-xs font-bold">Text Analytics</span>
+            <span className="text-xs font-bold gradient-text">Text Analytics</span>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-9 divide-x divide-border/30">
+          <div className="grid grid-cols-3 sm:grid-cols-9 divide-x divide-border/20">
             {[
               { label: "Chars", val: stats.chars },
               { label: "No Space", val: stats.charsNoSpace },
@@ -166,9 +166,9 @@ const CaseConverter = () => {
               { label: "Read", val: `${stats.readTime}m` },
               { label: "Speak", val: `${stats.speakTime}m` },
             ].map(s => (
-              <div key={s.label} className="p-2 text-center">
-                <div className="text-sm font-bold text-primary">{s.val}</div>
-                <div className="text-[8px] text-muted-foreground">{s.label}</div>
+              <div key={s.label} className="p-2.5 text-center group hover:bg-primary/5 transition-colors">
+                <div className="text-sm font-extrabold gradient-text">{s.val}</div>
+                <div className="text-[8px] text-muted-foreground/60 font-bold uppercase tracking-wider">{s.label}</div>
               </div>
             ))}
           </div>

@@ -175,14 +175,14 @@ export default function QrCodeMaker() {
         {/* QR Preview */}
         {qrData && (
           <div className="flex flex-col items-center gap-4">
-            <div id="qr-code-svg" className="rounded-2xl p-6 inline-block border border-border/50" style={{ backgroundColor: bgColor }}>
+            <div id="qr-code-svg" className="tool-result-card rounded-2xl p-6 inline-block" style={{ backgroundColor: bgColor }}>
               <QRCodeSVG value={qrData} size={sizeNum} fgColor={fgColor} bgColor={bgColor} level="H" includeMargin />
             </div>
-            <div className="flex gap-2">
-              <Button onClick={() => download("png")} className="gradient-bg text-primary-foreground rounded-xl font-semibold gap-2">
-                <Download className="w-4 h-4" /> PNG
-              </Button>
-              <Button onClick={() => download("svg")} variant="outline" className="rounded-xl font-semibold gap-2">
+            <div className="flex gap-3">
+              <button onClick={() => download("png")} className="tool-btn-primary px-6 py-3 flex items-center gap-2 text-sm">
+                <Download className="w-4 h-4" /> Download PNG
+              </button>
+              <Button onClick={() => download("svg")} variant="outline" className="rounded-xl font-bold gap-2 border-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5">
                 <Download className="w-4 h-4" /> SVG
               </Button>
             </div>
