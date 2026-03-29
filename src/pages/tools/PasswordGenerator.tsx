@@ -125,15 +125,16 @@ export default function PasswordGenerator() {
         {/* Options */}
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: "Uppercase (A-Z)", checked: uppercase, set: setUppercase },
-            { label: "Lowercase (a-z)", checked: lowercase, set: setLowercase },
-            { label: "Numbers (0-9)", checked: numbers, set: setNumbers },
-            { label: "Symbols (!@#$)", checked: symbols, set: setSymbols },
-            { label: "No Ambiguous (0O, 1lI)", checked: excludeAmbiguous, set: setExcludeAmbiguous },
+            { label: "Uppercase (A-Z)", checked: uppercase, set: setUppercase, emoji: "🔤" },
+            { label: "Lowercase (a-z)", checked: lowercase, set: setLowercase, emoji: "🔡" },
+            { label: "Numbers (0-9)", checked: numbers, set: setNumbers, emoji: "🔢" },
+            { label: "Symbols (!@#$)", checked: symbols, set: setSymbols, emoji: "✨" },
+            { label: "No Ambiguous", checked: excludeAmbiguous, set: setExcludeAmbiguous, emoji: "👁️" },
           ].map(opt => (
-            <label key={opt.label} className="flex items-center gap-2 cursor-pointer text-sm">
+            <label key={opt.label} className={`flex items-center gap-2.5 cursor-pointer text-sm p-3 rounded-xl border transition-all duration-300 ${opt.checked ? "border-primary/30 bg-primary/5 shadow-sm" : "border-border/40 hover:border-primary/20 hover:bg-accent/20"}`}>
               <Checkbox checked={opt.checked} onCheckedChange={c => opt.set(!!c)} />
-              {opt.label}
+              <span>{opt.emoji}</span>
+              <span className="font-medium">{opt.label}</span>
             </label>
           ))}
         </div>
