@@ -84,7 +84,7 @@ export function PopularToolsSection() {
             >
               <Link
                 to={tool.path}
-                className="group relative flex flex-col items-center text-center p-5 rounded-2xl border border-border/30 bg-card/60 backdrop-blur-md transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_60px_-15px] overflow-hidden h-full"
+                className="group relative flex flex-col items-center text-center p-5 rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.08)] transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_60px_-15px] overflow-hidden h-full"
                 style={{
                   // @ts-ignore
                   '--tw-shadow-color': `${tool.color.replace(')', ' / 0.2)')}`,
