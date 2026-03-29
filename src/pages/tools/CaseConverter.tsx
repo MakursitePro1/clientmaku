@@ -91,18 +91,18 @@ const CaseConverter = () => {
     <ToolLayout title="Text Case Converter" description="Convert text between 18+ cases with real-time text analytics">
       <div className="space-y-5 max-w-3xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold flex items-center gap-1.5"><Type className="w-4 h-4 text-primary" /> Input</label>
+          <div className="tool-section-card p-4 space-y-2">
+            <label className="text-sm font-bold flex items-center gap-1.5"><Type className="w-4 h-4 text-primary" /> Input</label>
             <Textarea value={text} onChange={e => { setText(e.target.value); setConverted(""); }}
-              className="min-h-[200px] rounded-xl bg-card border-border/50 resize-none text-sm" placeholder="Type or paste your text here..." />
+              className="min-h-[200px] rounded-xl bg-background border-primary/10 resize-none text-sm tool-input-colorful" placeholder="Type or paste your text here..." />
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold flex items-center gap-1.5">
+          <div className="tool-section-card p-4 space-y-2">
+            <label className="text-sm font-bold flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-primary" /> Output
-              {lastUsed && <span className="text-xs text-muted-foreground font-normal ml-1">({lastUsed})</span>}
+              {lastUsed && <span className="tool-badge text-[10px] ml-1">{lastUsed}</span>}
             </label>
             <Textarea value={output} readOnly
-              className="min-h-[200px] rounded-xl bg-accent/30 border-border/50 resize-none text-sm" placeholder="Converted text appears here..." />
+              className="min-h-[200px] rounded-xl bg-primary/[0.03] border-primary/10 resize-none text-sm" placeholder="Converted text appears here..." />
           </div>
         </div>
 
