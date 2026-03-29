@@ -36,11 +36,9 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover={{ y: -8, scale: 1.02 }}
+      className="shrink-0 w-[280px] sm:w-[320px] group"
+    >
       className="shrink-0 w-[280px] sm:w-[320px] group"
     >
       <div className={cn(
