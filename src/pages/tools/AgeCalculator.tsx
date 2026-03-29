@@ -92,22 +92,24 @@ export default function AgeCalculator() {
   return (
     <ToolLayout title="Age Calculator" description="Calculate your exact age with 25+ detailed life statistics and insights">
       <div className="space-y-6 max-w-2xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-semibold mb-2 block flex items-center gap-1.5"><Calendar className="w-4 h-4 text-primary" />Date of Birth</label>
-            <Input type="date" value={dob} onChange={e => setDob(e.target.value)} className="rounded-xl" />
-          </div>
-          <div>
-            <label className="text-sm font-semibold mb-2 block flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" />Calculate To</label>
-            <Input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} className="rounded-xl" />
+        <div className="tool-section-card p-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-bold mb-2 block flex items-center gap-1.5"><Calendar className="w-4 h-4 text-primary" />Date of Birth</label>
+              <Input type="date" value={dob} onChange={e => setDob(e.target.value)} className="rounded-xl tool-input-colorful" />
+            </div>
+            <div>
+              <label className="text-sm font-bold mb-2 block flex items-center gap-1.5"><Clock className="w-4 h-4 text-primary" />Calculate To</label>
+              <Input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)} className="rounded-xl tool-input-colorful" />
+            </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={calculate} className="flex-1 gradient-bg text-primary-foreground rounded-xl font-semibold gap-1.5" size="lg">
-            <Zap className="w-4 h-4" /> Calculate Age
-          </Button>
+        <div className="flex gap-3">
+          <button onClick={calculate} className="tool-btn-primary flex-1 py-3.5 px-6 flex items-center justify-center gap-2 text-base">
+            <Zap className="w-5 h-5" /> Calculate Age
+          </button>
           {result && (
-            <Button onClick={reset} variant="outline" className="rounded-xl gap-1.5">
+            <Button onClick={reset} variant="outline" className="rounded-xl gap-1.5 border-2 border-primary/20 hover:border-primary/40">
               <RotateCcw className="w-4 h-4" />
             </Button>
           )}
