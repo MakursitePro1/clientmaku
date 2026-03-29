@@ -57,7 +57,7 @@ export default function PortScanner() {
   }), []);
 
   return (
-    <ToolLayout title="Port Reference Guide" description="Common network ports reference & info lookup"
+    <ToolLayout title="Port Reference Guide" description="Common network ports reference & info lookup">
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-4 gap-3">

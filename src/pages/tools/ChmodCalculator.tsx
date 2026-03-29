@@ -47,7 +47,7 @@ export default function ChmodCalculator() {
   const targetColors = ["hsl(145, 80%, 42%)", "hsl(200, 85%, 48%)", "hsl(35, 90%, 50%)"];
 
   return (
-    <ToolLayout title="Chmod Calculator" description="Calculate Unix file permissions easily"
+    <ToolLayout title="Chmod Calculator" description="Calculate Unix file permissions easily">
       <div className="space-y-6">
         {/* Presets */}
         <div className="flex flex-wrap gap-2">

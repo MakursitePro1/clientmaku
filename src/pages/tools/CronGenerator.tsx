@@ -70,7 +70,7 @@ export default function CronGenerator() {
   }, [cron]);
 
   return (
-    <ToolLayout title="Cron Expression Generator" description="Build & explain cron schedule expressions visually"
+    <ToolLayout title="Cron Expression Generator" description="Build & explain cron schedule expressions visually">
       <div className="space-y-6">
         {/* Presets */}
         <div>

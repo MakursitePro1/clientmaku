@@ -47,7 +47,7 @@ export default function UserAgentParser() {
   ];
 
   return (
-    <ToolLayout title="User Agent Parser" description="Parse & analyze browser user agent strings"
+    <ToolLayout title="User Agent Parser" description="Parse & analyze browser user agent strings">
       <div className="space-y-6">
         <div>
           <div className="flex justify-between items-center mb-2">
