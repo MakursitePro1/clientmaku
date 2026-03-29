@@ -8,7 +8,7 @@ interface SEOHeadProps {
   type?: string;
 }
 
-const SITE_NAME = "Makursite";
+const SITE_NAME = "Cyber Venom";
 const BASE_URL = typeof window !== "undefined" ? window.location.origin : "";
 
 // Global cache for page SEO
@@ -47,7 +47,7 @@ export function SEOHead({ title, description, path = "/", type = "website" }: SE
   const twitterCard = dbSeo?.twitter_card || "summary_large_image";
   const twitterTitle = dbSeo?.twitter_title || ogTitle;
   const twitterDesc = dbSeo?.twitter_description || ogDesc;
-  const keywords = dbSeo?.meta_keywords || `${title}, free online tools, web tools, makursite`;
+  const keywords = dbSeo?.meta_keywords || `${title}, free online tools, web tools, cybervenom`;
   const robots = dbSeo?.robots || "index, follow";
 
   useEffect(() => {

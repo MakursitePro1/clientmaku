@@ -50,7 +50,7 @@ export default function ToolsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="All Tools — Makursite" description="Browse all 200+ free online tools. Filter by category, search instantly." path="/tools" />
+      <SEOHead title="All Tools — Cyber Venom" description="Browse all 200+ free online tools. Filter by category, search instantly." path="/tools" />
       <Navbar />
 
       {/* ===== PREMIUM HERO ===== */}

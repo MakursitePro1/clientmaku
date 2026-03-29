@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
         { onConflict: "user_id" }
       );
 
-      const issuer = "Makursite Admin";
+      const issuer = "Cyber Venom Admin";
       const accountName = user.email || "admin";
       const uri = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
 

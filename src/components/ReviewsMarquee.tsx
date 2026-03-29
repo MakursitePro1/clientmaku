@@ -93,7 +93,7 @@ export function ReviewsMarquee() {
             Loved by <span className="gradient-text">Users</span>
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground mt-2 max-w-lg mx-auto">
-            See what our community says about Makursite tools
+            See what our community says about Cyber Venom tools
           </p>
         </motion.div>
 

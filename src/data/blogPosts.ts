@@ -16,7 +16,7 @@ export const blogPosts: BlogPost[] = [
     id: "top-10-free-online-tools-2025",
     title: "Top 10 Free Online Tools Every Developer Needs in 2025",
     excerpt: "Discover the most essential free web tools that can supercharge your development workflow and save hours of work.",
-    content: `<p>In the rapidly evolving world of web development, having the right tools at your disposal can make all the difference. Here at Makursite, we've curated a collection of over 200 free tools that developers, designers, and creators use daily.</p>
+    content: `<p>In the rapidly evolving world of web development, having the right tools at your disposal can make all the difference. Here at Cyber Venom, we've curated a collection of over 200 free tools that developers, designers, and creators use daily.</p>
 
 <h2>1. JSON Formatter & Validator</h2>
 <p>Working with APIs means dealing with JSON data constantly. Our JSON Formatter tool helps you beautify, validate, and debug JSON data instantly — no installation required.</p>
@@ -49,9 +49,9 @@ export const blogPosts: BlogPost[] = [
 <p>Write and preview Markdown content in real-time with our feature-rich editor. Perfect for README files, documentation, and blog posts.</p>
 
 <h2>Conclusion</h2>
-<p>These tools represent just a fraction of what Makursite offers. With 200+ free tools and counting, we're committed to making web development faster, easier, and more accessible for everyone.</p>`,
+<p>These tools represent just a fraction of what Cyber Venom offers. With 200+ free tools and counting, we're committed to making web development faster, easier, and more accessible for everyone.</p>`,
     category: "Development",
-    author: "Makursite Team",
+    author: "Cyber Venom Team",
     date: "2025-03-20",
     readTime: "5 min read",
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80",
@@ -72,7 +72,7 @@ export const blogPosts: BlogPost[] = [
 <p><strong>WebP</strong> — The modern format offering 25-35% smaller file sizes than JPEG. Convert your images using our format converter tool.</p>
 
 <h2>Compression Techniques</h2>
-<p>Use Makursite's Image Compressor to reduce file sizes while maintaining visual quality. Our tool supports batch processing and lets you control the compression level.</p>
+<p>Use Cyber Venom's Image Compressor to reduce file sizes while maintaining visual quality. Our tool supports batch processing and lets you control the compression level.</p>
 
 <h2>Responsive Images</h2>
 <p>Serve different image sizes for different screen sizes. Our Image Resizer tool lets you create multiple versions of an image quickly for responsive designs.</p>
@@ -89,7 +89,7 @@ export const blogPosts: BlogPost[] = [
 <li>Use lazy loading for below-the-fold images</li>
 </ul>`,
     category: "Design",
-    author: "Makursite Team",
+    author: "Cyber Venom Team",
     date: "2025-03-15",
     readTime: "7 min read",
     image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&q=80",
@@ -125,7 +125,7 @@ export const blogPosts: BlogPost[] = [
 <li>Regularly check for data breaches</li>
 </ul>`,
     category: "Security",
-    author: "Makursite Team",
+    author: "Cyber Venom Team",
     date: "2025-03-10",
     readTime: "6 min read",
     image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80",
@@ -135,7 +135,7 @@ export const blogPosts: BlogPost[] = [
     id: "pdf-tools-complete-guide",
     title: "Complete Guide to PDF Tools: Edit, Merge, Convert & More",
     excerpt: "Master PDF management with our comprehensive collection of free PDF tools — from merging to watermarking.",
-    content: `<p>PDFs are ubiquitous in both professional and personal settings. Whether you need to merge documents, extract pages, or add watermarks, Makursite has you covered with our complete suite of PDF tools.</p>
+    content: `<p>PDFs are ubiquitous in both professional and personal settings. Whether you need to merge documents, extract pages, or add watermarks, Cyber Venom has you covered with our complete suite of PDF tools.</p>
 
 <h2>Merging PDFs</h2>
 <p>Need to combine multiple PDF files into one? Our PDF Merger tool makes it simple — just drag and drop your files, arrange the order, and merge them instantly.</p>
@@ -153,9 +153,9 @@ export const blogPosts: BlogPost[] = [
 <p>Convert PDFs to images for presentations, or extract text for editing. Our PDF to Image and PDF to Text tools handle these conversions seamlessly.</p>
 
 <h2>All Our PDF Tools</h2>
-<p>Makursite offers 20+ PDF tools including: Merger, Splitter, Compressor, Page Remover, Page Extractor, Rotate, Password Protect, Watermark, Page Reorder, Metadata Editor, Page Number, Header/Footer, Sign, Form Filler, Bookmark Editor, Text Extractor, Image Merger, Unlock, Compare, and Text Converter.</p>`,
+<p>Cyber Venom offers 20+ PDF tools including: Merger, Splitter, Compressor, Page Remover, Page Extractor, Rotate, Password Protect, Watermark, Page Reorder, Metadata Editor, Page Number, Header/Footer, Sign, Form Filler, Bookmark Editor, Text Extractor, Image Merger, Unlock, Compare, and Text Converter.</p>`,
     category: "Productivity",
-    author: "Makursite Team",
+    author: "Cyber Venom Team",
     date: "2025-03-05",
     readTime: "5 min read",
     image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&q=80",
@@ -180,9 +180,9 @@ export const blogPosts: BlogPost[] = [
 <p>Ensure sufficient contrast between text and background colors. Use our Color Blindness Simulator to check how your design appears to users with color vision deficiencies.</p>
 
 <h2>Tools for Color Work</h2>
-<p>Makursite offers several color tools: Color Picker, Color Mixer, Color Palette Generator, Color Scheme Generator, Color Converter, and Gradient Generator. Each tool is designed to help you work with colors more efficiently.</p>`,
+<p>Cyber Venom offers several color tools: Color Picker, Color Mixer, Color Palette Generator, Color Scheme Generator, Color Converter, and Gradient Generator. Each tool is designed to help you work with colors more efficiently.</p>`,
     category: "Design",
-    author: "Makursite Team",
+    author: "Cyber Venom Team",
     date: "2025-02-28",
     readTime: "6 min read",
     image: "https://images.unsplash.com/photo-1525909002-1b05e0c869d8?w=800&q=80",
@@ -191,7 +191,7 @@ export const blogPosts: BlogPost[] = [
   {
     id: "seo-optimization-with-free-tools",
     title: "SEO Optimization Using Free Online Tools",
-    excerpt: "Boost your website's search engine ranking using free tools available on Makursite. No premium subscriptions needed.",
+    excerpt: "Boost your website's search engine ranking using free tools available on Cyber Venom. No premium subscriptions needed.",
     content: `<p>Search Engine Optimization doesn't have to cost a fortune. With the right free tools, you can significantly improve your website's visibility in search results.</p>
 
 <h2>Meta Tags</h2>
@@ -209,7 +209,7 @@ export const blogPosts: BlogPost[] = [
 <h2>Performance</h2>
 <p>Page speed is a ranking factor. Minify your CSS with our CSS Minifier, compress images, and optimize your code for faster loading times.</p>`,
     category: "Marketing",
-    author: "Makursite Team",
+    author: "Cyber Venom Team",
     date: "2025-02-20",
     readTime: "4 min read",
     image: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&q=80",

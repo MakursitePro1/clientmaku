@@ -24,7 +24,7 @@ export default function PdfPasswordProtect() {
     const pages = await newPdf.copyPages(pdf, pdf.getPageIndices());
     pages.forEach(p => newPdf.addPage(p));
     newPdf.setTitle(`Protected: ${fileName}`);
-    newPdf.setProducer("Makursite PDF Tools");
+    newPdf.setProducer("Cyber Venom PDF Tools");
     const output = await newPdf.save();
     const blob = new Blob([output as BlobPart], { type: "application/pdf" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `protected_${fileName}`; a.click();

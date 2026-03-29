@@ -281,7 +281,7 @@ export default function AdminTools() {
                   <Input
                     value={seoData.meta_title}
                     onChange={(e) => updateSeo("meta_title", e.target.value)}
-                    placeholder={`${seoTool.name} — Free Online Tool | Makursite`}
+                    placeholder={`${seoTool.name} — Free Online Tool | Cyber Venom`}
                     maxLength={70}
                   />
                   <div className="flex justify-between">
@@ -439,7 +439,7 @@ export default function AdminTools() {
               <CardContent>
                 <div className="bg-background border border-border rounded-lg p-4 space-y-1">
                   <p className="text-sm text-primary truncate font-medium">
-                    {seoData.meta_title || `${seoTool.name} | Makursite`}
+                    {seoData.meta_title || `${seoTool.name} | Cyber Venom`}
                   </p>
                   <p className="text-xs text-green-600 truncate">
                     {seoData.canonical_url || `yourdomain.com/tools/${currentSlug}`}

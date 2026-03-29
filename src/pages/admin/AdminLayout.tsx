@@ -55,7 +55,7 @@ export default function AdminLayout() {
           {!collapsed && (
             <div>
               <h1 className="font-bold text-foreground text-sm">Admin Panel</h1>
-              <p className="text-[10px] text-muted-foreground">Makursite</p>
+              <p className="text-[10px] text-muted-foreground">Cyber Venom</p>
             </div>
           )}
         </Link>
