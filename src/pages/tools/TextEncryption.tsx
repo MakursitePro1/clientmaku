@@ -171,10 +171,10 @@ export default function TextEncryption() {
           <Textarea value={input} onChange={e => setInput(e.target.value)} placeholder={mode === "encrypt" ? "Enter text to encrypt..." : "Enter text to decrypt..."} className="min-h-[100px] rounded-xl font-mono text-sm" />
 
           <div className="flex gap-2">
-            <Button onClick={process} className="flex-1 gradient-bg text-primary-foreground rounded-xl font-bold gap-1.5">
+            <button onClick={process} className="tool-btn-primary flex-1 py-3 px-6 flex items-center justify-center gap-2 text-sm">
               {mode === "encrypt" ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
               {mode === "encrypt" ? "Encrypt" : "Decrypt"}
-            </Button>
+            </button>
             <Button onClick={swap} variant="outline" className="rounded-xl" title="Swap">
               <ArrowLeftRight className="w-4 h-4" />
             </Button>
