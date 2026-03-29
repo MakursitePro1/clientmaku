@@ -329,7 +329,7 @@ export default function ToolsPage() {
 }
 
 /* ===== COLORFUL TOOL CARD ===== */
-function ToolCard({ tool, index }: { tool: typeof tools[0]; index: number }) {
+function ToolCard({ tool, index }: { tool: import("@/data/tools").Tool; index: number }) {
   return (
     <motion.div
       layout
