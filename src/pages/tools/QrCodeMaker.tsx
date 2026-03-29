@@ -95,9 +95,9 @@ export default function QrCodeMaker() {
     <ToolLayout title="QR Code Maker" description="Create QR codes for URLs, WiFi, vCards, SMS and more">
       <div className="space-y-6 max-w-2xl mx-auto">
         <Tabs value={mode} onValueChange={(v) => setMode(v as QRMode)}>
-          <TabsList className="grid grid-cols-5 w-full rounded-xl">
+          <TabsList className="grid grid-cols-5 w-full rounded-2xl p-1.5 bg-gradient-to-r from-primary/5 via-accent/30 to-primary/5 border border-primary/10 h-auto">
             {(["url", "text", "wifi", "vcard", "sms"] as QRMode[]).map((m) => (
-              <TabsTrigger key={m} value={m} className="rounded-lg gap-1 text-xs sm:text-sm">
+              <TabsTrigger key={m} value={m} className="rounded-xl gap-1.5 text-xs sm:text-sm py-2.5 data-[state=active]:gradient-bg data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 font-bold">
                 {modeIcons[m]} {m === "url" ? "URL" : m === "wifi" ? "WiFi" : m === "vcard" ? "vCard" : m === "sms" ? "SMS" : "Text"}
               </TabsTrigger>
             ))}
