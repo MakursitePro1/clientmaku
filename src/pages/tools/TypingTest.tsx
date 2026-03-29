@@ -158,10 +158,10 @@ export default function TypingTest() {
               <SelectItem value="hard">🔥 Hard</SelectItem>
             </SelectContent>
           </Select>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {durations.map(d => (
               <button key={d} onClick={() => { setDuration(d); setTimeLeft(d); if (started) reset(); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${duration === d ? "bg-primary text-primary-foreground" : "bg-accent/50 text-muted-foreground"}`}>
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${duration === d ? "gradient-bg text-white shadow-lg shadow-primary/25" : "bg-card border border-border/30 text-muted-foreground hover:border-primary/30 hover:text-primary"}`}>
                 {d < 60 ? `${d}s` : `${d/60}m`}
               </button>
             ))}
