@@ -141,7 +141,7 @@ export default function TextEncryption() {
         <div className="grid grid-cols-5 gap-2">
           {methods.map(m => (
             <button key={m.id} onClick={() => setMethod(m.id)}
-              className={`p-2.5 rounded-xl text-center transition-all border ${method === m.id ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/30" : "border-border/50 bg-card text-muted-foreground hover:text-foreground hover:border-primary/30"}`}>
+              className={`p-3 rounded-xl text-center transition-all duration-300 border-2 ${method === m.id ? "border-primary/40 gradient-bg text-white shadow-lg shadow-primary/20" : "border-border/30 bg-card text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 hover:shadow-md"}`}>
               <span className="text-lg block">{m.icon}</span>
               <div className="text-[10px] font-bold mt-0.5">{m.label}</div>
             </button>
