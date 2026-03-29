@@ -169,12 +169,13 @@ const App = () => (
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
-    </SiteSettingsProvider>
-    </FavoritesProvider>
+                  </Routes>
+                </Suspense>
+              </BrowserRouter>
+            </TooltipProvider>
+          </ToolCatalogProvider>
+        </SiteSettingsProvider>
+      </FavoritesProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
