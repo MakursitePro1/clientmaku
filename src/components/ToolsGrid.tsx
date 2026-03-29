@@ -127,7 +127,7 @@ export function ToolsGrid() {
           className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2 mb-16"
         >
           {categories.map((cat) => {
-            const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
+            const count = getCategoryCount(cat.id);
             const isActive = activeCategory === cat.id;
             return (
               <motion.button
