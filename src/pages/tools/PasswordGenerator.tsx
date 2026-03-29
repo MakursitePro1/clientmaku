@@ -161,7 +161,7 @@ export default function PasswordGenerator() {
         {/* Result */}
         {password && (
           <div className="space-y-3">
-            <div className="bg-accent/50 rounded-2xl p-5">
+            <div className="tool-result-card">
               <div className="flex items-center gap-2 mb-3">
                 <code className="text-lg font-mono font-bold break-all flex-1 select-all">
                   {showPassword ? password : "•".repeat(password.length)}
