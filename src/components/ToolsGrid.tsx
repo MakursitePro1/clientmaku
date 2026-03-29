@@ -191,7 +191,7 @@ export function ToolsGrid() {
                 >
                   <Link
                     to={tool.path}
-                    className="group relative block rounded-2xl overflow-hidden h-full border border-border transition-all duration-500 hover:-translate-y-3"
+                    className="group relative block rounded-2xl overflow-hidden h-full border-2 border-border/80 transition-all duration-500 hover:-translate-y-3"
                     style={{
                       boxShadow: `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}`,
                       '--tool-color': tool.color,
