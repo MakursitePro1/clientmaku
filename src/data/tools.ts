@@ -4,7 +4,8 @@ import {
   CreditCard, ShieldAlert, User, MapPinned, Hash,
   KeyRound, ShieldCheck, Globe, Keyboard, IdCard, Facebook, Shield, Wrench, Zap,
   FileText, Palette, Braces, Binary, AlignLeft, Ruler, Timer, Paintbrush,
-  Code, Diff, DollarSign, Image, Key
+  Code, Diff, DollarSign, Image, Key, Regex, FileKey, Clock, Network,
+  MonitorSmartphone, Server, LockKeyhole, Terminal
 } from "lucide-react";
 
 export type ToolCategory = 
