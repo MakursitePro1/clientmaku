@@ -77,6 +77,9 @@ const App = () => (
             <Route path="/tools/password-generator" element={<PasswordGenerator />} />
             <Route path="/tools/qr-code-maker" element={<QrCodeMaker />} />
             <Route path="/tools/qr-code-scanner" element={<QrCodeScanner />} />
+            <Route path="/tools/ip-address-lookup" element={<IpAddressLookup />} />
+            <Route path="/tools/whatsapp-link-generator" element={<WhatsAppLinkGenerator />} />
+            <Route path="/tools/barcode-generator" element={<BarcodeGenerator />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
