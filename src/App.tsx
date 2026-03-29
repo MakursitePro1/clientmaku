@@ -75,6 +75,9 @@ const TextDiff = lazy(() => import("./pages/tools/TextDiff"));
 const LoanCalculator = lazy(() => import("./pages/tools/LoanCalculator"));
 const TextEncoderDecoder = lazy(() => import("./pages/tools/TextEncoderDecoder"));
 const ImageToBase64 = lazy(() => import("./pages/tools/ImageToBase64"));
+const CyberChef = lazy(() => import("./pages/tools/CyberChef"));
+const YouTubeIdCard = lazy(() => import("./pages/tools/YouTubeIdCard"));
+const DnsLookup = lazy(() => import("./pages/tools/DnsLookup"));
 
 const queryClient = new QueryClient();
 
@@ -147,6 +150,9 @@ const App = () => (
             <Route path="/tools/loan-calculator" element={<LoanCalculator />} />
             <Route path="/tools/text-encoder-decoder" element={<TextEncoderDecoder />} />
             <Route path="/tools/image-to-base64" element={<ImageToBase64 />} />
+            <Route path="/tools/cyber-chef" element={<CyberChef />} />
+            <Route path="/tools/youtube-id-card" element={<YouTubeIdCard />} />
+            <Route path="/tools/dns-lookup" element={<DnsLookup />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
