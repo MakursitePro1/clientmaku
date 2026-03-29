@@ -4,7 +4,8 @@ import {
   CreditCard, ShieldAlert, User, MapPinned, Hash,
   KeyRound, ShieldCheck, Globe, Keyboard, IdCard, Facebook, Shield, Wrench, Zap,
   FileText, Palette, Braces, Binary, AlignLeft, Ruler, Timer, Paintbrush,
-  Code, Diff, DollarSign, Image, Key
+  Code, Diff, DollarSign, Image, Key, Regex, FileKey, Clock, Network,
+  MonitorSmartphone, Server, LockKeyhole, Terminal
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -93,4 +94,14 @@ export const tools: Tool[] = [
   // Network / IP
   { id: "dns-lookup", name: "DNS Lookup", description: "Look up DNS records for any domain", icon: Globe, category: "utility", path: "/tools/dns-lookup", color: "hsl(195, 85%, 50%)" },
   { id: "cyber-chef", name: "CyberChef", description: "Universal encoder, decoder, hasher & transformer", icon: Sparkles, category: "developer", path: "/tools/cyber-chef", color: "hsl(25, 90%, 55%)" },
+
+  // New Cyber Tools
+  { id: "regex-tester", name: "Regex Tester", description: "Test, debug & visualize regular expressions in real-time", icon: Regex, category: "developer", path: "/tools/regex-tester", color: "hsl(145, 80%, 42%)" },
+  { id: "jwt-decoder", name: "JWT Decoder", description: "Decode, inspect & verify JSON Web Tokens", icon: FileKey, category: "security", path: "/tools/jwt-decoder", color: "hsl(35, 90%, 50%)" },
+  { id: "cron-generator", name: "Cron Expression Generator", description: "Build & explain cron schedule expressions visually", icon: Clock, category: "developer", path: "/tools/cron-generator", color: "hsl(200, 85%, 48%)" },
+  { id: "http-status-checker", name: "HTTP Status Code Lookup", description: "Look up all HTTP status codes with descriptions", icon: Network, category: "developer", path: "/tools/http-status-checker", color: "hsl(260, 80%, 58%)" },
+  { id: "user-agent-parser", name: "User Agent Parser", description: "Parse & analyze browser user agent strings", icon: MonitorSmartphone, category: "utility", path: "/tools/user-agent-parser", color: "hsl(310, 75%, 50%)" },
+  { id: "chmod-calculator", name: "Chmod Calculator", description: "Calculate Unix file permissions easily", icon: Terminal, category: "developer", path: "/tools/chmod-calculator", color: "hsl(120, 60%, 40%)" },
+  { id: "port-scanner", name: "Port Reference Guide", description: "Common network ports reference & info lookup", icon: Server, category: "security", path: "/tools/port-scanner", color: "hsl(180, 70%, 42%)" },
+  { id: "ssl-checker", name: "SSL Certificate Checker", description: "Check SSL/TLS certificate status & details", icon: LockKeyhole, category: "security", path: "/tools/ssl-checker", color: "hsl(150, 75%, 40%)" },
 ];

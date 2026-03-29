@@ -79,6 +79,14 @@ const ImageToBase64 = lazy(() => import("./pages/tools/ImageToBase64"));
 const CyberChef = lazy(() => import("./pages/tools/CyberChef"));
 const YouTubeIdCard = lazy(() => import("./pages/tools/YouTubeIdCard"));
 const DnsLookup = lazy(() => import("./pages/tools/DnsLookup"));
+const RegexTester = lazy(() => import("./pages/tools/RegexTester"));
+const JwtDecoder = lazy(() => import("./pages/tools/JwtDecoder"));
+const CronGenerator = lazy(() => import("./pages/tools/CronGenerator"));
+const HttpStatusChecker = lazy(() => import("./pages/tools/HttpStatusChecker"));
+const UserAgentParser = lazy(() => import("./pages/tools/UserAgentParser"));
+const ChmodCalculator = lazy(() => import("./pages/tools/ChmodCalculator"));
+const PortScanner = lazy(() => import("./pages/tools/PortScanner"));
+const SslChecker = lazy(() => import("./pages/tools/SslChecker"));
 
 const queryClient = new QueryClient();
 
@@ -154,6 +162,14 @@ const App = () => (
             <Route path="/tools/image-to-base64" element={<ImageToBase64 />} />
             <Route path="/tools/cyber-chef" element={<CyberChef />} />
             <Route path="/tools/youtube-id-card" element={<YouTubeIdCard />} />
+            <Route path="/tools/regex-tester" element={<RegexTester />} />
+            <Route path="/tools/jwt-decoder" element={<JwtDecoder />} />
+            <Route path="/tools/cron-generator" element={<CronGenerator />} />
+            <Route path="/tools/http-status-checker" element={<HttpStatusChecker />} />
+            <Route path="/tools/user-agent-parser" element={<UserAgentParser />} />
+            <Route path="/tools/chmod-calculator" element={<ChmodCalculator />} />
+            <Route path="/tools/port-scanner" element={<PortScanner />} />
+            <Route path="/tools/ssl-checker" element={<SslChecker />} />
             <Route path="/tools/dns-lookup" element={<DnsLookup />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
