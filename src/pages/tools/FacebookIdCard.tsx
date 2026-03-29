@@ -418,24 +418,45 @@ export default function FacebookIdCard() {
 
         {/* Actions */}
         <div className="flex flex-wrap gap-3">
-          <Button onClick={generate} className="gradient-bg text-primary-foreground rounded-xl font-semibold gap-1.5">
+          <button onClick={generate} className="tool-btn-primary px-6 py-3 flex items-center gap-2 text-sm font-bold">
             <Eye className="w-4 h-4" /> Preview Card
-          </Button>
-          <Button onClick={downloadCard} variant="outline" className="rounded-xl gap-1.5">
+          </button>
+          <button onClick={downloadCard} className="tool-btn-primary px-6 py-3 flex items-center gap-2 text-sm font-bold" style={{ background: "linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%))" }}>
             <Download className="w-4 h-4" /> Download PNG
-          </Button>
-          <Button onClick={resetAll} variant="ghost" className="rounded-xl gap-1.5 text-muted-foreground">
+          </button>
+          <Button onClick={resetAll} variant="ghost" className="rounded-xl gap-1.5 text-muted-foreground hover:text-destructive">
             <RotateCcw className="w-4 h-4" /> Reset
           </Button>
         </div>
 
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="tool-stat-card">
+            <MessageCircle className="w-5 h-5 mx-auto text-blue-500 mb-1" />
+            <div className="stat-value text-lg">{posts}</div>
+            <div className="stat-label">Posts</div>
+          </div>
+          <div className="tool-stat-card">
+            <Heart className="w-5 h-5 mx-auto text-pink-500 mb-1" />
+            <div className="stat-value text-lg">{likes}</div>
+            <div className="stat-label">Likes</div>
+          </div>
+          <div className="tool-stat-card">
+            <User className="w-5 h-5 mx-auto text-primary mb-1" />
+            <div className="stat-value text-lg">{friends}</div>
+            <div className="stat-label">Friends</div>
+          </div>
+        </div>
+
         {/* Canvas */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
-          <canvas ref={canvasRef} className="w-full rounded-2xl border border-border shadow-lg bg-accent/10" />
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="tool-result-card relative overflow-hidden">
+          <canvas ref={canvasRef} className="w-full rounded-2xl" />
           {!canvasRef.current?.width && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2 py-20">
-              <Sparkles className="w-8 h-8 opacity-30" />
-              <p className="text-sm">Click "Preview Card" to generate</p>
+              <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+                <Sparkles className="w-10 h-10 text-primary/30" />
+              </motion.div>
+              <p className="text-sm font-semibold">Click "Preview Card" to generate</p>
             </div>
           )}
         </motion.div>
