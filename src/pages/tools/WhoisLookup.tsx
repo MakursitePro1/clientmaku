@@ -3,7 +3,8 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Search, Globe, Copy } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Globe, Copy, Download, Loader2, ExternalLink, Clock, Server, Shield } from "lucide-react";
 
 interface WhoisResult {
   domain: string;
@@ -14,106 +15,182 @@ export default function WhoisLookup() {
   const [domain, setDomain] = useState("");
   const [result, setResult] = useState<WhoisResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [history, setHistory] = useState<string[]>([]);
 
   const lookup = async () => {
     if (!domain.trim()) return;
     setLoading(true);
-    setError("");
     setResult(null);
 
     const clean = domain.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, "").toLowerCase();
 
     try {
-      // Using a free WHOIS API
       const res = await fetch(`https://api.api-ninjas.com/v1/whois?domain=${encodeURIComponent(clean)}`, {
         headers: { "X-Api-Key": "free" }
       });
-
       if (!res.ok) throw new Error("API error");
-
       const data = await res.json();
 
-      if (data && Object.keys(data).length > 0) {
-        const info: Record<string, string> = {};
-        if (data.domain_name) info["Domain"] = Array.isArray(data.domain_name) ? data.domain_name[0] : data.domain_name;
-        if (data.registrar) info["Registrar"] = data.registrar;
-        if (data.creation_date) info["Created"] = Array.isArray(data.creation_date) ? data.creation_date[0] : data.creation_date;
-        if (data.expiration_date) info["Expires"] = Array.isArray(data.expiration_date) ? data.expiration_date[0] : data.expiration_date;
-        if (data.name_servers) info["Name Servers"] = Array.isArray(data.name_servers) ? data.name_servers.join(", ") : data.name_servers;
-        if (data.dnssec) info["DNSSEC"] = data.dnssec;
-        if (data.org) info["Organization"] = data.org;
-        if (data.state) info["State"] = data.state;
-        if (data.country) info["Country"] = data.country;
+      const info: Record<string, string> = {};
+      if (data.domain_name) info["Domain"] = Array.isArray(data.domain_name) ? data.domain_name[0] : data.domain_name;
+      if (data.registrar) info["Registrar"] = data.registrar;
+      if (data.creation_date) info["Created"] = Array.isArray(data.creation_date) ? data.creation_date[0] : data.creation_date;
+      if (data.expiration_date) info["Expires"] = Array.isArray(data.expiration_date) ? data.expiration_date[0] : data.expiration_date;
+      if (data.updated_date) info["Updated"] = Array.isArray(data.updated_date) ? data.updated_date[0] : data.updated_date;
+      if (data.name_servers) info["Name Servers"] = Array.isArray(data.name_servers) ? data.name_servers.join(", ") : data.name_servers;
+      if (data.dnssec) info["DNSSEC"] = data.dnssec;
+      if (data.org) info["Organization"] = data.org;
+      if (data.state) info["State"] = data.state;
+      if (data.country) info["Country"] = data.country;
+      if (data.emails) info["Contact Email"] = Array.isArray(data.emails) ? data.emails[0] : data.emails;
 
-        if (Object.keys(info).length === 0) {
-          info["Domain"] = clean;
-          info["Status"] = "No detailed WHOIS data available";
-        }
-
-        setResult({ domain: clean, info });
-        toast.success("WHOIS lookup complete!");
-      } else {
-        // Fallback with basic info
-        setResult({
-          domain: clean,
-          info: {
-            "Domain": clean,
-            "Status": "WHOIS data not available via free API",
-            "Tip": "Try rdap.org or whois.domaintools.com for detailed results"
-          }
-        });
+      if (Object.keys(info).length === 0) {
+        info["Domain"] = clean;
+        info["Status"] = "No detailed WHOIS data available from free API";
       }
+
+      setResult({ domain: clean, info });
+      if (!history.includes(clean)) setHistory(prev => [clean, ...prev].slice(0, 10));
+      toast.success("WHOIS lookup complete!");
     } catch {
-      // Provide fallback result
       setResult({
         domain: clean,
         info: {
           "Domain": clean,
           "Status": "Could not fetch WHOIS data",
-          "Suggestion": "Try visiting whois.domaintools.com/" + clean
+          "Suggestion": `Try visiting whois.domaintools.com/${clean}`
         }
       });
-      toast.info("Showing basic info - external API unavailable");
+      if (!history.includes(clean)) setHistory(prev => [clean, ...prev].slice(0, 10));
+      toast.info("Showing basic info — external API unavailable");
     }
-
     setLoading(false);
   };
 
-  const copyAll = () => {
-    if (!result) return;
-    const text = Object.entries(result.info).map(([k, v]) => `${k}: ${v}`).join("\n");
+  const copy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied!");
   };
 
+  const exportReport = () => {
+    if (!result) return;
+    const lines = [
+      `WHOIS Report for ${result.domain}`,
+      `Generated: ${new Date().toISOString()}`,
+      ``,
+      ...Object.entries(result.info).map(([k, v]) => `${k}: ${v}`),
+      ``,
+      `Generated by Cyber Venom Tools`
+    ];
+    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `whois-${result.domain}.txt`;
+    a.click();
+    toast.success("Report downloaded!");
+  };
+
+  const fieldIcons: Record<string, any> = {
+    Domain: Globe,
+    Registrar: Server,
+    Created: Clock,
+    Expires: Clock,
+    Updated: Clock,
+    "Name Servers": Server,
+    DNSSEC: Shield,
+    Organization: Server,
+    Country: Globe,
+  };
+
   return (
-    <ToolLayout title="Whois Lookup" description="Look up domain registration and ownership details">
-      <div className="space-y-6 max-w-lg mx-auto">
+    <ToolLayout title="Whois Lookup" description="Look up domain registration, ownership, and nameserver details">
+      <div className="space-y-6 max-w-2xl mx-auto">
         <div className="flex gap-2">
-          <Input value={domain} onChange={e => setDomain(e.target.value)} placeholder="Enter domain (e.g. google.com)..." className="rounded-xl" onKeyDown={e => e.key === "Enter" && lookup()} />
-          <Button onClick={lookup} disabled={loading || !domain.trim()} className="rounded-xl gap-2 gradient-bg text-primary-foreground shrink-0">
-            <Search className="w-4 h-4" /> {loading ? "..." : "Lookup"}
+          <div className="relative flex-1">
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={domain}
+              onChange={e => setDomain(e.target.value)}
+              placeholder="Enter domain (e.g. google.com)"
+              className="rounded-xl pl-10 font-mono"
+              onKeyDown={e => e.key === "Enter" && lookup()}
+            />
+          </div>
+          <Button onClick={lookup} disabled={loading || !domain.trim()} className="rounded-xl gap-1.5 gradient-bg text-primary-foreground shrink-0">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            Lookup
           </Button>
         </div>
 
-        {result && (
-          <div className="p-4 bg-card rounded-xl border border-border/50 space-y-3">
-            <div className="flex items-center gap-2 mb-3">
-              <Globe className="w-5 h-5 text-primary" />
-              <h3 className="font-bold text-lg">{result.domain}</h3>
-            </div>
-            <div className="space-y-2">
-              {Object.entries(result.info).map(([key, value]) => (
-                <div key={key} className="flex justify-between items-start gap-4 py-1.5 border-b border-border/20 last:border-0">
-                  <span className="text-xs text-muted-foreground font-medium shrink-0">{key}</span>
-                  <span className="text-sm text-right break-all">{value}</span>
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="space-y-4"
+            >
+              {/* Domain Header */}
+              <div className="rounded-2xl bg-gradient-to-r from-primary/10 to-accent/20 border border-primary/20 p-5 text-center">
+                <Globe className="w-8 h-8 text-primary mx-auto mb-2" />
+                <p className="text-2xl font-black font-mono">{result.domain}</p>
+                <div className="flex gap-2 justify-center mt-3">
+                  <a href={`https://${result.domain}`} target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" variant="outline" className="rounded-lg gap-1">
+                      <ExternalLink className="w-3 h-3" /> Visit
+                    </Button>
+                  </a>
+                  <Button size="sm" variant="outline" className="rounded-lg gap-1" onClick={exportReport}>
+                    <Download className="w-3 h-3" /> Export
+                  </Button>
                 </div>
+              </div>
+
+              {/* Info Cards */}
+              <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
+                <div className="p-3 bg-accent/30 border-b border-border/30">
+                  <h3 className="text-xs font-bold">📋 WHOIS Details</h3>
+                </div>
+                <div className="divide-y divide-border/20">
+                  {Object.entries(result.info).map(([key, value], i) => {
+                    const Icon = fieldIcons[key] || Globe;
+                    return (
+                      <motion.div
+                        key={key}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="flex items-start gap-3 px-4 py-3 hover:bg-accent/10 transition-colors group cursor-pointer"
+                        onClick={() => copy(value)}
+                      >
+                        <Icon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{key}</p>
+                          <p className="text-sm font-semibold break-all mt-0.5">{value}</p>
+                        </div>
+                        <Copy className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-muted-foreground shrink-0 mt-1" />
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* History */}
+        {history.length > 0 && (
+          <div className="rounded-xl border border-border/30 bg-card overflow-hidden">
+            <div className="p-3 bg-accent/30 border-b border-border/30 flex items-center justify-between">
+              <span className="text-xs font-bold">📋 Lookup History</span>
+              <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setHistory([])}>Clear</Button>
+            </div>
+            <div className="divide-y divide-border/20">
+              {history.map((h, i) => (
+                <button key={i} onClick={() => { setDomain(h); }}
+                  className="w-full text-left px-3 py-2 text-xs font-mono hover:bg-accent/10 transition-colors">{h}</button>
               ))}
             </div>
-            <Button onClick={copyAll} variant="outline" size="sm" className="rounded-lg gap-1 mt-2">
-              <Copy className="w-3 h-3" /> Copy All
-            </Button>
           </div>
         )}
       </div>

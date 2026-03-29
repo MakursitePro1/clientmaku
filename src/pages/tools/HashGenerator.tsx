@@ -1,69 +1,63 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
-import { Copy, Hash, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import { Copy, Hash, RefreshCw, Download, CheckCircle2, XCircle, FileText, Clock } from "lucide-react";
 
 type Algorithm = "MD5" | "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
 
-const HashGenerator = () => {
+const md5 = (str: string): string => {
+  const rotateLeft = (val: number, bits: number) => (val << bits) | (val >>> (32 - bits));
+  const addUnsigned = (x: number, y: number) => {
+    const r = (x & 0x7FFFFFFF) + (y & 0x7FFFFFFF);
+    if (x & 0x80000000) return y & 0x80000000 ? (r ^ 0x80000000) ^ 0x80000000 : r ^ 0x80000000;
+    return y & 0x80000000 ? r ^ 0x80000000 : r;
+  };
+  const msg = Array.from(new TextEncoder().encode(str));
+  const len = msg.length;
+  msg.push(0x80);
+  while (msg.length % 64 !== 56) msg.push(0);
+  const bits = len * 8;
+  msg.push(bits & 0xff, (bits >> 8) & 0xff, (bits >> 16) & 0xff, (bits >> 24) & 0xff, 0, 0, 0, 0);
+  let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+  const S = [7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
+  const K = Array.from({length: 64}, (_, i) => Math.floor(Math.abs(Math.sin(i + 1)) * 0x100000000));
+  for (let i = 0; i < msg.length; i += 64) {
+    const M = Array.from({length: 16}, (_, j) => msg[i+j*4] | (msg[i+j*4+1] << 8) | (msg[i+j*4+2] << 16) | (msg[i+j*4+3] << 24));
+    let [A, B, C, D] = [a0, b0, c0, d0];
+    for (let j = 0; j < 64; j++) {
+      let F, g;
+      if (j < 16) { F = (B & C) | (~B & D); g = j; }
+      else if (j < 32) { F = (D & B) | (~D & C); g = (5*j+1) % 16; }
+      else if (j < 48) { F = B ^ C ^ D; g = (3*j+5) % 16; }
+      else { F = C ^ (B | ~D); g = (7*j) % 16; }
+      F = addUnsigned(addUnsigned(A, F), addUnsigned(K[j], M[g]));
+      A = D; D = C; C = B; B = addUnsigned(B, rotateLeft(F, S[j]));
+    }
+    a0 = addUnsigned(a0, A); b0 = addUnsigned(b0, B); c0 = addUnsigned(c0, C); d0 = addUnsigned(d0, D);
+  }
+  const toHex = (n: number) => Array.from({length: 4}, (_, i) => ((n >> (i*8)) & 0xff).toString(16).padStart(2, "0")).join("");
+  return toHex(a0) + toHex(b0) + toHex(c0) + toHex(d0);
+};
+
+const generateHash = async (algorithm: string, data: string): Promise<string> => {
+  const buffer = await crypto.subtle.digest(algorithm, new TextEncoder().encode(data));
+  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+};
+
+export default function HashGenerator() {
   const [input, setInput] = useState("");
   const [hashes, setHashes] = useState<Record<string, string>>({});
   const [compareHash, setCompareHash] = useState("");
-
-  const generateHash = async (algorithm: string, data: string): Promise<string> => {
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(data);
-    const hashBuffer = await crypto.subtle.digest(algorithm, dataBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-  };
-
-  const md5 = (str: string): string => {
-    // Simple MD5 implementation
-    const rotateLeft = (val: number, bits: number) => (val << bits) | (val >>> (32 - bits));
-    const addUnsigned = (x: number, y: number) => {
-      const result = (x & 0x7FFFFFFF) + (y & 0x7FFFFFFF);
-      if (x & 0x80000000) return y & 0x80000000 ? (result ^ 0x80000000) ^ 0x80000000 : result ^ 0x80000000;
-      return y & 0x80000000 ? result ^ 0x80000000 : result;
-    };
-
-    const msg = Array.from(new TextEncoder().encode(str));
-    const len = msg.length;
-    msg.push(0x80);
-    while (msg.length % 64 !== 56) msg.push(0);
-    const bits = len * 8;
-    msg.push(bits & 0xff, (bits >> 8) & 0xff, (bits >> 16) & 0xff, (bits >> 24) & 0xff, 0, 0, 0, 0);
-
-    let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
-    const S = [7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
-    const K = Array.from({length: 64}, (_, i) => Math.floor(Math.abs(Math.sin(i + 1)) * 0x100000000));
-
-    for (let i = 0; i < msg.length; i += 64) {
-      const M = Array.from({length: 16}, (_, j) => msg[i+j*4] | (msg[i+j*4+1] << 8) | (msg[i+j*4+2] << 16) | (msg[i+j*4+3] << 24));
-      let [A, B, C, D] = [a0, b0, c0, d0];
-      for (let j = 0; j < 64; j++) {
-        let F, g;
-        if (j < 16) { F = (B & C) | (~B & D); g = j; }
-        else if (j < 32) { F = (D & B) | (~D & C); g = (5*j+1) % 16; }
-        else if (j < 48) { F = B ^ C ^ D; g = (3*j+5) % 16; }
-        else { F = C ^ (B | ~D); g = (7*j) % 16; }
-        F = addUnsigned(addUnsigned(A, F), addUnsigned(K[j], M[g]));
-        A = D; D = C; C = B; B = addUnsigned(B, rotateLeft(F, S[j]));
-      }
-      a0 = addUnsigned(a0, A); b0 = addUnsigned(b0, B); c0 = addUnsigned(c0, C); d0 = addUnsigned(d0, D);
-    }
-    const toHex = (n: number) => Array.from({length: 4}, (_, i) => ((n >> (i*8)) & 0xff).toString(16).padStart(2, "0")).join("");
-    return toHex(a0) + toHex(b0) + toHex(c0) + toHex(d0);
-  };
+  const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState<{ text: string; time: string }[]>([]);
 
   const generateAll = async () => {
-    if (!input) {
-      toast({ title: "Error", description: "Please enter some text", variant: "destructive" });
-      return;
-    }
+    if (!input) { toast.error("Please enter some text"); return; }
+    setLoading(true);
     const results: Record<string, string> = {};
     results["MD5"] = md5(input);
     results["SHA-1"] = await generateHash("SHA-1", input);
@@ -71,75 +65,155 @@ const HashGenerator = () => {
     results["SHA-384"] = await generateHash("SHA-384", input);
     results["SHA-512"] = await generateHash("SHA-512", input);
     setHashes(results);
-    toast({ title: "Generated!", description: "All hashes generated successfully" });
+    setHistory(prev => [{ text: input.slice(0, 30), time: new Date().toLocaleTimeString() }, ...prev].slice(0, 10));
+    setLoading(false);
+    toast.success("All hashes generated!");
   };
 
   const copyHash = (algo: string) => {
     navigator.clipboard.writeText(hashes[algo]);
-    toast({ title: "Copied!", description: `${algo} hash copied` });
+    toast.success(`${algo} hash copied!`);
+  };
+
+  const exportHashes = () => {
+    const lines = [
+      `Hash Report`,
+      `Input: ${input}`,
+      `Generated: ${new Date().toISOString()}`,
+      ``,
+      ...Object.entries(hashes).map(([k, v]) => `${k}: ${v}`),
+      ``,
+      `Generated by Cyber Venom Tools`
+    ];
+    const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "hash-report.txt";
+    a.click();
+    toast.success("Report downloaded!");
   };
 
   const matchResult = compareHash && Object.values(hashes).length > 0
     ? Object.entries(hashes).find(([, v]) => v.toLowerCase() === compareHash.toLowerCase().trim())
     : null;
 
+  const inputStats = useMemo(() => ({
+    chars: input.length,
+    words: input.trim() ? input.trim().split(/\s+/).length : 0,
+    bytes: new TextEncoder().encode(input).length,
+  }), [input]);
+
+  const algoInfo: Record<string, { bits: number; security: string }> = {
+    "MD5": { bits: 128, security: "⚠️ Weak" },
+    "SHA-1": { bits: 160, security: "⚠️ Weak" },
+    "SHA-256": { bits: 256, security: "✅ Strong" },
+    "SHA-384": { bits: 384, security: "✅ Strong" },
+    "SHA-512": { bits: 512, security: "✅ Very Strong" },
+  };
+
   return (
-    <ToolLayout title="Hash Generator" description="Generate MD5, SHA-1, SHA-256, SHA-384, SHA-512 hashes">
-      <div className="space-y-6">
+    <ToolLayout title="Hash Generator" description="Generate MD5, SHA-1, SHA-256, SHA-384, SHA-512 hashes with comparison tool">
+      <div className="space-y-6 max-w-2xl mx-auto">
         <div className="space-y-2">
-          <label className="text-sm font-semibold">Input Text</label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-semibold">Input Text</label>
+            <span className="text-xs text-muted-foreground">{inputStats.chars} chars • {inputStats.words} words • {inputStats.bytes} bytes</span>
+          </div>
           <Textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="min-h-[120px] rounded-xl bg-card border-border/50 resize-none"
+            onChange={e => setInput(e.target.value)}
+            className="min-h-[120px] rounded-xl bg-card border-border/50 resize-none font-mono text-sm"
             placeholder="Enter text to hash..."
           />
         </div>
 
         <div className="flex gap-3">
-          <Button onClick={generateAll} className="gradient-bg text-primary-foreground rounded-xl font-semibold gap-2">
-            <Hash className="w-4 h-4" /> Generate Hashes
+          <Button onClick={generateAll} disabled={loading} className="gradient-bg text-primary-foreground rounded-xl font-semibold gap-2 flex-1">
+            <Hash className="w-4 h-4" /> {loading ? "Generating..." : "Generate All Hashes"}
           </Button>
           <Button onClick={() => { setInput(""); setHashes({}); setCompareHash(""); }} variant="outline" className="rounded-xl gap-2">
-            <RefreshCw className="w-4 h-4" /> Clear
+            <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
 
-        {Object.keys(hashes).length > 0 && (
-          <div className="space-y-3">
-            {Object.entries(hashes).map(([algo, hash]) => (
-              <div key={algo} className="bg-card rounded-xl border border-border/50 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold text-primary">{algo}</span>
-                  <Button variant="ghost" size="sm" onClick={() => copyHash(algo)} className="gap-1.5 h-7">
-                    <Copy className="w-3.5 h-3.5" /> Copy
-                  </Button>
-                </div>
-                <code className="text-xs text-muted-foreground break-all font-mono select-all">{hash}</code>
-              </div>
-            ))}
-          </div>
-        )}
+        <AnimatePresence>
+          {Object.keys(hashes).length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-3"
+            >
+              {Object.entries(hashes).map(([algo, hash], i) => (
+                <motion.div
+                  key={algo}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.08 }}
+                  className="bg-card rounded-xl border border-border/50 overflow-hidden group hover:border-primary/30 transition-colors"
+                >
+                  <div className="flex items-center justify-between px-4 py-2 bg-accent/30 border-b border-border/30">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-primary">{algo}</span>
+                      <span className="text-[10px] text-muted-foreground">{algoInfo[algo]?.bits}-bit</span>
+                      <span className="text-[10px]">{algoInfo[algo]?.security}</span>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => copyHash(algo)} className="gap-1 h-7 opacity-50 group-hover:opacity-100">
+                      <Copy className="w-3 h-3" /> Copy
+                    </Button>
+                  </div>
+                  <div className="px-4 py-3">
+                    <code className="text-xs text-muted-foreground break-all font-mono select-all leading-relaxed">{hash}</code>
+                  </div>
+                </motion.div>
+              ))}
 
+              <Button onClick={exportHashes} variant="outline" className="w-full rounded-xl gap-1.5">
+                <Download className="w-4 h-4" /> Export All Hashes
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Compare */}
         {Object.keys(hashes).length > 0 && (
-          <div className="space-y-2">
-            <label className="text-sm font-semibold">Compare Hash</label>
+          <div className="rounded-xl border border-border/50 bg-card p-4 space-y-3">
+            <h3 className="text-sm font-bold flex items-center gap-1.5">
+              <FileText className="w-4 h-4 text-primary" /> Compare Hash
+            </h3>
             <Input
               value={compareHash}
-              onChange={(e) => setCompareHash(e.target.value)}
-              className="rounded-xl bg-card border-border/50 font-mono text-sm"
+              onChange={e => setCompareHash(e.target.value)}
+              className="rounded-xl bg-background font-mono text-sm"
               placeholder="Paste a hash to compare..."
             />
             {compareHash && (
-              <p className={`text-sm font-medium ${matchResult ? "text-green-500" : "text-destructive"}`}>
-                {matchResult ? `✅ Match found: ${matchResult[0]}` : "❌ No match found"}
-              </p>
+              <div className={`flex items-center gap-2 text-sm font-medium ${matchResult ? "text-green-500" : "text-destructive"}`}>
+                {matchResult ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+                {matchResult ? `Match found: ${matchResult[0]}` : "No match found"}
+              </div>
             )}
+          </div>
+        )}
+
+        {/* History */}
+        {history.length > 0 && (
+          <div className="rounded-xl border border-border/30 bg-card overflow-hidden">
+            <div className="p-3 bg-accent/30 border-b border-border/30 flex items-center justify-between">
+              <span className="text-xs font-bold flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> History</span>
+              <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setHistory([])}>Clear</Button>
+            </div>
+            <div className="divide-y divide-border/20">
+              {history.map((h, i) => (
+                <button key={i} onClick={() => setInput(h.text)}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-xs hover:bg-accent/10 transition-colors">
+                  <span className="font-mono truncate flex-1 text-left">{h.text}...</span>
+                  <span className="text-muted-foreground/50">{h.time}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
     </ToolLayout>
   );
-};
-
-export default HashGenerator;
+}
