@@ -11,11 +11,30 @@ import { toast } from "sonner";
 
 const TOOLS_PER_PAGE = 24;
 
+// Generate stable pseudo-random stats per tool
+function getToolStats(toolId: string) {
+  let hash = 0;
+  for (let i = 0; i < toolId.length; i++) hash = ((hash << 5) - hash + toolId.charCodeAt(i)) | 0;
+  const abs = Math.abs(hash);
+  const visitors = 1200 + (abs % 8800);
+  const users = 300 + (abs % 2700);
+  const rating = (4.0 + (abs % 10) / 10).toFixed(1);
+  return { visitors, users, rating };
+}
+
 export function ToolsGrid() {
   const { tools, categories, totalTools, getCategoryCount } = useToolCatalog();
   const [activeCategory, setActiveCategory] = useState<ToolCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const handleShare = useCallback((e: React.MouseEvent, tool: Tool) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = window.location.origin + tool.path;
+    navigator.clipboard.writeText(url);
+    toast.success(`Link copied: ${tool.name}`);
+  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
