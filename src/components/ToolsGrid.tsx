@@ -191,7 +191,7 @@ export function ToolsGrid() {
                 >
                   <Link
                     to={tool.path}
-                    className="group animated-border relative block rounded-2xl overflow-hidden h-full transition-all duration-500 hover:-translate-y-3"
+                    className="group relative block rounded-2xl overflow-hidden h-full border border-border transition-all duration-500 hover:-translate-y-3"
                     style={{
                       boxShadow: `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}`,
                       '--tool-color': tool.color,
@@ -199,7 +199,7 @@ export function ToolsGrid() {
                     onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 25px 60px -12px ${tool.color.replace(')', ' / 0.25)')}, 0 8px 20px -8px ${tool.color.replace(')', ' / 0.15)')}`; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}`; }}
                   >
-                    <div className="absolute inset-0 rounded-2xl border border-border/60 group-hover:border-primary/40 transition-colors duration-500" />
+                    
                     <div className="absolute inset-[1.5px] rounded-2xl bg-card/98 backdrop-blur-md" />
 
                     {/* Continuous shine sweep animation */}
