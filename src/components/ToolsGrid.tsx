@@ -1,38 +1,20 @@
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Star, FileCode } from "lucide-react";
+import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { tools as staticTools, categories, type ToolCategory, type Tool } from "@/data/tools";
+import { type ToolCategory } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
 
 const TOOLS_PER_PAGE = 24;
 
 export function ToolsGrid() {
+  const { tools, categories, totalTools, getCategoryCount } = useToolCatalog();
   const [activeCategory, setActiveCategory] = useState<ToolCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [customTools, setCustomTools] = useState<Tool[]>([]);
-
-  useEffect(() => {
-    supabase.from("custom_tools").select("*").eq("is_enabled", true).then(({ data }) => {
-      if (data) {
-        setCustomTools(data.map((t: any) => ({
-          id: `custom-${t.slug}`,
-          name: t.name,
-          description: t.description || "Custom tool",
-          icon: FileCode,
-          category: (t.category || "utility") as ToolCategory,
-          path: `/tools/custom/${t.slug}`,
-          color: t.color || "hsl(263, 85%, 58%)",
-        })));
-      }
-    });
-  }, []);
-
-  const tools = useMemo(() => [...staticTools, ...customTools], [customTools]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -51,7 +33,7 @@ export function ToolsGrid() {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
-  }), [activeCategory, searchQuery]);
+  }), [activeCategory, searchQuery, tools]);
 
   const totalPages = Math.ceil(filteredTools.length / TOOLS_PER_PAGE);
   const paginatedTools = filteredTools.slice((currentPage - 1) * TOOLS_PER_PAGE, currentPage * TOOLS_PER_PAGE);
@@ -121,7 +103,7 @@ export function ToolsGrid() {
             <div className="relative">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/60 group-focus-within:text-primary transition-colors" />
               <Input
-                placeholder="Search from 200+ tools..."
+                placeholder={`Search from ${totalTools} tools...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-13 pr-20 py-7 rounded-2xl bg-card/80 backdrop-blur-sm border-border/40 text-base focus:border-primary/40 transition-all shadow-sm focus:shadow-[0_0_30px_-8px_hsl(263_85%_58%/0.15)]"
@@ -145,7 +127,7 @@ export function ToolsGrid() {
           className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2 mb-16"
         >
           {categories.map((cat) => {
-            const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
+            const count = getCategoryCount(cat.id);
             const isActive = activeCategory === cat.id;
             return (
               <motion.button

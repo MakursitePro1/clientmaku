@@ -3,35 +3,38 @@ import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, ArrowRight, ChevronDown, X, Sparkles, Wrench, Zap, TrendingUp, Star, Grid3X3 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { tools, categories, type ToolCategory } from "@/data/tools";
+import { type ToolCategory } from "@/data/tools";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToolsBanner } from "@/components/ToolsBanner";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { cn } from "@/lib/utils";
 
-const stats = [
-  { label: "Total Tools", value: `${tools.length}+`, icon: Wrench, color: "hsl(262, 83%, 58%)" },
-  { label: "Categories", value: `${categories.length - 1}`, icon: Grid3X3, color: "hsl(142, 71%, 45%)" },
-  { label: "Always Free", value: "100%", icon: Star, color: "hsl(45, 93%, 47%)" },
-  { label: "Updated Daily", value: "24/7", icon: TrendingUp, color: "hsl(199, 89%, 48%)" },
-];
 
 export default function ToolsPage() {
+  const { tools, categories, totalTools, totalCategories, getCategoryCount } = useToolCatalog();
   const [searchParams] = useSearchParams();
   const initialCategory = (searchParams.get("category") as ToolCategory) || "all";
   const [activeCategory, setActiveCategory] = useState<ToolCategory>(initialCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const stats = [
+    { label: "Total Tools", value: `${totalTools}`, icon: Wrench, color: "hsl(262, 83%, 58%)" },
+    { label: "Categories", value: `${totalCategories}`, icon: Grid3X3, color: "hsl(142, 71%, 45%)" },
+    { label: "Always Free", value: "100%", icon: Star, color: "hsl(45, 93%, 47%)" },
+    { label: "Updated Daily", value: "24/7", icon: TrendingUp, color: "hsl(199, 89%, 48%)" },
+  ];
+
   const filteredTools = useMemo(() => tools.filter((tool) => {
     const matchesCategory = activeCategory === "all" || tool.category === activeCategory;
     const q = searchQuery.toLowerCase();
     const matchesSearch = tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q);
     return matchesCategory && matchesSearch;
-  }), [activeCategory, searchQuery]);
+  }), [activeCategory, searchQuery, tools]);
 
   const activeLabel = categories.find(c => c.id === activeCategory)?.label || "All Tools";
   const ActiveIcon = categories.find(c => c.id === activeCategory)?.icon;
@@ -50,7 +53,7 @@ export default function ToolsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="All Tools — Cyber Venom" description="Browse all 200+ free online tools. Filter by category, search instantly." path="/tools" />
+      <SEOHead title="All Tools — Cyber Venom" description={`Browse all ${totalTools} free online tools across ${totalCategories} categories. Filter by category and search instantly.`} path="/tools" />
       <Navbar />
 
       {/* ===== PREMIUM HERO ===== */}
@@ -91,7 +94,7 @@ export default function ToolsPage() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_3s_ease-in-out_infinite]" />
               <Sparkles className="w-4 h-4 text-primary relative z-10" />
-              <span className="text-sm font-bold gradient-text relative z-10">{tools.length}+ Free Tools Available</span>
+              <span className="text-sm font-bold gradient-text relative z-10">{totalTools} Free Tools Available</span>
             </motion.div>
 
             {/* Heading */}
@@ -221,7 +224,7 @@ export default function ToolsPage() {
                         className="absolute top-full mt-2 left-0 right-0 sm:left-auto sm:right-0 sm:w-80 rounded-2xl bg-card border-2 border-primary/20 shadow-2xl z-50 p-2 max-h-[60vh] overflow-y-auto"
                       >
                         {categories.map(cat => {
-                          const count = cat.id === "all" ? tools.length : tools.filter(t => t.category === cat.id).length;
+                          const count = getCategoryCount(cat.id);
                           const isActive = activeCategory === cat.id;
                           return (
                             <button

@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { ToolCatalogProvider } from "@/contexts/ToolCatalogContext";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -90,13 +91,14 @@ const Loading = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-    <FavoritesProvider>
-    <SiteSettingsProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={<Loading />}>
+      <FavoritesProvider>
+        <SiteSettingsProvider>
+          <ToolCatalogProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tools" element={<Suspense fallback={<Loading />}><ToolsPage /></Suspense>} />
@@ -167,12 +169,13 @@ const App = () => (
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
-    </SiteSettingsProvider>
-    </FavoritesProvider>
+                  </Routes>
+                </Suspense>
+              </BrowserRouter>
+            </TooltipProvider>
+          </ToolCatalogProvider>
+        </SiteSettingsProvider>
+      </FavoritesProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
