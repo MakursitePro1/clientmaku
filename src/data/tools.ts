@@ -1,6 +1,6 @@
 import {
   Wifi, Calculator, Lock, QrCode, ScanLine, Gauge, Sparkles,
-  MapPin, MessageCircle, BarChart3
+  MapPin, MessageCircle, BarChart3, ScanBarcode, Link, Phone, Mail, Type
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -31,4 +31,9 @@ export const tools: Tool[] = [
   { id: "ip-address-lookup", name: "IP Address Lookup", description: "Find geolocation and details of any IP address", icon: MapPin, category: "utility", path: "/tools/ip-address-lookup", color: "hsl(199, 89%, 48%)" },
   { id: "whatsapp-link-generator", name: "WhatsApp Link Generator", description: "Create direct WhatsApp chat links", icon: MessageCircle, category: "utility", path: "/tools/whatsapp-link-generator", color: "hsl(142, 71%, 45%)" },
   { id: "barcode-generator", name: "Barcode Generator", description: "Generate barcodes from text", icon: BarChart3, category: "utility", path: "/tools/barcode-generator", color: "hsl(220, 90%, 56%)" },
+  { id: "barcode-scanner", name: "Barcode Scanner", description: "Scan barcodes from uploaded images", icon: ScanBarcode, category: "utility", path: "/tools/barcode-scanner", color: "hsl(30, 80%, 50%)" },
+  { id: "url-shortener", name: "URL Shortener", description: "Shorten long URLs for easy sharing", icon: Link, category: "utility", path: "/tools/url-shortener", color: "hsl(200, 85%, 50%)" },
+  { id: "temp-number", name: "Temp Number", description: "Get temporary phone numbers instantly", icon: Phone, category: "utility", path: "/tools/temp-number", color: "hsl(150, 70%, 45%)" },
+  { id: "temp-mail", name: "Temp Mail", description: "Get a disposable temporary email address", icon: Mail, category: "utility", path: "/tools/temp-mail", color: "hsl(0, 75%, 55%)" },
+  { id: "case-converter", name: "Text Case Converter", description: "Convert text between different cases", icon: Type, category: "utility", path: "/tools/case-converter", color: "hsl(270, 70%, 55%)" },
 ];
