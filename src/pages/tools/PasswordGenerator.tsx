@@ -154,9 +154,9 @@ export default function PasswordGenerator() {
           </div>
         </div>
 
-        <Button onClick={generate} className="w-full gradient-bg text-primary-foreground rounded-xl font-bold" size="lg">
-          <RefreshCw className="w-4 h-4 mr-2" /> Generate Password{quantity > 1 ? "s" : ""}
-        </Button>
+        <button onClick={generate} className="tool-btn-primary w-full py-3.5 px-6 text-base flex items-center justify-center gap-2">
+          <RefreshCw className="w-5 h-5" /> Generate Password{quantity > 1 ? "s" : ""}
+        </button>
 
         {/* Result */}
         {password && (
