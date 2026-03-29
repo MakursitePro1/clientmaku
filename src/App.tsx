@@ -106,6 +106,12 @@ const App = () => (
             <Route path="/tools/random-name-generator" element={<RandomNameGenerator />} />
             <Route path="/tools/random-address-generator" element={<RandomAddressGenerator />} />
             <Route path="/tools/hash-generator" element={<HashGenerator />} />
+            <Route path="/tools/hash-decoder" element={<HashDecoder />} />
+            <Route path="/tools/encryption-tool" element={<EncryptionTool />} />
+            <Route path="/tools/whois-lookup" element={<WhoisLookup />} />
+            <Route path="/tools/typing-test" element={<TypingTest />} />
+            <Route path="/tools/student-id-card" element={<StudentIdCard />} />
+            <Route path="/tools/facebook-id-card" element={<FacebookIdCard />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
