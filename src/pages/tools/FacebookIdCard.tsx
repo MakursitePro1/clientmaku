@@ -1,20 +1,47 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Download, Eye, Upload } from "lucide-react";
+import { Download, Eye, Upload, User, Settings, Heart, MessageCircle, Share2, ThumbsUp, RotateCcw, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+
+const cardStyles = [
+  { id: "classic", name: "Classic Blue", headerBg: "#1877f2", headerBg2: "#42a5f5", textColor: "#fff" },
+  { id: "dark", name: "Dark Mode", headerBg: "#242526", headerBg2: "#3a3b3c", textColor: "#e4e6eb" },
+  { id: "gradient", name: "Gradient Purple", headerBg: "#833ab4", headerBg2: "#fd1d1d", textColor: "#fff" },
+  { id: "green", name: "Green Nature", headerBg: "#1b5e20", headerBg2: "#43a047", textColor: "#fff" },
+  { id: "gold", name: "Gold Premium", headerBg: "#5d4037", headerBg2: "#d4a574", textColor: "#fff8e1" },
+];
+
+function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number | number[]) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+}
 
 export default function FacebookIdCard() {
   const [name, setName] = useState("John Doe");
   const [username, setUsername] = useState("johndoe");
-  const [bio, setBio] = useState("Web Developer | Tech Enthusiast");
+  const [bio, setBio] = useState("Web Developer | Tech Enthusiast | Coffee Lover ☕");
   const [friends, setFriends] = useState("1,234");
-  const [followers, setFollowers] = useState("567");
-  const [location, setLocation] = useState("New York, USA");
+  const [followers, setFollowers] = useState("5,678");
+  const [following, setFollowing] = useState("234");
+  const [locationVal, setLocationVal] = useState("New York, USA");
   const [workplace, setWorkplace] = useState("Tech Company Inc.");
+  const [education, setEducation] = useState("MIT - Computer Science");
   const [joined, setJoined] = useState("January 2015");
+  const [relationship, setRelationship] = useState("Single");
+  const [website, setWebsite] = useState("johndoe.com");
+  const [likes, setLikes] = useState("12,345");
+  const [posts, setPosts] = useState("456");
+  const [verified, setVerified] = useState(true);
+  const [showReactions, setShowReactions] = useState(true);
+  const [cardStyle, setCardStyle] = useState("classic");
   const [profilePhoto, setProfilePhoto] = useState("");
   const [coverPhoto, setCoverPhoto] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,7 +55,6 @@ export default function FacebookIdCard() {
     reader.onload = () => setProfilePhoto(reader.result as string);
     reader.readAsDataURL(file);
   };
-
   const handleCoverPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -37,217 +63,382 @@ export default function FacebookIdCard() {
     reader.readAsDataURL(file);
   };
 
-  const generate = () => {
+  const generate = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const w = 600, h = 400;
+    const w = 650, h = 520;
     canvas.width = w;
     canvas.height = h;
+    const style = cardStyles.find(s => s.id === cardStyle) || cardStyles[0];
+    const isDark = cardStyle === "dark";
 
-    // Card background
-    ctx.fillStyle = "#ffffff";
-    ctx.roundRect(0, 0, w, h, 16);
+    // Card shadow
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 25;
+    ctx.shadowOffsetY = 10;
+
+    // Main card bg
+    ctx.fillStyle = isDark ? "#18191a" : "#ffffff";
+    drawRoundRect(ctx, 0, 0, w, h, 16);
     ctx.fill();
 
-    // Cover photo area
-    if (coverPhoto) {
-      const img = new Image();
-      img.onload = () => { ctx.drawImage(img, 0, 0, w, 150); drawRest(); };
-      img.src = coverPhoto;
-    } else {
-      const grad = ctx.createLinearGradient(0, 0, w, 150);
-      grad.addColorStop(0, "#1877f2");
-      grad.addColorStop(1, "#42a5f5");
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.roundRect(0, 0, w, 150, [16, 16, 0, 0]);
-      ctx.fill();
-    }
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
 
-    drawRest();
-
-    function drawRest() {
+    const drawAll = () => {
       if (!ctx) return;
-      // Facebook header
-      ctx.fillStyle = "rgba(24, 119, 242, 0.9)";
-      ctx.fillRect(0, 0, w, 40);
-      ctx.fillStyle = "#fff";
-      ctx.font = "bold 20px 'Segoe UI', sans-serif";
-      ctx.textAlign = "left";
-      ctx.fillText("facebook", 15, 28);
-      ctx.font = "11px sans-serif";
-      ctx.textAlign = "right";
-      ctx.fillText("ID Card", w - 15, 26);
 
-      // Profile photo circle
-      const cx = 80, cy = 155, r = 45;
-      ctx.save();
+      // Cover area (if no image)
+      if (!coverPhoto) {
+        const cGrad = ctx.createLinearGradient(0, 0, w, 170);
+        cGrad.addColorStop(0, style.headerBg);
+        cGrad.addColorStop(1, style.headerBg2);
+        ctx.fillStyle = cGrad;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, w, 170, [16, 16, 0, 0]);
+        ctx.fill();
+        // Cover pattern
+        ctx.save();
+        ctx.globalAlpha = 0.08;
+        for (let i = 0; i < 15; i++) {
+          ctx.beginPath();
+          ctx.arc(Math.random() * w, Math.random() * 170, Math.random() * 50 + 10, 0, Math.PI * 2);
+          ctx.fillStyle = "#fff";
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Facebook logo bar
+      ctx.fillStyle = "rgba(24, 119, 242, 0.95)";
+      ctx.fillRect(0, 0, w, 42);
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 22px 'Segoe UI', sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("facebook", 16, 30);
+      // ID card badge
+      ctx.fillStyle = "rgba(255,255,255,0.2)";
+      drawRoundRect(ctx, w - 90, 8, 75, 26, 13);
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 10px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("ID CARD", w - 52, 26);
+
+      // Profile photo - white ring
+      const cx = 85, cy = 175, r = 52;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 5, 0, Math.PI * 2);
+      ctx.fillStyle = isDark ? "#242526" : "#fff";
+      ctx.fill();
       ctx.beginPath();
       ctx.arc(cx, cy, r + 3, 0, Math.PI * 2);
-      ctx.fillStyle = "#fff";
-      ctx.fill();
+      ctx.strokeStyle = style.headerBg;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Profile photo circle clip
+      ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
       ctx.clip();
-      
       if (profilePhoto) {
-        const img = new Image();
-        img.onload = () => {
-          ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2);
-          ctx.restore();
-          drawInfo();
-        };
-        img.src = profilePhoto;
+        // drawn externally
       } else {
-        ctx.fillStyle = "#e4e6eb";
+        ctx.fillStyle = isDark ? "#3a3b3c" : "#e4e6eb";
         ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
-        ctx.fillStyle = "#999";
-        ctx.font = "11px sans-serif";
+        ctx.fillStyle = isDark ? "#b0b3b8" : "#999";
+        ctx.font = "36px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("Photo", cx, cy + 4);
-        ctx.restore();
-        drawInfo();
+        ctx.fillText("👤", cx, cy + 12);
       }
+      ctx.restore();
 
-      function drawInfo() {
-        if (!ctx) return;
-        ctx.textAlign = "left";
-        
-        // Name & username
-        ctx.fillStyle = "#050505";
-        ctx.font = "bold 22px 'Segoe UI', sans-serif";
-        ctx.fillText(name, 140, 165);
-        ctx.fillStyle = "#65676b";
-        ctx.font = "13px sans-serif";
-        ctx.fillText(`@${username}`, 140, 185);
+      // Active dot
+      ctx.beginPath();
+      ctx.arc(cx + r - 5, cy + r - 8, 8, 0, Math.PI * 2);
+      ctx.fillStyle = isDark ? "#242526" : "#fff";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + r - 5, cy + r - 8, 6, 0, Math.PI * 2);
+      ctx.fillStyle = "#31a24c";
+      ctx.fill();
 
-        // Bio
-        ctx.fillStyle = "#333";
-        ctx.font = "12px sans-serif";
-        ctx.fillText(bio, 140, 208);
+      // Name + verification
+      ctx.textAlign = "left";
+      ctx.fillStyle = isDark ? "#e4e6eb" : "#050505";
+      ctx.font = "bold 24px 'Segoe UI', sans-serif";
+      const nameX = 155;
+      ctx.fillText(name, nameX, 180);
 
-        // Stats row
-        const statsY = 235;
-        ctx.fillStyle = "#f0f2f5";
-        ctx.fillRect(15, statsY - 5, w - 30, 35);
-        
-        const stats = [
-          { label: "Friends", val: friends },
-          { label: "Followers", val: followers },
-          { label: "Joined", val: joined },
-        ];
-        const sWidth = (w - 30) / stats.length;
-        stats.forEach((s, i) => {
-          const sx = 15 + sWidth * i + sWidth / 2;
-          ctx.fillStyle = "#1877f2";
-          ctx.font = "bold 14px sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText(s.val, sx, statsY + 10);
-          ctx.fillStyle = "#65676b";
-          ctx.font = "10px sans-serif";
-          ctx.fillText(s.label, sx, statsY + 23);
-        });
-
-        // Details
-        const detailY = 285;
-        ctx.textAlign = "left";
-        const details = [
-          { icon: "📍", label: "Location", val: location },
-          { icon: "💼", label: "Works at", val: workplace },
-        ];
-        details.forEach((d, i) => {
-          const dy = detailY + i * 28;
-          ctx.font = "13px sans-serif";
-          ctx.fillText(d.icon, 25, dy);
-          ctx.fillStyle = "#65676b";
-          ctx.font = "11px sans-serif";
-          ctx.fillText(d.label + ":", 45, dy - 2);
-          ctx.fillStyle = "#050505";
-          ctx.font = "12px sans-serif";
-          ctx.fillText(d.val, 45, dy + 13);
-        });
-
-        // Verification badge area
+      if (verified) {
+        const nameW = ctx.measureText(name).width;
         ctx.fillStyle = "#1877f2";
         ctx.beginPath();
-        ctx.arc(140 + ctx.measureText(name).width + 15, 157, 8, 0, Math.PI * 2);
+        ctx.arc(nameX + nameW + 14, 174, 10, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = "#fff";
-        ctx.font = "bold 10px sans-serif";
+        ctx.font = "bold 12px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("✓", 140 + ctx.measureText(name).width + 15, 161);
-
-        // Footer
-        ctx.fillStyle = "#f0f2f5";
-        ctx.beginPath();
-        ctx.roundRect(0, h - 45, w, 45, [0, 0, 16, 16]);
-        ctx.fill();
-        ctx.fillStyle = "#65676b";
-        ctx.font = "9px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("Facebook ID Card — Generated by Cyber Venom Tools", w / 2, h - 24);
-        ctx.fillText("This is a novelty card for entertainment purposes only", w / 2, h - 12);
+        ctx.fillText("✓", nameX + nameW + 14, 178);
       }
-    }
-  };
 
-  const download = () => {
+      ctx.textAlign = "left";
+      ctx.fillStyle = isDark ? "#b0b3b8" : "#65676b";
+      ctx.font = "13px sans-serif";
+      ctx.fillText(`@${username}`, nameX, 200);
+
+      // Bio
+      ctx.fillStyle = isDark ? "#e4e6eb" : "#333";
+      ctx.font = "12px sans-serif";
+      const bioLines = bio.length > 50 ? [bio.slice(0, 50), bio.slice(50, 100)] : [bio];
+      bioLines.forEach((line, i) => ctx.fillText(line, nameX, 220 + i * 16));
+
+      // Stats row
+      const statsY = 250;
+      ctx.fillStyle = isDark ? "#242526" : "#f0f2f5";
+      drawRoundRect(ctx, 15, statsY, w - 30, 42, 8);
+      ctx.fill();
+
+      const stats = [
+        { label: "Friends", val: friends },
+        { label: "Followers", val: followers },
+        { label: "Following", val: following },
+        { label: "Posts", val: posts },
+        { label: "Likes", val: likes },
+      ];
+      const sWidth = (w - 30) / stats.length;
+      stats.forEach((s, i) => {
+        const sx = 15 + sWidth * i + sWidth / 2;
+        ctx.fillStyle = "#1877f2";
+        ctx.font = "bold 14px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(s.val, sx, statsY + 18);
+        ctx.fillStyle = isDark ? "#b0b3b8" : "#65676b";
+        ctx.font = "9px sans-serif";
+        ctx.fillText(s.label, sx, statsY + 32);
+      });
+
+      // Details section
+      const detailY = 310;
+      ctx.textAlign = "left";
+      const details = [
+        { icon: "📍", label: "Lives in", val: locationVal },
+        { icon: "💼", label: "Works at", val: workplace },
+        { icon: "🎓", label: "Studied at", val: education },
+        { icon: "❤️", label: "Relationship", val: relationship },
+        { icon: "🌐", label: "Website", val: website },
+        { icon: "📅", label: "Joined", val: joined },
+      ];
+      details.forEach((d, i) => {
+        const dy = detailY + i * 26;
+        ctx.font = "14px sans-serif";
+        ctx.fillText(d.icon, 25, dy);
+        ctx.fillStyle = isDark ? "#b0b3b8" : "#65676b";
+        ctx.font = "10px sans-serif";
+        ctx.fillText(d.label, 48, dy - 3);
+        ctx.fillStyle = isDark ? "#e4e6eb" : "#050505";
+        ctx.font = "bold 11px sans-serif";
+        ctx.fillText(d.val, 48 + ctx.measureText(d.label).width + 8, dy - 3);
+      });
+
+      // Reactions row
+      if (showReactions) {
+        const ry = 475;
+        ctx.fillStyle = isDark ? "#242526" : "#f0f2f5";
+        drawRoundRect(ctx, 15, ry - 8, w - 30, 30, 6);
+        ctx.fill();
+        const reactions = ["👍", "❤️", "😂", "😮", "😢", "😡"];
+        reactions.forEach((r, i) => {
+          ctx.font = "16px sans-serif";
+          ctx.fillText(r, 30 + i * 35, ry + 12);
+        });
+        ctx.fillStyle = isDark ? "#b0b3b8" : "#65676b";
+        ctx.font = "11px sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(`${likes} reactions`, w - 25, ry + 12);
+      }
+
+      // Footer
+      ctx.fillStyle = isDark ? "#242526" : "#f0f2f5";
+      ctx.beginPath();
+      ctx.roundRect(0, h - 38, w, 38, [0, 0, 16, 16]);
+      ctx.fill();
+      ctx.fillStyle = isDark ? "#b0b3b8" : "#65676b";
+      ctx.font = "8px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Facebook ID Card — Generated by Cyber Venom Tools — For Entertainment Purposes Only", w / 2, h - 18);
+    };
+
+    // Load images then draw
+    let profileImgLoaded = !profilePhoto;
+    let coverImgLoaded = !coverPhoto;
+
+    const tryDraw = () => {
+      if (profileImgLoaded && coverImgLoaded) drawAll();
+    };
+
+    if (coverPhoto) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(0, 0, w, 170, [16, 16, 0, 0]);
+        ctx.clip();
+        const aspect = img.width / img.height;
+        let dw = w, dh = 170;
+        if (aspect > w / 170) { dh = 170; dw = 170 * aspect; }
+        else { dw = w; dh = w / aspect; }
+        ctx.drawImage(img, (w - dw) / 2, (170 - dh) / 2, dw, dh);
+        ctx.restore();
+        coverImgLoaded = true;
+        tryDraw();
+      };
+      img.src = coverPhoto;
+    }
+
+    if (profilePhoto) {
+      const img = new Image();
+      img.onload = () => {
+        profileImgLoaded = true;
+        tryDraw();
+        // Draw profile after all
+        const cx2 = 85, cy2 = 175, r2 = 52;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx2, cy2, r2, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, cx2 - r2, cy2 - r2, r2 * 2, r2 * 2);
+        ctx.restore();
+      };
+      img.src = profilePhoto;
+    }
+
+    if (!profilePhoto && !coverPhoto) drawAll();
+  }, [name, username, bio, friends, followers, following, locationVal, workplace, education, joined, relationship, website, likes, posts, verified, showReactions, cardStyle, profilePhoto, coverPhoto]);
+
+  const downloadCard = () => {
     generate();
     setTimeout(() => {
       const a = document.createElement("a");
       a.download = `facebook-id-${username}.png`;
       a.href = canvasRef.current?.toDataURL("image/png") || "";
       a.click();
-      toast.success("Downloaded!");
-    }, 300);
+      toast.success("Facebook ID Card downloaded!");
+    }, 400);
+  };
+
+  const resetAll = () => {
+    setName("John Doe"); setUsername("johndoe"); setBio("Web Developer | Tech Enthusiast | Coffee Lover ☕");
+    setFriends("1,234"); setFollowers("5,678"); setFollowing("234"); setLocationVal("New York, USA");
+    setWorkplace("Tech Company Inc."); setEducation("MIT - Computer Science"); setJoined("January 2015");
+    setRelationship("Single"); setWebsite("johndoe.com"); setLikes("12,345"); setPosts("456");
+    setVerified(true); setProfilePhoto(""); setCoverPhoto(""); setCardStyle("classic");
+    toast.info("Form reset!");
   };
 
   return (
-    <ToolLayout title="Facebook ID Card Maker" description="Create stunning Facebook-style ID cards with photo upload">
-      <div className="space-y-5 max-w-2xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <Input value={name} onChange={e => setName(e.target.value)} placeholder="Full Name" className="rounded-xl" />
-            <Input value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" className="rounded-xl" />
-            <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Bio" className="rounded-xl resize-none" rows={2} />
-            <Input value={location} onChange={e => setLocation(e.target.value)} placeholder="Location" className="rounded-xl" />
-          </div>
-          <div className="space-y-3">
-            <Input value={workplace} onChange={e => setWorkplace(e.target.value)} placeholder="Workplace" className="rounded-xl" />
-            <div className="grid grid-cols-2 gap-2">
-              <Input value={friends} onChange={e => setFriends(e.target.value)} placeholder="Friends" className="rounded-xl" />
-              <Input value={followers} onChange={e => setFollowers(e.target.value)} placeholder="Followers" className="rounded-xl" />
+    <ToolLayout title="Facebook ID Card Maker" description="Create stunning Facebook-style ID cards with full customization, themes & reactions">
+      <div className="space-y-6 max-w-3xl mx-auto">
+
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 rounded-xl">
+            <TabsTrigger value="profile" className="gap-1.5 text-xs"><User className="w-3.5 h-3.5" /> Profile</TabsTrigger>
+            <TabsTrigger value="details" className="gap-1.5 text-xs"><Heart className="w-3.5 h-3.5" /> Details</TabsTrigger>
+            <TabsTrigger value="design" className="gap-1.5 text-xs"><Settings className="w-3.5 h-3.5" /> Design</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="profile" className="space-y-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Full Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Username</Label><Input value={username} onChange={e => setUsername(e.target.value)} className="rounded-xl" /></div>
+              <div className="sm:col-span-2 space-y-1.5"><Label className="text-xs text-muted-foreground">Bio</Label><Textarea value={bio} onChange={e => setBio(e.target.value)} className="rounded-xl resize-none" rows={2} /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={locationVal} onChange={e => setLocationVal(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Workplace</Label><Input value={workplace} onChange={e => setWorkplace(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Education</Label><Input value={education} onChange={e => setEducation(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Joined</Label><Input value={joined} onChange={e => setJoined(e.target.value)} className="rounded-xl" /></div>
             </div>
-            <Input value={joined} onChange={e => setJoined(e.target.value)} placeholder="Joined Date" className="rounded-xl" />
-          </div>
-        </div>
+          </TabsContent>
 
-        {/* Photo uploads */}
+          <TabsContent value="details" className="space-y-4 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Friends</Label><Input value={friends} onChange={e => setFriends(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Followers</Label><Input value={followers} onChange={e => setFollowers(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Following</Label><Input value={following} onChange={e => setFollowing(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Posts</Label><Input value={posts} onChange={e => setPosts(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Total Likes</Label><Input value={likes} onChange={e => setLikes(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Relationship</Label>
+                <Select value={relationship} onValueChange={setRelationship}>
+                  <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {["Single", "In a Relationship", "Engaged", "Married", "Complicated", "Not Specified"].map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="col-span-2 sm:col-span-3 space-y-1.5"><Label className="text-xs text-muted-foreground">Website</Label><Input value={website} onChange={e => setWebsite(e.target.value)} className="rounded-xl" /></div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="design" className="space-y-4 mt-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Card Style</Label>
+              <Select value={cardStyle} onValueChange={setCardStyle}>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>{cardStyles.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            {/* Style preview */}
+            <div className="flex gap-2 flex-wrap">
+              {cardStyles.map(s => (
+                <button key={s.id} onClick={() => setCardStyle(s.id)}
+                  className={`w-8 h-8 rounded-full border-2 transition-all ${cardStyle === s.id ? "ring-2 ring-primary scale-110" : "opacity-70 hover:opacity-100"}`}
+                  style={{ background: `linear-gradient(135deg, ${s.headerBg}, ${s.headerBg2})` }} />
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <input ref={profileRef} type="file" accept="image/*" className="hidden" onChange={handleProfilePhoto} />
+              <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
+              <Button variant="outline" className="rounded-xl gap-1.5" onClick={() => profileRef.current?.click()}>
+                <Upload className="w-4 h-4" /> {profilePhoto ? "Change Profile" : "Profile Photo"}
+              </Button>
+              <Button variant="outline" className="rounded-xl gap-1.5" onClick={() => coverRef.current?.click()}>
+                <Upload className="w-4 h-4" /> {coverPhoto ? "Change Cover" : "Cover Photo"}
+              </Button>
+              {profilePhoto && <img src={profilePhoto} alt="" className="w-10 h-10 rounded-full object-cover border" />}
+              {coverPhoto && <img src={coverPhoto} alt="" className="w-16 h-10 rounded-lg object-cover border" />}
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2"><Switch checked={verified} onCheckedChange={setVerified} /><Label className="text-xs">Verified Badge</Label></div>
+              <div className="flex items-center gap-2"><Switch checked={showReactions} onCheckedChange={setShowReactions} /><Label className="text-xs">Reactions Bar</Label></div>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Actions */}
         <div className="flex flex-wrap gap-3">
-          <input ref={profileRef} type="file" accept="image/*" className="hidden" onChange={handleProfilePhoto} />
-          <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
-          <Button variant="outline" className="rounded-xl gap-1.5" onClick={() => profileRef.current?.click()}>
-            <Upload className="w-4 h-4" /> {profilePhoto ? "Change Profile" : "Profile Photo"}
+          <Button onClick={generate} className="gradient-bg text-primary-foreground rounded-xl font-semibold gap-1.5">
+            <Eye className="w-4 h-4" /> Preview Card
           </Button>
-          <Button variant="outline" className="rounded-xl gap-1.5" onClick={() => coverRef.current?.click()}>
-            <Upload className="w-4 h-4" /> {coverPhoto ? "Change Cover" : "Cover Photo"}
+          <Button onClick={downloadCard} variant="outline" className="rounded-xl gap-1.5">
+            <Download className="w-4 h-4" /> Download PNG
           </Button>
-          {profilePhoto && <img src={profilePhoto} alt="Profile" className="w-10 h-10 rounded-full object-cover border" />}
-          {coverPhoto && <img src={coverPhoto} alt="Cover" className="w-16 h-10 rounded-lg object-cover border" />}
+          <Button onClick={resetAll} variant="ghost" className="rounded-xl gap-1.5 text-muted-foreground">
+            <RotateCcw className="w-4 h-4" /> Reset
+          </Button>
         </div>
 
-        <div className="flex gap-3">
-          <Button onClick={generate} className="gradient-bg text-primary-foreground rounded-xl font-semibold gap-1.5">
-            <Eye className="w-4 h-4" /> Preview
-          </Button>
-          <Button onClick={download} variant="outline" className="rounded-xl gap-1.5">
-            <Download className="w-4 h-4" /> Download
-          </Button>
-        </div>
-        
-        <canvas ref={canvasRef} className="w-full rounded-2xl border border-border shadow-lg" />
+        {/* Canvas */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative">
+          <canvas ref={canvasRef} className="w-full rounded-2xl border border-border shadow-lg bg-accent/10" />
+          {!canvasRef.current?.width && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2 py-20">
+              <Sparkles className="w-8 h-8 opacity-30" />
+              <p className="text-sm">Click "Preview Card" to generate</p>
+            </div>
+          )}
+        </motion.div>
       </div>
     </ToolLayout>
   );
