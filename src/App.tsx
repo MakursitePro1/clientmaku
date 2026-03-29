@@ -46,6 +46,11 @@ const UrlShortener = lazy(() => import("./pages/tools/UrlShortener"));
 const TempNumber = lazy(() => import("./pages/tools/TempNumber"));
 const TempMail = lazy(() => import("./pages/tools/TempMail"));
 const CaseConverter = lazy(() => import("./pages/tools/CaseConverter"));
+const BinChecker = lazy(() => import("./pages/tools/BinChecker"));
+const IPBlacklistChecker = lazy(() => import("./pages/tools/IPBlacklistChecker"));
+const RandomNameGenerator = lazy(() => import("./pages/tools/RandomNameGenerator"));
+const RandomAddressGenerator = lazy(() => import("./pages/tools/RandomAddressGenerator"));
+const HashGenerator = lazy(() => import("./pages/tools/HashGenerator"));
 
 const queryClient = new QueryClient();
 
@@ -90,6 +95,11 @@ const App = () => (
             <Route path="/tools/temp-number" element={<TempNumber />} />
             <Route path="/tools/temp-mail" element={<TempMail />} />
             <Route path="/tools/case-converter" element={<CaseConverter />} />
+            <Route path="/tools/bin-checker" element={<BinChecker />} />
+            <Route path="/tools/ip-blacklist-checker" element={<IPBlacklistChecker />} />
+            <Route path="/tools/random-name-generator" element={<RandomNameGenerator />} />
+            <Route path="/tools/random-address-generator" element={<RandomAddressGenerator />} />
+            <Route path="/tools/hash-generator" element={<HashGenerator />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />

@@ -1,6 +1,7 @@
 import {
   Wifi, Calculator, Lock, QrCode, ScanLine, Gauge, Sparkles,
-  MapPin, MessageCircle, BarChart3, ScanBarcode, Link, Phone, Mail, Type
+  MapPin, MessageCircle, BarChart3, ScanBarcode, Link, Phone, Mail, Type,
+  CreditCard, ShieldAlert, User, MapPinned, Hash
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -36,4 +37,9 @@ export const tools: Tool[] = [
   { id: "temp-number", name: "Temp Number", description: "Get temporary phone numbers instantly", icon: Phone, category: "utility", path: "/tools/temp-number", color: "hsl(150, 70%, 45%)" },
   { id: "temp-mail", name: "Temp Mail", description: "Get a disposable temporary email address", icon: Mail, category: "utility", path: "/tools/temp-mail", color: "hsl(0, 75%, 55%)" },
   { id: "case-converter", name: "Text Case Converter", description: "Convert text between different cases", icon: Type, category: "utility", path: "/tools/case-converter", color: "hsl(270, 70%, 55%)" },
+  { id: "bin-checker", name: "BIN Checker", description: "Look up bank info from card BIN numbers", icon: CreditCard, category: "utility", path: "/tools/bin-checker", color: "hsl(350, 80%, 50%)" },
+  { id: "ip-blacklist-checker", name: "IP Blacklist Checker", description: "Check if an IP is blacklisted", icon: ShieldAlert, category: "utility", path: "/tools/ip-blacklist-checker", color: "hsl(10, 80%, 50%)" },
+  { id: "random-name-generator", name: "Random Name Generator", description: "Generate realistic random names", icon: User, category: "utility", path: "/tools/random-name-generator", color: "hsl(180, 60%, 45%)" },
+  { id: "random-address-generator", name: "Random Address Generator", description: "Generate random addresses instantly", icon: MapPinned, category: "utility", path: "/tools/random-address-generator", color: "hsl(45, 80%, 50%)" },
+  { id: "hash-generator", name: "Hash Generator", description: "Generate MD5, SHA1, SHA256 hashes", icon: Hash, category: "utility", path: "/tools/hash-generator", color: "hsl(300, 65%, 50%)" },
 ];
