@@ -1,6 +1,8 @@
 import {
   Wifi, Calculator, Lock, QrCode, ScanLine, Gauge, Sparkles,
-  MapPin, MessageCircle, BarChart3, ScanBarcode, Link, Phone, Mail, Type
+  MapPin, MessageCircle, BarChart3, ScanBarcode, Link, Phone, Mail, Type,
+  CreditCard, ShieldAlert, User, MapPinned, Hash
+} from "lucide-react";
 } from "lucide-react";
 
 export type ToolCategory = 
