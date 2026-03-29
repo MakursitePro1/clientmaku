@@ -105,9 +105,9 @@ export default function PasswordGenerator() {
     <ToolLayout title="Password Generator" description="Generate ultra-secure passwords with advanced options">
       <div className="space-y-6 max-w-xl mx-auto">
         {/* Mode Toggle */}
-        <div className="flex gap-2 p-1 bg-accent/30 rounded-xl">
+        <div className="flex gap-2 p-1.5 bg-gradient-to-r from-primary/5 via-accent/30 to-primary/5 rounded-2xl border border-primary/10">
           {(["random", "passphrase"] as const).map(m => (
-            <button key={m} onClick={() => setMode(m)} className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${mode === m ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+            <button key={m} onClick={() => setMode(m)} className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${mode === m ? "gradient-bg text-white shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground hover:bg-accent/40"}`}>
               {m === "random" ? "🔐 Random" : "📝 Passphrase"}
             </button>
           ))}
