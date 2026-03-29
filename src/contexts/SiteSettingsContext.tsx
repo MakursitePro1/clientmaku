@@ -54,7 +54,7 @@ const defaults: SiteSettings = {
   hero_cta_link: "/tools",
   about_title: "About Us",
   about_text: "",
-  footer_text: "200+ free, fast, and powerful web tools for developers, designers, and everyone. Built with ❤️ for the community.",
+  footer_text: "",
   footer_copyright: "All rights reserved by",
   social_facebook: "",
   social_twitter: "",
