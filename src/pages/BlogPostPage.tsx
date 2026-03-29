@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { supabase } from "@/integrations/supabase/client";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { motion } from "framer-motion";
 import { Calendar, Clock, ArrowLeft, Tag, User, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
