@@ -79,7 +79,7 @@ export function Footer() {
                   </div>
                 </Link>
                 <p className="text-sm text-muted-foreground/70 max-w-xs leading-relaxed">
-                  {settings.footer_text || `${totalTools} free, fast, and powerful web tools across ${totalCategories} categories for developers, designers, and everyone. Built with ❤️ for the community.`}
+                  {footerText}
                 </p>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-xs font-semibold text-primary">
