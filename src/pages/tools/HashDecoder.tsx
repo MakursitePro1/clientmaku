@@ -112,10 +112,10 @@ export default function HashDecoder() {
           </div>
         </div>
 
-        <Button onClick={crack} disabled={loading || !hashInput.trim()} className="w-full rounded-xl gap-2 gradient-bg text-primary-foreground">
+        <button onClick={crack} disabled={loading || !hashInput.trim()} className="tool-btn-primary w-full py-3.5 flex items-center justify-center gap-2 text-sm disabled:opacity-50">
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
           {loading ? `Cracking... ${progress}%` : "Crack Hash"}
-        </Button>
+        </button>
 
         {/* Progress */}
         {loading && (
