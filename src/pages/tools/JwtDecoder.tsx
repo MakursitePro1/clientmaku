@@ -33,8 +33,7 @@ export default function JwtDecoder() {
   const sampleJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE5MTYyMzkwMjIsInJvbGUiOiJhZG1pbiJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
   return (
-    <ToolLayout toolId="jwt-decoder" title="JWT Decoder" description="Decode, inspect & verify JSON Web Tokens"
-      icon={FileKey} color="hsl(35, 90%, 50%)">
+    <ToolLayout title="JWT Decoder" description="Decode, inspect & verify JSON Web Tokens"
       <div className="space-y-6">
         <div>
           <div className="flex justify-between items-center mb-2">

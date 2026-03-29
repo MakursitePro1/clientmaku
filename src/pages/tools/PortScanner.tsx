@@ -57,8 +57,7 @@ export default function PortScanner() {
   }), []);
 
   return (
-    <ToolLayout toolId="port-scanner" title="Port Reference Guide" description="Common network ports reference & info lookup"
-      icon={Server} color="hsl(180, 70%, 42%)">
+    <ToolLayout title="Port Reference Guide" description="Common network ports reference & info lookup"
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-4 gap-3">

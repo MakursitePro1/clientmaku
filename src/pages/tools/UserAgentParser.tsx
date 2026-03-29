@@ -47,8 +47,7 @@ export default function UserAgentParser() {
   ];
 
   return (
-    <ToolLayout toolId="user-agent-parser" title="User Agent Parser" description="Parse & analyze browser user agent strings"
-      icon={MonitorSmartphone} color="hsl(310, 75%, 50%)">
+    <ToolLayout title="User Agent Parser" description="Parse & analyze browser user agent strings"
       <div className="space-y-6">
         <div>
           <div className="flex justify-between items-center mb-2">

@@ -68,8 +68,7 @@ export default function HttpStatusChecker() {
   }, [search, allCodes]);
 
   return (
-    <ToolLayout toolId="http-status-checker" title="HTTP Status Code Lookup" description="Look up all HTTP status codes with descriptions"
-      icon={Network} color="hsl(260, 80%, 58%)">
+    <ToolLayout title="HTTP Status Code Lookup" description="Look up all HTTP status codes with descriptions"
       <div className="space-y-6">
         {/* Search */}
         <div className="relative">

@@ -70,8 +70,7 @@ export default function CronGenerator() {
   }, [cron]);
 
   return (
-    <ToolLayout toolId="cron-generator" title="Cron Expression Generator" description="Build & explain cron schedule expressions visually"
-      icon={Clock} color="hsl(200, 85%, 48%)">
+    <ToolLayout title="Cron Expression Generator" description="Build & explain cron schedule expressions visually"
       <div className="space-y-6">
         {/* Presets */}
         <div>

@@ -65,8 +65,7 @@ export default function SslChecker() {
   const gradeColor = (g: string) => g.startsWith("A") ? "hsl(145, 80%, 42%)" : g === "B" ? "hsl(35, 90%, 50%)" : "hsl(0, 85%, 55%)";
 
   return (
-    <ToolLayout toolId="ssl-checker" title="SSL Certificate Checker" description="Check SSL/TLS certificate status & details"
-      icon={LockKeyhole} color="hsl(150, 75%, 40%)">
+    <ToolLayout title="SSL Certificate Checker" description="Check SSL/TLS certificate status & details"
       <div className="space-y-6">
         {/* Input */}
         <div className="flex gap-3">

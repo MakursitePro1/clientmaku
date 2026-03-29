@@ -63,8 +63,8 @@ export default function RegexTester() {
       toolId="regex-tester"
       title="Regex Tester"
       description="Test, debug & visualize regular expressions in real-time"
-      icon={Regex}
-      color="hsl(145, 80%, 42%)"
+     
+     
     >
       <div className="space-y-6">
         {/* Presets */}
