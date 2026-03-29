@@ -90,12 +90,12 @@ export default function HashDecoder() {
   return (
     <ToolLayout title="Hash Decoder / Cracker" description="Dictionary-based hash cracker with 600+ word variations">
       <div className="space-y-6 max-w-2xl mx-auto">
-        <div className="space-y-3">
+        <div className="tool-section-card p-4 space-y-3">
           <Input
             value={hashInput}
             onChange={e => setHashInput(e.target.value)}
             placeholder="Paste hash here (SHA-1 or SHA-256)..."
-            className="rounded-xl font-mono text-sm"
+            className="rounded-xl font-mono text-sm tool-input-colorful"
           />
           <div className="flex gap-2">
             <Select value={hashType} onValueChange={setHashType}>
