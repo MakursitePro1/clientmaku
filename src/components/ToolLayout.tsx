@@ -7,6 +7,7 @@ import { SEOHead } from "./SEOHead";
 import { ScrollToTop } from "./ScrollToTop";
 import { FavoriteButton } from "./FavoriteButton";
 import { AdSlotDisplay } from "./AdSlotDisplay";
+import { ToolSidebar } from "./ToolSidebar";
 import { tools } from "@/data/tools";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -56,13 +57,6 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
       .then(({ data }) => { if (data) setToolSeo(data); });
   }, [currentTool?.id]);
 
-  const relatedTools = useMemo(() => {
-    if (!currentTool) return [];
-    return tools
-      .filter(t => t.category === currentTool.category && t.id !== currentTool.id)
-      .slice(0, 4);
-  }, [currentTool]);
-
   const seoTitle = toolSeo?.meta_title || title;
   const seoDescription = toolSeo?.meta_description || description;
   const toolColor = currentTool?.color || "hsl(var(--primary))";
@@ -88,7 +82,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
       <div className="relative">
         {/* ===== COMPACT HEADER ===== */}
         <div className="pt-20 sm:pt-24 pb-2 px-4">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             {/* Back Button */}
             <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="mb-4">
               <Link to="/tools" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors group">
@@ -105,7 +99,6 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
               className="rounded-2xl bg-card border border-border/50 p-4 sm:p-5 shadow-sm"
             >
               <div className="flex items-center gap-3 sm:gap-4">
-                {/* Icon */}
                 {currentTool && (
                   <div
                     className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shrink-0"
@@ -117,21 +110,12 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                     <currentTool.icon className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
                 )}
-
-                {/* Title & Description */}
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground leading-tight truncate">
-                    {title}
-                  </h1>
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 line-clamp-1">
-                    {description}
-                  </p>
+                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight text-foreground leading-tight truncate">{title}</h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 line-clamp-1">{description}</p>
                 </div>
-
-                {/* Action Buttons */}
                 <div className="flex items-center gap-2 shrink-0">
                   {currentTool && <FavoriteButton toolId={currentTool.id} size="sm" />}
-
                   <div className="relative">
                     <button
                       ref={shareBtnRef}
@@ -141,7 +125,6 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                     >
                       <Share2 className="w-4 h-4 text-muted-foreground" />
                     </button>
-
                     <AnimatePresence>
                       {shareOpen && (
                         <>
@@ -190,113 +173,71 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
 
         {/* ===== AD: BEFORE TOOL ===== */}
         <div className="px-4 py-2">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <AdSlotDisplay placement="before_tool" className="rounded-xl" />
           </div>
         </div>
 
-        {/* ===== TOOL CONTENT CARD ===== */}
+        {/* ===== TWO-COLUMN LAYOUT: CONTENT + SIDEBAR ===== */}
         <div className="px-4 pb-8">
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.4 }}
-              className="rounded-2xl border border-border/50 bg-card shadow-sm overflow-hidden"
-            >
-              {/* Top accent line */}
-              {currentTool && (
-                <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${toolColor}, ${toolColor.replace(')', ' / 0.2)')}, transparent)` }} />
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
+            {/* Main Content */}
+            <div className="flex-1 min-w-0">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.4 }}
+                className="rounded-2xl border border-border/50 bg-card shadow-sm overflow-hidden"
+              >
+                {currentTool && (
+                  <div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${toolColor}, ${toolColor.replace(')', ' / 0.2)')}, transparent)` }} />
+                )}
+                <div className="p-4 sm:p-6 lg:p-8">
+                  {children}
+                  <AdSlotDisplay placement="in_content" className="mt-6 pt-5 border-t border-border/20" />
+                </div>
+              </motion.div>
+
+              {/* SEO Long Description */}
+              {toolSeo?.long_description && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mt-6 rounded-2xl border border-border/40 bg-card/60 p-5 sm:p-6"
+                >
+                  <h2 className="text-base font-bold text-foreground mb-3">About {title}</h2>
+                  <div
+                    className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground/80 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: toolSeo.long_description }}
+                  />
+                </motion.div>
               )}
 
-              <div className="p-4 sm:p-6 lg:p-8">
-                {children}
-                <AdSlotDisplay placement="in_content" className="mt-6 pt-5 border-t border-border/20" />
+              {/* AD: AFTER TOOL */}
+              <div className="mt-4">
+                <AdSlotDisplay placement="after_tool" className="rounded-xl" />
               </div>
-            </motion.div>
-          </div>
-        </div>
+            </div>
 
-        {/* ===== AD: AFTER TOOL ===== */}
-        <div className="px-4 pb-4">
-          <div className="max-w-4xl mx-auto">
-            <AdSlotDisplay placement="after_tool" className="rounded-xl" />
-          </div>
-        </div>
-
-        {/* ===== SEO LONG DESCRIPTION ===== */}
-        {toolSeo?.long_description && (
-          <div className="px-4 pb-6">
-            <div className="max-w-4xl mx-auto">
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="rounded-2xl border border-border/40 bg-card/60 p-5 sm:p-6"
-              >
-                <h2 className="text-base font-bold text-foreground mb-3">About {title}</h2>
-                <div
-                  className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground/80 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: toolSeo.long_description }}
+            {/* Right Sidebar - hidden on mobile, shown on lg+ */}
+            <div className="w-full lg:w-[300px] xl:w-[320px] shrink-0">
+              <div className="lg:sticky lg:top-24">
+                <ToolSidebar
+                  currentToolId={currentTool?.id}
+                  currentCategory={currentTool?.category}
                 />
-              </motion.div>
+              </div>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* ===== STRUCTURED DATA ===== */}
+        {/* Structured Data */}
         {toolSeo?.structured_data && (
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(toolSeo.structured_data) }}
           />
-        )}
-
-        {/* ===== RELATED TOOLS ===== */}
-        {relatedTools.length > 0 && (
-          <div className="px-4 pb-4">
-            <div className="max-w-4xl mx-auto">
-              <AdSlotDisplay placement="sidebar_top" className="rounded-xl" />
-            </div>
-          </div>
-        )}
-
-        {relatedTools.length > 0 && (
-          <div className="px-4 pb-16">
-            <div className="max-w-4xl mx-auto">
-              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                <div className="flex items-center gap-2.5 mb-5">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-primary" />
-                  </div>
-                  <h2 className="text-lg font-bold tracking-tight">Similar Tools</h2>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {relatedTools.map((tool, i) => (
-                    <motion.div key={tool.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 + i * 0.04 }}>
-                      <Link
-                        to={tool.path}
-                        className="group flex items-center gap-3 p-3.5 rounded-xl border border-border/40 bg-card hover:border-border hover:shadow-md transition-all duration-300"
-                      >
-                        <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
-                          style={{ backgroundColor: tool.color.replace(')', ' / 0.1)'), color: tool.color }}
-                        >
-                          <tool.icon className="w-5 h-5" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">{tool.name}</h3>
-                          <p className="text-xs text-muted-foreground/70 truncate">{tool.description}</p>
-                        </div>
-                        <ArrowRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-          </div>
         )}
       </div>
 
