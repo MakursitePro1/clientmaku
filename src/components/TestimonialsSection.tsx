@@ -39,8 +39,6 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
       whileHover={{ y: -8, scale: 1.02 }}
       className="shrink-0 w-[280px] sm:w-[320px] group"
     >
-      className="shrink-0 w-[280px] sm:w-[320px] group"
-    >
       <div className={cn(
         "relative h-full p-5 sm:p-6 rounded-2xl sm:rounded-3xl",
         "bg-card/90 backdrop-blur-xl border border-border/50",
