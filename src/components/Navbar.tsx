@@ -159,7 +159,7 @@ export function Navbar() {
             {settings.site_logo_url ? (
               <img src={settings.site_logo_url} alt={settings.site_name} className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover glow-shadow flex-shrink-0" />
             ) : (
-              <img src="/logo.jpg" alt={settings.site_name} className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover glow-shadow flex-shrink-0" />
+              <img src="/logo.png" alt={settings.site_name} className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover glow-shadow flex-shrink-0" />
             )}
             <span className="text-sm sm:text-lg font-bold tracking-tight whitespace-nowrap leading-none">
               <span className="gradient-text">{settings.navbar_brand_text}</span>
