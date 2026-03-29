@@ -88,4 +88,9 @@ export const tools: Tool[] = [
   // Identity & Card Makers
   { id: "student-id-card", name: "Student ID Card Maker", description: "Create student ID cards instantly", icon: IdCard, category: "identity", path: "/tools/student-id-card", color: "hsl(210, 80%, 50%)" },
   { id: "facebook-id-card", name: "Facebook ID Card Maker", description: "Create Facebook-style ID cards", icon: Facebook, category: "identity", path: "/tools/facebook-id-card", color: "hsl(220, 90%, 55%)" },
+  { id: "youtube-id-card", name: "YouTube ID Card Maker", description: "Create YouTube channel ID cards", icon: Sparkles, category: "identity", path: "/tools/youtube-id-card", color: "hsl(0, 85%, 55%)" },
+
+  // Network / IP
+  { id: "dns-lookup", name: "DNS Lookup", description: "Look up DNS records for any domain", icon: Globe, category: "utility", path: "/tools/dns-lookup", color: "hsl(195, 85%, 50%)" },
+  { id: "cyber-chef", name: "CyberChef", description: "Universal encoder, decoder, hasher & transformer", icon: Sparkles, category: "developer", path: "/tools/cyber-chef", color: "hsl(25, 90%, 55%)" },
 ];
