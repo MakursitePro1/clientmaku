@@ -349,52 +349,58 @@ export default function InternetSpeedTester() {
 
         {/* Gauge */}
         <div className="relative rounded-2xl border border-border/40 bg-gradient-to-b from-card to-accent/10 p-6 text-center overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: "radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)",
-            backgroundSize: "20px 20px"
-          }} />
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: "radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)",
+              backgroundSize: "20px 20px"
+            }}
+          />
 
-          <SpeedGauge value={gaugeVal} maxSpeed={maxSpeed} phase={phase} testing={testing} />
+          <div className="relative z-10">
+            <SpeedGauge value={gaugeVal} maxSpeed={maxSpeed} phase={phase} testing={testing} />
 
-          {/* Download / Upload Results */}
-          <div className="grid grid-cols-2 gap-4 mt-2 pt-4 border-t border-border/20">
-            <div className={`relative rounded-xl bg-accent/30 p-3 overflow-hidden ${phase === "download" ? "ring-1 ring-primary/50" : ""}`}>
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Download className="w-4 h-4 text-blue-500" />
-                <span className="text-[11px] font-semibold text-muted-foreground">Download</span>
+            {/* Download / Upload Results */}
+            <div className="grid grid-cols-2 gap-4 mt-2 pt-4 border-t border-border/20">
+              <div className={`relative rounded-xl bg-accent/30 p-3 overflow-hidden ${phase === "download" ? "ring-1 ring-primary/50" : ""}`}>
+                <div className="flex items-center justify-center gap-1.5 mb-1">
+                  <Download className="w-4 h-4 text-blue-500" />
+                  <span className="text-[11px] font-semibold text-muted-foreground">Download</span>
+                </div>
+                <div className="text-2xl font-black">
+                  {download !== null ? download : "—"}
+                  <span className="text-xs font-normal text-muted-foreground ml-1">Mbps</span>
+                </div>
               </div>
-              <div className="text-2xl font-black">
-                {download !== null ? download : "—"}
-                <span className="text-xs font-normal text-muted-foreground ml-1">Mbps</span>
+              <div className={`relative rounded-xl bg-accent/30 p-3 overflow-hidden ${phase === "upload" ? "ring-1 ring-primary/50" : ""}`}>
+                <div className="flex items-center justify-center gap-1.5 mb-1">
+                  <Upload className="w-4 h-4 text-green-500" />
+                  <span className="text-[11px] font-semibold text-muted-foreground">Upload</span>
+                </div>
+                <div className="text-2xl font-black">
+                  {upload !== null ? upload : "—"}
+                  <span className="text-xs font-normal text-muted-foreground ml-1">Mbps</span>
+                </div>
               </div>
             </div>
-            <div className={`relative rounded-xl bg-accent/30 p-3 overflow-hidden ${phase === "upload" ? "ring-1 ring-primary/50" : ""}`}>
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Upload className="w-4 h-4 text-green-500" />
-                <span className="text-[11px] font-semibold text-muted-foreground">Upload</span>
-              </div>
-              <div className="text-2xl font-black">
-                {upload !== null ? upload : "—"}
-                <span className="text-xs font-normal text-muted-foreground ml-1">Mbps</span>
-              </div>
-            </div>
-          </div>
 
-          {/* Start Button */}
-          <div className="mt-5">
-            {testing ? (
-              <Button variant="outline" onClick={cancel} className="rounded-full px-10 py-5 text-primary border-primary/30 font-bold">
-                Cancel Test
-              </Button>
-            ) : (
-              <Button
-                onClick={runTest}
-                className="gradient-bg text-primary-foreground rounded-full px-10 py-6 font-bold text-base shadow-xl shadow-primary/25"
-              >
-                <Zap className="w-5 h-5 mr-2" />
-                {phase === "done" ? "Test Again" : "Start Speed Test"}
-              </Button>
-            )}
+            {/* Start Button */}
+            <div className="mt-5">
+              {testing ? (
+                <Button type="button" variant="outline" onClick={cancel} className="rounded-full px-10 py-5 text-primary border-primary/30 font-bold">
+                  Cancel Test
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={runTest}
+                  className="gradient-bg text-primary-foreground rounded-full px-10 py-6 font-bold text-base shadow-xl shadow-primary/25"
+                >
+                  <Zap className="w-5 h-5 mr-2" />
+                  {phase === "done" ? "Test Again" : "Start Speed Test"}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
