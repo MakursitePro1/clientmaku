@@ -38,6 +38,9 @@ const AgeCalculator = lazy(() => import("./pages/tools/AgeCalculator"));
 const PasswordGenerator = lazy(() => import("./pages/tools/PasswordGenerator"));
 const QrCodeMaker = lazy(() => import("./pages/tools/QrCodeMaker"));
 const QrCodeScanner = lazy(() => import("./pages/tools/QrCodeScanner"));
+const IpAddressLookup = lazy(() => import("./pages/tools/IpAddressLookup"));
+const WhatsAppLinkGenerator = lazy(() => import("./pages/tools/WhatsAppLinkGenerator"));
+const BarcodeGenerator = lazy(() => import("./pages/tools/BarcodeGenerator"));
 
 const queryClient = new QueryClient();
 
@@ -74,6 +77,9 @@ const App = () => (
             <Route path="/tools/password-generator" element={<PasswordGenerator />} />
             <Route path="/tools/qr-code-maker" element={<QrCodeMaker />} />
             <Route path="/tools/qr-code-scanner" element={<QrCodeScanner />} />
+            <Route path="/tools/ip-address-lookup" element={<IpAddressLookup />} />
+            <Route path="/tools/whatsapp-link-generator" element={<WhatsAppLinkGenerator />} />
+            <Route path="/tools/barcode-generator" element={<BarcodeGenerator />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
