@@ -58,6 +58,24 @@ const TypingTest = lazy(() => import("./pages/tools/TypingTest"));
 const StudentIdCard = lazy(() => import("./pages/tools/StudentIdCard"));
 const FacebookIdCard = lazy(() => import("./pages/tools/FacebookIdCard"));
 
+// New Tools
+const WordCounter = lazy(() => import("./pages/tools/WordCounter"));
+const ColorPicker = lazy(() => import("./pages/tools/ColorPicker"));
+const JsonFormatter = lazy(() => import("./pages/tools/JsonFormatter"));
+const Base64Tool = lazy(() => import("./pages/tools/Base64Tool"));
+const LoremIpsum = lazy(() => import("./pages/tools/LoremIpsum"));
+const UnitConverter = lazy(() => import("./pages/tools/UnitConverter"));
+const BmiCalculator = lazy(() => import("./pages/tools/BmiCalculator"));
+const MarkdownPreview = lazy(() => import("./pages/tools/MarkdownPreview"));
+const UuidGenerator = lazy(() => import("./pages/tools/UuidGenerator"));
+const CountdownTimer = lazy(() => import("./pages/tools/CountdownTimer"));
+const GradientGenerator = lazy(() => import("./pages/tools/GradientGenerator"));
+const MetaTagGenerator = lazy(() => import("./pages/tools/MetaTagGenerator"));
+const TextDiff = lazy(() => import("./pages/tools/TextDiff"));
+const LoanCalculator = lazy(() => import("./pages/tools/LoanCalculator"));
+const TextEncoderDecoder = lazy(() => import("./pages/tools/TextEncoderDecoder"));
+const ImageToBase64 = lazy(() => import("./pages/tools/ImageToBase64"));
+
 const queryClient = new QueryClient();
 
 const Loading = () => (
@@ -112,6 +130,23 @@ const App = () => (
             <Route path="/tools/typing-test" element={<TypingTest />} />
             <Route path="/tools/student-id-card" element={<StudentIdCard />} />
             <Route path="/tools/facebook-id-card" element={<FacebookIdCard />} />
+            {/* New Tools */}
+            <Route path="/tools/word-counter" element={<WordCounter />} />
+            <Route path="/tools/color-picker" element={<ColorPicker />} />
+            <Route path="/tools/json-formatter" element={<JsonFormatter />} />
+            <Route path="/tools/base64-tool" element={<Base64Tool />} />
+            <Route path="/tools/lorem-ipsum" element={<LoremIpsum />} />
+            <Route path="/tools/unit-converter" element={<UnitConverter />} />
+            <Route path="/tools/bmi-calculator" element={<BmiCalculator />} />
+            <Route path="/tools/markdown-preview" element={<MarkdownPreview />} />
+            <Route path="/tools/uuid-generator" element={<UuidGenerator />} />
+            <Route path="/tools/countdown-timer" element={<CountdownTimer />} />
+            <Route path="/tools/gradient-generator" element={<GradientGenerator />} />
+            <Route path="/tools/meta-tag-generator" element={<MetaTagGenerator />} />
+            <Route path="/tools/text-diff" element={<TextDiff />} />
+            <Route path="/tools/loan-calculator" element={<LoanCalculator />} />
+            <Route path="/tools/text-encoder-decoder" element={<TextEncoderDecoder />} />
+            <Route path="/tools/image-to-base64" element={<ImageToBase64 />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
