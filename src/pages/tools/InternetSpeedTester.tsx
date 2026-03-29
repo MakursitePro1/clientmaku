@@ -43,7 +43,7 @@ function SpeedGauge({ value, maxSpeed, phase, testing }: { value: number; maxSpe
         <motion.div
           animate={{ opacity: [0.2, 0.5, 0.2], scale: [0.95, 1.05, 0.95] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="absolute inset-0 rounded-full blur-3xl"
+          className="absolute inset-0 rounded-full blur-3xl pointer-events-none"
           style={{ background: `radial-gradient(circle, ${activeColor}20 0%, transparent 70%)` }}
         />
       )}
