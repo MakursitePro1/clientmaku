@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Heart, ArrowUpRight, Sparkles, Grid3X3, BookOpen, Shield, Info } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 
 const navLinks = [
   { name: "Category", path: "/categories", icon: Grid3X3 },
@@ -12,6 +13,7 @@ const navLinks = [
 export function Footer() {
   const navigate = useNavigate();
   const { settings } = useSiteSettings();
+  const { totalTools, totalCategories } = useToolCatalog();
 
   const handleNav = (link: typeof navLinks[0]) => {
     if (link.path) {
@@ -71,13 +73,16 @@ export function Footer() {
                   </div>
                 </Link>
                 <p className="text-sm text-muted-foreground/70 max-w-xs leading-relaxed">
-                  {settings.footer_text || "200+ free, fast, and powerful web tools for developers, designers, and everyone. Built with ❤️ for the community."}
+                  {settings.footer_text || `${totalTools} free, fast, and powerful web tools across ${totalCategories} categories for developers, designers, and everyone. Built with ❤️ for the community.`}
                 </p>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-xs font-semibold text-primary">
-                    <Sparkles className="w-3 h-3" /> {settings.stats_tools_count} Tools
+                    <Sparkles className="w-3 h-3" /> {totalTools} Tools
                   </span>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-xs font-semibold text-emerald-500">
+                    <Grid3X3 className="w-3 h-3" /> {totalCategories} Categories
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/50 border border-border/40 text-xs font-semibold text-foreground/80">
                     100% Free
                   </span>
                 </div>

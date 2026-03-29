@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Search, ArrowRight, Sparkles, Filter, X, TrendingUp, Clock } from "lucide-react";
-import { tools, categories, type ToolCategory } from "@/data/tools";
+import { type Tool, type ToolCategory } from "@/data/tools";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 
 interface ToolSidebarProps {
   currentToolId?: string;
@@ -29,7 +30,7 @@ function saveRecentTool(toolId: string) {
   localStorage.setItem("cv_recent_tools", JSON.stringify(recent.slice(0, 10)));
 }
 
-function ToolItem({ tool, delay = 0 }: { tool: typeof tools[0]; delay?: number }) {
+function ToolItem({ tool, delay = 0 }: { tool: Tool; delay?: number }) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay }}>
       <Link
@@ -75,6 +76,7 @@ function SidebarSection({ icon: Icon, label, children, shineDelay = "0s" }: { ic
 export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps) {
   const [search, setSearch] = useState("");
   const [selectedCat, setSelectedCat] = useState<ToolCategory>("all");
+  const { tools, categories, totalTools, totalCategories, getCategoryCount } = useToolCatalog();
 
   const similarTools = useMemo(() => {
     if (!currentCategory || !currentToolId) return [];
@@ -82,13 +84,13 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
   }, [currentCategory, currentToolId]);
 
   const popular = useMemo(() =>
-    popularToolIds.map(id => tools.find(t => t.id === id)).filter((t): t is typeof tools[0] => !!t && t.id !== currentToolId).slice(0, 5),
+    popularToolIds.map(id => tools.find(t => t.id === id)).filter((t): t is Tool => !!t && t.id !== currentToolId).slice(0, 5),
     [currentToolId]
   );
 
   const recent = useMemo(() => {
     const ids = getRecentTools();
-    return ids.map(id => tools.find(t => t.id === id)).filter((t): t is typeof tools[0] => !!t && t.id !== currentToolId).slice(0, 5);
+    return ids.map(id => tools.find(t => t.id === id)).filter((t): t is Tool => !!t && t.id !== currentToolId).slice(0, 5);
   }, [currentToolId]);
 
   const filteredTools = useMemo(() => {
@@ -118,7 +120,7 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search tools..."
+              placeholder={`Search from ${totalTools} tools...`}
               className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-accent/40 border border-border/30 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
             />
             {search && (
@@ -135,6 +137,7 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
         <div className="flex flex-wrap gap-1.5 px-1.5 pb-1">
           {categories.map(cat => {
             const isActive = selectedCat === cat.id;
+            const count = getCategoryCount(cat.id);
             return (
               <button
                 key={cat.id}
@@ -148,6 +151,12 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
               >
                 <cat.icon className="w-3 h-3" />
                 {cat.label}
+                <span className={cn(
+                  "rounded-md px-1.5 py-0.5 text-[10px] font-bold",
+                  isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-background/70 text-muted-foreground"
+                )}>
+                  {count}
+                </span>
               </button>
             );
           })}
@@ -197,8 +206,8 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
       <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm">
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: "Total Tools", value: tools.length, color: "text-primary" },
-            { label: "Categories", value: categories.length - 1, color: "text-green-500" },
+            { label: "Total Tools", value: totalTools, color: "text-primary" },
+            { label: "Categories", value: totalCategories, color: "text-primary" },
           ].map(s => (
             <div key={s.label} className="text-center p-2 rounded-xl bg-accent/30">
               <p className={cn("text-xl font-bold", s.color)}>{s.value}</p>

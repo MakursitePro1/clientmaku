@@ -3,16 +3,17 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { categories, tools } from "@/data/tools";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Grid3X3 } from "lucide-react";
+import { ArrowRight, Grid3X3 } from "lucide-react";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 
 const CategoriesPage = () => {
+  const { categories, tools, totalTools, totalCategories } = useToolCatalog();
   const cats = categories.filter((c) => c.id !== "all");
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Tool Categories" description="Browse all tool categories — Text, Image, PDF, Developer, Design, Security, Finance, and more. 200+ free tools organized for you." path="/categories" />
+      <SEOHead title="Tool Categories" description={`Browse ${totalCategories} tool categories with ${totalTools} free tools organized for you.`} path="/categories" />
       <Navbar />
 
       {/* Hero */}
@@ -27,7 +28,7 @@ const CategoriesPage = () => {
             Explore Tools by <span className="gradient-text">Category</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-muted-foreground max-w-2xl mx-auto">
-            {cats.length} categories with 200+ tools — find exactly what you need, organized for maximum productivity.
+            {totalCategories} categories with {totalTools} tools — find exactly what you need, organized for maximum productivity.
           </motion.p>
         </div>
       </section>

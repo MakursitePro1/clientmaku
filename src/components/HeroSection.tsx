@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { ArrowRight, Play, Zap, Code2, Image, Shield, Globe, Search, BarChart3, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 
 const floatingIcons = [
   { icon: Globe, top: "12%", left: "8%", delay: 0, size: "w-10 h-10" },
@@ -123,13 +124,14 @@ function AnimatedCounter({ target, duration = 2 }: { target: string; duration?: 
 
 export function HeroSection() {
   const { settings } = useSiteSettings();
+  const { totalTools, totalCategories } = useToolCatalog();
   const typedText = useTypingEffect(defaultTypingWords);
 
   const stats = [
-    { value: settings.stats_tools_count, label: "Free Tools", icon: Zap },
+    { value: `${totalTools}`, label: "Free Tools", icon: Zap },
     { value: "100%", label: "Free to Use", icon: Shield },
     { value: settings.stats_users_count, label: "Happy Users", icon: Globe },
-    { value: settings.stats_categories_count, label: "Categories", icon: BarChart3 },
+    { value: `${totalCategories}`, label: "Categories", icon: BarChart3 },
   ];
 
   return (

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Target, Heart, Award, TrendingUp, Zap, Sparkles, Users, Globe, Shield } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 
 const features = [
   { icon: Target, title: "Mission-Driven", desc: "Building the most useful tools for everyone, everywhere.", color: "from-violet-500 to-purple-600" },
@@ -11,10 +12,11 @@ const features = [
 
 export function AboutSection() {
   const { settings } = useSiteSettings();
+  const { totalTools, totalCategories } = useToolCatalog();
 
   const stats = [
-    { val: settings.stats_tools_count, label: "Tools Available", icon: Zap },
-    { val: settings.stats_categories_count, label: "Categories", icon: Globe },
+    { val: `${totalTools}`, label: "Tools Available", icon: Zap },
+    { val: `${totalCategories}`, label: "Categories", icon: Globe },
     { val: "100%", label: "Free Forever", icon: Shield },
     { val: settings.stats_users_count, label: "Happy Users", icon: Users },
   ];
