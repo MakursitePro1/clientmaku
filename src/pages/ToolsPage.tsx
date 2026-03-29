@@ -3,21 +3,16 @@ import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, ArrowRight, ChevronDown, X, Sparkles, Wrench, Zap, TrendingUp, Star, Grid3X3 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { tools, categories, type ToolCategory } from "@/data/tools";
+import { type ToolCategory } from "@/data/tools";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ToolsBanner } from "@/components/ToolsBanner";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { cn } from "@/lib/utils";
 
-const stats = [
-  { label: "Total Tools", value: `${tools.length}+`, icon: Wrench, color: "hsl(262, 83%, 58%)" },
-  { label: "Categories", value: `${categories.length - 1}`, icon: Grid3X3, color: "hsl(142, 71%, 45%)" },
-  { label: "Always Free", value: "100%", icon: Star, color: "hsl(45, 93%, 47%)" },
-  { label: "Updated Daily", value: "24/7", icon: TrendingUp, color: "hsl(199, 89%, 48%)" },
-];
 
 export default function ToolsPage() {
   const [searchParams] = useSearchParams();
