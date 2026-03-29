@@ -14,6 +14,12 @@ export function Footer() {
   const navigate = useNavigate();
   const { settings } = useSiteSettings();
   const { totalTools, totalCategories } = useToolCatalog();
+  const footerText = (settings.footer_text || `${totalTools} free, fast, and powerful web tools across ${totalCategories} categories for developers, designers, and everyone. Built with ❤️ for the community.`)
+    .replace(/\b\d+\+?\s*free,\s*fast,\s*and\s*powerful\s*web\s*tools/gi, `${totalTools} free, fast, and powerful web tools`)
+    .replace(/\b\d+\+?\s*free\s*tools/gi, `${totalTools} free tools`)
+    .replace(/\b\d+\+?\s*tools/gi, `${totalTools} tools`)
+    .replace(/\bacross\s+\d+\+?\s*categories/gi, `across ${totalCategories} categories`)
+    .replace(/\b\d+\+?\s*categories/gi, `${totalCategories} categories`);
 
   const handleNav = (link: typeof navLinks[0]) => {
     if (link.path) {
