@@ -1,6 +1,6 @@
 import {
   Wifi, Calculator, Lock, QrCode, ScanLine, Gauge, Sparkles,
-  MapPin, MessageCircle, BarChart3
+  MapPin, MessageCircle, BarChart3, ScanBarcode, Link, Phone, Mail, Type
 } from "lucide-react";
 
 export type ToolCategory = 
