@@ -130,19 +130,27 @@ export default function ToolsPage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.35 + i * 0.08 }}
-                className="relative rounded-2xl border border-border/30 bg-card/50 backdrop-blur-md p-4 text-center group hover:border-primary/30 transition-all duration-500 overflow-hidden"
+                whileHover={{ scale: 1.05, y: -4 }}
+                className="relative rounded-2xl border-2 border-border bg-card/60 backdrop-blur-xl p-5 text-center group hover:border-primary/50 transition-all duration-500 overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-primary/10"
               >
-                {/* Hover glow */}
+                {/* Background gradient glow */}
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"
-                  style={{ background: `radial-gradient(circle at 50% 50%, ${stat.color.replace(')', ' / 0.12)')}, transparent 70%)` }}
+                  style={{ background: `radial-gradient(circle at 50% 30%, ${stat.color.replace(')', ' / 0.15)')}, transparent 70%)` }}
                 />
-                {/* Color stripe */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: stat.color }} />
+                {/* Top color stripe - always visible */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] transition-all duration-500"
+                  style={{ background: `linear-gradient(90deg, transparent, ${stat.color}, transparent)` }} />
+                {/* Bottom subtle stripe on hover */}
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: `linear-gradient(90deg, transparent, ${stat.color.replace(')', ' / 0.5)')}, transparent)` }} />
 
-                <stat.icon className="w-5 h-5 mx-auto mb-2 relative z-10 group-hover:scale-110 transition-transform" style={{ color: stat.color }} />
-                <div className="text-xl font-extrabold relative z-10" style={{ color: stat.color }}>{stat.value}</div>
-                <div className="text-[10px] text-muted-foreground/60 font-semibold uppercase tracking-wider relative z-10">{stat.label}</div>
+                {/* Icon with colored bg circle */}
+                <div className="w-10 h-10 rounded-full mx-auto mb-3 flex items-center justify-center relative z-10 transition-all duration-500 group-hover:scale-110"
+                  style={{ backgroundColor: stat.color.replace(')', ' / 0.12)'), boxShadow: `0 0 20px ${stat.color.replace(')', ' / 0.15)')}` }}>
+                  <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
+                </div>
+                <div className="text-2xl font-black relative z-10 mb-0.5" style={{ color: stat.color }}>{stat.value}</div>
+                <div className="text-[10px] text-muted-foreground/70 font-bold uppercase tracking-widest relative z-10">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
