@@ -162,6 +162,14 @@ const App = () => (
             <Route path="/tools/image-to-base64" element={<ImageToBase64 />} />
             <Route path="/tools/cyber-chef" element={<CyberChef />} />
             <Route path="/tools/youtube-id-card" element={<YouTubeIdCard />} />
+            <Route path="/tools/regex-tester" element={<RegexTester />} />
+            <Route path="/tools/jwt-decoder" element={<JwtDecoder />} />
+            <Route path="/tools/cron-generator" element={<CronGenerator />} />
+            <Route path="/tools/http-status-checker" element={<HttpStatusChecker />} />
+            <Route path="/tools/user-agent-parser" element={<UserAgentParser />} />
+            <Route path="/tools/chmod-calculator" element={<ChmodCalculator />} />
+            <Route path="/tools/port-scanner" element={<PortScanner />} />
+            <Route path="/tools/ssl-checker" element={<SslChecker />} />
             <Route path="/tools/dns-lookup" element={<DnsLookup />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
