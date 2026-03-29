@@ -344,74 +344,91 @@ export default function FacebookIdCard() {
       <div className="space-y-6 max-w-3xl mx-auto">
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 rounded-xl">
-            <TabsTrigger value="profile" className="gap-1.5 text-xs"><User className="w-3.5 h-3.5" /> Profile</TabsTrigger>
-            <TabsTrigger value="details" className="gap-1.5 text-xs"><Heart className="w-3.5 h-3.5" /> Details</TabsTrigger>
-            <TabsTrigger value="design" className="gap-1.5 text-xs"><Settings className="w-3.5 h-3.5" /> Design</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 rounded-xl bg-primary/5 border border-primary/20">
+            <TabsTrigger value="profile" className="gap-1.5 text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"><User className="w-3.5 h-3.5" /> Profile</TabsTrigger>
+            <TabsTrigger value="details" className="gap-1.5 text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"><Heart className="w-3.5 h-3.5" /> Details</TabsTrigger>
+            <TabsTrigger value="design" className="gap-1.5 text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg"><Settings className="w-3.5 h-3.5" /> Design</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="profile" className="space-y-4 mt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Full Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Username</Label><Input value={username} onChange={e => setUsername(e.target.value)} className="rounded-xl" /></div>
-              <div className="sm:col-span-2 space-y-1.5"><Label className="text-xs text-muted-foreground">Bio</Label><Textarea value={bio} onChange={e => setBio(e.target.value)} className="rounded-xl resize-none" rows={2} /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Location</Label><Input value={locationVal} onChange={e => setLocationVal(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Workplace</Label><Input value={workplace} onChange={e => setWorkplace(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Education</Label><Input value={education} onChange={e => setEducation(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Joined</Label><Input value={joined} onChange={e => setJoined(e.target.value)} className="rounded-xl" /></div>
+          <TabsContent value="profile" className="mt-4">
+            <div className="tool-section-card p-4 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <User className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-bold gradient-text">Profile Information</h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Full Name</Label><Input value={name} onChange={e => setName(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Username</Label><Input value={username} onChange={e => setUsername(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="sm:col-span-2 space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Bio</Label><Textarea value={bio} onChange={e => setBio(e.target.value)} className="tool-input-colorful rounded-xl resize-none" rows={2} /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Location</Label><Input value={locationVal} onChange={e => setLocationVal(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Workplace</Label><Input value={workplace} onChange={e => setWorkplace(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Education</Label><Input value={education} onChange={e => setEducation(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Joined</Label><Input value={joined} onChange={e => setJoined(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+              </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="details" className="space-y-4 mt-4">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Friends</Label><Input value={friends} onChange={e => setFriends(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Followers</Label><Input value={followers} onChange={e => setFollowers(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Following</Label><Input value={following} onChange={e => setFollowing(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Posts</Label><Input value={posts} onChange={e => setPosts(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Total Likes</Label><Input value={likes} onChange={e => setLikes(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Relationship</Label>
-                <Select value={relationship} onValueChange={setRelationship}>
-                  <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {["Single", "In a Relationship", "Engaged", "Married", "Complicated", "Not Specified"].map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                  </SelectContent>
+          <TabsContent value="details" className="mt-4">
+            <div className="tool-section-card p-4 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Heart className="w-4 h-4 text-pink-500" />
+                <h3 className="text-sm font-bold gradient-text">Social Details</h3>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Friends</Label><Input value={friends} onChange={e => setFriends(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Followers</Label><Input value={followers} onChange={e => setFollowers(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Following</Label><Input value={following} onChange={e => setFollowing(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Posts</Label><Input value={posts} onChange={e => setPosts(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Total Likes</Label><Input value={likes} onChange={e => setLikes(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+                <div className="space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Relationship</Label>
+                  <Select value={relationship} onValueChange={setRelationship}>
+                    <SelectTrigger className="tool-input-colorful rounded-xl"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {["Single", "In a Relationship", "Engaged", "Married", "Complicated", "Not Specified"].map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-2 sm:col-span-3 space-y-1.5"><Label className="text-xs text-muted-foreground font-semibold">Website</Label><Input value={website} onChange={e => setWebsite(e.target.value)} className="tool-input-colorful rounded-xl" /></div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="design" className="mt-4">
+            <div className="tool-section-card p-4 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-4 h-4 text-yellow-500" />
+                <h3 className="text-sm font-bold gradient-text">Design & Style</h3>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground font-semibold">Card Style</Label>
+                <Select value={cardStyle} onValueChange={setCardStyle}>
+                  <SelectTrigger className="tool-input-colorful rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>{cardStyles.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div className="col-span-2 sm:col-span-3 space-y-1.5"><Label className="text-xs text-muted-foreground">Website</Label><Input value={website} onChange={e => setWebsite(e.target.value)} className="rounded-xl" /></div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="design" className="space-y-4 mt-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Card Style</Label>
-              <Select value={cardStyle} onValueChange={setCardStyle}>
-                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                <SelectContent>{cardStyles.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            {/* Style preview */}
-            <div className="flex gap-2 flex-wrap">
-              {cardStyles.map(s => (
-                <button key={s.id} onClick={() => setCardStyle(s.id)}
-                  className={`w-8 h-8 rounded-full border-2 transition-all ${cardStyle === s.id ? "ring-2 ring-primary scale-110" : "opacity-70 hover:opacity-100"}`}
-                  style={{ background: `linear-gradient(135deg, ${s.headerBg}, ${s.headerBg2})` }} />
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <input ref={profileRef} type="file" accept="image/*" className="hidden" onChange={handleProfilePhoto} />
-              <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
-              <Button variant="outline" className="rounded-xl gap-1.5" onClick={() => profileRef.current?.click()}>
-                <Upload className="w-4 h-4" /> {profilePhoto ? "Change Profile" : "Profile Photo"}
-              </Button>
-              <Button variant="outline" className="rounded-xl gap-1.5" onClick={() => coverRef.current?.click()}>
-                <Upload className="w-4 h-4" /> {coverPhoto ? "Change Cover" : "Cover Photo"}
-              </Button>
-              {profilePhoto && <img src={profilePhoto} alt="" className="w-10 h-10 rounded-full object-cover border" />}
-              {coverPhoto && <img src={coverPhoto} alt="" className="w-16 h-10 rounded-lg object-cover border" />}
-            </div>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2"><Switch checked={verified} onCheckedChange={setVerified} /><Label className="text-xs">Verified Badge</Label></div>
-              <div className="flex items-center gap-2"><Switch checked={showReactions} onCheckedChange={setShowReactions} /><Label className="text-xs">Reactions Bar</Label></div>
+              <div className="flex gap-2 flex-wrap">
+                {cardStyles.map(s => (
+                  <button key={s.id} onClick={() => setCardStyle(s.id)}
+                    className={`w-10 h-10 rounded-full border-2 transition-all shadow-md ${cardStyle === s.id ? "ring-2 ring-primary scale-110 shadow-primary/30" : "opacity-70 hover:opacity-100 hover:scale-105"}`}
+                    style={{ background: `linear-gradient(135deg, ${s.headerBg}, ${s.headerBg2})` }} />
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <input ref={profileRef} type="file" accept="image/*" className="hidden" onChange={handleProfilePhoto} />
+                <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
+                <button className="tool-btn-primary px-4 py-2.5 flex items-center gap-1.5 text-sm" onClick={() => profileRef.current?.click()}>
+                  <Upload className="w-4 h-4" /> {profilePhoto ? "Change Profile" : "Profile Photo"}
+                </button>
+                <button className="tool-btn-primary px-4 py-2.5 flex items-center gap-1.5 text-sm" onClick={() => coverRef.current?.click()}>
+                  <Upload className="w-4 h-4" /> {coverPhoto ? "Change Cover" : "Cover Photo"}
+                </button>
+                {profilePhoto && <img src={profilePhoto} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-primary/30 shadow-md" />}
+                {coverPhoto && <img src={coverPhoto} alt="" className="w-16 h-10 rounded-lg object-cover border-2 border-primary/30 shadow-md" />}
+              </div>
+              <div className="flex flex-wrap gap-4 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                <div className="flex items-center gap-2"><Switch checked={verified} onCheckedChange={setVerified} /><Label className="text-xs font-semibold">Verified Badge ✓</Label></div>
+                <div className="flex items-center gap-2"><Switch checked={showReactions} onCheckedChange={setShowReactions} /><Label className="text-xs font-semibold">Reactions Bar 😍</Label></div>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
