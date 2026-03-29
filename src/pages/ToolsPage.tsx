@@ -15,18 +15,26 @@ import { cn } from "@/lib/utils";
 
 
 export default function ToolsPage() {
+  const { tools, categories, totalTools, totalCategories, getCategoryCount } = useToolCatalog();
   const [searchParams] = useSearchParams();
   const initialCategory = (searchParams.get("category") as ToolCategory) || "all";
   const [activeCategory, setActiveCategory] = useState<ToolCategory>(initialCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const stats = [
+    { label: "Total Tools", value: `${totalTools}`, icon: Wrench, color: "hsl(262, 83%, 58%)" },
+    { label: "Categories", value: `${totalCategories}`, icon: Grid3X3, color: "hsl(142, 71%, 45%)" },
+    { label: "Always Free", value: "100%", icon: Star, color: "hsl(45, 93%, 47%)" },
+    { label: "Updated Daily", value: "24/7", icon: TrendingUp, color: "hsl(199, 89%, 48%)" },
+  ];
+
   const filteredTools = useMemo(() => tools.filter((tool) => {
     const matchesCategory = activeCategory === "all" || tool.category === activeCategory;
     const q = searchQuery.toLowerCase();
     const matchesSearch = tool.name.toLowerCase().includes(q) || tool.description.toLowerCase().includes(q);
     return matchesCategory && matchesSearch;
-  }), [activeCategory, searchQuery]);
+  }), [activeCategory, searchQuery, tools]);
 
   const activeLabel = categories.find(c => c.id === activeCategory)?.label || "All Tools";
   const ActiveIcon = categories.find(c => c.id === activeCategory)?.icon;
