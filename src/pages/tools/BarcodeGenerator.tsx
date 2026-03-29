@@ -144,7 +144,7 @@ export default function BarcodeGenerator() {
             <Input value={text} onChange={e => setText(e.target.value)} placeholder="Enter text for barcode..." className="rounded-xl font-mono text-lg flex-1 tool-input-colorful" />
             <button onClick={generate} className="tool-btn-primary px-5 py-2.5 flex items-center gap-1.5 text-sm shrink-0">
               <RefreshCw className="w-4 h-4" /> Generate
-            </Button>
+            </button>
           </div>
         </div>
 
