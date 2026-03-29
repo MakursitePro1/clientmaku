@@ -33,7 +33,7 @@ export function ToolsGrid() {
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tool.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
-  }), [activeCategory, searchQuery]);
+  }), [activeCategory, searchQuery, tools]);
 
   const totalPages = Math.ceil(filteredTools.length / TOOLS_PER_PAGE);
   const paginatedTools = filteredTools.slice((currentPage - 1) * TOOLS_PER_PAGE, currentPage * TOOLS_PER_PAGE);
