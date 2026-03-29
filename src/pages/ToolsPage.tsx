@@ -94,7 +94,7 @@ export default function ToolsPage() {
             >
               <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_3s_ease-in-out_infinite]" />
               <Sparkles className="w-4 h-4 text-primary relative z-10" />
-              <span className="text-sm font-bold gradient-text relative z-10">{tools.length}+ Free Tools Available</span>
+              <span className="text-sm font-bold gradient-text relative z-10">{totalTools} Free Tools Available</span>
             </motion.div>
 
             {/* Heading */}
