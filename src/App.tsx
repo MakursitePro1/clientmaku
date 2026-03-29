@@ -38,6 +38,9 @@ const AgeCalculator = lazy(() => import("./pages/tools/AgeCalculator"));
 const PasswordGenerator = lazy(() => import("./pages/tools/PasswordGenerator"));
 const QrCodeMaker = lazy(() => import("./pages/tools/QrCodeMaker"));
 const QrCodeScanner = lazy(() => import("./pages/tools/QrCodeScanner"));
+const IpAddressLookup = lazy(() => import("./pages/tools/IpAddressLookup"));
+const WhatsAppLinkGenerator = lazy(() => import("./pages/tools/WhatsAppLinkGenerator"));
+const BarcodeGenerator = lazy(() => import("./pages/tools/BarcodeGenerator"));
 
 const queryClient = new QueryClient();
 
