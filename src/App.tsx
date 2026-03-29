@@ -51,6 +51,12 @@ const IPBlacklistChecker = lazy(() => import("./pages/tools/IPBlacklistChecker")
 const RandomNameGenerator = lazy(() => import("./pages/tools/RandomNameGenerator"));
 const RandomAddressGenerator = lazy(() => import("./pages/tools/RandomAddressGenerator"));
 const HashGenerator = lazy(() => import("./pages/tools/HashGenerator"));
+const HashDecoder = lazy(() => import("./pages/tools/HashDecoder"));
+const EncryptionTool = lazy(() => import("./pages/tools/TextEncryption"));
+const WhoisLookup = lazy(() => import("./pages/tools/WhoisLookup"));
+const TypingTest = lazy(() => import("./pages/tools/TypingTest"));
+const StudentIdCard = lazy(() => import("./pages/tools/StudentIdCard"));
+const FacebookIdCard = lazy(() => import("./pages/tools/FacebookIdCard"));
 
 const queryClient = new QueryClient();
 
