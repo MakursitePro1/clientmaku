@@ -61,7 +61,7 @@ function ToolCard({ tool }: { tool: typeof tools[0] }) {
   return (
     <Link
       to={tool.path}
-      className="group relative shrink-0 w-[280px] block rounded-2xl border border-border/40 bg-card/80 backdrop-blur-sm p-5 transition-all duration-500 hover:-translate-y-1 overflow-hidden"
+      className="group relative shrink-0 w-[280px] block rounded-2xl border border-foreground/20 bg-card/80 backdrop-blur-sm shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.08)] p-5 transition-all duration-500 hover:-translate-y-1 hover:border-foreground/40 overflow-hidden"
     >
       <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity"
         style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
