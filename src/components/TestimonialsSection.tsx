@@ -122,24 +122,28 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
 }
 
 function MarqueeRow({ items, direction = "left", speed = 40 }: { items: Testimonial[]; direction?: "left" | "right"; speed?: number }) {
-  const duplicated = [...items, ...items, ...items];
-  const totalWidth = items.length * 340;
+  const duplicated = [...items, ...items, ...items, ...items];
+  const gap = 20; // matches gap-5
+  const cardWidth = 340;
+  const setWidth = items.length * cardWidth + items.length * gap;
 
   return (
     <div className="relative overflow-hidden py-2">
-      {/* Edge fades */}
       <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-28 z-10 pointer-events-none" style={{ background: "linear-gradient(to right, hsl(var(--background)), transparent)" }} />
       <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-28 z-10 pointer-events-none" style={{ background: "linear-gradient(to left, hsl(var(--background)), transparent)" }} />
 
-      <motion.div
-        className="flex gap-4 sm:gap-5 w-max"
-        animate={{ x: direction === "left" ? [0, -totalWidth] : [-totalWidth, 0] }}
-        transition={{ duration: speed, repeat: Infinity, ease: "linear", repeatType: "loop" }}
+      <div
+        className="flex gap-5 w-max"
+        style={{
+          animation: `${direction === "left" ? "marquee-left" : "marquee-right"} ${speed}s linear infinite`,
+          // @ts-ignore
+          '--set-width': `${setWidth}px`,
+        } as React.CSSProperties}
       >
         {duplicated.map((t, i) => (
           <TestimonialCard key={`${t.name}-${i}`} testimonial={t} index={i % items.length} />
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }
