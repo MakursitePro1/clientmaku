@@ -1,7 +1,8 @@
 import {
   Wifi, Calculator, Lock, QrCode, ScanLine, Gauge, Sparkles,
   MapPin, MessageCircle, BarChart3, ScanBarcode, Link, Phone, Mail, Type,
-  CreditCard, ShieldAlert, User, MapPinned, Hash
+  CreditCard, ShieldAlert, User, MapPinned, Hash,
+  KeyRound, ShieldCheck, Globe, Keyboard, IdCard, Facebook
 } from "lucide-react";
 
 export type ToolCategory = 
@@ -42,4 +43,10 @@ export const tools: Tool[] = [
   { id: "random-name-generator", name: "Random Name Generator", description: "Generate realistic random names", icon: User, category: "utility", path: "/tools/random-name-generator", color: "hsl(180, 60%, 45%)" },
   { id: "random-address-generator", name: "Random Address Generator", description: "Generate random addresses instantly", icon: MapPinned, category: "utility", path: "/tools/random-address-generator", color: "hsl(45, 80%, 50%)" },
   { id: "hash-generator", name: "Hash Generator", description: "Generate MD5, SHA1, SHA256 hashes", icon: Hash, category: "utility", path: "/tools/hash-generator", color: "hsl(300, 65%, 50%)" },
+  { id: "hash-decoder", name: "Hash Decoder / Cracker", description: "Dictionary-based hash cracker (educational)", icon: KeyRound, category: "utility", path: "/tools/hash-decoder", color: "hsl(15, 85%, 55%)" },
+  { id: "encryption-tool", name: "Encryption / Decryption", description: "Encrypt and decrypt text with AES & Base64", icon: ShieldCheck, category: "utility", path: "/tools/encryption-tool", color: "hsl(230, 75%, 55%)" },
+  { id: "whois-lookup", name: "Whois Lookup", description: "Look up domain registration details", icon: Globe, category: "utility", path: "/tools/whois-lookup", color: "hsl(190, 80%, 45%)" },
+  { id: "typing-test", name: "Typing Test", description: "Test your typing speed and accuracy", icon: Keyboard, category: "utility", path: "/tools/typing-test", color: "hsl(50, 85%, 50%)" },
+  { id: "student-id-card", name: "Student ID Card Maker", description: "Create student ID cards instantly", icon: IdCard, category: "utility", path: "/tools/student-id-card", color: "hsl(210, 80%, 50%)" },
+  { id: "facebook-id-card", name: "Facebook ID Card Maker", description: "Create Facebook-style ID cards", icon: Facebook, category: "utility", path: "/tools/facebook-id-card", color: "hsl(220, 90%, 55%)" },
 ];

@@ -51,6 +51,12 @@ const IPBlacklistChecker = lazy(() => import("./pages/tools/IPBlacklistChecker")
 const RandomNameGenerator = lazy(() => import("./pages/tools/RandomNameGenerator"));
 const RandomAddressGenerator = lazy(() => import("./pages/tools/RandomAddressGenerator"));
 const HashGenerator = lazy(() => import("./pages/tools/HashGenerator"));
+const HashDecoder = lazy(() => import("./pages/tools/HashDecoder"));
+const EncryptionTool = lazy(() => import("./pages/tools/TextEncryption"));
+const WhoisLookup = lazy(() => import("./pages/tools/WhoisLookup"));
+const TypingTest = lazy(() => import("./pages/tools/TypingTest"));
+const StudentIdCard = lazy(() => import("./pages/tools/StudentIdCard"));
+const FacebookIdCard = lazy(() => import("./pages/tools/FacebookIdCard"));
 
 const queryClient = new QueryClient();
 
@@ -100,6 +106,12 @@ const App = () => (
             <Route path="/tools/random-name-generator" element={<RandomNameGenerator />} />
             <Route path="/tools/random-address-generator" element={<RandomAddressGenerator />} />
             <Route path="/tools/hash-generator" element={<HashGenerator />} />
+            <Route path="/tools/hash-decoder" element={<HashDecoder />} />
+            <Route path="/tools/encryption-tool" element={<EncryptionTool />} />
+            <Route path="/tools/whois-lookup" element={<WhoisLookup />} />
+            <Route path="/tools/typing-test" element={<TypingTest />} />
+            <Route path="/tools/student-id-card" element={<StudentIdCard />} />
+            <Route path="/tools/facebook-id-card" element={<FacebookIdCard />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
