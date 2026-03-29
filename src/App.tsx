@@ -41,6 +41,11 @@ const QrCodeScanner = lazy(() => import("./pages/tools/QrCodeScanner"));
 const IpAddressLookup = lazy(() => import("./pages/tools/IpAddressLookup"));
 const WhatsAppLinkGenerator = lazy(() => import("./pages/tools/WhatsAppLinkGenerator"));
 const BarcodeGenerator = lazy(() => import("./pages/tools/BarcodeGenerator"));
+const BarcodeScanner = lazy(() => import("./pages/tools/BarcodeScanner"));
+const UrlShortener = lazy(() => import("./pages/tools/UrlShortener"));
+const TempNumber = lazy(() => import("./pages/tools/TempNumber"));
+const TempMail = lazy(() => import("./pages/tools/TempMail"));
+const CaseConverter = lazy(() => import("./pages/tools/CaseConverter"));
 
 const queryClient = new QueryClient();
 
