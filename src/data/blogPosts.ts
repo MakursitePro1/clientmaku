@@ -16,7 +16,7 @@ export const blogPosts: BlogPost[] = [
     id: "top-10-free-online-tools-2025",
     title: "Top 10 Free Online Tools Every Developer Needs in 2025",
     excerpt: "Discover the most essential free web tools that can supercharge your development workflow and save hours of work.",
-    content: `<p>In the rapidly evolving world of web development, having the right tools at your disposal can make all the difference. Here at Cyber Venom, we've curated a collection of over 200 free tools that developers, designers, and creators use daily.</p>
+    content: `<p>In the rapidly evolving world of web development, having the right tools at your disposal can make all the difference. Here at Makursite, we've curated a collection of free tools that developers, designers, and creators use daily.</p>
 
 <h2>1. JSON Formatter & Validator</h2>
 <p>Working with APIs means dealing with JSON data constantly. Our JSON Formatter tool helps you beautify, validate, and debug JSON data instantly — no installation required.</p>
@@ -49,7 +49,7 @@ export const blogPosts: BlogPost[] = [
 <p>Write and preview Markdown content in real-time with our feature-rich editor. Perfect for README files, documentation, and blog posts.</p>
 
 <h2>Conclusion</h2>
-<p>These tools represent just a fraction of what Cyber Venom offers. With 200+ free tools and counting, we're committed to making web development faster, easier, and more accessible for everyone.</p>`,
+<p>These tools represent just a fraction of what we offer. With free tools and counting, we're committed to making web development faster, easier, and more accessible for everyone.</p>`,
     category: "Development",
     author: "Cyber Venom Team",
     date: "2025-03-20",

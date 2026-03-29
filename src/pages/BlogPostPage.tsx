@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { supabase } from "@/integrations/supabase/client";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { motion } from "framer-motion";
 import { Calendar, Clock, ArrowLeft, Tag, User, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,16 @@ const BlogPostPage = () => {
   const [related, setRelated] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const { totalTools, totalCategories } = useToolCatalog();
+
+  // Replace hardcoded counts in blog content with dynamic values
+  const dynamicContent = useMemo(() => {
+    if (!post?.content) return "";
+    return post.content
+      .replace(/200\+?\s*(free\s+)?tools/gi, `${totalTools}+ free tools`)
+      .replace(/over\s+200\s*(free\s+)?tools/gi, `over ${totalTools} free tools`)
+      .replace(/\b200\+?\s*tools/gi, `${totalTools}+ tools`);
+  }, [post?.content, totalTools]);
 
   useEffect(() => {
     if (!slug) return;
@@ -149,7 +160,7 @@ const BlogPostPage = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="max-w-3xl mx-auto">
           <div
             className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-muted-foreground prose-p:leading-relaxed prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: dynamicContent }}
           />
 
           {post.tags.length > 0 && (
