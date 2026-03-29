@@ -13,7 +13,7 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { cn } from "@/lib/utils";
 
 const stats = [
-  { label: "Total Tools", value: "200+", icon: Wrench, color: "hsl(262, 83%, 58%)" },
+  { label: "Total Tools", value: `${tools.length}+`, icon: Wrench, color: "hsl(262, 83%, 58%)" },
   { label: "Categories", value: `${categories.length - 1}`, icon: Grid3X3, color: "hsl(142, 71%, 45%)" },
   { label: "Always Free", value: "100%", icon: Star, color: "hsl(45, 93%, 47%)" },
   { label: "Updated Daily", value: "24/7", icon: TrendingUp, color: "hsl(199, 89%, 48%)" },

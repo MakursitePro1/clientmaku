@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Wrench, Zap, ArrowRight, Sparkles, Star, Layers, Code2, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { tools, categories } from "@/data/tools";
 
 const floatingIcons = [
   { icon: Code2, x: "8%", y: "20%", delay: 0, size: 20 },
