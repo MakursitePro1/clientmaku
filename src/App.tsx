@@ -91,13 +91,14 @@ const Loading = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-    <FavoritesProvider>
-    <SiteSettingsProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={<Loading />}>
+      <FavoritesProvider>
+        <SiteSettingsProvider>
+          <ToolCatalogProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tools" element={<Suspense fallback={<Loading />}><ToolsPage /></Suspense>} />
