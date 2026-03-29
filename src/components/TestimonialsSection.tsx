@@ -78,7 +78,6 @@ function TestimonialCard({ testimonial, index }: { testimonial: Testimonial; ind
               )}
             />
           ))}
-          ))}
           <span className="text-[10px] text-muted-foreground/60 ml-1 font-medium">{testimonial.rating}.0</span>
         </div>
 
