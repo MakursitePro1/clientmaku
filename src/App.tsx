@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { ToolCatalogProvider } from "@/contexts/ToolCatalogContext";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
