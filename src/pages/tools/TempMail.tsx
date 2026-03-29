@@ -112,7 +112,7 @@ export default function TempMail() {
         </div>
 
         {/* Inbox / Email View */}
-        <div className="min-h-[300px] rounded-xl border border-border/50 bg-card overflow-hidden">
+        <div className="min-h-[300px] tool-section-card overflow-hidden">
           {selected ? (
             <div className="p-4 space-y-3">
               <button onClick={() => setSelected(null)} className="text-xs text-primary hover:underline">← Back to Inbox</button>
