@@ -3,7 +3,6 @@ import {
   MapPin, MessageCircle, BarChart3, ScanBarcode, Link, Phone, Mail, Type,
   CreditCard, ShieldAlert, User, MapPinned, Hash
 } from "lucide-react";
-} from "lucide-react";
 
 export type ToolCategory = 
   | "all"
