@@ -49,6 +49,7 @@ interface CustomTool {
   icon_name: string;
   color: string;
   html_content: string;
+  embed_url: string;
   is_enabled: boolean;
   created_at: string;
   updated_at: string;
