@@ -314,10 +314,25 @@ export default function InternetSpeedTester() {
 
   return (
     <ToolLayout title="Internet Speed Tester" description="Analyze your internet connection speed with advanced metrics">
-      <div className="max-w-xl mx-auto space-y-6">
+      <div className="max-w-xl mx-auto space-y-6 relative">
+        {/* Deep Green Gradient Background */}
+        <div className="absolute -inset-6 -top-10 rounded-3xl overflow-hidden pointer-events-none -z-10">
+          <div className="absolute inset-0" style={{
+            background: "linear-gradient(135deg, #064e3b 0%, #065f46 20%, #047857 40%, #059669 60%, #10b981 80%, #064e3b 100%)"
+          }} />
+          <div className="absolute inset-0 opacity-30" style={{
+            background: "radial-gradient(ellipse at 20% 20%, #34d399 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, #6ee7b7 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, #047857 0%, transparent 60%)"
+          }} />
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)",
+            backgroundSize: "24px 24px"
+          }} />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full blur-[120px] opacity-20 bg-emerald-300" />
+          <div className="absolute bottom-0 right-0 w-[300px] h-[200px] rounded-full blur-[100px] opacity-15 bg-teal-400" />
+        </div>
 
         {/* Server Selection */}
-        <div className="rounded-xl border border-border/30 bg-card p-4">
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/60 backdrop-blur-sm p-4 shadow-lg shadow-emerald-900/20">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Server className="w-4 h-4 text-primary" />
