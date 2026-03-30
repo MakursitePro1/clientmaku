@@ -562,14 +562,15 @@ export default function InternetSpeedTester() {
         setJitter(pingResult.avgJitter);
       }
 
-      // Keep final download speed on the meter for 1 second
-      await wait(1000);
+      // Hold final download speed visibly for 2 seconds
+      await wait(2000);
       if (cancelRef.current) return reset();
 
-      // Bring meter fully back to zero before upload starts
+      // Smooth reset to zero
       setPhase("resetting");
       liveSpeedRef.current = 0;
-      await wait(1000);
+      // Wait long enough for the smooth decay animation to reach zero
+      await wait(1800);
       if (cancelRef.current) return reset();
       setDisplaySpeed(0);
 
