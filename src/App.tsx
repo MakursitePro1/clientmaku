@@ -87,6 +87,7 @@ const UserAgentParser = lazy(() => import("./pages/tools/UserAgentParser"));
 const ChmodCalculator = lazy(() => import("./pages/tools/ChmodCalculator"));
 const PortScanner = lazy(() => import("./pages/tools/PortScanner"));
 const SslChecker = lazy(() => import("./pages/tools/SslChecker"));
+const HtmlCssJsRunner = lazy(() => import("./pages/tools/HtmlCssJsRunner"));
 
 const queryClient = new QueryClient();
 
