@@ -476,7 +476,7 @@ export default function AdminCustomTools() {
 
     const canGoNext = () => {
       if (activeTab === "info") return !!(editingTool.name?.trim());
-      if (activeTab === "code") return !!(editingTool.html_content?.trim());
+      if (activeTab === "code") return !!(editingTool.html_content?.trim() || editingTool.embed_url?.trim());
       return true;
     };
 
