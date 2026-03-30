@@ -30,9 +30,30 @@ function saveRecentTool(toolId: string) {
   localStorage.setItem("cv_recent_tools", JSON.stringify(recent.slice(0, 10)));
 }
 
-function ToolItem({ tool, delay = 0 }: { tool: Tool; delay?: number }) {
+const itemVariants = {
+  hidden: { opacity: 0, x: -16, scale: 0.96 },
+  visible: (i: number) => ({
+    opacity: 1, x: 0, scale: 1,
+    transition: { delay: i * 0.045, duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
+  exit: { opacity: 0, x: 16, scale: 0.96, transition: { duration: 0.2 } },
+};
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 12, scale: 0.97 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94], staggerChildren: 0.04 } },
+  exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.25 } },
+};
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.04 } },
+  exit: { transition: { staggerChildren: 0.02, staggerDirection: -1 } },
+};
+
+function ToolItem({ tool, index = 0 }: { tool: Tool; index?: number }) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay }}>
+    <motion.div variants={itemVariants} custom={index} initial="hidden" animate="visible" exit="exit" layout>
       <Link
         to={tool.path}
         onClick={() => saveRecentTool(tool.id)}
@@ -64,7 +85,14 @@ function ToolItem({ tool, delay = 0 }: { tool: Tool; delay?: number }) {
 
 function SidebarSection({ icon: Icon, label, children, accent }: { icon: any; label: string; children: React.ReactNode; accent?: string }) {
   return (
-    <div className="tool-section-card overflow-hidden group/section">
+    <motion.div
+      variants={sectionVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      layout
+      className="tool-section-card overflow-hidden group/section"
+    >
       {/* Section header with accent icon */}
       <div className="p-4 pb-2.5 flex items-center gap-2.5">
         <div
@@ -84,7 +112,7 @@ function SidebarSection({ icon: Icon, label, children, accent }: { icon: any; la
       <div className="px-2 pb-3.5 space-y-0.5">
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -150,17 +178,21 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
       {/* Categories */}
       <SidebarSection icon={Filter} label="Categories" accent="#f59e0b">
         <div className="flex flex-wrap gap-1.5 px-2 pb-1">
-          {categories.map(cat => {
+          {categories.map((cat, i) => {
             const isActive = selectedCat === cat.id;
             const count = getCategoryCount(cat.id);
             return (
-              <button
+              <motion.button
                 key={cat.id}
                 onClick={() => setSelectedCat(cat.id)}
+                layout
+                whileTap={{ scale: 0.95 }}
+                animate={isActive ? { scale: 1.03 } : { scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all duration-300 border",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-colors duration-300 border",
                   isActive
-                    ? "bg-foreground text-background border-foreground shadow-[0_8px_20px_-8px_hsl(var(--foreground)/0.5)] scale-[1.03]"
+                    ? "bg-foreground text-background border-foreground shadow-[0_8px_20px_-8px_hsl(var(--foreground)/0.5)]"
                     : "bg-foreground/[0.03] text-muted-foreground border-foreground/[0.08] hover:bg-foreground/[0.07] hover:text-foreground hover:border-foreground/[0.16]"
                 )}
               >
@@ -172,7 +204,7 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
                 )}>
                   {count}
                 </span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
@@ -181,7 +213,12 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
       {/* Filtered Results */}
       <AnimatePresence mode="wait">
         {showFiltered && filteredTools.length > 0 && (
-          <motion.div key="filtered" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+          <motion.div
+            key={`filtered-${selectedCat}-${search}`}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             className="tool-section-card overflow-hidden"
           >
             <div className="p-4 pb-2">
@@ -189,33 +226,41 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
                 {search ? "Search Results" : "Filtered"} ({filteredTools.length})
               </span>
             </div>
-            <div className="px-2 pb-3 space-y-0.5">
-              {filteredTools.map((tool, i) => <ToolItem key={tool.id} tool={tool} delay={i * 0.03} />)}
-            </div>
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" exit="exit" className="px-2 pb-3 space-y-0.5">
+              {filteredTools.map((tool, i) => <ToolItem key={tool.id} tool={tool} index={i} />)}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Popular Tools */}
-      {!showFiltered && popular.length > 0 && (
-        <SidebarSection icon={Flame} label="Popular Tools" accent="#ef4444">
-          {popular.map((tool, i) => <ToolItem key={tool.id} tool={tool} delay={0.2 + i * 0.04} />)}
-        </SidebarSection>
-      )}
+      <AnimatePresence mode="wait">
+        {/* Popular Tools */}
+        {!showFiltered && popular.length > 0 && (
+          <SidebarSection key="popular" icon={Flame} label="Popular Tools" accent="#ef4444">
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" exit="exit">
+              {popular.map((tool, i) => <ToolItem key={tool.id} tool={tool} index={i} />)}
+            </motion.div>
+          </SidebarSection>
+        )}
 
-      {/* Similar Tools */}
-      {!showFiltered && similarTools.length > 0 && (
-        <SidebarSection icon={Zap} label="Similar Tools" accent="#8b5cf6">
-          {similarTools.map((tool, i) => <ToolItem key={tool.id} tool={tool} delay={0.3 + i * 0.05} />)}
-        </SidebarSection>
-      )}
+        {/* Similar Tools */}
+        {!showFiltered && similarTools.length > 0 && (
+          <SidebarSection key="similar" icon={Zap} label="Similar Tools" accent="#8b5cf6">
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" exit="exit">
+              {similarTools.map((tool, i) => <ToolItem key={tool.id} tool={tool} index={i} />)}
+            </motion.div>
+          </SidebarSection>
+        )}
 
-      {/* Recent Tools */}
-      {!showFiltered && recent.length > 0 && (
-        <SidebarSection icon={Clock} label="Recently Visited" accent="#10b981">
-          {recent.map((tool, i) => <ToolItem key={tool.id} tool={tool} delay={0.3 + i * 0.04} />)}
-        </SidebarSection>
-      )}
+        {/* Recent Tools */}
+        {!showFiltered && recent.length > 0 && (
+          <SidebarSection key="recent" icon={Clock} label="Recently Visited" accent="#10b981">
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" exit="exit">
+              {recent.map((tool, i) => <ToolItem key={tool.id} tool={tool} index={i} />)}
+            </motion.div>
+          </SidebarSection>
+        )}
+      </AnimatePresence>
 
       {/* Quick Stats */}
       <div className="tool-section-card p-5">
