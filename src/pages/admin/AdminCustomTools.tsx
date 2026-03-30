@@ -153,7 +153,7 @@ export default function AdminCustomTools() {
   const handleCreate = () => {
     setEditingTool({
       name: "", slug: "", description: "", category: "utility",
-      icon_name: "Wrench", color: "hsl(263, 85%, 58%)", html_content: "", is_enabled: true
+      icon_name: "Wrench", color: "hsl(263, 85%, 58%)", html_content: "", embed_url: "", is_enabled: true
     });
     setActiveTab("info");
     setView("create");
