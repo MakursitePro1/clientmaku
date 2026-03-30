@@ -133,7 +133,7 @@ export function HeroSection() {
     { value: `${totalTools}`, label: "Free Tools", icon: Zap },
     { value: "100%", label: "Free to Use", icon: Shield },
     { value: settings.stats_users_count, label: "Happy Users", icon: Globe },
-    { value: `${totalCategories}`, label: "Categories", icon: BarChart3 },
+    { value: `${totalCategories}+`, label: "Categories", icon: BarChart3 },
   ];
 
   return (
