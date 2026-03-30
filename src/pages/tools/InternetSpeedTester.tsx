@@ -464,7 +464,7 @@ function PhaseResult({
 // --- Main Component ---
 export default function InternetSpeedTester() {
   const [testing, setTesting] = useState(false);
-  const [phase, setPhase] = useState<"idle" | "download" | "upload" | "done" | "error">("idle");
+  const [phase, setPhase] = useState<"idle" | "download" | "upload" | "resetting" | "done" | "error">("idle");
   const [download, setDownload] = useState<number | null>(null);
   const [upload, setUpload] = useState<number | null>(null);
   const [ping, setPing] = useState<number | null>(null);
