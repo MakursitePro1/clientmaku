@@ -62,6 +62,8 @@ interface SiteSettings {
   // Announcements
   announcement_text: string;
   announcement_enabled: string;
+  // Admin
+  admin_slug: string;
 }
 
 const defaultSettings: SiteSettings = {
