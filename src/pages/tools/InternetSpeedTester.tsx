@@ -495,21 +495,26 @@ export default function InternetSpeedTester() {
         const target = liveSpeedRef.current;
 
         if (phase === "resetting") {
-          const next = prev <= 0.2 ? 0 : prev + (0 - prev) * 0.2;
-          return +Math.max(0, next).toFixed(2);
+          // Very smooth exponential decay to zero
+          if (prev <= 0.15) return 0;
+          const decay = prev * 0.94; // slow decay
+          return +Math.max(0, decay).toFixed(2);
         }
 
         if (target > 0.35) {
-          const smooth = prev + (target - prev) * 0.16;
-          const wobble = Math.sin(elapsed / 90) * Math.min(target * 0.05, 2.8)
-            + Math.cos(elapsed / 60) * Math.min(target * 0.018, 1);
+          // Slow, smooth interpolation — 0.06 factor for gentle movement
+          const smooth = prev + (target - prev) * 0.06;
+          // Gentle wobble at slower frequencies
+          const wobble = Math.sin(elapsed / 400) * Math.min(target * 0.03, 1.5)
+            + Math.cos(elapsed / 280) * Math.min(target * 0.012, 0.6);
           return +Math.max(0.1, smooth + wobble).toFixed(2);
         }
 
-        const peak = phase === "download" ? 42 : 24;
-        const sweep = peak * Math.abs(Math.sin(elapsed / 260));
-        const pulse = peak * 0.08 * Math.abs(Math.cos(elapsed / 110));
-        return +Math.max(0.5, sweep + pulse).toFixed(2);
+        // Synthetic sweep while waiting for data — slower
+        const peak = phase === "download" ? 35 : 20;
+        const sweep = peak * Math.abs(Math.sin(elapsed / 600));
+        const pulse = peak * 0.05 * Math.abs(Math.cos(elapsed / 300));
+        return +Math.max(0.3, sweep + pulse).toFixed(2);
       });
 
       raf = requestAnimationFrame(tick);
