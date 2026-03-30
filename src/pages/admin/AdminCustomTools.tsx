@@ -683,7 +683,7 @@ export default function AdminCustomTools() {
                   <CardContent>
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm" style={{ backgroundColor: (editingTool.color || "hsl(263,85%,58%)") + "22", color: editingTool.color || "hsl(263,85%,58%)" }}>
-                        <FileCode className="w-6 h-6" />
+                        {(() => { const I = getIconComponent(editingTool.icon_name || "FileCode"); return <I className="w-6 h-6" />; })()}
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate">{editingTool.name}</p>
