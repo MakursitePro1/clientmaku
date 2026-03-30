@@ -222,9 +222,9 @@ export default function CustomToolPage() {
       <div className="w-full flex-1" style={{ minHeight: 0 }}>
         <iframe
           ref={iframeRef}
-          srcDoc={tool.html_content}
+          {...(tool.embed_url ? { src: tool.embed_url } : { srcDoc: tool.html_content })}
           title={tool.name}
-          sandbox="allow-scripts allow-forms allow-modals allow-popups"
+          sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"
           className="w-full border-0 block"
           style={{ height: "calc(100vh - 160px)", minHeight: "500px" }}
         />
