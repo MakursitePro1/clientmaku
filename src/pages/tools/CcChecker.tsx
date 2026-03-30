@@ -1,14 +1,25 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import {
   CreditCard, CheckCircle2, XCircle, Info, Trash2, Plus, Shield, Zap, Download,
-  Copy, Filter, BarChart3, Eye, EyeOff, Hash, Clock, Search, FileJson, AlertTriangle
+  Copy, Filter, BarChart3, Eye, EyeOff, Hash, Clock, Search, FileJson, AlertTriangle,
+  Globe, Building2, Loader2, Database
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
+
+interface BinData {
+  scheme?: string;
+  type?: string;
+  brand?: string;
+  prepaid?: boolean;
+  country?: { name?: string; emoji?: string; alpha2?: string; currency?: string; latitude?: number; longitude?: number };
+  bank?: { name?: string; url?: string; phone?: string; city?: string };
+  number?: { length?: number; luhn?: boolean };
+}
 
 interface CardResult {
   number: string;
@@ -23,6 +34,28 @@ interface CardResult {
   checkDigit: string;
   iin: string;
   timestamp: number;
+  binData?: BinData | null;
+  binLoading?: boolean;
+}
+
+// BIN cache to avoid duplicate API calls
+const binCache: Record<string, BinData | null> = {};
+
+async function fetchBinData(bin: string): Promise<BinData | null> {
+  const key = bin.substring(0, 6);
+  if (binCache[key] !== undefined) return binCache[key];
+  try {
+    const res = await fetch(`https://lookup.binlist.net/${key}`, {
+      headers: { "Accept-Version": "3" },
+    });
+    if (!res.ok) { binCache[key] = null; return null; }
+    const data = await res.json();
+    binCache[key] = data;
+    return data;
+  } catch {
+    binCache[key] = null;
+    return null;
+  }
 }
 
 function luhnCheck(num: string): boolean {
@@ -94,19 +127,6 @@ function detectLevel(num: string, brand: string): string {
   return "Standard";
 }
 
-function detectCountry(num: string): string {
-  const d = num.replace(/\D/g, "");
-  const iin = d.substring(0, 6);
-  const n = parseInt(iin, 10);
-  if (n >= 400000 && n <= 499999) return "🇺🇸 United States";
-  if (n >= 510000 && n <= 559999) return "🌍 International";
-  if (n >= 340000 && n <= 349999) return "🇺🇸 United States";
-  if (n >= 370000 && n <= 379999) return "🇺🇸 United States";
-  if (n >= 620000 && n <= 629999) return "🇨🇳 China";
-  if (n >= 353000 && n <= 358999) return "🇯🇵 Japan";
-  return "🌐 Unknown";
-}
-
 function getBrandColor(brand: string): string {
   const map: Record<string, string> = {
     Visa: "hsl(220, 90%, 55%)",
@@ -142,6 +162,93 @@ function maskNumber(num: string): string {
 
 type FilterType = "all" | "valid" | "invalid";
 
+// BIN Info Display Component
+function BinInfoCard({ binData, loading }: { binData?: BinData | null; loading?: boolean }) {
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        <span>Looking up BIN data...</span>
+      </div>
+    );
+  }
+  if (!binData) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      className="border-t border-border/30 pt-3 mt-2"
+    >
+      <p className="text-xs font-semibold text-primary flex items-center gap-1.5 mb-2">
+        <Database className="w-3.5 h-3.5" /> BIN Lookup — Real Data
+      </p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+        {binData.bank?.name && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground flex items-center gap-1"><Building2 className="w-3 h-3" /> Bank</p>
+            <p className="font-medium text-foreground">{binData.bank.name}</p>
+          </div>
+        )}
+        {binData.country?.name && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground flex items-center gap-1"><Globe className="w-3 h-3" /> Country</p>
+            <p className="font-medium text-foreground">{binData.country.emoji} {binData.country.name}</p>
+          </div>
+        )}
+        {binData.scheme && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground">Scheme</p>
+            <p className="font-medium text-foreground capitalize">{binData.scheme}</p>
+          </div>
+        )}
+        {binData.type && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground">Card Type</p>
+            <p className="font-medium text-foreground capitalize">{binData.type}</p>
+          </div>
+        )}
+        {binData.brand && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground">Brand</p>
+            <p className="font-medium text-foreground">{binData.brand}</p>
+          </div>
+        )}
+        {binData.prepaid !== undefined && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground">Prepaid</p>
+            <p className="font-medium text-foreground">{binData.prepaid ? "Yes" : "No"}</p>
+          </div>
+        )}
+        {binData.country?.currency && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground">Currency</p>
+            <p className="font-medium text-foreground">{binData.country.currency}</p>
+          </div>
+        )}
+        {binData.bank?.url && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground">Bank URL</p>
+            <p className="font-medium text-foreground text-primary truncate">{binData.bank.url}</p>
+          </div>
+        )}
+        {binData.bank?.phone && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground">Bank Phone</p>
+            <p className="font-medium text-foreground">{binData.bank.phone}</p>
+          </div>
+        )}
+        {binData.country?.alpha2 && (
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2">
+            <p className="text-muted-foreground">Country Code</p>
+            <p className="font-medium text-foreground">{binData.country.alpha2}</p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function CcChecker() {
   const [input, setInput] = useState("");
   const [results, setResults] = useState<CardResult[]>([]);
@@ -151,9 +258,14 @@ export default function CcChecker() {
   const [checkDigitInput, setCheckDigitInput] = useState("");
   const [singleCardInput, setSingleCardInput] = useState("");
   const [singleResult, setSingleResult] = useState<CardResult | null>(null);
+  const [singleBinLoading, setSingleBinLoading] = useState(false);
   const [history, setHistory] = useState<{ count: number; valid: number; time: string }[]>([]);
+  const [binLookupInput, setBinLookupInput] = useState("");
+  const [binLookupResult, setBinLookupResult] = useState<BinData | null>(null);
+  const [binLookupLoading, setBinLookupLoading] = useState(false);
+  const [bulkBinLoading, setBulkBinLoading] = useState(false);
 
-  const checkCards = () => {
+  const checkCards = useCallback(async () => {
     const lines = input
       .split(/[\n,|;]+/)
       .map((l) => l.trim().replace(/[\s\-]/g, "").replace(/\D/g, ""))
@@ -176,30 +288,56 @@ export default function CcChecker() {
         level: detectLevel(num, brand),
         length: num.length,
         luhn: luhnCheck(num),
-        issuerCountry: detectCountry(num),
+        issuerCountry: "Loading...",
         checkDigit: num[num.length - 1],
         iin: num.substring(0, 6),
         timestamp: Date.now(),
+        binData: null,
+        binLoading: true,
       };
     });
 
     setResults(checked);
+    setBulkBinLoading(true);
     setHistory(prev => [...prev, {
       count: checked.length,
       valid: checked.filter(r => r.valid).length,
       time: new Date().toLocaleTimeString()
     }]);
-    toast.success(`Validated ${checked.length} card(s) — ${checked.filter(r => r.valid).length} valid`);
-  };
+    toast.success(`Validated ${checked.length} card(s) — ${checked.filter(r => r.valid).length} valid. Fetching BIN data...`);
 
-  const checkSingleCard = () => {
+    // Fetch BIN data for unique BINs (rate-limited)
+    const uniqueBins = [...new Set(checked.map(r => r.iin))];
+    const binResults: Record<string, BinData | null> = {};
+    
+    for (const bin of uniqueBins) {
+      binResults[bin] = await fetchBinData(bin);
+      // Small delay to respect rate limits
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    setResults(prev => prev.map(r => {
+      const bd = binResults[r.iin];
+      return {
+        ...r,
+        binData: bd,
+        binLoading: false,
+        issuerCountry: bd?.country ? `${bd.country.emoji || "🌐"} ${bd.country.name || "Unknown"}` : r.issuerCountry === "Loading..." ? "🌐 Unknown" : r.issuerCountry,
+        brand: bd?.scheme ? (bd.scheme.charAt(0).toUpperCase() + bd.scheme.slice(1)) : r.brand,
+        type: bd?.type ? (bd.type.charAt(0).toUpperCase() + bd.type.slice(1)) : r.type,
+      };
+    }));
+    setBulkBinLoading(false);
+  }, [input]);
+
+  const checkSingleCard = useCallback(async () => {
     const num = singleCardInput.replace(/[\s\-]/g, "").replace(/\D/g, "");
     if (num.length < 12 || num.length > 19) {
       toast.error("Enter a valid card number (12-19 digits)");
       return;
     }
     const brand = detectBrand(num);
-    setSingleResult({
+    const result: CardResult = {
       number: num,
       masked: maskNumber(num),
       valid: luhnCheck(num),
@@ -208,18 +346,48 @@ export default function CcChecker() {
       level: detectLevel(num, brand),
       length: num.length,
       luhn: luhnCheck(num),
-      issuerCountry: detectCountry(num),
+      issuerCountry: "Loading...",
       checkDigit: num[num.length - 1],
       iin: num.substring(0, 6),
       timestamp: Date.now(),
-    });
-  };
+      binData: null,
+      binLoading: true,
+    };
+    setSingleResult(result);
+    setSingleBinLoading(true);
+
+    const bd = await fetchBinData(num);
+    setSingleResult(prev => prev ? {
+      ...prev,
+      binData: bd,
+      binLoading: false,
+      issuerCountry: bd?.country ? `${bd.country.emoji || "🌐"} ${bd.country.name || "Unknown"}` : "🌐 Unknown",
+      brand: bd?.scheme ? (bd.scheme.charAt(0).toUpperCase() + bd.scheme.slice(1)) : prev.brand,
+      type: bd?.type ? (bd.type.charAt(0).toUpperCase() + bd.type.slice(1)) : prev.type,
+    } : prev);
+    setSingleBinLoading(false);
+  }, [singleCardInput]);
+
+  const lookupBin = useCallback(async () => {
+    const bin = binLookupInput.replace(/\D/g, "").substring(0, 8);
+    if (bin.length < 6) {
+      toast.error("Enter at least 6 digits for BIN lookup");
+      return;
+    }
+    setBinLookupLoading(true);
+    setBinLookupResult(null);
+    const data = await fetchBinData(bin);
+    setBinLookupResult(data);
+    setBinLookupLoading(false);
+    if (!data) toast.error("No BIN data found for this number");
+    else toast.success("BIN data retrieved successfully!");
+  }, [binLookupInput]);
 
   const exportCsv = () => {
     if (filteredResults.length === 0) return;
-    const header = "Card Number,Valid,Brand,Type,Level,Length,IIN,Country,Check Digit\n";
+    const header = "Card Number,Valid,Brand,Type,Level,Length,IIN,Country,Bank,Prepaid,Currency,Check Digit\n";
     const rows = filteredResults.map((r) =>
-      `${showMasked ? r.masked : r.number},${r.valid ? "VALID" : "INVALID"},${r.brand},${r.type},${r.level},${r.length},${r.iin},${r.issuerCountry},${r.checkDigit}`
+      `${showMasked ? r.masked : r.number},${r.valid ? "VALID" : "INVALID"},${r.brand},${r.type},${r.level},${r.length},${r.iin},"${r.issuerCountry}","${r.binData?.bank?.name || "N/A"}",${r.binData?.prepaid ?? "N/A"},${r.binData?.country?.currency || "N/A"},${r.checkDigit}`
     ).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -236,7 +404,10 @@ export default function CcChecker() {
     const data = filteredResults.map(r => ({
       number: showMasked ? r.masked : r.number,
       valid: r.valid, brand: r.brand, type: r.type, level: r.level,
-      length: r.length, iin: r.iin, country: r.issuerCountry, checkDigit: r.checkDigit
+      length: r.length, iin: r.iin, country: r.issuerCountry, checkDigit: r.checkDigit,
+      bank: r.binData?.bank?.name || null,
+      prepaid: r.binData?.prepaid ?? null,
+      currency: r.binData?.country?.currency || null,
     }));
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -250,7 +421,7 @@ export default function CcChecker() {
 
   const copyResults = () => {
     const text = filteredResults.map(r =>
-      `${showMasked ? r.masked : r.number} | ${r.valid ? "VALID" : "INVALID"} | ${r.brand} | ${r.type}`
+      `${showMasked ? r.masked : r.number} | ${r.valid ? "VALID" : "INVALID"} | ${r.brand} | ${r.type} | ${r.binData?.bank?.name || "N/A"} | ${r.issuerCountry}`
     ).join("\n");
     navigator.clipboard.writeText(text);
     toast.success("Results copied to clipboard!");
@@ -264,7 +435,10 @@ export default function CcChecker() {
     if (filter === "invalid") filtered = filtered.filter(r => !r.valid);
     if (searchQuery) {
       filtered = filtered.filter(r =>
-        r.number.includes(searchQuery) || r.brand.toLowerCase().includes(searchQuery.toLowerCase())
+        r.number.includes(searchQuery) ||
+        r.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.binData?.bank?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (r.binData?.country?.name || "").toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     return filtered;
@@ -282,7 +456,7 @@ export default function CcChecker() {
   return (
     <ToolLayout
       title="CC Checker / Validator"
-      description="Advanced credit card number validator with Luhn algorithm (Educational purpose only)"
+      description="Advanced credit card validator with BIN Lookup & Luhn algorithm (Educational only)"
     >
       <div className="space-y-6 max-w-5xl mx-auto">
         {/* Disclaimer */}
@@ -293,21 +467,24 @@ export default function CcChecker() {
         >
           <Shield className="w-5 h-5 text-yellow-500 mt-0.5 shrink-0" />
           <p className="text-sm text-muted-foreground">
-            <strong className="text-yellow-500">Educational Tool:</strong> This tool validates card number format using the Luhn algorithm. It does NOT verify if a card is active, has funds, or is real. For educational & testing purposes only.
+            <strong className="text-yellow-500">Educational Tool:</strong> Validates card format using Luhn algorithm + real BIN database lookup. Does NOT verify if a card is active, has funds, or is real.
           </p>
         </motion.div>
 
         {/* Tabs */}
         <Tabs defaultValue="bulk" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 h-12">
+          <TabsList className="grid w-full grid-cols-5 h-12">
             <TabsTrigger value="bulk" className="gap-1.5 text-xs sm:text-sm">
-              <Zap className="w-3.5 h-3.5" /> Bulk Check
+              <Zap className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Bulk</span> Check
             </TabsTrigger>
             <TabsTrigger value="single" className="gap-1.5 text-xs sm:text-sm">
-              <CreditCard className="w-3.5 h-3.5" /> Single Check
+              <CreditCard className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Single</span> Card
+            </TabsTrigger>
+            <TabsTrigger value="binlookup" className="gap-1.5 text-xs sm:text-sm">
+              <Database className="w-3.5 h-3.5" /> BIN <span className="hidden sm:inline">Lookup</span>
             </TabsTrigger>
             <TabsTrigger value="checkdigit" className="gap-1.5 text-xs sm:text-sm">
-              <Hash className="w-3.5 h-3.5" /> Check Digit
+              <Hash className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Check</span> Digit
             </TabsTrigger>
             <TabsTrigger value="history" className="gap-1.5 text-xs sm:text-sm">
               <Clock className="w-3.5 h-3.5" /> History
@@ -325,7 +502,7 @@ export default function CcChecker() {
                 <CreditCard className="w-5 h-5 text-primary" />
                 <h3 className="font-semibold text-foreground">Bulk Card Validation</h3>
                 <span className="text-xs text-muted-foreground ml-auto">
-                  Supports: comma, pipe, semicolon, newline separated
+                  + Real BIN Lookup
                 </span>
               </div>
               <textarea
@@ -338,10 +515,15 @@ export default function CcChecker() {
                 <p className="text-xs text-muted-foreground">
                   {input.trim() ? `~${input.split(/[\n,|;]+/).filter(l => l.trim()).length} entries detected` : "No entries"}
                 </p>
+                {bulkBinLoading && (
+                  <p className="text-xs text-primary flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Fetching BIN data...
+                  </p>
+                )}
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button onClick={checkCards} className="gap-2" disabled={!input.trim()}>
-                  <Zap className="w-4 h-4" /> Validate All
+                <Button onClick={checkCards} className="gap-2" disabled={!input.trim() || bulkBinLoading}>
+                  {bulkBinLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />} Validate All
                 </Button>
                 <Button variant="outline" onClick={() => { setInput(""); setResults([]); setFilter("all"); setSearchQuery(""); }} className="gap-2">
                   <Trash2 className="w-4 h-4" /> Clear
@@ -435,7 +617,7 @@ export default function CcChecker() {
                     <div className="relative flex-1 min-w-[180px]">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
-                        placeholder="Search by number or brand..."
+                        placeholder="Search number, brand, bank, country..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-9 h-9"
@@ -470,7 +652,6 @@ export default function CcChecker() {
                     </Button>
                   </div>
 
-                  {/* Results count */}
                   <p className="text-xs text-muted-foreground">
                     Showing {filteredResults.length} of {results.length} results
                   </p>
@@ -539,10 +720,14 @@ export default function CcChecker() {
                           </p>
                         </div>
                         <div className="rounded-lg bg-muted/50 p-2">
-                          <p className="text-muted-foreground">Algorithm</p>
-                          <p className="font-medium text-foreground">Luhn (Mod 10)</p>
+                          <p className="text-muted-foreground">Bank</p>
+                          <p className="font-medium text-foreground truncate">
+                            {r.binLoading ? "..." : r.binData?.bank?.name || "N/A"}
+                          </p>
                         </div>
                       </div>
+                      {/* BIN Info */}
+                      <BinInfoCard binData={r.binData} loading={r.binLoading} />
                     </motion.div>
                   ))}
                 </motion.div>
@@ -559,7 +744,7 @@ export default function CcChecker() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <CreditCard className="w-5 h-5 text-primary" />
-                <h3 className="font-semibold text-foreground">Single Card Deep Analysis</h3>
+                <h3 className="font-semibold text-foreground">Single Card Deep Analysis + BIN Lookup</h3>
               </div>
               <div className="flex gap-3">
                 <Input
@@ -568,8 +753,8 @@ export default function CcChecker() {
                   onChange={(e) => setSingleCardInput(e.target.value)}
                   className="font-mono"
                 />
-                <Button onClick={checkSingleCard} disabled={!singleCardInput.trim()} className="gap-2 shrink-0">
-                  <Zap className="w-4 h-4" /> Analyze
+                <Button onClick={checkSingleCard} disabled={!singleCardInput.trim() || singleBinLoading} className="gap-2 shrink-0">
+                  {singleBinLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />} Analyze
                 </Button>
               </div>
 
@@ -583,7 +768,7 @@ export default function CcChecker() {
                   >
                     {/* Visual Card */}
                     <div
-                      className="relative rounded-2xl p-6 text-white overflow-hidden h-52"
+                      className="relative rounded-2xl p-6 text-white overflow-hidden h-56"
                       style={{
                         background: `linear-gradient(135deg, ${getBrandColor(singleResult.brand)}, ${getBrandColor(singleResult.brand)}dd, hsl(var(--primary)))`,
                       }}
@@ -602,6 +787,11 @@ export default function CcChecker() {
                         </div>
                         <div>
                           <p className="font-mono text-xl tracking-[0.2em]">{formatDisplay(singleResult.number)}</p>
+                          {singleResult.binData?.bank?.name && (
+                            <p className="text-xs opacity-70 mt-1 flex items-center gap-1">
+                              <Building2 className="w-3 h-3" /> {singleResult.binData.bank.name}
+                            </p>
+                          )}
                         </div>
                         <div className="flex justify-between items-end">
                           <div>
@@ -609,8 +799,8 @@ export default function CcChecker() {
                             <p className="text-sm font-bold">{singleResult.valid ? "✓ VALID" : "✗ INVALID"}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs opacity-60">Type</p>
-                            <p className="text-sm">{singleResult.type}</p>
+                            <p className="text-xs opacity-60">Country</p>
+                            <p className="text-sm">{singleResult.issuerCountry}</p>
                           </div>
                         </div>
                       </div>
@@ -627,25 +817,209 @@ export default function CcChecker() {
                         { label: "Length", value: `${singleResult.length} digits`, icon: "📏" },
                         { label: "Check Digit", value: singleResult.checkDigit, icon: "🔑" },
                         { label: "Luhn Check", value: singleResult.luhn ? "Pass ✓" : "Fail ✗", icon: "🧮" },
-                        { label: "Algorithm", value: "Mod 10 (Luhn)", icon: "⚙️" },
+                        { label: "Prepaid", value: singleResult.binData?.prepaid !== undefined ? (singleResult.binData.prepaid ? "Yes" : "No") : "N/A", icon: "💰" },
+                        { label: "Bank", value: singleResult.binData?.bank?.name || (singleBinLoading ? "Loading..." : "N/A"), icon: "🏦" },
+                        { label: "Currency", value: singleResult.binData?.country?.currency || "N/A", icon: "💱" },
+                        { label: "Bank URL", value: singleResult.binData?.bank?.url || "N/A", icon: "🔗" },
                       ].map((item, idx) => (
                         <motion.div
                           key={idx}
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: idx * 0.05 }}
+                          transition={{ delay: idx * 0.04 }}
                           className="rounded-xl border border-border/50 bg-card/50 p-3"
                         >
                           <p className="text-xs text-muted-foreground flex items-center gap-1">
                             <span>{item.icon}</span> {item.label}
                           </p>
-                          <p className="font-medium text-foreground text-sm mt-1">{item.value}</p>
+                          <p className="font-medium text-foreground text-sm mt-1 truncate">{item.value}</p>
                         </motion.div>
                       ))}
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
+            </motion.div>
+          </TabsContent>
+
+          {/* BIN Lookup Tab */}
+          <TabsContent value="binlookup" className="space-y-6 mt-6">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 space-y-4"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Database className="w-5 h-5 text-primary" />
+                <h3 className="font-semibold text-foreground">BIN / IIN Lookup</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Enter the first 6-8 digits of a card number (BIN/IIN) to look up the issuing bank, country, card type, and more from a real database.
+              </p>
+              <div className="flex gap-3">
+                <Input
+                  placeholder="Enter BIN (first 6-8 digits, e.g. 411111)"
+                  value={binLookupInput}
+                  onChange={(e) => setBinLookupInput(e.target.value.replace(/\D/g, "").substring(0, 8))}
+                  className="font-mono"
+                  maxLength={8}
+                />
+                <Button onClick={lookupBin} disabled={binLookupInput.length < 6 || binLookupLoading} className="gap-2 shrink-0">
+                  {binLookupLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />} Lookup
+                </Button>
+              </div>
+
+              {/* Quick BIN Examples */}
+              <div className="flex flex-wrap gap-2">
+                <p className="text-xs text-muted-foreground mr-1 mt-1">Try:</p>
+                {["411111", "550000", "378282", "601111", "353011", "620000", "400005"].map(bin => (
+                  <Button
+                    key={bin}
+                    size="sm"
+                    variant="outline"
+                    className="text-xs font-mono h-7"
+                    onClick={() => { setBinLookupInput(bin); }}
+                  >
+                    {bin}
+                  </Button>
+                ))}
+              </div>
+
+              <AnimatePresence>
+                {binLookupLoading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center justify-center gap-3 py-8"
+                  >
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">Looking up BIN database...</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {binLookupResult && !binLookupLoading && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="space-y-4"
+                  >
+                    {/* Summary Card */}
+                    <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{getBrandIcon(binLookupResult.scheme ? binLookupResult.scheme.charAt(0).toUpperCase() + binLookupResult.scheme.slice(1) : "Unknown")}</span>
+                        <div>
+                          <p className="font-semibold text-foreground text-lg capitalize">
+                            {binLookupResult.scheme || "Unknown Scheme"}
+                          </p>
+                          {binLookupResult.brand && (
+                            <p className="text-sm text-muted-foreground">{binLookupResult.brand}</p>
+                          )}
+                        </div>
+                        {binLookupResult.country?.emoji && (
+                          <span className="text-4xl ml-auto">{binLookupResult.country.emoji}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {binLookupResult.bank?.name && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground flex items-center gap-1"><Building2 className="w-3 h-3" /> Issuing Bank</p>
+                          <p className="font-medium text-foreground text-sm mt-1">{binLookupResult.bank.name}</p>
+                        </div>
+                      )}
+                      {binLookupResult.country?.name && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground flex items-center gap-1"><Globe className="w-3 h-3" /> Country</p>
+                          <p className="font-medium text-foreground text-sm mt-1">{binLookupResult.country.emoji} {binLookupResult.country.name}</p>
+                        </div>
+                      )}
+                      {binLookupResult.type && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Card Type</p>
+                          <p className="font-medium text-foreground text-sm mt-1 capitalize">{binLookupResult.type}</p>
+                        </div>
+                      )}
+                      {binLookupResult.scheme && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Scheme / Network</p>
+                          <p className="font-medium text-foreground text-sm mt-1 capitalize">{binLookupResult.scheme}</p>
+                        </div>
+                      )}
+                      {binLookupResult.brand && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Brand</p>
+                          <p className="font-medium text-foreground text-sm mt-1">{binLookupResult.brand}</p>
+                        </div>
+                      )}
+                      {binLookupResult.prepaid !== undefined && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Prepaid</p>
+                          <p className={`font-medium text-sm mt-1 ${binLookupResult.prepaid ? "text-yellow-500" : "text-green-500"}`}>
+                            {binLookupResult.prepaid ? "Yes (Prepaid)" : "No (Regular)"}
+                          </p>
+                        </div>
+                      )}
+                      {binLookupResult.country?.currency && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Currency</p>
+                          <p className="font-medium text-foreground text-sm mt-1">{binLookupResult.country.currency}</p>
+                        </div>
+                      )}
+                      {binLookupResult.country?.alpha2 && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Country Code</p>
+                          <p className="font-medium text-foreground text-sm mt-1">{binLookupResult.country.alpha2}</p>
+                        </div>
+                      )}
+                      {binLookupResult.bank?.url && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Bank Website</p>
+                          <p className="font-medium text-primary text-sm mt-1 truncate">{binLookupResult.bank.url}</p>
+                        </div>
+                      )}
+                      {binLookupResult.bank?.phone && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Bank Phone</p>
+                          <p className="font-medium text-foreground text-sm mt-1">{binLookupResult.bank.phone}</p>
+                        </div>
+                      )}
+                      {binLookupResult.number?.length && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Card Length</p>
+                          <p className="font-medium text-foreground text-sm mt-1">{binLookupResult.number.length} digits</p>
+                        </div>
+                      )}
+                      {binLookupResult.number?.luhn !== undefined && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Luhn Verified</p>
+                          <p className={`font-medium text-sm mt-1 ${binLookupResult.number.luhn ? "text-green-500" : "text-red-500"}`}>
+                            {binLookupResult.number.luhn ? "Yes ✓" : "No ✗"}
+                          </p>
+                        </div>
+                      )}
+                      {(binLookupResult.country?.latitude !== undefined && binLookupResult.country?.longitude !== undefined) && (
+                        <div className="rounded-xl border border-border/50 bg-card/50 p-3">
+                          <p className="text-xs text-muted-foreground">Coordinates</p>
+                          <p className="font-medium text-foreground text-sm mt-1 font-mono">
+                            {binLookupResult.country.latitude}°, {binLookupResult.country.longitude}°
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {binLookupResult === null && !binLookupLoading && binLookupInput.length >= 6 && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Click "Lookup" to search the BIN database
+                </p>
+              )}
             </motion.div>
           </TabsContent>
 
@@ -661,7 +1035,7 @@ export default function CcChecker() {
                 <h3 className="font-semibold text-foreground">Luhn Check Digit Calculator</h3>
               </div>
               <p className="text-sm text-muted-foreground">
-                Enter a partial card number (without the last digit) and this tool will calculate the correct check digit using the Luhn algorithm.
+                Enter a partial card number (without the last digit) to calculate the correct check digit.
               </p>
               <div className="flex gap-3">
                 <Input
@@ -719,7 +1093,6 @@ export default function CcChecker() {
                 <div className="text-center py-8">
                   <Clock className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground">No validation history yet</p>
-                  <p className="text-xs text-muted-foreground/60 mt-1">Run a bulk check to see history</p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -733,7 +1106,7 @@ export default function CcChecker() {
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-muted-foreground font-mono">#{i + 1}</span>
-                        <span className="text-sm text-foreground">{h.count} cards checked</span>
+                        <span className="text-sm text-foreground">{h.count} cards</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-green-500">{h.valid} valid</span>
@@ -756,33 +1129,40 @@ export default function CcChecker() {
           className="rounded-2xl border border-border/50 bg-card/50 p-6 space-y-4"
         >
           <h3 className="font-semibold text-foreground flex items-center gap-2">
-            <Info className="w-4 h-4 text-primary" /> How Luhn Algorithm Works
+            <Info className="w-4 h-4 text-primary" /> How It Works
           </h3>
           <div className="grid sm:grid-cols-2 gap-4">
-            <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-2">
-              <li>Starting from the rightmost digit, double every second digit</li>
-              <li>If doubling results in a number greater than 9, subtract 9</li>
-              <li>Sum all the digits together</li>
-              <li>If the total modulo 10 equals 0, the number is valid</li>
-            </ol>
             <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">Supported Card Networks:</p>
-              <div className="flex flex-wrap gap-2">
-                {["Visa", "Mastercard", "American Express", "Discover", "JCB", "UnionPay", "Diners Club", "Troy", "Maestro", "Dankort", "UATP"].map(brand => (
-                  <span key={brand} className="px-2 py-1 rounded-full text-xs text-white font-medium" style={{ backgroundColor: getBrandColor(brand) }}>
-                    {getBrandIcon(brand)} {brand}
-                  </span>
-                ))}
-              </div>
+              <p className="text-sm font-medium text-foreground">Luhn Algorithm:</p>
+              <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-1.5">
+                <li>Double every second digit from right</li>
+                <li>If result &gt; 9, subtract 9</li>
+                <li>Sum all digits</li>
+                <li>Valid if sum mod 10 = 0</li>
+              </ol>
             </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">BIN Lookup:</p>
+              <ul className="text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
+                <li>First 6 digits = BIN (Bank ID Number)</li>
+                <li>Identifies issuing bank & country</li>
+                <li>Shows card type, brand & prepaid status</li>
+                <li>Uses real banking database (binlist.net)</li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {["Visa", "Mastercard", "American Express", "Discover", "JCB", "UnionPay", "Diners Club", "Maestro"].map(brand => (
+              <span key={brand} className="px-2 py-1 rounded-full text-xs text-white font-medium" style={{ backgroundColor: getBrandColor(brand) }}>
+                {getBrandIcon(brand)} {brand}
+              </span>
+            ))}
           </div>
           <div className="mt-3 p-3 rounded-lg bg-muted/30 border border-border/30">
             <p className="text-xs text-muted-foreground flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
               <span>
-                <strong className="text-yellow-500">Disclaimer:</strong> This tool is for educational and development testing purposes only. 
-                It validates number format using mathematical algorithms. It cannot check if a card is real, active, or has available balance. 
-                Never use this for fraudulent activities.
+                <strong className="text-yellow-500">Disclaimer:</strong> Educational & development testing only. Cannot check if a card is real, active, or funded.
               </span>
             </p>
           </div>
