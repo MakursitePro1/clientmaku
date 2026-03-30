@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { FileCode } from "lucide-react";
+import { FileCode, icons as lucideIcons } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { tools as staticTools, categories as staticCategories, type Tool, type ToolCategory } from "@/data/tools";
 
