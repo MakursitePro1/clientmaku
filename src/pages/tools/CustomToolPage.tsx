@@ -39,7 +39,6 @@ export default function CustomToolPage() {
       .filter(t => t.category === tool.category && t.id !== `custom-${tool.slug}`)
       .slice(0, 8);
   }, [tool, allTools]);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (!slug) return;
