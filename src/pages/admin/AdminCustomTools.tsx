@@ -980,7 +980,7 @@ export default function AdminCustomTools() {
                       className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
                       style={{ backgroundColor: tool.color + "22", color: tool.color }}
                     >
-                      <FileCode className="w-5 h-5" />
+                      {(() => { const I = getIconComponent(tool.icon_name); return <I className="w-5 h-5" />; })()}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
