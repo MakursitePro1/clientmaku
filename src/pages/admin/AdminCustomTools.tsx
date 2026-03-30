@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,30 @@ import {
   Plus, Trash2, Edit, Eye, Upload, FileCode, ArrowLeft, X,
   CheckCircle, AlertCircle, Code2, Palette, Tag, Globe, Copy,
   Sparkles, Layers, Zap, LayoutGrid, RotateCcw, Archive,
-  Search, ExternalLink, AlertTriangle
+  Search, ExternalLink, AlertTriangle, icons as lucideIcons
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { categories as toolCategories } from "@/data/tools";
 import { cn } from "@/lib/utils";
+
+// Popular icons to show first
+const POPULAR_ICON_NAMES = [
+  "Wrench", "Code2", "Calculator", "FileText", "Image", "Globe", "Lock",
+  "Palette", "Mail", "Shield", "PiggyBank", "Share2", "Zap", "Sparkles",
+  "Star", "Heart", "Camera", "Music", "Video", "Database", "Cloud",
+  "Map", "Clock", "Calendar", "Bookmark", "Search", "Settings", "Terminal",
+  "Hash", "Link", "Key", "Cpu", "Wifi", "QrCode", "Smartphone", "Monitor",
+  "Gamepad2", "Scissors", "Ruler", "Compass", "Pen", "Type", "Binary",
+  "Braces", "Bug", "Cog", "Fingerprint", "Flask", "Gauge", "Gift",
+  "HardDrive", "Headphones", "Layers", "LayoutGrid", "Lightbulb", "Megaphone",
+  "Microscope", "Package", "Paintbrush", "Puzzle", "Rocket", "ScanLine",
+  "Server", "Sigma", "Sliders", "Swords", "Target", "Thermometer", "Timer",
+  "Truck", "Umbrella", "Users", "Wand2", "Workflow", "Boxes", "FileCode"
+];
+
+function getIconComponent(name: string): LucideIcon {
+  return (lucideIcons as Record<string, LucideIcon>)[name] || FileCode;
+}
 
 interface CustomTool {
   id: string;
