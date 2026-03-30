@@ -378,9 +378,9 @@ export default function AdminCustomTools() {
         </div>
         <div className="border border-border rounded-2xl overflow-hidden bg-white shadow-lg" style={{ height: "75vh" }}>
           <iframe
-            srcDoc={previewTool.html_content}
+            {...(previewTool.embed_url ? { src: previewTool.embed_url } : { srcDoc: previewTool.html_content })}
             className="w-full h-full border-0"
-            sandbox="allow-scripts allow-forms allow-modals"
+            sandbox="allow-scripts allow-forms allow-modals allow-same-origin"
             title={previewTool.name}
           />
         </div>
