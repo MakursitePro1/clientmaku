@@ -78,7 +78,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
       <SEOHead title={seoTitle} description={seoDescription} path={location.pathname} type="website" />
       <Navbar />
 
-      <div className="relative">
+      <div className="relative tool-page-shell">
         {/* ===== COLORFUL HERO HEADER ===== */}
         <div className="relative pt-20 sm:pt-24 pb-4 px-4 overflow-hidden">
           {/* Animated gradient background */}
@@ -117,7 +117,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="relative rounded-2xl border border-border/40 overflow-hidden shadow-lg"
+              className="tool-header-card relative overflow-hidden"
               style={{ boxShadow: `0 8px 40px -12px ${toolColor.replace(')', ' / 0.15)')}` }}
             >
               {/* Top gradient stripe */}
@@ -127,7 +127,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[80px] rounded-full blur-[60px] pointer-events-none opacity-20"
                 style={{ backgroundColor: toolColor }} />
 
-              <div className="relative bg-card/90 backdrop-blur-sm p-4 sm:p-5">
+              <div className="relative bg-card/80 backdrop-blur-xl p-4 sm:p-5">
                 <div className="flex items-center gap-3 sm:gap-4">
                   {currentTool && (
                     <motion.div
@@ -157,7 +157,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                   )}
                   <div className="flex-1 min-w-0">
                     <h1 className="text-lg sm:text-xl lg:text-2xl font-extrabold tracking-tight text-foreground leading-tight truncate">{title}</h1>
-                    <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 line-clamp-1">{description}</p>
+                    {description ? <p className="text-xs sm:text-sm text-muted-foreground/90 mt-0.5 line-clamp-1">{description}</p> : null}
                     {/* Category badge */}
                     {currentTool && (
                       <motion.span
@@ -248,7 +248,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.4 }}
-                className="relative rounded-2xl border border-border/40 bg-card shadow-sm overflow-hidden"
+                className="tool-page-main relative overflow-hidden"
                 style={{ boxShadow: `0 4px 24px -8px ${toolColor.replace(')', ' / 0.08)')}` }}
               >
                 {/* Top color bar */}
@@ -270,7 +270,7 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="mt-6 rounded-2xl border border-border/40 bg-card/60 p-5 sm:p-6"
+                  className="tool-rich-block mt-6 p-5 sm:p-6"
                 >
                   <h2 className="text-base font-bold text-foreground mb-3">About {title}</h2>
                   <div
