@@ -1011,6 +1011,31 @@ export default function CcChecker() {
                         </div>
                       )}
                     </div>
+
+                    {/* Country Map */}
+                    {binLookupResult.country?.latitude !== undefined && binLookupResult.country?.longitude !== undefined && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="rounded-xl border border-border/50 overflow-hidden"
+                      >
+                        <div className="flex items-center gap-2 px-4 py-2.5 bg-card/80 border-b border-border/30">
+                          <Globe className="w-4 h-4 text-primary" />
+                          <p className="text-sm font-medium text-foreground">
+                            {binLookupResult.country.emoji} {binLookupResult.country.name} — Issuer Location
+                          </p>
+                        </div>
+                        <iframe
+                          title="Country Map"
+                          width="100%"
+                          height="280"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          src={`https://www.openstreetmap.org/export/embed.html?bbox=${binLookupResult.country.longitude! - 8},${binLookupResult.country.latitude! - 5},${binLookupResult.country.longitude! + 8},${binLookupResult.country.latitude! + 5}&layer=mapnik&marker=${binLookupResult.country.latitude},${binLookupResult.country.longitude}`}
+                        />
+                      </motion.div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
