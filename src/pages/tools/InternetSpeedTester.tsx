@@ -448,7 +448,6 @@ export default function InternetSpeedTester() {
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
-  const animStartRef = useRef(0);
 
   const updateLive = useCallback((speed: number) => {
     liveSpeedRef.current = Math.max(0, speed);
@@ -476,52 +475,43 @@ export default function InternetSpeedTester() {
       setDisplaySpeed(0);
       return;
     }
+
     if (phase === "done") {
-      // Show final upload speed briefly, then hold
       setDisplaySpeed(upload ?? 0);
       return;
     }
-    if (phase === "error") return;
 
-    // "resetting" phase: smooth decay to zero
-    if (phase === "resetting") {
-      let raf = 0;
-      const decay = () => {
-        setDisplaySpeed(prev => {
-          if (prev < 0.3) return 0;
-          return +(prev * 0.88).toFixed(2);
-        });
-        raf = requestAnimationFrame(decay);
-      };
-      raf = requestAnimationFrame(decay);
-      return () => cancelAnimationFrame(raf);
+    if (phase === "error") {
+      return;
     }
 
-    // Active phases: download or upload
     let raf = 0;
     const phaseStart = performance.now();
 
     const tick = (now: number) => {
       const elapsed = now - phaseStart;
-      setDisplaySpeed(prev => {
+
+      setDisplaySpeed((prev) => {
         const target = liveSpeedRef.current;
 
-        if (target > 0.5) {
-          // Real data coming in — smoothly chase target with wobble
-          const diff = target - prev;
-          const smooth = prev + diff * 0.14;
-          const w1 = Math.sin(elapsed / 85) * Math.min(target * 0.06, 3);
-          const w2 = Math.sin(elapsed / 50) * Math.min(target * 0.025, 1.2);
-          return +Math.max(0.1, smooth + w1 + w2).toFixed(2);
+        if (phase === "resetting") {
+          const next = prev <= 0.2 ? 0 : prev + (0 - prev) * 0.2;
+          return +Math.max(0, next).toFixed(2);
         }
 
-        // No data yet — dramatic synthetic sweep to show activity
-        const peak = phase === "download" ? 40 : 25;
-        const base = peak * 0.5 * (1 - Math.cos(elapsed / 250));
-        const jit = peak * 0.12 * Math.sin(elapsed / 65);
-        const burst = peak * 0.08 * Math.abs(Math.cos(elapsed / 110));
-        return +Math.max(0.5, base + jit + burst).toFixed(2);
+        if (target > 0.35) {
+          const smooth = prev + (target - prev) * 0.16;
+          const wobble = Math.sin(elapsed / 90) * Math.min(target * 0.05, 2.8)
+            + Math.cos(elapsed / 60) * Math.min(target * 0.018, 1);
+          return +Math.max(0.1, smooth + wobble).toFixed(2);
+        }
+
+        const peak = phase === "download" ? 42 : 24;
+        const sweep = peak * Math.abs(Math.sin(elapsed / 260));
+        const pulse = peak * 0.08 * Math.abs(Math.cos(elapsed / 110));
+        return +Math.max(0.5, sweep + pulse).toFixed(2);
       });
+
       raf = requestAnimationFrame(tick);
     };
 
@@ -538,6 +528,8 @@ export default function InternetSpeedTester() {
   }, []);
 
   const runTest = useCallback(async () => {
+    const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+
     cancelRef.current = false;
     setTesting(true);
     setDownload(null);
@@ -546,11 +538,10 @@ export default function InternetSpeedTester() {
     setJitter(null);
     setErrorMsg("");
     liveSpeedRef.current = 0;
-    animStartRef.current = performance.now();
-    setDisplaySpeed(5);
+    setDisplaySpeed(4);
 
     try {
-      // --- Phase 1: Download ---
+      // Phase 1: download measurement and final hold
       setPhase("download");
       const pingPromise = measurePing(TEST_SERVER_URL, cancelRef);
       const dlSpeed = await measureDownload(TEST_SERVER_URL, updateLive, cancelRef);
@@ -566,27 +557,26 @@ export default function InternetSpeedTester() {
         setJitter(pingResult.avgJitter);
       }
 
-      // Show final download speed on gauge briefly
-      await new Promise((r) => setTimeout(r, 800));
+      // Keep final download speed on the meter for 1 second
+      await wait(1000);
       if (cancelRef.current) return reset();
 
-      // Reset gauge to zero before upload
+      // Bring meter fully back to zero before upload starts
       setPhase("resetting");
       liveSpeedRef.current = 0;
-      await new Promise((r) => setTimeout(r, 1200));
+      await wait(1000);
       if (cancelRef.current) return reset();
+      setDisplaySpeed(0);
 
-      // --- Phase 2: Upload ---
+      // Phase 2: upload starts fresh in green
       setPhase("upload");
       liveSpeedRef.current = 0;
-
       const ulSpeed = await measureUpload(TEST_SERVER_URL, updateLive, cancelRef);
       if (cancelRef.current) return reset();
 
       setUpload(ulSpeed);
       updateLive(ulSpeed);
 
-      // Save history
       const entry = {
         dl: +dlSpeed.toFixed(2),
         ul: +ulSpeed.toFixed(2),
