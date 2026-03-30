@@ -105,4 +105,5 @@ export const tools: Tool[] = [
   { id: "chmod-calculator", name: "Chmod Calculator", description: "Calculate Unix file permissions easily", icon: Terminal, category: "developer", path: "/tools/chmod-calculator", color: "hsl(120, 60%, 40%)" },
   { id: "port-scanner", name: "Port Reference Guide", description: "Common network ports reference & info lookup", icon: Server, category: "security", path: "/tools/port-scanner", color: "hsl(180, 70%, 42%)" },
   { id: "ssl-checker", name: "SSL Certificate Checker", description: "Check SSL/TLS certificate status & details", icon: LockKeyhole, category: "security", path: "/tools/ssl-checker", color: "hsl(150, 75%, 40%)" },
+  { id: "cc-checker", name: "CC Checker / Validator", description: "Validate credit card numbers using Luhn algorithm", icon: CreditCard, category: "security", path: "/tools/cc-checker", color: "hsl(340, 80%, 52%)" },
 ];
