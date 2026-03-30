@@ -1,11 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Play, RotateCcw, Download, Copy, Maximize2, Minimize2,
   Code2, Paintbrush, Braces, Eye, EyeOff, Smartphone, Monitor, Tablet,
-  Sun, Moon, ChevronDown, ChevronUp, Trash2
+  ChevronDown, ChevronUp, Trash2, FileCode, Terminal
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -13,8 +12,9 @@ import { cn } from "@/lib/utils";
 const DEFAULT_HTML = `<div class="container">
   <h1>Hello, World! 🌍</h1>
   <p>Edit the HTML, CSS & JavaScript panels to see live changes.</p>
-  <button id="btn" onclick="changeColor()">Click Me!</button>
-  <div id="output" class="output-box">Output will appear here</div>
+  <button id="btn">Click Me!</button>
+  <div id="output" class="output-box">Output appears here</div>
+  <div id="counter" class="counter">0</div>
 </div>`;
 
 const DEFAULT_CSS = `* {
@@ -24,417 +24,460 @@ const DEFAULT_CSS = `* {
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Segoe UI', system-ui, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: #fff;
 }
 
 .container {
   text-align: center;
-  padding: 2rem;
+  padding: 2.5rem;
   background: rgba(255,255,255,0.12);
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.15);
-  max-width: 420px;
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.18);
+  max-width: 440px;
   width: 90%;
 }
 
-h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
+h1 { font-size: 2.2rem; margin-bottom: 0.6rem; }
 
 p {
-  opacity: 0.85;
+  opacity: 0.8;
   margin-bottom: 1.5rem;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 #btn {
-  padding: 0.7rem 2rem;
+  padding: 0.75rem 2.2rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #fff;
   color: #764ba2;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition: all 0.2s;
 }
 
 #btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
+
+#btn:active { transform: scale(0.97); }
 
 .output-box {
   margin-top: 1.2rem;
   padding: 1rem;
-  background: rgba(0,0,0,0.2);
-  border-radius: 8px;
-  font-size: 0.9rem;
-  min-height: 48px;
+  background: rgba(0,0,0,0.25);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  min-height: 50px;
   transition: all 0.3s;
+}
+
+.counter {
+  margin-top: 1rem;
+  font-size: 3rem;
+  font-weight: 800;
+  opacity: 0.9;
+  transition: transform 0.15s;
 }`;
 
-const DEFAULT_JS = `let clickCount = 0;
+const DEFAULT_JS = `let count = 0;
+const btn = document.getElementById('btn');
+const output = document.getElementById('output');
+const counter = document.getElementById('counter');
 
-function changeColor() {
-  clickCount++;
-  const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8'];
-  const color = colors[clickCount % colors.length];
+const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997'];
 
-  document.getElementById('btn').style.background = color;
-  document.getElementById('btn').style.color = '#fff';
+btn.addEventListener('click', function() {
+  count++;
+  const color = colors[count % colors.length];
 
-  const output = document.getElementById('output');
-  output.textContent = 'Clicked ' + clickCount + ' time' + (clickCount > 1 ? 's' : '') + '!';
-  output.style.borderLeft = '3px solid ' + color;
-}`;
+  btn.style.background = color;
+  btn.style.color = '#fff';
 
-type ActivePanel = "html" | "css" | "js";
-type PreviewDevice = "desktop" | "tablet" | "mobile";
+  output.textContent = 'Clicked ' + count + ' time' + (count > 1 ? 's' : '') + '!';
+  output.style.borderLeft = '4px solid ' + color;
 
-const PANEL_CONFIG: { id: ActivePanel; label: string; icon: typeof Code2; color: string }[] = [
-  { id: "html", label: "HTML", icon: Code2, color: "text-orange-400" },
-  { id: "css", label: "CSS", icon: Paintbrush, color: "text-blue-400" },
-  { id: "js", label: "JS", icon: Braces, color: "text-yellow-400" },
+  counter.textContent = count;
+  counter.style.transform = 'scale(1.2)';
+  setTimeout(() => counter.style.transform = 'scale(1)', 150);
+
+  console.log('Button clicked! Count:', count);
+});
+
+console.log('🚀 App initialized successfully!');`;
+
+type Panel = "html" | "css" | "js";
+type Device = "desktop" | "tablet" | "mobile";
+
+const PANELS: { id: Panel; label: string; icon: typeof Code2; accent: string }[] = [
+  { id: "html", label: "HTML", icon: Code2, accent: "text-orange-400" },
+  { id: "css", label: "CSS", icon: Paintbrush, accent: "text-blue-400" },
+  { id: "js", label: "JS", icon: Braces, accent: "text-yellow-400" },
 ];
 
-const DEVICE_CONFIG: { id: PreviewDevice; icon: typeof Monitor; w: string }[] = [
-  { id: "desktop", icon: Monitor, w: "100%" },
-  { id: "tablet", icon: Tablet, w: "768px" },
-  { id: "mobile", icon: Smartphone, w: "375px" },
+const DEVICES: { id: Device; icon: typeof Monitor; width: string; label: string }[] = [
+  { id: "desktop", icon: Monitor, width: "100%", label: "Desktop" },
+  { id: "tablet", icon: Tablet, width: "768px", label: "Tablet" },
+  { id: "mobile", icon: Smartphone, width: "375px", label: "Mobile" },
 ];
 
-export default function HtmlCssJsRunner() {
-  const [html, setHtml] = useState(DEFAULT_HTML);
-  const [css, setCss] = useState(DEFAULT_CSS);
-  const [js, setJs] = useState(DEFAULT_JS);
-  const [activePanel, setActivePanel] = useState<ActivePanel>("html");
-  const [autoRun, setAutoRun] = useState(true);
-  const [previewDevice, setPreviewDevice] = useState<PreviewDevice>("desktop");
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showPreview, setShowPreview] = useState(true);
-  const [editorCollapsed, setEditorCollapsed] = useState(false);
-  const [consoleOutput, setConsoleOutput] = useState<string[]>([]);
-  const [showConsole, setShowConsole] = useState(false);
-  const [srcDoc, setSrcDoc] = useState("");
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-
-  const buildSrcDoc = useCallback(() => {
-    const doc = `<!DOCTYPE html>
+function buildDocument(html: string, css: string, js: string): string {
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <style>${css}</style>
 </head>
 <body>
 ${html}
 <script>
-(function() {
-  const _log = console.log;
-  const _error = console.error;
-  const _warn = console.warn;
-  function send(type, args) {
-    try { window.parent.postMessage({ type: 'console', level: type, data: Array.from(args).map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ') }, '*'); } catch(e) {}
+(function(){
+  var _l=console.log,_e=console.error,_w=console.warn,_i=console.info;
+  function _s(t,a){
+    try{window.parent.postMessage({__console:true,level:t,data:Array.prototype.slice.call(a).map(function(x){return typeof x==='object'?JSON.stringify(x,null,2):String(x)}).join(' ')},'*')}catch(e){}
   }
-  console.log = function() { send('log', arguments); _log.apply(console, arguments); };
-  console.error = function() { send('error', arguments); _error.apply(console, arguments); };
-  console.warn = function() { send('warn', arguments); _warn.apply(console, arguments); };
-  window.onerror = function(msg, url, line) { send('error', ['Error: ' + msg + ' (line ' + line + ')']); };
+  console.log=function(){_s('log',arguments);_l.apply(console,arguments)};
+  console.error=function(){_s('error',arguments);_e.apply(console,arguments)};
+  console.warn=function(){_s('warn',arguments);_w.apply(console,arguments)};
+  console.info=function(){_s('info',arguments);_i.apply(console,arguments)};
+  window.onerror=function(m,u,l,c,e){_s('error',['Error: '+m+' (line '+l+')']);return true};
+  window.onunhandledrejection=function(e){_s('error',['Unhandled Promise: '+(e.reason||e)])};
 })();
-try {
+try{
 ${js}
-} catch(e) {
+}catch(e){
   console.error(e.message);
 }
 <\/script>
 </body>
 </html>`;
-    setSrcDoc(doc);
-  }, [html, css, js]);
+}
 
+export default function HtmlCssJsRunner() {
+  const [html, setHtml] = useState(DEFAULT_HTML);
+  const [css, setCss] = useState(DEFAULT_CSS);
+  const [js, setJs] = useState(DEFAULT_JS);
+  const [activePanel, setActivePanel] = useState<Panel>("html");
+  const [autoRun, setAutoRun] = useState(true);
+  const [device, setDevice] = useState<Device>("desktop");
+  const [fullscreen, setFullscreen] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
+  const [showConsole, setShowConsole] = useState(false);
+  const [consoleLines, setConsoleLines] = useState<{ level: string; text: string }[]>([]);
+  const [srcDoc, setSrcDoc] = useState("");
+  const [runKey, setRunKey] = useState(0);
+
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Listen for console messages from iframe
   useEffect(() => {
     const handler = (e: MessageEvent) => {
-      if (e.data?.type === "console") {
-        const prefix = e.data.level === "error" ? "❌ " : e.data.level === "warn" ? "⚠️ " : "› ";
-        setConsoleOutput((prev) => [...prev.slice(-99), prefix + e.data.data]);
+      if (e.data?.__console) {
+        setConsoleLines((prev) => [...prev.slice(-199), { level: e.data.level, text: e.data.data }]);
       }
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
   }, []);
 
+  // Build and run
+  const run = useCallback(() => {
+    setConsoleLines([]);
+    setSrcDoc(buildDocument(html, css, js));
+    setRunKey((k) => k + 1);
+  }, [html, css, js]);
+
+  // Auto-run with debounce
   useEffect(() => {
     if (!autoRun) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(buildSrcDoc, 400);
+    debounceRef.current = setTimeout(run, 500);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [html, css, js, autoRun, buildSrcDoc]);
+  }, [html, css, js, autoRun, run]);
 
+  // Initial run
+  useEffect(() => { run(); }, []);
+
+  // Keyboard shortcut: Ctrl+Enter to run
   useEffect(() => {
-    if (!autoRun) return;
-    buildSrcDoc();
-  }, []);
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        run();
+        toast.success("Code executed!");
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [run]);
 
-  const runCode = () => {
-    setConsoleOutput([]);
-    buildSrcDoc();
-    toast.success("Code executed!");
-  };
-
-  const resetCode = () => {
-    setHtml(DEFAULT_HTML);
-    setCss(DEFAULT_CSS);
-    setJs(DEFAULT_JS);
-    setConsoleOutput([]);
-    toast.success("Code reset to default!");
-  };
-
-  const clearCode = () => {
-    if (activePanel === "html") setHtml("");
-    else if (activePanel === "css") setCss("");
-    else setJs("");
-    toast.success(`${activePanel.toUpperCase()} cleared`);
-  };
-
-  const copyCode = () => {
-    const code = activePanel === "html" ? html : activePanel === "css" ? css : js;
-    navigator.clipboard.writeText(code);
-    toast.success(`${activePanel.toUpperCase()} copied!`);
-  };
-
-  const downloadProject = () => {
-    const fullHtml = `<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>My Project</title>\n<style>\n${css}\n</style>\n</head>\n<body>\n${html}\n<script>\n${js}\n<\/script>\n</body>\n</html>`;
-    const blob = new Blob([fullHtml], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "project.html";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Project downloaded!");
+  // Tab key support in textarea
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const ta = e.currentTarget;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const val = ta.value;
+      const newVal = val.substring(0, start) + "  " + val.substring(end);
+      setCurrentCode(newVal);
+      requestAnimationFrame(() => {
+        ta.selectionStart = ta.selectionEnd = start + 2;
+      });
+    }
   };
 
   const currentCode = activePanel === "html" ? html : activePanel === "css" ? css : js;
   const setCurrentCode = activePanel === "html" ? setHtml : activePanel === "css" ? setCss : setJs;
-
-  const deviceWidth = DEVICE_CONFIG.find((d) => d.id === previewDevice)?.w || "100%";
-
   const lineCount = currentCode.split("\n").length;
+  const deviceWidth = DEVICES.find((d) => d.id === device)?.width || "100%";
+
+  const resetAll = () => {
+    setHtml(DEFAULT_HTML); setCss(DEFAULT_CSS); setJs(DEFAULT_JS);
+    setConsoleLines([]);
+    toast.success("Reset to default!");
+  };
+
+  const clearPanel = () => {
+    setCurrentCode("");
+    toast.success(`${activePanel.toUpperCase()} cleared`);
+  };
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(currentCode);
+    toast.success(`${activePanel.toUpperCase()} copied!`);
+  };
+
+  const downloadProject = () => {
+    const blob = new Blob([buildDocument(html, css, js)], { type: "text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "project.html";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast.success("Downloaded!");
+  };
 
   return (
     <ToolLayout title="HTML, CSS & JS Runner" description="">
-      <div className={cn("mx-auto space-y-3", isFullscreen ? "fixed inset-0 z-50 bg-background p-3" : "max-w-7xl")}>
+      <div className={cn(
+        "mx-auto space-y-2.5",
+        fullscreen ? "fixed inset-0 z-50 bg-background p-2.5 overflow-hidden" : "max-w-7xl"
+      )}>
 
-        {/* Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border-2 border-foreground/10 bg-card p-2.5">
-          <Button size="sm" onClick={runCode} className="gap-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold">
+        {/* ─── Toolbar ─── */}
+        <div className="flex flex-wrap items-center gap-1.5 rounded-xl border-2 border-foreground/10 bg-card px-2.5 py-2">
+          <Button size="sm" onClick={() => { run(); toast.success("Executed!"); }} className="gap-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold shadow-sm">
             <Play className="h-3.5 w-3.5" /> Run
           </Button>
-          <Button size="sm" variant="outline" onClick={resetCode} className="gap-1.5 rounded-lg text-xs">
-            <RotateCcw className="h-3.5 w-3.5" /> Reset
-          </Button>
-          <Button size="sm" variant="outline" onClick={clearCode} className="gap-1.5 rounded-lg text-xs">
-            <Trash2 className="h-3.5 w-3.5" /> Clear
-          </Button>
-          <Button size="sm" variant="outline" onClick={copyCode} className="gap-1.5 rounded-lg text-xs">
-            <Copy className="h-3.5 w-3.5" /> Copy
-          </Button>
-          <Button size="sm" variant="outline" onClick={downloadProject} className="gap-1.5 rounded-lg text-xs">
-            <Download className="h-3.5 w-3.5" /> Download
-          </Button>
+          <Button size="sm" variant="outline" onClick={resetAll} className="gap-1 rounded-lg text-xs"><RotateCcw className="h-3 w-3" /> Reset</Button>
+          <Button size="sm" variant="outline" onClick={clearPanel} className="gap-1 rounded-lg text-xs"><Trash2 className="h-3 w-3" /> Clear</Button>
+          <Button size="sm" variant="outline" onClick={copyCode} className="gap-1 rounded-lg text-xs"><Copy className="h-3 w-3" /> Copy</Button>
+          <Button size="sm" variant="outline" onClick={downloadProject} className="gap-1 rounded-lg text-xs"><Download className="h-3 w-3" /> Download</Button>
 
           <div className="ml-auto flex items-center gap-1.5">
+            <span className="hidden text-[10px] text-muted-foreground sm:inline">Ctrl+Enter to Run</span>
+
             <Button
               size="sm"
               variant={autoRun ? "default" : "outline"}
               onClick={() => setAutoRun(!autoRun)}
               className="gap-1 rounded-lg text-xs"
             >
-              {autoRun ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+              {autoRun ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
               {autoRun ? "Auto" : "Manual"}
             </Button>
 
-            <div className="flex items-center rounded-lg border border-foreground/10 p-0.5">
-              {DEVICE_CONFIG.map(({ id, icon: Icon }) => (
+            <div className="flex rounded-lg border border-foreground/10 p-0.5">
+              {DEVICES.map(({ id, icon: Icon }) => (
                 <button
                   key={id}
-                  onClick={() => setPreviewDevice(id)}
-                  className={cn(
-                    "rounded-md p-1.5 transition-colors",
-                    previewDevice === id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                  )}
+                  onClick={() => setDevice(id)}
+                  className={cn("rounded-md p-1.5 transition-colors", device === id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
+                  title={id}
                 >
                   <Icon className="h-3.5 w-3.5" />
                 </button>
               ))}
             </div>
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setIsFullscreen(!isFullscreen)}
-              className="rounded-lg p-2"
-            >
-              {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            <Button size="sm" variant="outline" onClick={() => setFullscreen(!fullscreen)} className="rounded-lg p-2">
+              {fullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
             </Button>
           </div>
         </div>
 
-        {/* Main Layout */}
-        <div className={cn("grid gap-3", isFullscreen ? "h-[calc(100vh-80px)]" : "min-h-[550px]", showPreview ? "lg:grid-cols-2" : "lg:grid-cols-1")}>
+        {/* ─── Main Content ─── */}
+        <div className={cn(
+          "grid gap-2.5",
+          fullscreen ? "h-[calc(100vh-72px)]" : "min-h-[520px]",
+          showPreview ? "lg:grid-cols-2" : ""
+        )}>
 
-          {/* Editor Panel */}
-          {!editorCollapsed && (
-            <div className="flex flex-col rounded-xl border-2 border-foreground/10 bg-card overflow-hidden">
-              {/* Panel Tabs */}
-              <div className="flex items-center justify-between border-b border-foreground/10 bg-muted/30 px-2 py-1.5">
-                <Tabs value={activePanel} onValueChange={(v) => setActivePanel(v as ActivePanel)}>
-                  <TabsList className="h-8 bg-transparent p-0 gap-1">
-                    {PANEL_CONFIG.map(({ id, label, icon: Icon, color }) => (
-                      <TabsTrigger
-                        key={id}
-                        value={id}
-                        className={cn(
-                          "h-7 gap-1.5 rounded-md px-3 text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm",
-                        )}
-                      >
-                        <Icon className={cn("h-3 w-3", activePanel === id ? color : "text-muted-foreground")} />
-                        {label}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                </Tabs>
+          {/* ─── Editor ─── */}
+          <div className="flex flex-col rounded-xl border-2 border-foreground/10 bg-card overflow-hidden min-h-[300px]">
 
-                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                  <span>{lineCount} lines</span>
-                  <span>•</span>
-                  <span>{currentCode.length} chars</span>
-                </div>
-              </div>
-
-              {/* Code Editor */}
-              <div className="relative flex-1 overflow-hidden">
-                <div className="absolute inset-0 flex">
-                  {/* Line Numbers */}
-                  <div className="flex-shrink-0 w-10 overflow-hidden border-r border-foreground/5 bg-muted/20 text-right">
-                    <div className="p-2 pt-3">
-                      {Array.from({ length: lineCount }, (_, i) => (
-                        <div key={i} className="text-[11px] leading-[20px] text-muted-foreground/50 pr-2 select-none">
-                          {i + 1}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Textarea */}
-                  <textarea
-                    value={currentCode}
-                    onChange={(e) => setCurrentCode(e.target.value)}
-                    className="flex-1 resize-none bg-transparent p-3 text-[13px] leading-[20px] text-foreground font-mono outline-none placeholder:text-muted-foreground/40 overflow-auto"
-                    placeholder={`Write your ${activePanel.toUpperCase()} here...`}
-                    spellCheck={false}
-                    autoCapitalize="off"
-                    autoCorrect="off"
-                  />
-                </div>
-              </div>
-
-              {/* Console */}
-              {showConsole && (
-                <div className="border-t border-foreground/10 bg-muted/20">
-                  <div className="flex items-center justify-between px-3 py-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Console</span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setConsoleOutput([])}
-                      className="h-5 px-2 text-[10px]"
-                    >
-                      Clear
-                    </Button>
-                  </div>
-                  <div className="max-h-[120px] overflow-y-auto px-3 pb-2 font-mono text-[11px]">
-                    {consoleOutput.length === 0 ? (
-                      <div className="text-muted-foreground/50 py-2">No output yet...</div>
-                    ) : (
-                      consoleOutput.map((line, i) => (
-                        <div
-                          key={i}
-                          className={cn(
-                            "py-0.5 border-b border-foreground/5 last:border-0",
-                            line.startsWith("❌") ? "text-destructive" : line.startsWith("⚠️") ? "text-yellow-500" : "text-foreground/80"
-                          )}
-                        >
-                          {line}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Editor Footer */}
-              <div className="flex items-center justify-between border-t border-foreground/10 bg-muted/30 px-3 py-1">
+            {/* Panel Tabs */}
+            <div className="flex items-center gap-1 border-b border-foreground/10 bg-muted/30 px-2 py-1.5">
+              {PANELS.map(({ id, label, icon: Icon, accent }) => (
                 <button
-                  onClick={() => setShowConsole(!showConsole)}
-                  className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+                  key={id}
+                  onClick={() => setActivePanel(id)}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-all",
+                    activePanel === id
+                      ? "bg-background shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                  )}
                 >
-                  {showConsole ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
-                  Console {consoleOutput.length > 0 && `(${consoleOutput.length})`}
+                  <Icon className={cn("h-3 w-3", activePanel === id ? accent : "")} />
+                  {label}
                 </button>
-                <button
-                  onClick={() => setShowPreview(!showPreview)}
-                  className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPreview ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-                  {showPreview ? "Hide Preview" : "Show Preview"}
-                </button>
+              ))}
+
+              <div className="ml-auto flex items-center gap-2 text-[10px] text-muted-foreground">
+                <FileCode className="h-3 w-3" />
+                <span>{lineCount} lines</span>
+                <span className="opacity-40">|</span>
+                <span>{currentCode.length} chars</span>
               </div>
             </div>
-          )}
 
-          {/* Preview Panel */}
+            {/* Editor Area */}
+            <div className="relative flex-1 overflow-hidden">
+              <div className="absolute inset-0 flex overflow-auto">
+                {/* Line numbers */}
+                <div className="sticky left-0 z-10 flex-shrink-0 w-10 border-r border-foreground/5 bg-muted/20 select-none">
+                  <div className="py-3 pr-2">
+                    {Array.from({ length: lineCount }, (_, i) => (
+                      <div key={i} className="text-right text-[11px] leading-[20px] text-muted-foreground/40 pr-1">
+                        {i + 1}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Code input */}
+                <textarea
+                  ref={textareaRef}
+                  value={currentCode}
+                  onChange={(e) => setCurrentCode(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="flex-1 resize-none bg-transparent py-3 pl-3 pr-4 text-[13px] leading-[20px] text-foreground font-mono outline-none placeholder:text-muted-foreground/30 min-h-full whitespace-pre overflow-auto"
+                  placeholder={`Write your ${activePanel.toUpperCase()} code here...`}
+                  spellCheck={false}
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  wrap="off"
+                />
+              </div>
+            </div>
+
+            {/* Console */}
+            {showConsole && (
+              <div className="border-t-2 border-foreground/10 bg-muted/15 max-h-[160px] flex flex-col">
+                <div className="flex items-center justify-between px-3 py-1 border-b border-foreground/5">
+                  <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <Terminal className="h-3 w-3" /> Console
+                    {consoleLines.length > 0 && (
+                      <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-primary text-[9px] font-bold">{consoleLines.length}</span>
+                    )}
+                  </span>
+                  <Button size="sm" variant="ghost" onClick={() => setConsoleLines([])} className="h-5 px-2 text-[10px]">Clear</Button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-3 py-1.5 font-mono text-[11px] leading-relaxed">
+                  {consoleLines.length === 0 ? (
+                    <div className="text-muted-foreground/40 py-2 text-center">No output yet. Run your code!</div>
+                  ) : (
+                    consoleLines.map((line, i) => (
+                      <div
+                        key={i}
+                        className={cn(
+                          "py-0.5 border-b border-foreground/5 last:border-0",
+                          line.level === "error" ? "text-destructive" : line.level === "warn" ? "text-yellow-500" : "text-foreground/75"
+                        )}
+                      >
+                        <span className="opacity-40 mr-1.5">{line.level === "error" ? "❌" : line.level === "warn" ? "⚠️" : "›"}</span>
+                        {line.text}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Footer */}
+            <div className="flex items-center justify-between border-t border-foreground/10 bg-muted/30 px-3 py-1">
+              <button
+                onClick={() => setShowConsole(!showConsole)}
+                className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showConsole ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
+                Console
+                {consoleLines.length > 0 && !showConsole && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                )}
+              </button>
+              <button
+                onClick={() => setShowPreview(!showPreview)}
+                className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPreview ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                {showPreview ? "Hide Preview" : "Show Preview"}
+              </button>
+            </div>
+          </div>
+
+          {/* ─── Preview ─── */}
           {showPreview && (
-            <div className="flex flex-col rounded-xl border-2 border-foreground/10 bg-card overflow-hidden">
+            <div className="flex flex-col rounded-xl border-2 border-foreground/10 bg-card overflow-hidden min-h-[300px]">
               <div className="flex items-center justify-between border-b border-foreground/10 bg-muted/30 px-3 py-1.5">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1">
-                    <div className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
-                    <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
-                    <div className="h-2.5 w-2.5 rounded-full bg-green-500/60" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-destructive/50" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/50" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-green-500/50" />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                    Live Preview
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Live Preview</span>
+                  <span className="text-[9px] text-muted-foreground/50 hidden sm:inline">
+                    ({DEVICES.find((d) => d.id === device)?.label})
                   </span>
                 </div>
-
-                <button
-                  onClick={() => setEditorCollapsed(!editorCollapsed)}
-                  className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={run}
+                  className="h-6 gap-1 px-2 text-[10px] font-semibold text-muted-foreground hover:text-foreground"
                 >
-                  {editorCollapsed ? "Show Editor" : "Expand"}
-                </button>
+                  <RotateCcw className="h-2.5 w-2.5" /> Refresh
+                </Button>
               </div>
 
-              <div className="flex-1 flex items-start justify-center overflow-auto bg-white p-0">
+              <div className="flex-1 flex items-start justify-center overflow-auto bg-white">
                 <iframe
+                  key={runKey}
                   ref={iframeRef}
                   srcDoc={srcDoc}
-                  title="Preview"
-                  sandbox="allow-scripts allow-modals"
-                  className="border-0 h-full min-h-[400px]"
-                  style={{ width: deviceWidth, maxWidth: "100%", transition: "width 0.3s ease" }}
+                  title="Live Preview"
+                  sandbox="allow-scripts allow-modals allow-forms allow-popups"
+                  className="border-0 min-h-[400px] h-full"
+                  style={{
+                    width: deviceWidth,
+                    maxWidth: "100%",
+                    transition: "width 0.3s ease",
+                  }}
                 />
               </div>
             </div>
