@@ -836,6 +836,31 @@ export default function CcChecker() {
                         </motion.div>
                       ))}
                     </div>
+
+                    {/* Country Map */}
+                    {singleResult.binData?.country?.latitude && singleResult.binData?.country?.longitude && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="rounded-xl border border-border/50 overflow-hidden"
+                      >
+                        <div className="flex items-center gap-2 p-3 bg-card/80 border-b border-border/30">
+                          <Globe className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-medium text-foreground">
+                            {singleResult.binData.country.emoji} {singleResult.binData.country.name || singleResult.issuerCountry}
+                          </span>
+                        </div>
+                        <iframe
+                          title="Country Map"
+                          width="100%"
+                          height="220"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          src={`https://www.openstreetmap.org/export/embed.html?bbox=${singleResult.binData.country.longitude! - 8},${singleResult.binData.country.latitude! - 5},${singleResult.binData.country.longitude! + 8},${singleResult.binData.country.latitude! + 5}&layer=mapnik&marker=${singleResult.binData.country.latitude},${singleResult.binData.country.longitude}`}
+                        />
+                      </motion.div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
