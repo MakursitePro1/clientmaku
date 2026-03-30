@@ -120,9 +120,11 @@ function SpeedGauge({
       ? "UPLOAD"
       : isDone
         ? "COMPLETE"
-        : phase === "error"
-          ? "FAILED"
-          : "READY";
+        : phase === "resetting"
+          ? "PREPARING..."
+          : phase === "error"
+            ? "FAILED"
+            : "READY";
 
   const activeColor = isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)";
 
