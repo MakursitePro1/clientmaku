@@ -168,6 +168,42 @@ export default function CustomToolPage() {
         </div>
       </div>
 
+      {/* Related Tools */}
+      {relatedTools.length > 0 && (
+        <div className="w-full border-t border-border bg-muted/30">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-bold">Related Tools</h2>
+              <Link to="/tools" className="text-sm text-primary hover:underline flex items-center gap-1">
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {relatedTools.map(rt => {
+                const Icon = rt.icon || FileCode;
+                return (
+                  <Link
+                    key={rt.id}
+                    to={rt.path}
+                    className="group flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:shadow-md hover:border-primary/30 transition-all"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: rt.color + "18", color: rt.color }}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                      {rt.name}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
