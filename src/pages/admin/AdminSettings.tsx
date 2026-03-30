@@ -295,6 +295,16 @@ export default function AdminSettings() {
         ],
       },
     ],
+    admin: [
+      {
+        title: "Admin Panel URL",
+        icon: Link2,
+        description: "Change the admin panel URL slug. After saving, use the new URL to access admin.",
+        fields: [
+          { key: "admin_slug", label: "Admin URL Slug", type: "input", placeholder: "makuadmingowebs99" },
+        ],
+      },
+    ],
   };
 
   const renderField = (field: SettingField) => (
