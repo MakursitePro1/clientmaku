@@ -171,6 +171,7 @@ export default function AdminSettings() {
     { id: "social", label: "Social", icon: ExternalLink },
     { id: "seo", label: "SEO", icon: Megaphone },
     { id: "navbar", label: "Navbar", icon: Type },
+    { id: "admin", label: "Admin", icon: Key },
   ];
 
   const sections: Record<string, SettingSection[]> = {
