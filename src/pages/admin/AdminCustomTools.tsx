@@ -188,7 +188,7 @@ export default function AdminCustomTools() {
 
   const handleSave = async () => {
     if (!editingTool.name?.trim()) { toast.error("Tool name is required!"); return; }
-    if (!editingTool.html_content?.trim()) { toast.error("HTML content is required!"); return; }
+    if (!editingTool.html_content?.trim() && !editingTool.embed_url?.trim()) { toast.error("HTML content or Embed URL is required!"); return; }
 
     const slug = editingTool.slug?.trim() || generateSlug(editingTool.name);
     setSaving(true);
@@ -200,7 +200,8 @@ export default function AdminCustomTools() {
       category: editingTool.category || "utility",
       icon_name: editingTool.icon_name || "Wrench",
       color: editingTool.color || "hsl(263, 85%, 58%)",
-      html_content: editingTool.html_content!,
+      html_content: editingTool.html_content || "",
+      embed_url: editingTool.embed_url?.trim() || "",
       is_enabled: editingTool.is_enabled ?? true,
       meta_title: editingTool.meta_title?.trim() || "",
       meta_description: editingTool.meta_description?.trim() || "",
