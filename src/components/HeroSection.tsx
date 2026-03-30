@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Play, Zap, Code2, Image, Shield, Globe, Search, BarChart3, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
@@ -123,6 +124,7 @@ function AnimatedCounter({ target, duration = 2 }: { target: string; duration?: 
 }
 
 export function HeroSection() {
+  const navigate = useNavigate();
   const { settings } = useSiteSettings();
   const { totalTools, totalCategories } = useToolCatalog();
   const typedText = useTypingEffect(defaultTypingWords);
@@ -268,6 +270,7 @@ export function HeroSection() {
               size="lg"
               variant="outline"
               className="rounded-2xl px-10 py-6 font-bold text-base border-border/50 hover:bg-accent hover:border-primary/30 transition-all"
+              onClick={() => navigate("/categories")}
             >
               <Play className="mr-2 w-5 h-5" /> Watch Demo
             </Button>
