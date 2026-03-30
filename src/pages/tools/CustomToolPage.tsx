@@ -31,6 +31,15 @@ export default function CustomToolPage() {
   const [notFound, setNotFound] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { tools: allTools } = useToolCatalog();
+
+  const relatedTools = useMemo(() => {
+    if (!tool) return [];
+    return allTools
+      .filter(t => t.category === tool.category && t.id !== `custom-${tool.slug}`)
+      .slice(0, 8);
+  }, [tool, allTools]);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (!slug) return;
