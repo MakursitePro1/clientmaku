@@ -89,19 +89,15 @@ function SpeedGauge({
           ? "FAILED"
           : "READY";
 
-  const arcColor = isUpload
-    ? "hsl(var(--primary) / 0.75)"
-    : "hsl(var(--primary) / 1)";
-
   return (
     <div className="relative flex flex-col items-center">
       {testing && (
         <motion.div
-          animate={{ opacity: [0.1, 0.2, 0.1], scale: [0.97, 1.03, 0.97] }}
+          animate={{ opacity: [0.15, 0.35, 0.15], scale: [0.97, 1.03, 0.97] }}
           transition={{ duration: 2, repeat: Infinity }}
           className="pointer-events-none absolute top-0 h-[300px] w-[300px] rounded-full blur-3xl sm:h-[380px] sm:w-[380px]"
           style={{
-            background: `radial-gradient(circle, ${isUpload ? "hsl(var(--primary) / 0.12)" : "hsl(var(--primary) / 0.18)"}, transparent 70%)`,
+            background: `radial-gradient(circle, ${isUpload ? "hsl(142 76% 46% / 0.25)" : "hsl(var(--primary) / 0.3)"}, transparent 70%)`,
           }}
         />
       )}
@@ -109,15 +105,15 @@ function SpeedGauge({
       <svg viewBox="0 0 400 290" className="relative w-full max-w-[420px]">
         <defs>
           <linearGradient id="gaugeDownGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(var(--primary) / 1)" />
-            <stop offset="100%" stopColor="hsl(var(--primary) / 0.6)" />
+            <stop offset="0%" stopColor="hsl(263 70% 50%)" />
+            <stop offset="100%" stopColor="hsl(280 80% 60%)" />
           </linearGradient>
           <linearGradient id="gaugeUpGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(142 76% 46% / 1)" />
-            <stop offset="100%" stopColor="hsl(142 76% 46% / 0.6)" />
+            <stop offset="0%" stopColor="hsl(142 76% 36%)" />
+            <stop offset="100%" stopColor="hsl(160 70% 45%)" />
           </linearGradient>
           <filter id="arcGlow2">
-            <feGaussianBlur stdDeviation="5" result="b" />
+            <feGaussianBlur stdDeviation="6" result="b" />
             <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
@@ -125,14 +121,29 @@ function SpeedGauge({
           </filter>
         </defs>
 
-        {/* Background arc */}
+        {/* Background arc - deeper/more visible */}
         <path
           d={arcPath(START_ANGLE, END_ANGLE, r)}
           fill="none"
-          stroke="hsl(var(--muted) / 0.25)"
-          strokeWidth="20"
+          stroke="hsl(var(--muted-foreground) / 0.18)"
+          strokeWidth="22"
           strokeLinecap="round"
         />
+        {/* Tick marks on background */}
+        {SCALE_LABELS.map(({ angle: a }) => {
+          const inner = polar(a, r - 14);
+          const outer = polar(a, r + 14);
+          return (
+            <line
+              key={a}
+              x1={inner.x} y1={inner.y}
+              x2={outer.x} y2={outer.y}
+              stroke="hsl(var(--muted-foreground) / 0.15)"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          );
+        })}
 
         {/* Active arc */}
         {value > 0 && (
@@ -140,16 +151,16 @@ function SpeedGauge({
             d={arcPath(START_ANGLE, angle, r)}
             fill="none"
             stroke={isUpload ? "url(#gaugeUpGrad)" : "url(#gaugeDownGrad)"}
-            strokeWidth="20"
+            strokeWidth="22"
             strokeLinecap="round"
             filter="url(#arcGlow2)"
-            style={{ transition: "all 0.15s linear" }}
+            style={{ transition: "all 0.12s linear" }}
           />
         )}
 
         {/* Scale labels */}
         {SCALE_LABELS.map(({ value: label, angle: labelAngle }) => {
-          const p = polar(labelAngle, r + 32);
+          const p = polar(labelAngle, r + 34);
           return (
             <text
               key={label}
@@ -157,8 +168,8 @@ function SpeedGauge({
               y={p.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="fill-muted-foreground"
-              style={{ fontSize: "12px", fontWeight: 500 }}
+              fill="hsl(var(--foreground) / 0.5)"
+              style={{ fontSize: "12px", fontWeight: 600 }}
             >
               {label >= 100 ? "100+" : label}
             </text>
@@ -169,9 +180,9 @@ function SpeedGauge({
         <circle
           cx={needleDot.x}
           cy={needleDot.y}
-          r="9"
-          fill={isUpload ? "hsl(142 76% 46%)" : "hsl(var(--primary))"}
-          style={{ transition: "all 0.15s linear", filter: "drop-shadow(0 0 6px hsl(var(--primary) / 0.4))" }}
+          r="10"
+          fill={isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)"}
+          style={{ transition: "all 0.12s linear", filter: `drop-shadow(0 0 8px ${isUpload ? "hsl(142 76% 40% / 0.6)" : "hsl(263 70% 55% / 0.6)"})` }}
         />
 
         {/* Phase label above number */}
@@ -179,7 +190,7 @@ function SpeedGauge({
           x={cx}
           y={cy - 55}
           textAnchor="middle"
-          className={testing ? "fill-primary" : "fill-muted-foreground"}
+          fill={testing ? (isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)") : "hsl(var(--muted-foreground))"}
           style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "2.5px" }}
         >
           {phaseLabel}
@@ -196,7 +207,7 @@ function SpeedGauge({
               y={cy - 38}
               textAnchor="middle"
               style={{ fontSize: "16px" }}
-              className="fill-primary"
+              fill={isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)"}
             >
               {isDownload ? "↓" : "↑"}
             </text>
@@ -209,7 +220,7 @@ function SpeedGauge({
             {value > 0 ? intPart : "—"}
           </tspan>
           {value > 0 && (
-            <tspan className="fill-muted-foreground" style={{ fontSize: "38px", fontWeight: 200 }}>
+            <tspan fill="hsl(var(--foreground) / 0.5)" style={{ fontSize: "38px", fontWeight: 200 }}>
               {decPart}
             </tspan>
           )}
@@ -220,7 +231,7 @@ function SpeedGauge({
           x={cx}
           y={cy + 40}
           textAnchor="middle"
-          className="fill-muted-foreground"
+          fill="hsl(var(--foreground) / 0.45)"
           style={{ fontSize: "14px", fontWeight: 600, letterSpacing: "1px" }}
         >
           Mbps
@@ -246,10 +257,12 @@ async function measureDownload(
   onProgress: (speed: number) => void,
   cancelRef: MutableRefObject<boolean>
 ): Promise<number> {
-  const sizes = [5_000_000, 10_000_000, 20_000_000];
+  // Use multiple parallel streams for faster & more accurate measurement
+  const sizes = [2_000_000, 4_000_000, 8_000_000];
   const urls = sizes.map((size, i) => `${baseUrl}/__down?bytes=${size}&_=${Date.now() + i}`);
   const start = performance.now();
   let totalBytes = 0;
+  let lastReport = 0;
 
   await Promise.all(
     urls.map(async (url) => {
@@ -263,8 +276,13 @@ async function measureDownload(
           const { done, value } = await reader.read();
           if (done) break;
           totalBytes += value.byteLength;
-          const elapsed = (performance.now() - start) / 1000;
-          if (elapsed > 0.05) onProgress(+((totalBytes * 8) / elapsed / 1e6).toFixed(2));
+          const now = performance.now();
+          // Report every 50ms for smooth gauge updates
+          if (now - lastReport > 50) {
+            lastReport = now;
+            const elapsed = (now - start) / 1000;
+            if (elapsed > 0.05) onProgress(+((totalBytes * 8) / elapsed / 1e6).toFixed(2));
+          }
         }
       } catch { /* skip */ }
     })
@@ -282,18 +300,24 @@ async function measureUpload(
   onProgress: (speed: number) => void,
   cancelRef: MutableRefObject<boolean>
 ): Promise<number> {
-  const sizes = [1_200_000, 2_400_000, 4_800_000, 7_200_000];
+  // Parallel uploads for speed & accuracy
+  const sizes = [500_000, 1_000_000, 2_000_000];
   const start = performance.now();
   let totalBytes = 0;
-  for (const size of sizes) {
-    if (cancelRef.current) break;
-    try {
-      await fetch(`${baseUrl}/__up`, { method: "POST", body: new Uint8Array(size), cache: "no-store", mode: "cors" });
-      totalBytes += size;
-      const elapsed = (performance.now() - start) / 1000;
-      if (elapsed > 0.05) onProgress(+((totalBytes * 8) / elapsed / 1e6).toFixed(2));
-    } catch { return 0; }
-  }
+
+  await Promise.all(
+    sizes.map(async (size) => {
+      if (cancelRef.current) return;
+      try {
+        const data = new Uint8Array(size);
+        await fetch(`${baseUrl}/__up`, { method: "POST", body: data, cache: "no-store", mode: "cors" });
+        totalBytes += size;
+        const elapsed = (performance.now() - start) / 1000;
+        if (elapsed > 0.05) onProgress(+((totalBytes * 8) / elapsed / 1e6).toFixed(2));
+      } catch { /* skip */ }
+    })
+  );
+
   const elapsed = (performance.now() - start) / 1000;
   if (totalBytes > 0 && elapsed > 0) return +((totalBytes * 8) / elapsed / 1e6).toFixed(2);
   return getConnectionEstimate().uploadMbps;
@@ -301,7 +325,8 @@ async function measureUpload(
 
 async function measurePing(baseUrl: string, cancelRef: MutableRefObject<boolean>) {
   const pings: number[] = [];
-  for (let i = 0; i < 12; i++) {
+  // Only 6 pings for speed
+  for (let i = 0; i < 6; i++) {
     if (cancelRef.current) return { avgPing: 0, avgJitter: 0 };
     const s = performance.now();
     try {
@@ -348,8 +373,8 @@ function PhaseResult({
         active
           ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10"
           : done
-            ? "border-foreground/10 bg-card"
-            : "border-foreground/5 bg-muted/30 opacity-50"
+            ? "border-foreground/15 bg-card"
+            : "border-foreground/8 bg-muted/40 opacity-50"
       }`}
     >
       <div className="flex items-center gap-2">
@@ -448,16 +473,15 @@ export default function InternetSpeedTester() {
         const elapsed = time - animStartRef.current;
 
         if (target > 0.5) {
-          // Smooth towards real value with wobble
-          const smooth = prev + (target - prev) * 0.18;
-          const wobble = Math.sin(elapsed / 100) * Math.min(target * 0.025, 1.5);
+          const smooth = prev + (target - prev) * 0.25;
+          const wobble = Math.sin(elapsed / 80) * Math.min(target * 0.03, 2);
           return +Math.max(0, smooth + wobble).toFixed(2);
         }
 
-        // Synthetic wave while waiting for real data
-        const base = phase === "download" ? 10 : 6;
-        const wave1 = (phase === "download" ? 15 : 10) * Math.abs(Math.sin(elapsed / 180));
-        const wave2 = (phase === "download" ? 6 : 4) * Math.abs(Math.sin(elapsed / 75));
+        // Synthetic wave while waiting
+        const base = phase === "download" ? 8 : 5;
+        const wave1 = (phase === "download" ? 12 : 8) * Math.abs(Math.sin(elapsed / 150));
+        const wave2 = (phase === "download" ? 5 : 3) * Math.abs(Math.sin(elapsed / 60));
         return +(base + wave1 + wave2).toFixed(2);
       });
       raf = requestAnimationFrame(tick);
@@ -485,7 +509,7 @@ export default function InternetSpeedTester() {
     setErrorMsg("");
     liveSpeedRef.current = 0;
     animStartRef.current = performance.now();
-    setDisplaySpeed(8);
+    setDisplaySpeed(5);
 
     try {
       // --- Phase 1: Download ---
@@ -504,8 +528,8 @@ export default function InternetSpeedTester() {
         setJitter(pingResult.avgJitter);
       }
 
-      // Brief pause to show download result
-      await new Promise((r) => setTimeout(r, 800));
+      // Brief pause
+      await new Promise((r) => setTimeout(r, 500));
       if (cancelRef.current) return reset();
 
       // --- Phase 2: Upload ---
@@ -586,7 +610,7 @@ export default function InternetSpeedTester() {
               value={download}
               active={phase === "download"}
               done={dlDone}
-              color="hsl(var(--primary))"
+              color="hsl(263 70% 55%)"
             />
             <PhaseResult
               label="Upload"
@@ -594,7 +618,7 @@ export default function InternetSpeedTester() {
               value={upload}
               active={phase === "upload"}
               done={ulDone}
-              color="hsl(142 76% 46%)"
+              color="hsl(142 76% 40%)"
             />
           </div>
 
