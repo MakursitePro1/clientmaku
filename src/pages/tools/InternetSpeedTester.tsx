@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, type MutableRefObject } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
-import { Download, Upload, Activity, Globe, Server, Clock, Shield, RotateCcw, AlertTriangle, Gauge } from "lucide-react";
+import { Download, Upload, Activity, Globe, Server, Clock, Shield, RotateCcw, AlertTriangle, Gauge, Wifi, Monitor, MapPin, Zap, BarChart3, TrendingUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TEST_SERVER_URL = "https://speed.cloudflare.com";
@@ -446,6 +446,10 @@ export default function InternetSpeedTester() {
   const [connType, setConnType] = useState("—");
   const [testHistory, setTestHistory] = useState<{ dl: number; ul: number; ping: number; time: string }[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isp, setIsp] = useState("—");
+  const [location_, setLocation_] = useState("—");
+  const [downlink, setDownlink] = useState("—");
+  const [rtt, setRtt] = useState("—");
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
@@ -456,15 +460,27 @@ export default function InternetSpeedTester() {
 
   // Fetch IP & connection type
   useEffect(() => {
-    const conn = (navigator as Navigator & { connection?: { effectiveType?: string; type?: string } }).connection;
-    if (conn) setConnType((conn.effectiveType || conn.type || "Unknown").toUpperCase());
+    const conn = (navigator as Navigator & { connection?: { effectiveType?: string; type?: string; downlink?: number; rtt?: number } }).connection;
+    if (conn) {
+      setConnType((conn.effectiveType || conn.type || "Unknown").toUpperCase());
+      if (conn.downlink) setDownlink(`${conn.downlink} Mbps`);
+      if (conn.rtt) setRtt(`${conn.rtt} ms`);
+    }
 
     (async () => {
       try {
-        const res = await fetch("https://api.ipify.org?format=json");
+        const res = await fetch("https://ipinfo.io/json");
         const data = await res.json();
         setIp(data.ip || "—");
-      } catch { setIp("Unknown"); }
+        setIsp(data.org || "—");
+        setLocation_(data.city && data.country ? `${data.city}, ${data.country}` : "—");
+      } catch {
+        try {
+          const res = await fetch("https://api.ipify.org?format=json");
+          const data = await res.json();
+          setIp(data.ip || "—");
+        } catch { setIp("Unknown"); }
+      }
     })();
 
     try { setTestHistory(JSON.parse(localStorage.getItem("cv_speed_history") || "[]")); } catch { /* */ }
@@ -680,8 +696,8 @@ export default function InternetSpeedTester() {
             </motion.div>
           )}
 
-          {/* Action button */}
-          <div className="mt-6 flex justify-center">
+          {/* Action buttons */}
+          <div className="mt-6 flex items-center justify-center gap-3">
             {testing ? (
               <Button
                 variant="outline"
@@ -691,18 +707,35 @@ export default function InternetSpeedTester() {
                 Cancel
               </Button>
             ) : (
-              <Button
-                onClick={runTest}
-                className="rounded-full bg-primary px-10 py-5 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary/90"
-              >
-                <Gauge className="mr-2 h-4 w-4" />
-                {phase === "done" ? "Test Again" : phase === "error" ? "Retry" : "Run Speed Test"}
-              </Button>
+              <>
+                <Button
+                  onClick={runTest}
+                  className="rounded-full bg-primary px-10 py-5 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary/90"
+                >
+                  <Gauge className="mr-2 h-4 w-4" />
+                  {phase === "done" ? "Test Again" : phase === "error" ? "Retry" : "Run Speed Test"}
+                </Button>
+                {(phase === "done" || phase === "error") && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      reset();
+                      setDownload(null);
+                      setUpload(null);
+                      setPing(null);
+                      setJitter(null);
+                    }}
+                    className="rounded-full border-2 border-foreground/15 px-6 py-5 text-sm font-medium gap-1.5"
+                  >
+                    <RotateCcw className="h-4 w-4" /> Restart
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </div>
 
-        {/* Network info */}
+        {/* Network Information */}
         <div className="rounded-2xl border-2 border-foreground/10 bg-card p-5">
           <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
             <Globe className="h-3.5 w-3.5 text-primary" /> Network Information
@@ -710,11 +743,14 @@ export default function InternetSpeedTester() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {[
               { icon: Globe, label: "IP Address", value: ip },
-              { icon: Activity, label: "Connection", value: connType },
+              { icon: Wifi, label: "Connection", value: connType },
               { icon: Server, label: "Server", value: "Cloudflare" },
               { icon: Shield, label: "Protocol", value: location.protocol === "https:" ? "HTTPS" : "HTTP" },
+              { icon: MapPin, label: "Location", value: location_ },
+              { icon: Monitor, label: "ISP / Org", value: isp },
+              { icon: Zap, label: "Est. Bandwidth", value: downlink },
+              { icon: Activity, label: "RTT", value: rtt },
               { icon: Clock, label: "Last Test", value: testHistory[0]?.time || "Never" },
-              { icon: Activity, label: "Tests Run", value: `${testHistory.length}` },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex items-center gap-2 rounded-lg border border-foreground/8 bg-background p-2.5">
                 <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
@@ -726,6 +762,63 @@ export default function InternetSpeedTester() {
             ))}
           </div>
         </div>
+
+        {/* Test History */}
+        {testHistory.length > 0 && (
+          <div className="rounded-2xl border-2 border-foreground/10 bg-card p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                <BarChart3 className="h-3.5 w-3.5 text-primary" /> Test History
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 text-[10px]"
+                onClick={() => { setTestHistory([]); localStorage.removeItem("cv_speed_history"); }}
+              >
+                Clear
+              </Button>
+            </div>
+
+            {/* Average summary */}
+            {testHistory.length >= 2 && (
+              <div className="mb-3 grid grid-cols-3 gap-2 rounded-lg border border-foreground/8 bg-muted/30 p-2.5">
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-semibold uppercase text-muted-foreground">Avg Download</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {(testHistory.reduce((s, h) => s + h.dl, 0) / testHistory.length).toFixed(1)} Mbps
+                  </span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-semibold uppercase text-muted-foreground">Avg Upload</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {(testHistory.reduce((s, h) => s + h.ul, 0) / testHistory.length).toFixed(1)} Mbps
+                  </span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-semibold uppercase text-muted-foreground">Avg Ping</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {Math.round(testHistory.reduce((s, h) => s + h.ping, 0) / testHistory.length)} ms
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="divide-y divide-foreground/5">
+              {testHistory.map((h, i) => (
+                <div key={i} className="flex items-center gap-3 py-2 text-xs">
+                  <TrendingUp className="h-3 w-3 shrink-0 text-primary/50" />
+                  <span className="font-mono font-semibold text-foreground">{h.dl.toFixed(1)}</span>
+                  <Download className="h-3 w-3 text-muted-foreground" />
+                  <span className="font-mono font-semibold text-foreground">{h.ul.toFixed(1)}</span>
+                  <Upload className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-muted-foreground">{h.ping}ms</span>
+                  <span className="ml-auto text-muted-foreground/60">{h.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </ToolLayout>
   );
