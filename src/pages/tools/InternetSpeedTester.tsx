@@ -577,13 +577,14 @@ export default function InternetSpeedTester() {
         setJitter(pingResult.avgJitter);
       }
 
-      // Brief pause
-      await new Promise((r) => setTimeout(r, 500));
+      // Animate gauge back to zero before upload
+      liveSpeedRef.current = 0;
+      setDisplaySpeed(0);
+      await new Promise((r) => setTimeout(r, 1200));
       if (cancelRef.current) return reset();
 
       // --- Phase 2: Upload ---
       setPhase("upload");
-      liveSpeedRef.current = 0;
       animStartRef.current = performance.now();
 
       const ulSpeed = await measureUpload(TEST_SERVER_URL, updateLive, cancelRef);
