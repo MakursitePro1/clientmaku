@@ -483,7 +483,7 @@ export default function AdminCustomTools() {
     const handleNext = () => {
       if (!canGoNext()) {
         if (activeTab === "info") toast.error("Tool name is required to continue!");
-        if (activeTab === "code") toast.error("HTML content is required to continue!");
+        if (activeTab === "code") toast.error("HTML content or Embed URL is required to continue!");
         return;
       }
       if (!isLastStep) setActiveTab(steps[currentStepIndex + 1].id);
