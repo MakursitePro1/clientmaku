@@ -55,9 +55,9 @@ function SpeedGauge({
   phase: string;
   testing: boolean;
 }) {
-  const cx = 200;
-  const cy = 200;
-  const r = 150;
+  const cx = 160;
+  const cy = 160;
+  const r = 120;
   const rad = (d: number) => (d * Math.PI) / 180;
   const polar = (angle: number, radius: number) => ({
     x: cx + radius * Math.cos(rad(angle)),
@@ -70,10 +70,45 @@ function SpeedGauge({
     return `M ${a.x} ${a.y} A ${radius} ${radius} 0 ${large} 1 ${b.x} ${b.y}`;
   };
 
-  const angle = speedToAngle(value);
-  const needleDot = polar(angle, r + 2);
-  const intPart = Math.floor(value);
-  const decPart = (value % 1).toFixed(2).slice(1);
+  // Animated needle value with wobble during testing
+  const [animValue, setAnimValue] = useState(0);
+  const wobbleRef = useRef(0);
+
+  useEffect(() => {
+    if (!testing) {
+      setAnimValue(value);
+      return;
+    }
+
+    let raf = 0;
+    const startTime = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      // Smooth interpolation toward target
+      setAnimValue(prev => {
+        const target = value;
+        const smooth = prev + (target - prev) * 0.15;
+        // Add wobble effect during testing
+        const wobbleAmount = Math.min(target * 0.08, 4);
+        const wobble = wobbleAmount * Math.sin(elapsed / 100) * Math.cos(elapsed / 67);
+        wobbleRef.current = wobble;
+        return Math.max(0, smooth + wobble);
+      });
+      raf = requestAnimationFrame(animate);
+    };
+
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [testing, value]);
+
+  const displayVal = testing ? animValue : value;
+  const angle = speedToAngle(displayVal);
+  const needleEnd = polar(angle, r - 8);
+  const needleBase1 = polar(angle + 90, 4);
+  const needleBase2 = polar(angle - 90, 4);
+  const intPart = Math.floor(displayVal);
+  const decPart = (displayVal % 1).toFixed(2).slice(1);
 
   const isDownload = phase === "download";
   const isUpload = phase === "upload";
@@ -89,20 +124,41 @@ function SpeedGauge({
           ? "FAILED"
           : "READY";
 
+  const activeColor = isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)";
+
+  // Minor tick marks
+  const ticks = [];
+  for (let i = 0; i <= 40; i++) {
+    const a = START_ANGLE + (TOTAL_ARC * i) / 40;
+    const isMajor = i % 5 === 0;
+    const inner = polar(a, r - (isMajor ? 16 : 10));
+    const outer = polar(a, r - 4);
+    ticks.push(
+      <line
+        key={i}
+        x1={inner.x} y1={inner.y}
+        x2={outer.x} y2={outer.y}
+        stroke={`hsl(var(--foreground) / ${isMajor ? "0.25" : "0.1"})`}
+        strokeWidth={isMajor ? 2 : 1}
+        strokeLinecap="round"
+      />
+    );
+  }
+
   return (
     <div className="relative flex flex-col items-center">
       {testing && (
         <motion.div
           animate={{ opacity: [0.15, 0.35, 0.15], scale: [0.97, 1.03, 0.97] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="pointer-events-none absolute top-0 h-[300px] w-[300px] rounded-full blur-3xl sm:h-[380px] sm:w-[380px]"
+          className="pointer-events-none absolute inset-0 m-auto h-[200px] w-[200px] rounded-full blur-3xl sm:h-[280px] sm:w-[280px]"
           style={{
             background: `radial-gradient(circle, ${isUpload ? "hsl(142 76% 46% / 0.25)" : "hsl(var(--primary) / 0.3)"}, transparent 70%)`,
           }}
         />
       )}
 
-      <svg viewBox="0 0 400 290" className="relative w-full max-w-[420px]">
+      <svg viewBox="0 0 320 230" className="relative w-full max-w-[340px] sm:max-w-[400px]">
         <defs>
           <linearGradient id="gaugeDownGrad" x1="0%" y1="100%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="hsl(263 70% 50%)" />
@@ -113,54 +169,44 @@ function SpeedGauge({
             <stop offset="100%" stopColor="hsl(160 70% 45%)" />
           </linearGradient>
           <filter id="arcGlow2">
-            <feGaussianBlur stdDeviation="6" result="b" />
+            <feGaussianBlur stdDeviation="5" result="b" />
             <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+          <filter id="needleShadow">
+            <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor={activeColor} floodOpacity="0.5" />
+          </filter>
         </defs>
 
-        {/* Background arc - deeper/more visible */}
+        {/* Background arc */}
         <path
           d={arcPath(START_ANGLE, END_ANGLE, r)}
           fill="none"
-          stroke="hsl(var(--muted-foreground) / 0.18)"
-          strokeWidth="22"
+          stroke="hsl(var(--foreground) / 0.12)"
+          strokeWidth="18"
           strokeLinecap="round"
         />
-        {/* Tick marks on background */}
-        {SCALE_LABELS.map(({ angle: a }) => {
-          const inner = polar(a, r - 14);
-          const outer = polar(a, r + 14);
-          return (
-            <line
-              key={a}
-              x1={inner.x} y1={inner.y}
-              x2={outer.x} y2={outer.y}
-              stroke="hsl(var(--muted-foreground) / 0.15)"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          );
-        })}
+
+        {/* Tick marks */}
+        {ticks}
 
         {/* Active arc */}
-        {value > 0 && (
+        {displayVal > 0.1 && (
           <path
             d={arcPath(START_ANGLE, angle, r)}
             fill="none"
             stroke={isUpload ? "url(#gaugeUpGrad)" : "url(#gaugeDownGrad)"}
-            strokeWidth="22"
+            strokeWidth="18"
             strokeLinecap="round"
             filter="url(#arcGlow2)"
-            style={{ transition: "all 0.12s linear" }}
           />
         )}
 
         {/* Scale labels */}
         {SCALE_LABELS.map(({ value: label, angle: labelAngle }) => {
-          const p = polar(labelAngle, r + 34);
+          const p = polar(labelAngle, r + 26);
           return (
             <text
               key={label}
@@ -168,46 +214,47 @@ function SpeedGauge({
               y={p.y}
               textAnchor="middle"
               dominantBaseline="middle"
-              fill="hsl(var(--foreground) / 0.5)"
-              style={{ fontSize: "12px", fontWeight: 600 }}
+              fill="hsl(var(--foreground) / 0.45)"
+              style={{ fontSize: "10px", fontWeight: 600 }}
             >
               {label >= 100 ? "100+" : label}
             </text>
           );
         })}
 
-        {/* Needle dot */}
-        <circle
-          cx={needleDot.x}
-          cy={needleDot.y}
-          r="10"
-          fill={isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)"}
-          style={{ transition: "all 0.12s linear", filter: `drop-shadow(0 0 8px ${isUpload ? "hsl(142 76% 40% / 0.6)" : "hsl(263 70% 55% / 0.6)"})` }}
+        {/* Needle - triangle pointer */}
+        <polygon
+          points={`${needleEnd.x},${needleEnd.y} ${needleBase1.x},${needleBase1.y} ${needleBase2.x},${needleBase2.y}`}
+          fill={activeColor}
+          filter="url(#needleShadow)"
         />
+        {/* Center dot */}
+        <circle cx={cx} cy={cy} r="6" fill={activeColor} />
+        <circle cx={cx} cy={cy} r="3" fill="hsl(var(--background))" />
 
-        {/* Phase label above number */}
+        {/* Phase label */}
         <text
           x={cx}
-          y={cy - 55}
+          y={cy - 42}
           textAnchor="middle"
-          fill={testing ? (isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)") : "hsl(var(--muted-foreground))"}
-          style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "2.5px" }}
+          fill={testing ? activeColor : "hsl(var(--muted-foreground))"}
+          style={{ fontSize: "9px", fontWeight: 700, letterSpacing: "2.5px" }}
         >
           {phaseLabel}
         </text>
 
-        {/* Phase icon */}
+        {/* Phase arrow */}
         {(isDownload || isUpload) && (
           <motion.g
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 0.7, repeat: Infinity, ease: "easeInOut" }}
           >
             <text
               x={cx}
-              y={cy - 38}
+              y={cy - 28}
               textAnchor="middle"
-              style={{ fontSize: "16px" }}
-              fill={isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)"}
+              style={{ fontSize: "13px" }}
+              fill={activeColor}
             >
               {isDownload ? "↓" : "↑"}
             </text>
@@ -215,12 +262,12 @@ function SpeedGauge({
         )}
 
         {/* Speed number */}
-        <text x={cx} y={cy + 5} textAnchor="middle" dominantBaseline="middle">
-          <tspan className="fill-foreground" style={{ fontSize: "72px", fontWeight: 200 }}>
-            {value > 0 ? intPart : "—"}
+        <text x={cx} y={cy + 10} textAnchor="middle" dominantBaseline="middle">
+          <tspan className="fill-foreground" style={{ fontSize: "52px", fontWeight: 200 }}>
+            {displayVal > 0.1 ? intPart : "—"}
           </tspan>
-          {value > 0 && (
-            <tspan fill="hsl(var(--foreground) / 0.5)" style={{ fontSize: "38px", fontWeight: 200 }}>
+          {displayVal > 0.1 && (
+            <tspan fill="hsl(var(--foreground) / 0.5)" style={{ fontSize: "28px", fontWeight: 200 }}>
               {decPart}
             </tspan>
           )}
@@ -229,10 +276,10 @@ function SpeedGauge({
         {/* Unit */}
         <text
           x={cx}
-          y={cy + 40}
+          y={cy + 38}
           textAnchor="middle"
-          fill="hsl(var(--foreground) / 0.45)"
-          style={{ fontSize: "14px", fontWeight: 600, letterSpacing: "1px" }}
+          fill="hsl(var(--foreground) / 0.4)"
+          style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "1px" }}
         >
           Mbps
         </text>
