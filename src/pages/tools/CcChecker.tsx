@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
-import { CreditCard, CheckCircle2, XCircle, Info, Trash2, Plus, Shield, Zap } from "lucide-react";
+import { CreditCard, CheckCircle2, XCircle, Info, Trash2, Plus, Shield, Zap, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -94,6 +94,19 @@ export default function CcChecker() {
     setResults(checked);
   };
 
+  const exportCsv = () => {
+    if (results.length === 0) return;
+    const header = "Card Number,Valid,Brand,Type,Length\n";
+    const rows = results.map((r) => `${r.number},${r.valid ? "VALID" : "INVALID"},${r.brand},${r.type},${r.length}`).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "cc-check-results.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const formatDisplay = (num: string) =>
     num.replace(/(.{4})/g, "$1 ").trim();
 
@@ -160,6 +173,11 @@ export default function CcChecker() {
             >
               <Plus className="w-4 h-4" /> Load Samples
             </Button>
+            {results.length > 0 && (
+              <Button variant="outline" onClick={exportCsv} className="gap-2">
+                <Download className="w-4 h-4" /> Export CSV
+              </Button>
+            )}
           </div>
         </motion.div>
 
