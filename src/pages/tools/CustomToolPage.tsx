@@ -214,44 +214,8 @@ export default function CustomToolPage() {
       <ScrollToTop />
 
 
-      {/* Sticky toolbar */}
-      <div className="sticky top-[72px] sm:top-[80px] lg:top-[88px] z-30 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
-        <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-5 lg:px-8 py-2.5 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/tools")} className="shrink-0 h-9 w-9 rounded-xl hover:bg-accent">
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ring-1 ring-border/50"
-              style={{ backgroundColor: tool.color + "15", color: tool.color }}
-            >
-              <span className="text-sm sm:text-base font-bold">{tool.name.charAt(0)}</span>
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-sm sm:text-base font-bold truncate leading-tight">{tool.name}</h1>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <Eye className="w-3 h-3" /> {tool.view_count || 0}
-                </span>
-                <span className="text-border">•</span>
-                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {avgRating > 0 ? avgRating.toFixed(1) : "—"}
-                  <span className="hidden sm:inline">({totalRatings})</span>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <Button variant="ghost" size="icon" onClick={handleShare} className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl">
-              <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-1.5 h-8 sm:h-9 rounded-xl text-xs sm:text-sm px-2.5 sm:px-3">
-              <Maximize2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Fullscreen</span>
-            </Button>
-          </div>
-        </div>
-      </div>
+      {/* Spacer for header gap */}
+      <div className="h-4 sm:h-6" />
 
       {/* FULL WIDTH TOOL IFRAME */}
       <div className="w-full flex-1" style={{ minHeight: 0 }}>
