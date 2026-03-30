@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { ArrowLeft, Maximize2, Minimize2, Share2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Maximize2, Minimize2, Share2, ChevronRight, FileCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { toast } from "sonner";
@@ -30,6 +31,14 @@ export default function CustomToolPage() {
   const [notFound, setNotFound] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { tools: allTools } = useToolCatalog();
+
+  const relatedTools = useMemo(() => {
+    if (!tool) return [];
+    return allTools
+      .filter(t => t.category === tool.category && t.id !== `custom-${tool.slug}`)
+      .slice(0, 8);
+  }, [tool, allTools]);
 
   useEffect(() => {
     if (!slug) return;
@@ -158,6 +167,42 @@ export default function CustomToolPage() {
           </div>
         </div>
       </div>
+
+      {/* Related Tools */}
+      {relatedTools.length > 0 && (
+        <div className="w-full border-t border-border bg-muted/30">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-bold">Related Tools</h2>
+              <Link to="/tools" className="text-sm text-primary hover:underline flex items-center gap-1">
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {relatedTools.map(rt => {
+                const Icon = rt.icon || FileCode;
+                return (
+                  <Link
+                    key={rt.id}
+                    to={rt.path}
+                    className="group flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:shadow-md hover:border-primary/30 transition-all"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: rt.color + "18", color: rt.color }}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                      {rt.name}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
