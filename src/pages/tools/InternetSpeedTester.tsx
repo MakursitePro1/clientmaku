@@ -361,15 +361,15 @@ export default function InternetSpeedTester() {
         <AnimatePresence>
           {phase === "error" && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
+              className="rounded-xl border border-red-500/40 bg-red-950/40 backdrop-blur-sm p-4">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-destructive">Speed Test Failed</p>
-                  <p className="text-xs text-muted-foreground mt-1">{errorMsg}</p>
-                  {retryCount > 1 && <p className="text-[10px] text-muted-foreground mt-1">Try switching to a different server or check your connection.</p>}
+                  <p className="text-sm font-bold text-red-400">Speed Test Failed</p>
+                  <p className="text-xs text-emerald-200/60 mt-1">{errorMsg}</p>
+                  {retryCount > 1 && <p className="text-[10px] text-emerald-200/50 mt-1">Try switching to a different server or check your connection.</p>}
                 </div>
-                <Button type="button" size="sm" variant="outline" onClick={runTest} className="shrink-0 text-xs gap-1.5">
+                <Button type="button" size="sm" variant="outline" onClick={runTest} className="shrink-0 text-xs gap-1.5 border-emerald-500/30 text-emerald-200 hover:bg-emerald-800/40">
                   <RotateCcw className="w-3 h-3" /> Retry{retryCount > 0 && ` (${retryCount})`}
                 </Button>
               </div>
