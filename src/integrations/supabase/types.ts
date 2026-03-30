@@ -116,6 +116,7 @@ export type Database = {
           color: string
           created_at: string
           created_by: string | null
+          deleted_at: string | null
           description: string
           html_content: string
           icon_name: string
@@ -133,6 +134,7 @@ export type Database = {
           color?: string
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           description?: string
           html_content?: string
           icon_name?: string
@@ -150,6 +152,7 @@ export type Database = {
           color?: string
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           description?: string
           html_content?: string
           icon_name?: string
