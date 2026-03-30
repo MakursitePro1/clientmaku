@@ -115,7 +115,17 @@ export default function AdminCustomTools() {
   const [activeTab, setActiveTab] = useState<"info" | "code" | "seo">("info");
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; tool: CustomTool | null; permanent: boolean }>({ open: false, tool: null, permanent: false });
+  const [iconSearch, setIconSearch] = useState("");
+  const [showAllIcons, setShowAllIcons] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const allIconNames = useMemo(() => Object.keys(lucideIcons), []);
+  const filteredIcons = useMemo(() => {
+    const base = showAllIcons ? allIconNames : POPULAR_ICON_NAMES.filter(n => n in lucideIcons);
+    if (!iconSearch) return base.slice(0, showAllIcons ? 200 : base.length);
+    const q = iconSearch.toLowerCase();
+    return (showAllIcons ? allIconNames : base).filter(n => n.toLowerCase().includes(q)).slice(0, 200);
+  }, [iconSearch, showAllIcons, allIconNames]);
 
   useEffect(() => { fetchTools(); }, []);
 
