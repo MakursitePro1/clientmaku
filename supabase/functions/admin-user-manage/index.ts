@@ -11,16 +11,99 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const body = await req.json();
+    const { action } = body;
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || Deno.env.get("SUPABASE_ANON_KEY")!;
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
+    // ACTION: setup-admin — Create admin user without requiring auth (first-time setup only)
+    if (action === "setup-admin") {
+      const { email, password, setup_key } = body;
+      if (setup_key !== "makuwebsgo99-setup") {
+        return new Response(JSON.stringify({ error: "Invalid setup key" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (!email || !password) {
+        return new Response(JSON.stringify({ error: "Email and password required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: listData, error: listError } = await adminClient.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000,
+      });
+      if (listError) {
+        return new Response(JSON.stringify({ error: listError.message }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const normalizedEmail = String(email).trim().toLowerCase();
+      const existing = listData?.users?.find((u: any) => String(u.email || "").trim().toLowerCase() === normalizedEmail);
+
+      if (existing) {
+        const { error: upErr } = await adminClient.auth.admin.updateUserById(existing.id, {
+          password,
+          email_confirm: true,
+          user_metadata: {
+            ...(existing.user_metadata || {}),
+            display_name: existing.user_metadata?.display_name || body.username || email,
+            username: body.username || existing.user_metadata?.username || "Makuwebsgo99",
+          },
+        });
+
+        if (upErr) {
+          return new Response(JSON.stringify({ error: upErr.message }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        await adminClient
+          .from("user_roles")
+          .upsert({ user_id: existing.id, role: "admin" }, { onConflict: "user_id,role" });
+
+        return new Response(JSON.stringify({ success: true, message: "Password updated and admin role confirmed." }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: newUser, error: createErr } = await adminClient.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          display_name: body.username || email,
+          username: body.username || "Makuwebsgo99",
+        },
+      });
+
+      if (createErr) {
+        return new Response(JSON.stringify({ error: createErr.message }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      await adminClient.from("user_roles").upsert(
+        { user_id: newUser.user.id, role: "admin" },
+        { onConflict: "user_id,role" },
+      );
+
+      return new Response(JSON.stringify({ success: true, message: "Admin user created successfully." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const anonKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || Deno.env.get("SUPABASE_ANON_KEY")!;
 
     // Verify the caller is an admin
     const userClient = createClient(supabaseUrl, anonKey, {
@@ -32,8 +115,6 @@ Deno.serve(async (req) => {
         status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
     const { data: roleData } = await adminClient
       .from("user_roles")
@@ -47,10 +128,6 @@ Deno.serve(async (req) => {
         status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const body = await req.json();
-    const { action } = body;
-
     // ACTION: create-admin — Create a new user and assign admin role
     if (action === "create-admin") {
       const { email, password, display_name } = body;
@@ -234,54 +311,6 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ success: true, message: "Password updated successfully." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
-    }
-
-    // ACTION: setup-admin — Create admin user without requiring auth (first-time setup only)
-    if (action === "setup-admin") {
-      const { email, password, setup_key } = body;
-      // Simple setup key check to prevent abuse
-      if (setup_key !== "makuwebsgo99-setup") {
-        return new Response(JSON.stringify({ error: "Invalid setup key" }), {
-          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (!email || !password) {
-        return new Response(JSON.stringify({ error: "Email and password required" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      const { data: listData } = await adminClient.auth.admin.listUsers();
-      const existing = listData?.users?.find((u: any) => u.email === email);
-
-      if (existing) {
-        // Update password
-        const { error: upErr } = await adminClient.auth.admin.updateUserById(existing.id, { password, email_confirm: true });
-        if (upErr) {
-          return new Response(JSON.stringify({ error: upErr.message }), {
-            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        // Ensure admin role
-        await adminClient.from("user_roles").upsert({ user_id: existing.id, role: "admin" }, { onConflict: "user_id,role" });
-        return new Response(JSON.stringify({ success: true, message: "Password updated and admin role confirmed." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      } else {
-        const { data: newUser, error: createErr } = await adminClient.auth.admin.createUser({
-          email, password, email_confirm: true,
-          user_metadata: { display_name: email },
-        });
-        if (createErr) {
-          return new Response(JSON.stringify({ error: createErr.message }), {
-            status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
-        }
-        await adminClient.from("user_roles").insert({ user_id: newUser.user.id, role: "admin" });
-        return new Response(JSON.stringify({ success: true, message: "Admin user created successfully." }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
     }
 
     // ACTION: get-admin-emails — Get emails for admin users
