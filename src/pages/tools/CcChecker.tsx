@@ -104,8 +104,6 @@ export default function CcChecker() {
     <ToolLayout
       title="CC Checker / Validator"
       description="Validate credit card numbers using Luhn algorithm (Educational purpose only)"
-      icon={<CreditCard className="w-6 h-6" />}
-      category="security"
     >
       <div className="space-y-6 max-w-4xl mx-auto">
         {/* Disclaimer */}
