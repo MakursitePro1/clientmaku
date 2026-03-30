@@ -229,7 +229,7 @@ export default function CustomToolPage() {
       </div>
 
       {/* Sticky toolbar */}
-      <div className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
+      <div className="sticky top-[56px] sm:top-[64px] z-30 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
         <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-5 lg:px-8 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <Button variant="ghost" size="icon" onClick={() => navigate("/tools")} className="shrink-0 h-9 w-9 rounded-xl hover:bg-accent">
@@ -275,7 +275,7 @@ export default function CustomToolPage() {
           title={tool.name}
           sandbox="allow-scripts allow-forms allow-modals allow-popups"
           className="w-full border-0 block"
-          style={{ height: "calc(100vh - 96px)", minHeight: "500px" }}
+          style={{ height: "calc(100vh - 160px)", minHeight: "500px" }}
         />
       </div>
 
