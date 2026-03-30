@@ -1,0 +1,1 @@
+ALTER TABLE public.custom_tools ADD COLUMN embed_url text NOT NULL DEFAULT '';
