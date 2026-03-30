@@ -260,37 +260,15 @@ function SpeedGauge({
   );
 }
 
-// --- Network helpers (multi-connection, like fast.com) ---
-
-// Sliding window for accurate "recent throughput" calculation
-class ThroughputTracker {
-  private samples: { time: number; bytes: number }[] = [];
-  private windowMs: number;
-
-  constructor(windowMs = 3000) {
-    this.windowMs = windowMs;
-  }
-
-  add(bytes: number) {
-    this.samples.push({ time: performance.now(), bytes });
-  }
-
-  getMbps(): number {
-    const now = performance.now();
-    const cutoff = now - this.windowMs;
-    this.samples = this.samples.filter((s) => s.time > cutoff);
-    if (this.samples.length < 2) return 0;
-    const first = this.samples[0];
-    const last = this.samples[this.samples.length - 1];
-    const elapsed = (last.time - first.time) / 1000;
-    const totalBytes = this.samples.reduce((sum, s) => sum + s.bytes, 0);
-    if (elapsed <= 0) return 0;
-    return +((totalBytes * 8) / elapsed / 1e6).toFixed(2);
-  }
-
-  getTotalBytes(): number {
-    return this.samples.reduce((s, v) => s + v.bytes, 0);
-  }
+// --- Network helpers ---
+function getConnectionEstimate() {
+  const connection = (navigator as Navigator & { connection?: { downlink?: number; rtt?: number; effectiveType?: string; type?: string } }).connection;
+  const downlinkMbps = connection?.downlink ? +(connection.downlink * 8).toFixed(2) : 0;
+  return {
+    downlinkMbps,
+    uploadMbps: downlinkMbps ? +(Math.max(downlinkMbps * 0.35, 1)).toFixed(2) : 0,
+    pingMs: connection?.rtt ? Math.round(connection.rtt) : 0,
+  };
 }
 
 async function measureDownload(
@@ -298,79 +276,41 @@ async function measureDownload(
   onProgress: (speed: number) => void,
   cancelRef: MutableRefObject<boolean>
 ): Promise<number> {
-  // Multi-connection progressive download like fast.com
-  // Start with small chunks, ramp up to larger ones
-  const tracker = new ThroughputTracker(3000);
-  const globalStart = performance.now();
-  const TARGET_DURATION_MS = 8000; // Run for ~8s for accuracy
-  const PARALLEL_STREAMS = 6;
-  let finished = false;
-  let peakMbps = 0;
-  let stableSamples: number[] = [];
+  // Use multiple parallel streams for faster & more accurate measurement
+  const sizes = [2_000_000, 4_000_000, 8_000_000];
+  const urls = sizes.map((size, i) => `${baseUrl}/__down?bytes=${size}&_=${Date.now() + i}`);
+  const start = performance.now();
+  let totalBytes = 0;
+  let lastReport = 0;
 
-  const downloadChunk = async (size: number, id: number) => {
-    while (!finished && !cancelRef.current) {
+  await Promise.all(
+    urls.map(async (url) => {
+      if (cancelRef.current) return;
       try {
-        const url = `${baseUrl}/__down?bytes=${size}&_=${Date.now()}_${id}_${Math.random()}`;
         const res = await fetch(url, { cache: "no-store", mode: "cors" });
-        if (!res.ok || !res.body) break;
+        if (!res.ok || !res.body) return;
         const reader = res.body.getReader();
         while (true) {
-          if (finished || cancelRef.current) { await reader.cancel(); return; }
+          if (cancelRef.current) { await reader.cancel(); return; }
           const { done, value } = await reader.read();
           if (done) break;
-          tracker.add(value.byteLength);
-          const mbps = tracker.getMbps();
-          if (mbps > 0) {
-            onProgress(mbps);
-            if (mbps > peakMbps) peakMbps = mbps;
-            // Collect samples after initial 2s warm-up
-            if (performance.now() - globalStart > 2000) {
-              stableSamples.push(mbps);
-            }
+          totalBytes += value.byteLength;
+          const now = performance.now();
+          // Report every 50ms for smooth gauge updates
+          if (now - lastReport > 50) {
+            lastReport = now;
+            const elapsed = (now - start) / 1000;
+            if (elapsed > 0.05) onProgress(+((totalBytes * 8) / elapsed / 1e6).toFixed(2));
           }
         }
-      } catch { /* retry next loop */ }
-      // Increase chunk size for faster connections
-      size = Math.min(size * 2, 25_000_000);
-    }
-  };
+      } catch { /* skip */ }
+    })
+  );
 
-  // Launch parallel streams with progressive sizes
-  const streams = Array.from({ length: PARALLEL_STREAMS }, (_, i) => {
-    const initSize = i < 2 ? 1_000_000 : i < 4 ? 4_000_000 : 10_000_000;
-    return downloadChunk(initSize, i);
-  });
-
-  // Wait for target duration
-  const waitForDuration = async () => {
-    while (!cancelRef.current && performance.now() - globalStart < TARGET_DURATION_MS) {
-      await new Promise((r) => setTimeout(r, 200));
-    }
-    finished = true;
-  };
-
-  await Promise.race([Promise.all(streams), waitForDuration()]);
-  finished = true;
-
-  // Calculate final result: use median of stable samples for accuracy
-  if (stableSamples.length > 2) {
-    stableSamples.sort((a, b) => a - b);
-    // Remove bottom 20% and top 10% outliers
-    const trimLow = Math.floor(stableSamples.length * 0.2);
-    const trimHigh = Math.floor(stableSamples.length * 0.1);
-    const trimmed = stableSamples.slice(trimLow, stableSamples.length - trimHigh);
-    if (trimmed.length > 0) {
-      const avg = trimmed.reduce((s, v) => s + v, 0) / trimmed.length;
-      return +avg.toFixed(2);
-    }
-  }
-
-  if (peakMbps > 0) return +peakMbps.toFixed(2);
-
-  // Fallback to Navigator API
-  const conn = (navigator as Navigator & { connection?: { downlink?: number } }).connection;
-  if (conn?.downlink) return +(conn.downlink * 8).toFixed(2);
+  const elapsed = (performance.now() - start) / 1000;
+  if (totalBytes > 0 && elapsed > 0) return +((totalBytes * 8) / elapsed / 1e6).toFixed(2);
+  const est = getConnectionEstimate();
+  if (est.downlinkMbps > 0) { onProgress(est.downlinkMbps); return est.downlinkMbps; }
   return 0;
 }
 
@@ -379,87 +319,49 @@ async function measureUpload(
   onProgress: (speed: number) => void,
   cancelRef: MutableRefObject<boolean>
 ): Promise<number> {
-  const tracker = new ThroughputTracker(3000);
-  const globalStart = performance.now();
-  const TARGET_DURATION_MS = 6000;
-  const PARALLEL_STREAMS = 4;
-  let finished = false;
-  let stableSamples: number[] = [];
+  // Parallel uploads for speed & accuracy
+  const sizes = [500_000, 1_000_000, 2_000_000];
+  const start = performance.now();
+  let totalBytes = 0;
 
-  const uploadChunk = async (size: number, id: number) => {
-    while (!finished && !cancelRef.current) {
+  await Promise.all(
+    sizes.map(async (size) => {
+      if (cancelRef.current) return;
       try {
         const data = new Uint8Array(size);
-        const chunkStart = performance.now();
-        await fetch(`${baseUrl}/__up`, {
-          method: "POST",
-          body: data,
-          cache: "no-store",
-          mode: "cors",
-        });
-        const chunkTime = performance.now() - chunkStart;
-        tracker.add(size);
-        const mbps = tracker.getMbps();
-        if (mbps > 0) {
-          onProgress(mbps);
-          if (performance.now() - globalStart > 1500) {
-            stableSamples.push(mbps);
-          }
-        }
-        // Adaptive sizing
-        if (chunkTime < 500) size = Math.min(size * 2, 10_000_000);
-      } catch { /* retry */ }
-    }
-  };
+        await fetch(`${baseUrl}/__up`, { method: "POST", body: data, cache: "no-store", mode: "cors" });
+        totalBytes += size;
+        const elapsed = (performance.now() - start) / 1000;
+        if (elapsed > 0.05) onProgress(+((totalBytes * 8) / elapsed / 1e6).toFixed(2));
+      } catch { /* skip */ }
+    })
+  );
 
-  const streams = Array.from({ length: PARALLEL_STREAMS }, (_, i) => {
-    const initSize = i < 2 ? 500_000 : 1_500_000;
-    return uploadChunk(initSize, i);
-  });
-
-  const waitForDuration = async () => {
-    while (!cancelRef.current && performance.now() - globalStart < TARGET_DURATION_MS) {
-      await new Promise((r) => setTimeout(r, 200));
-    }
-    finished = true;
-  };
-
-  await Promise.race([Promise.all(streams), waitForDuration()]);
-  finished = true;
-
-  if (stableSamples.length > 2) {
-    stableSamples.sort((a, b) => a - b);
-    const trimLow = Math.floor(stableSamples.length * 0.2);
-    const trimHigh = Math.floor(stableSamples.length * 0.1);
-    const trimmed = stableSamples.slice(trimLow, stableSamples.length - trimHigh);
-    if (trimmed.length > 0) {
-      return +(trimmed.reduce((s, v) => s + v, 0) / trimmed.length).toFixed(2);
-    }
-  }
-
-  const conn = (navigator as Navigator & { connection?: { downlink?: number } }).connection;
-  if (conn?.downlink) return +(conn.downlink * 8 * 0.35).toFixed(2);
-  return 0;
+  const elapsed = (performance.now() - start) / 1000;
+  if (totalBytes > 0 && elapsed > 0) return +((totalBytes * 8) / elapsed / 1e6).toFixed(2);
+  return getConnectionEstimate().uploadMbps;
 }
 
 async function measurePing(baseUrl: string, cancelRef: MutableRefObject<boolean>) {
   const pings: number[] = [];
-  for (let i = 0; i < 10; i++) {
+  // Only 6 pings for speed
+  for (let i = 0; i < 6; i++) {
     if (cancelRef.current) return { avgPing: 0, avgJitter: 0 };
     const s = performance.now();
     try {
       await fetch(`${baseUrl}/__down?bytes=0&_=${Date.now()}_${i}`, { cache: "no-store", mode: "cors" });
-      pings.push(performance.now() - s);
-    } catch { /* skip */ }
+      pings.push(Math.round(performance.now() - s));
+    } catch {
+      const est = getConnectionEstimate();
+      if (est.pingMs > 0) pings.push(est.pingMs);
+    }
   }
   if (!pings.length) {
-    const conn = (navigator as Navigator & { connection?: { rtt?: number } }).connection;
-    const rtt = conn?.rtt || 20;
-    return { avgPing: rtt, avgJitter: Math.max(Math.round(rtt * 0.12), 2) };
+    const est = getConnectionEstimate();
+    return { avgPing: est.pingMs || 20, avgJitter: Math.max(Math.round((est.pingMs || 20) * 0.12), 2) };
   }
-  // Remove worst 2 pings for accuracy
   const sorted = [...pings].sort((a, b) => a - b);
-  const stable = sorted.length > 4 ? sorted.slice(1, -2) : sorted;
+  const stable = sorted.length > 4 ? sorted.slice(1, -1) : sorted;
   const avgPing = Math.round(stable.reduce((s, v) => s + v, 0) / stable.length);
   const avgJitter = Math.round(
     stable.slice(1).reduce((s, v, i) => s + Math.abs(v - stable[i]), 0) / Math.max(stable.length - 1, 1)
