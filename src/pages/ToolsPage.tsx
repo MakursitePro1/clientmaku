@@ -24,7 +24,7 @@ export default function ToolsPage() {
 
   const stats = [
     { label: "Total Tools", value: `${totalTools}`, icon: Wrench, color: "hsl(262, 83%, 58%)" },
-    { label: "Categories", value: `${totalCategories}`, icon: Grid3X3, color: "hsl(142, 71%, 45%)" },
+    { label: "Categories", value: `${totalCategories}+`, icon: Grid3X3, color: "hsl(142, 71%, 45%)" },
     { label: "Always Free", value: "100%", icon: Star, color: "hsl(45, 93%, 47%)" },
     { label: "Updated Daily", value: "24/7", icon: TrendingUp, color: "hsl(199, 89%, 48%)" },
   ];
