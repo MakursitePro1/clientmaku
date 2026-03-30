@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ToolLayout from "@/components/ToolLayout";
+import { ToolLayout } from "@/components/ToolLayout";
 import { CreditCard, CheckCircle2, XCircle, Info, Trash2, Plus, Shield, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
