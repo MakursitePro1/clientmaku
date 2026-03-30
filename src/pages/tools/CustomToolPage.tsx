@@ -204,7 +204,7 @@ export default function CustomToolPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pt-[72px] sm:pt-[80px] lg:pt-[88px]">
       <SEOHead
         title={tool.meta_title || tool.name}
         description={tool.meta_description || tool.description}
