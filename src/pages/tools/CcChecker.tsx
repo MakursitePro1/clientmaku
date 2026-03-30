@@ -94,6 +94,19 @@ export default function CcChecker() {
     setResults(checked);
   };
 
+  const exportCsv = () => {
+    if (results.length === 0) return;
+    const header = "Card Number,Valid,Brand,Type,Length\n";
+    const rows = results.map((r) => `${r.number},${r.valid ? "VALID" : "INVALID"},${r.brand},${r.type},${r.length}`).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "cc-check-results.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const formatDisplay = (num: string) =>
     num.replace(/(.{4})/g, "$1 ").trim();
 
