@@ -88,6 +88,7 @@ const ChmodCalculator = lazy(() => import("./pages/tools/ChmodCalculator"));
 const PortScanner = lazy(() => import("./pages/tools/PortScanner"));
 const SslChecker = lazy(() => import("./pages/tools/SslChecker"));
 const HtmlCssJsRunner = lazy(() => import("./pages/tools/HtmlCssJsRunner"));
+const CcChecker = lazy(() => import("./pages/tools/CcChecker"));
 
 const queryClient = new QueryClient();
 
@@ -173,6 +174,7 @@ const App = () => (
             <Route path="/tools/ssl-checker" element={<SslChecker />} />
             <Route path="/tools/dns-lookup" element={<DnsLookup />} />
             <Route path="/tools/html-css-js-runner" element={<HtmlCssJsRunner />} />
+            <Route path="/tools/cc-checker" element={<CcChecker />} />
             {/* Admin Panel - Dynamic Slug */}
             <Route path="/:adminSlug" element={<AdminSlugChecker />}>
               <Route index element={<AdminDashboard />} />
