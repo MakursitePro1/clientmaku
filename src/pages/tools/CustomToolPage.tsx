@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { ArrowLeft, Maximize2, Minimize2, Share2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Maximize2, Minimize2, Share2, ChevronRight, FileCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { toast } from "sonner";
