@@ -738,6 +738,42 @@ export default function AdminCustomTools() {
           {/* Step 2: Code */}
           {activeTab === "code" && (
             <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
+              {/* Embed URL Option */}
+              <Card className="border-border/60 border-primary/20 bg-primary/[0.02]">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4 text-primary" /> Embed URL (Lovable / External)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Lovable বা অন্য কোনো সাইটে তৈরি টুলের Published URL দিন — সরাসরি embed হয়ে যাবে।
+                  </p>
+                  <Input
+                    value={editingTool.embed_url || ""}
+                    onChange={e => updateField("embed_url", e.target.value)}
+                    placeholder="https://your-tool.lovable.app"
+                    type="url"
+                  />
+                  {editingTool.embed_url && (
+                    <div className="border border-border rounded-2xl overflow-hidden bg-white shadow-sm" style={{ height: "300px" }}>
+                      <iframe src={editingTool.embed_url} className="w-full h-full border-0" title="Embed Preview" />
+                    </div>
+                  )}
+                  {editingTool.embed_url && editingTool.html_content && (
+                    <p className="text-xs text-amber-600 flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      Embed URL দেওয়া থাকলে HTML কোডের বদলে URL ব্যবহৃত হবে।
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-xs text-muted-foreground font-medium px-2">অথবা HTML কোড দিন</span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
               <Card className="border-border/60">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between flex-wrap gap-3">
