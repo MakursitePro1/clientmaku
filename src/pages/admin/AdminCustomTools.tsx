@@ -15,7 +15,7 @@ import {
   Plus, Trash2, Edit, Eye, Upload, FileCode, ArrowLeft, X,
   CheckCircle, AlertCircle, Code2, Palette, Tag, Globe, Copy,
   Sparkles, Layers, Zap, LayoutGrid, RotateCcw, Archive,
-  Search, ExternalLink, AlertTriangle, icons as lucideIcons
+  Search, ExternalLink, AlertTriangle, ChevronRight, icons as lucideIcons
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { categories as toolCategories } from "@/data/tools";
