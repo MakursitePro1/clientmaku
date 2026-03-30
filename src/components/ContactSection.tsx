@@ -11,7 +11,7 @@ export function ContactSection() {
 
   const contactInfo = [
     { icon: MapPin, title: "Our Location", value: settings.contact_address || "Dhaka, Bangladesh", color: "from-violet-500 to-purple-600" },
-    { icon: Phone, title: "Phone Number", value: settings.contact_phone || "+880 1635-915989", color: "from-pink-500 to-rose-600" },
+    { icon: Phone, title: "Phone Number", value: settings.contact_phone || "+880 1754-839834", color: "from-pink-500 to-rose-600" },
     { icon: Mail, title: "Email Address", value: settings.contact_email || "hello@cybervenom.com", color: "from-amber-500 to-orange-600" },
     { icon: Clock, title: "Working Hours", value: "24/7 Available", color: "from-emerald-500 to-teal-600" },
   ];
