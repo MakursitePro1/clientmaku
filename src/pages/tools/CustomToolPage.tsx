@@ -21,6 +21,7 @@ interface CustomTool {
   description: string;
   category: string;
   html_content: string;
+  embed_url: string;
   color: string;
   meta_title: string;
   meta_description: string;
@@ -194,9 +195,9 @@ export default function CustomToolPage() {
         </div>
         <iframe
           ref={iframeRef}
-          srcDoc={tool.html_content}
+          {...(tool.embed_url ? { src: tool.embed_url } : { srcDoc: tool.html_content })}
           className="flex-1 w-full border-0"
-          sandbox="allow-scripts allow-forms allow-modals allow-popups"
+          sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"
           title={tool.name}
         />
       </div>
@@ -221,9 +222,9 @@ export default function CustomToolPage() {
       <div className="w-full flex-1" style={{ minHeight: 0 }}>
         <iframe
           ref={iframeRef}
-          srcDoc={tool.html_content}
+          {...(tool.embed_url ? { src: tool.embed_url } : { srcDoc: tool.html_content })}
           title={tool.name}
-          sandbox="allow-scripts allow-forms allow-modals allow-popups"
+          sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"
           className="w-full border-0 block"
           style={{ height: "calc(100vh - 160px)", minHeight: "500px" }}
         />

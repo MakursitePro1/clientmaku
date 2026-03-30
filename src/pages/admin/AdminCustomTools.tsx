@@ -49,6 +49,7 @@ interface CustomTool {
   icon_name: string;
   color: string;
   html_content: string;
+  embed_url: string;
   is_enabled: boolean;
   created_at: string;
   updated_at: string;
@@ -152,7 +153,7 @@ export default function AdminCustomTools() {
   const handleCreate = () => {
     setEditingTool({
       name: "", slug: "", description: "", category: "utility",
-      icon_name: "Wrench", color: "hsl(263, 85%, 58%)", html_content: "", is_enabled: true
+      icon_name: "Wrench", color: "hsl(263, 85%, 58%)", html_content: "", embed_url: "", is_enabled: true
     });
     setActiveTab("info");
     setView("create");
@@ -187,7 +188,7 @@ export default function AdminCustomTools() {
 
   const handleSave = async () => {
     if (!editingTool.name?.trim()) { toast.error("Tool name is required!"); return; }
-    if (!editingTool.html_content?.trim()) { toast.error("HTML content is required!"); return; }
+    if (!editingTool.html_content?.trim() && !editingTool.embed_url?.trim()) { toast.error("HTML content or Embed URL is required!"); return; }
 
     const slug = editingTool.slug?.trim() || generateSlug(editingTool.name);
     setSaving(true);
@@ -199,7 +200,8 @@ export default function AdminCustomTools() {
       category: editingTool.category || "utility",
       icon_name: editingTool.icon_name || "Wrench",
       color: editingTool.color || "hsl(263, 85%, 58%)",
-      html_content: editingTool.html_content!,
+      html_content: editingTool.html_content || "",
+      embed_url: editingTool.embed_url?.trim() || "",
       is_enabled: editingTool.is_enabled ?? true,
       meta_title: editingTool.meta_title?.trim() || "",
       meta_description: editingTool.meta_description?.trim() || "",
@@ -270,6 +272,7 @@ export default function AdminCustomTools() {
       icon_name: tool.icon_name,
       color: tool.color,
       html_content: tool.html_content,
+      embed_url: tool.embed_url || "",
       is_enabled: false,
       meta_title: tool.meta_title,
       meta_description: tool.meta_description,
@@ -375,9 +378,9 @@ export default function AdminCustomTools() {
         </div>
         <div className="border border-border rounded-2xl overflow-hidden bg-white shadow-lg" style={{ height: "75vh" }}>
           <iframe
-            srcDoc={previewTool.html_content}
+            {...(previewTool.embed_url ? { src: previewTool.embed_url } : { srcDoc: previewTool.html_content })}
             className="w-full h-full border-0"
-            sandbox="allow-scripts allow-forms allow-modals"
+            sandbox="allow-scripts allow-forms allow-modals allow-same-origin"
             title={previewTool.name}
           />
         </div>
@@ -474,14 +477,14 @@ export default function AdminCustomTools() {
 
     const canGoNext = () => {
       if (activeTab === "info") return !!(editingTool.name?.trim());
-      if (activeTab === "code") return !!(editingTool.html_content?.trim());
+      if (activeTab === "code") return !!(editingTool.html_content?.trim() || editingTool.embed_url?.trim());
       return true;
     };
 
     const handleNext = () => {
       if (!canGoNext()) {
         if (activeTab === "info") toast.error("Tool name is required to continue!");
-        if (activeTab === "code") toast.error("HTML content is required to continue!");
+        if (activeTab === "code") toast.error("HTML content or Embed URL is required to continue!");
         return;
       }
       if (!isLastStep) setActiveTab(steps[currentStepIndex + 1].id);
@@ -736,6 +739,42 @@ export default function AdminCustomTools() {
           {/* Step 2: Code */}
           {activeTab === "code" && (
             <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
+              {/* Embed URL Option */}
+              <Card className="border-border/60 border-primary/20 bg-primary/[0.02]">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4 text-primary" /> Embed URL (Lovable / External)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Lovable বা অন্য কোনো সাইটে তৈরি টুলের Published URL দিন — সরাসরি embed হয়ে যাবে।
+                  </p>
+                  <Input
+                    value={editingTool.embed_url || ""}
+                    onChange={e => updateField("embed_url", e.target.value)}
+                    placeholder="https://your-tool.lovable.app"
+                    type="url"
+                  />
+                  {editingTool.embed_url && (
+                    <div className="border border-border rounded-2xl overflow-hidden bg-white shadow-sm" style={{ height: "300px" }}>
+                      <iframe src={editingTool.embed_url} className="w-full h-full border-0" title="Embed Preview" />
+                    </div>
+                  )}
+                  {editingTool.embed_url && editingTool.html_content && (
+                    <p className="text-xs text-amber-600 flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      Embed URL দেওয়া থাকলে HTML কোডের বদলে URL ব্যবহৃত হবে।
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-xs text-muted-foreground font-medium px-2">অথবা HTML কোড দিন</span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
               <Card className="border-border/60">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between flex-wrap gap-3">
