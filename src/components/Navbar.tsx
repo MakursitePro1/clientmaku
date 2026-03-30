@@ -355,6 +355,11 @@ export function Navbar() {
           </div>
         </div>
 
+        {/* Mobile Menu Overlay */}
+        {isOpen && isCompactNav && (
+          <div className="fixed inset-0 z-[-1]" onClick={() => setIsOpen(false)} />
+        )}
+
         {/* Mobile Menu */}
         {isOpen && isCompactNav && (
           <div className="lg:hidden mt-2 navbar-glass rounded-2xl p-4 space-y-2 animate-fade-in">
