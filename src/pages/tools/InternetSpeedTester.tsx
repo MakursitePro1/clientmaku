@@ -735,7 +735,7 @@ export default function InternetSpeedTester() {
           </div>
         </div>
 
-        {/* Network info */}
+        {/* Network Information */}
         <div className="rounded-2xl border-2 border-foreground/10 bg-card p-5">
           <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
             <Globe className="h-3.5 w-3.5 text-primary" /> Network Information
@@ -743,11 +743,14 @@ export default function InternetSpeedTester() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {[
               { icon: Globe, label: "IP Address", value: ip },
-              { icon: Activity, label: "Connection", value: connType },
+              { icon: Wifi, label: "Connection", value: connType },
               { icon: Server, label: "Server", value: "Cloudflare" },
               { icon: Shield, label: "Protocol", value: location.protocol === "https:" ? "HTTPS" : "HTTP" },
+              { icon: MapPin, label: "Location", value: location_ },
+              { icon: Monitor, label: "ISP / Org", value: isp },
+              { icon: Zap, label: "Est. Bandwidth", value: downlink },
+              { icon: Activity, label: "RTT", value: rtt },
               { icon: Clock, label: "Last Test", value: testHistory[0]?.time || "Never" },
-              { icon: Activity, label: "Tests Run", value: `${testHistory.length}` },
             ].map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex items-center gap-2 rounded-lg border border-foreground/8 bg-background p-2.5">
                 <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
@@ -759,6 +762,63 @@ export default function InternetSpeedTester() {
             ))}
           </div>
         </div>
+
+        {/* Test History */}
+        {testHistory.length > 0 && (
+          <div className="rounded-2xl border-2 border-foreground/10 bg-card p-5">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                <BarChart3 className="h-3.5 w-3.5 text-primary" /> Test History
+              </h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 text-[10px]"
+                onClick={() => { setTestHistory([]); localStorage.removeItem("cv_speed_history"); }}
+              >
+                Clear
+              </Button>
+            </div>
+
+            {/* Average summary */}
+            {testHistory.length >= 2 && (
+              <div className="mb-3 grid grid-cols-3 gap-2 rounded-lg border border-foreground/8 bg-muted/30 p-2.5">
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-semibold uppercase text-muted-foreground">Avg Download</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {(testHistory.reduce((s, h) => s + h.dl, 0) / testHistory.length).toFixed(1)} Mbps
+                  </span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-semibold uppercase text-muted-foreground">Avg Upload</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {(testHistory.reduce((s, h) => s + h.ul, 0) / testHistory.length).toFixed(1)} Mbps
+                  </span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-semibold uppercase text-muted-foreground">Avg Ping</span>
+                  <span className="text-sm font-bold text-foreground">
+                    {Math.round(testHistory.reduce((s, h) => s + h.ping, 0) / testHistory.length)} ms
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="divide-y divide-foreground/5">
+              {testHistory.map((h, i) => (
+                <div key={i} className="flex items-center gap-3 py-2 text-xs">
+                  <TrendingUp className="h-3 w-3 shrink-0 text-primary/50" />
+                  <span className="font-mono font-semibold text-foreground">{h.dl.toFixed(1)}</span>
+                  <Download className="h-3 w-3 text-muted-foreground" />
+                  <span className="font-mono font-semibold text-foreground">{h.ul.toFixed(1)}</span>
+                  <Upload className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-muted-foreground">{h.ping}ms</span>
+                  <span className="ml-auto text-muted-foreground/60">{h.time}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </ToolLayout>
   );
