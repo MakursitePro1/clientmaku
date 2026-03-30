@@ -33,14 +33,18 @@ Deno.serve(async (req) => {
         });
       }
 
-      const { data: listData, error: listError } = await adminClient.auth.admin.listUsers();
+      const { data: listData, error: listError } = await adminClient.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000,
+      });
       if (listError) {
         return new Response(JSON.stringify({ error: listError.message }), {
           status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      const existing = listData?.users?.find((u: any) => u.email === email);
+      const normalizedEmail = String(email).trim().toLowerCase();
+      const existing = listData?.users?.find((u: any) => String(u.email || "").trim().toLowerCase() === normalizedEmail);
 
       if (existing) {
         const { error: upErr } = await adminClient.auth.admin.updateUserById(existing.id, {
