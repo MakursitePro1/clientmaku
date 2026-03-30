@@ -146,13 +146,17 @@ export function Footer() {
                 {settings.footer_copyright || "All rights reserved by"} <span className="font-semibold gradient-text">{settings.site_name}</span>
               </p>
               <a
-                href="https://www.cybervenom.com/"
+                href="https://www.makursite.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide gradient-text hover:opacity-80 transition-opacity"
+                className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary/10 via-pink-500/10 to-purple-500/10 border border-primary/20 hover:border-primary/40 hover:from-primary/20 hover:via-pink-500/20 hover:to-purple-500/20 transition-all duration-300"
               >
-                <Sparkles className="w-3 h-3 text-primary" />
-                Developed By Cyber Venom.com
+                <span className="text-xs text-muted-foreground/70">Designed & Developed by</span>
+                <span className="text-xs font-bold gradient-text group-hover:opacity-90 transition-opacity flex items-center gap-1.5">
+                  <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+                  Makursite.com
+                  <ArrowUpRight className="w-3 h-3 opacity-60 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </span>
               </a>
             </div>
           </div>
