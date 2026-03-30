@@ -75,6 +75,7 @@ export const tools: Tool[] = [
   { id: "meta-tag-generator", name: "Meta Tag Generator", description: "Generate SEO-friendly meta tags", icon: Globe, category: "generator", path: "/tools/meta-tag-generator", color: "hsl(200, 75%, 50%)" },
 
   // Developer Tools
+  { id: "html-css-js-runner", name: "HTML/CSS/JS Runner", description: "Write & run HTML, CSS, JavaScript with live preview", icon: Code, category: "developer", path: "/tools/html-css-js-runner", color: "hsl(25, 95%, 53%)" },
   { id: "json-formatter", name: "JSON Formatter", description: "Format, validate & minify JSON data", icon: Braces, category: "developer", path: "/tools/json-formatter", color: "hsl(40, 90%, 50%)" },
   { id: "color-picker", name: "Color Picker", description: "Pick colors, convert formats & generate palettes", icon: Palette, category: "developer", path: "/tools/color-picker", color: "hsl(320, 85%, 55%)" },
   { id: "markdown-preview", name: "Markdown Preview", description: "Write markdown and preview in real-time", icon: FileText, category: "developer", path: "/tools/markdown-preview", color: "hsl(210, 70%, 50%)" },
