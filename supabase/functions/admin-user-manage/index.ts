@@ -187,6 +187,103 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ACTION: update-password — Update a user's password (admin only)
+    if (action === "update-password") {
+      const { email, password } = body;
+      if (!email || !password) {
+        return new Response(JSON.stringify({ error: "Email and password are required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Find user by email
+      const { data: listData, error: listError } = await adminClient.auth.admin.listUsers();
+      if (listError) {
+        return new Response(JSON.stringify({ error: listError.message }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const targetUser = listData.users.find((u: any) => u.email === email);
+      if (!targetUser) {
+        // Create user if not exists
+        const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: { display_name: email },
+        });
+        if (createError) {
+          return new Response(JSON.stringify({ error: createError.message }), {
+            status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        // Assign admin role
+        await adminClient.from("user_roles").insert({ user_id: newUser.user.id, role: "admin" });
+        return new Response(JSON.stringify({ success: true, message: "User created with password and admin role assigned." }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Update password
+      const { error: updateError } = await adminClient.auth.admin.updateUserById(targetUser.id, { password });
+      if (updateError) {
+        return new Response(JSON.stringify({ error: updateError.message }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ success: true, message: "Password updated successfully." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ACTION: setup-admin — Create admin user without requiring auth (first-time setup only)
+    if (action === "setup-admin") {
+      const { email, password, setup_key } = body;
+      // Simple setup key check to prevent abuse
+      if (setup_key !== "makuwebsgo99-setup") {
+        return new Response(JSON.stringify({ error: "Invalid setup key" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (!email || !password) {
+        return new Response(JSON.stringify({ error: "Email and password required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: listData } = await adminClient.auth.admin.listUsers();
+      const existing = listData?.users?.find((u: any) => u.email === email);
+
+      if (existing) {
+        // Update password
+        const { error: upErr } = await adminClient.auth.admin.updateUserById(existing.id, { password, email_confirm: true });
+        if (upErr) {
+          return new Response(JSON.stringify({ error: upErr.message }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        // Ensure admin role
+        await adminClient.from("user_roles").upsert({ user_id: existing.id, role: "admin" }, { onConflict: "user_id,role" });
+        return new Response(JSON.stringify({ success: true, message: "Password updated and admin role confirmed." }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } else {
+        const { data: newUser, error: createErr } = await adminClient.auth.admin.createUser({
+          email, password, email_confirm: true,
+          user_metadata: { display_name: email },
+        });
+        if (createErr) {
+          return new Response(JSON.stringify({ error: createErr.message }), {
+            status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        await adminClient.from("user_roles").insert({ user_id: newUser.user.id, role: "admin" });
+        return new Response(JSON.stringify({ success: true, message: "Admin user created successfully." }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // ACTION: get-admin-emails — Get emails for admin users
     if (action === "get-admin-emails") {
       const { user_ids } = body;
