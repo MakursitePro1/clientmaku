@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Save, Globe, FileText, MessageCircle, Layout,
   ExternalLink, Type, Mail, Phone, MapPin, Facebook, Twitter,
-  Instagram, Youtube, Linkedin, Github, Star, Megaphone
+  Instagram, Youtube, Linkedin, Github, Star, Megaphone, Key, Link2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { ImageUploadField } from "@/components/ImageUploadField";
