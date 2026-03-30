@@ -9,9 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
-  Plus, Trash2, Edit, Eye, Upload, FileCode, Info, ArrowLeft, X,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
+} from "@/components/ui/dialog";
+import {
+  Plus, Trash2, Edit, Eye, Upload, FileCode, ArrowLeft, X,
   CheckCircle, AlertCircle, Code2, Palette, Tag, Globe, Copy,
-  Sparkles, Layers, Zap, LayoutGrid, ExternalLink, Maximize2
+  Sparkles, Layers, Zap, LayoutGrid, RotateCcw, Archive,
+  Search, ExternalLink, AlertTriangle
 } from "lucide-react";
 import { categories as toolCategories } from "@/data/tools";
 import { cn } from "@/lib/utils";
@@ -28,6 +32,7 @@ interface CustomTool {
   is_enabled: boolean;
   created_at: string;
   updated_at: string;
+  deleted_at: string | null;
   meta_title: string;
   meta_description: string;
   meta_keywords: string;
@@ -83,11 +88,13 @@ const SAMPLE_HTML = `<!DOCTYPE html>
 export default function AdminCustomTools() {
   const [tools, setTools] = useState<CustomTool[]>([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<"list" | "create" | "edit" | "preview">("list");
+  const [view, setView] = useState<"list" | "create" | "edit" | "preview" | "trash">("list");
   const [editingTool, setEditingTool] = useState<Partial<CustomTool>>({});
   const [previewTool, setPreviewTool] = useState<CustomTool | null>(null);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"info" | "code" | "seo">("info");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; tool: CustomTool | null; permanent: boolean }>({ open: false, tool: null, permanent: false });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchTools(); }, []);
@@ -101,6 +108,13 @@ export default function AdminCustomTools() {
     if (!error && data) setTools(data as unknown as CustomTool[]);
     setLoading(false);
   };
+
+  const activeToolsList = tools.filter(t => !t.deleted_at);
+  const trashedTools = tools.filter(t => !!t.deleted_at);
+  const filteredTools = activeToolsList.filter(t =>
+    !searchQuery || t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.slug.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const enabledCount = activeToolsList.filter(t => t.is_enabled).length;
 
   const generateSlug = (name: string) =>
     name.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
@@ -174,11 +188,41 @@ export default function AdminCustomTools() {
     setSaving(false);
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Delete "${name}" permanently?`)) return;
-    const { error } = await supabase.from("custom_tools").delete().eq("id", id);
-    if (error) toast.error("Failed to delete");
-    else { toast.success("Tool deleted!"); fetchTools(); }
+  // Soft delete → move to trash
+  const handleMoveToTrash = async (tool: CustomTool) => {
+    const { error } = await supabase.from("custom_tools")
+      .update({ deleted_at: new Date().toISOString(), is_enabled: false } as any)
+      .eq("id", tool.id);
+    if (error) toast.error("Failed to move to trash");
+    else { toast.success(`"${tool.name}" moved to trash`); fetchTools(); }
+    setDeleteDialog({ open: false, tool: null, permanent: false });
+  };
+
+  // Permanent delete
+  const handlePermanentDelete = async (tool: CustomTool) => {
+    const { error } = await supabase.from("custom_tools").delete().eq("id", tool.id);
+    if (error) toast.error("Failed to delete permanently");
+    else { toast.success(`"${tool.name}" permanently deleted`); fetchTools(); }
+    setDeleteDialog({ open: false, tool: null, permanent: false });
+  };
+
+  // Restore from trash
+  const handleRestore = async (tool: CustomTool) => {
+    const { error } = await supabase.from("custom_tools")
+      .update({ deleted_at: null } as any)
+      .eq("id", tool.id);
+    if (error) toast.error("Failed to restore");
+    else { toast.success(`"${tool.name}" restored!`); fetchTools(); }
+  };
+
+  // Empty entire trash
+  const handleEmptyTrash = async () => {
+    if (!confirm("Permanently delete ALL trashed tools? This cannot be undone!")) return;
+    for (const tool of trashedTools) {
+      await supabase.from("custom_tools").delete().eq("id", tool.id);
+    }
+    toast.success("Trash emptied!");
+    fetchTools();
   };
 
   const handleToggle = async (id: string, enabled: boolean) => {
@@ -211,6 +255,67 @@ export default function AdminCustomTools() {
       ...(field === "name" && !prev.slug ? { slug: generateSlug(value) } : {})
     }));
 
+  // DELETE CONFIRMATION DIALOG
+  const DeleteConfirmDialog = () => (
+    <Dialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({ open: false, tool: null, permanent: false })}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="flex items-center gap-3 mb-2">
+            <div className={cn(
+              "w-12 h-12 rounded-xl flex items-center justify-center",
+              deleteDialog.permanent ? "bg-destructive/10" : "bg-amber-500/10"
+            )}>
+              {deleteDialog.permanent
+                ? <AlertTriangle className="w-6 h-6 text-destructive" />
+                : <Trash2 className="w-6 h-6 text-amber-500" />
+              }
+            </div>
+            <div>
+              <DialogTitle>
+                {deleteDialog.permanent ? "Permanent Delete" : "Move to Trash"}
+              </DialogTitle>
+              <DialogDescription className="mt-1">
+                {deleteDialog.permanent
+                  ? "This action cannot be undone. The tool will be permanently removed."
+                  : "The tool will be moved to trash. You can restore it later."
+                }
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+        {deleteDialog.tool && (
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/40">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ backgroundColor: deleteDialog.tool.color + "22", color: deleteDialog.tool.color }}
+            >
+              <FileCode className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm truncate">{deleteDialog.tool.name}</p>
+              <p className="text-xs text-muted-foreground">/tools/custom/{deleteDialog.tool.slug}</p>
+            </div>
+          </div>
+        )}
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="outline" onClick={() => setDeleteDialog({ open: false, tool: null, permanent: false })}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (!deleteDialog.tool) return;
+              if (deleteDialog.permanent) handlePermanentDelete(deleteDialog.tool);
+              else handleMoveToTrash(deleteDialog.tool);
+            }}
+          >
+            {deleteDialog.permanent ? "Delete Permanently" : "Move to Trash"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   // PREVIEW VIEW
   if (view === "preview" && previewTool) {
     return (
@@ -227,9 +332,16 @@ export default function AdminCustomTools() {
               <h2 className="text-lg font-bold">{previewTool.name}</h2>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={() => handleEdit(previewTool)} className="gap-1.5">
-            <Edit className="w-4 h-4" /> Edit
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => handleEdit(previewTool)} className="gap-1.5">
+              <Edit className="w-4 h-4" /> Edit
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href={`/tools/custom/${previewTool.slug}`} target="_blank" rel="noopener noreferrer" className="gap-1.5">
+                <ExternalLink className="w-4 h-4" /> Open Live
+              </a>
+            </Button>
+          </div>
         </div>
         <div className="border border-border rounded-2xl overflow-hidden bg-white shadow-lg" style={{ height: "75vh" }}>
           <iframe
@@ -239,6 +351,81 @@ export default function AdminCustomTools() {
             title={previewTool.name}
           />
         </div>
+      </div>
+    );
+  }
+
+  // TRASH VIEW
+  if (view === "trash") {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" onClick={() => setView("list")}>
+              <ArrowLeft className="w-4 h-4 mr-1" /> Back
+            </Button>
+            <div>
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Trash2 className="w-5 h-5 text-destructive" /> Trash
+              </h2>
+              <p className="text-xs text-muted-foreground">{trashedTools.length} item(s) in trash</p>
+            </div>
+          </div>
+          {trashedTools.length > 0 && (
+            <Button variant="destructive" size="sm" onClick={handleEmptyTrash} className="gap-1.5">
+              <Trash2 className="w-4 h-4" /> Empty Trash
+            </Button>
+          )}
+        </div>
+
+        {trashedTools.length === 0 ? (
+          <Card className="border-dashed border-2 border-border/60">
+            <CardContent className="text-center py-16">
+              <Archive className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
+              <h3 className="text-lg font-bold mb-2">Trash is Empty</h3>
+              <p className="text-sm text-muted-foreground">Deleted tools will appear here for recovery.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-3">
+            {trashedTools.map(tool => (
+              <Card key={tool.id} className="border-border/60 opacity-75 hover:opacity-100 transition-all">
+                <CardContent className="p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 grayscale"
+                        style={{ backgroundColor: tool.color + "22", color: tool.color }}
+                      >
+                        <FileCode className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-sm truncate line-through text-muted-foreground">{tool.name}</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Deleted {tool.deleted_at ? new Date(tool.deleted_at).toLocaleDateString() : ""}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleRestore(tool)} className="gap-1.5">
+                        <RotateCcw className="w-4 h-4" /> Restore
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setDeleteDialog({ open: true, tool, permanent: true })}
+                        className="gap-1.5"
+                      >
+                        <Trash2 className="w-4 h-4" /> Delete Forever
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+        <DeleteConfirmDialog />
       </div>
     );
   }
@@ -313,12 +500,7 @@ export default function AdminCustomTools() {
                 <CardContent className="pt-6 space-y-4">
                   <div>
                     <Label className="text-sm font-semibold">Tool Name *</Label>
-                    <Input
-                      value={editingTool.name || ""}
-                      onChange={e => updateField("name", e.target.value)}
-                      placeholder="e.g. JSON Beautifier, Color Palette Generator"
-                      className="mt-1.5"
-                    />
+                    <Input value={editingTool.name || ""} onChange={e => updateField("name", e.target.value)} placeholder="e.g. JSON Beautifier" className="mt-1.5" />
                   </div>
                   <div>
                     <Label className="text-sm font-semibold">URL Slug *</Label>
@@ -326,21 +508,11 @@ export default function AdminCustomTools() {
                       <Globe className="w-3 h-3" />
                       <code className="bg-muted px-1.5 py-0.5 rounded">/tools/custom/{editingTool.slug || "your-slug"}</code>
                     </div>
-                    <Input
-                      value={editingTool.slug || ""}
-                      onChange={e => updateField("slug", e.target.value)}
-                      placeholder="json-beautifier"
-                    />
+                    <Input value={editingTool.slug || ""} onChange={e => updateField("slug", e.target.value)} placeholder="json-beautifier" />
                   </div>
                   <div>
                     <Label className="text-sm font-semibold">Description</Label>
-                    <Textarea
-                      value={editingTool.description || ""}
-                      onChange={e => updateField("description", e.target.value)}
-                      placeholder="A brief description of what this tool does..."
-                      rows={3}
-                      className="mt-1.5"
-                    />
+                    <Textarea value={editingTool.description || ""} onChange={e => updateField("description", e.target.value)} placeholder="A brief description..." rows={3} className="mt-1.5" />
                   </div>
                 </CardContent>
               </Card>
@@ -388,19 +560,13 @@ export default function AdminCustomTools() {
                         onClick={() => updateField("color", color)}
                         className={cn(
                           "w-9 h-9 rounded-xl border-2 transition-all hover:scale-110",
-                          editingTool.color === color
-                            ? "border-foreground scale-110 shadow-lg"
-                            : "border-transparent shadow-sm"
+                          editingTool.color === color ? "border-foreground scale-110 shadow-lg" : "border-transparent shadow-sm"
                         )}
                         style={{ backgroundColor: color }}
                       />
                     ))}
                   </div>
-                  <Input
-                    value={editingTool.color || ""}
-                    onChange={e => updateField("color", e.target.value)}
-                    placeholder="hsl(263, 85%, 58%)"
-                  />
+                  <Input value={editingTool.color || ""} onChange={e => updateField("color", e.target.value)} placeholder="hsl(263, 85%, 58%)" />
                   {editingTool.color && (
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/50">
                       <div className="w-12 h-12 rounded-xl shadow-sm" style={{ backgroundColor: editingTool.color }} />
@@ -420,15 +586,11 @@ export default function AdminCustomTools() {
                       <Label className="text-sm font-semibold">Enabled</Label>
                       <p className="text-xs text-muted-foreground mt-0.5">Tool will be visible to users</p>
                     </div>
-                    <Switch
-                      checked={editingTool.is_enabled ?? true}
-                      onCheckedChange={v => updateField("is_enabled", v)}
-                    />
+                    <Switch checked={editingTool.is_enabled ?? true} onCheckedChange={v => updateField("is_enabled", v)} />
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Quick preview card */}
               {editingTool.name && (
                 <Card className="border-border/60 overflow-hidden">
                   <CardHeader className="pb-2">
@@ -436,10 +598,7 @@ export default function AdminCustomTools() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40">
-                      <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-                        style={{ backgroundColor: (editingTool.color || "hsl(263,85%,58%)") + "22", color: editingTool.color || "hsl(263,85%,58%)" }}
-                      >
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm" style={{ backgroundColor: (editingTool.color || "hsl(263,85%,58%)") + "22", color: editingTool.color || "hsl(263,85%,58%)" }}>
                         <FileCode className="w-6 h-6" />
                       </div>
                       <div className="min-w-0">
@@ -480,7 +639,6 @@ export default function AdminCustomTools() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {/* Drop zone */}
                 {!editingTool.html_content ? (
                   <div
                     className="border-2 border-dashed border-border/60 rounded-2xl p-12 text-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all"
@@ -505,9 +663,6 @@ export default function AdminCustomTools() {
                     <Upload className="w-12 h-12 mx-auto text-muted-foreground/40 mb-4" />
                     <p className="text-sm font-semibold mb-1">Drop your HTML file here</p>
                     <p className="text-xs text-muted-foreground">or click to browse • .html / .htm up to 5MB</p>
-                    <p className="text-xs text-muted-foreground mt-3">
-                      Or click <strong>"Sample Template"</strong> to start with a pre-built template
-                    </p>
                   </div>
                 ) : (
                   <>
@@ -527,7 +682,6 @@ export default function AdminCustomTools() {
               </CardContent>
             </Card>
 
-            {/* Live Preview */}
             {editingTool.html_content && (
               <Card className="border-border/60">
                 <CardHeader className="pb-3">
@@ -537,12 +691,7 @@ export default function AdminCustomTools() {
                 </CardHeader>
                 <CardContent>
                   <div className="border border-border rounded-2xl overflow-hidden bg-white shadow-sm" style={{ height: "400px" }}>
-                    <iframe
-                      srcDoc={editingTool.html_content}
-                      className="w-full h-full border-0"
-                      sandbox="allow-scripts allow-forms allow-modals"
-                      title="Preview"
-                    />
+                    <iframe srcDoc={editingTool.html_content} className="w-full h-full border-0" sandbox="allow-scripts allow-forms allow-modals" title="Preview" />
                   </div>
                 </CardContent>
               </Card>
@@ -552,82 +701,101 @@ export default function AdminCustomTools() {
 
         {/* Tab: SEO */}
         {activeTab === "seo" && (
-          <Card className="border-border/60">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Globe className="w-4 h-4 text-primary" /> Search Engine Optimization
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="text-sm font-semibold">Meta Title</Label>
-                <Input
-                  value={editingTool.meta_title || ""}
-                  onChange={e => updateField("meta_title", e.target.value)}
-                  placeholder="Custom meta title (leave empty to use tool name)"
-                  className="mt-1.5"
-                />
-                <div className="flex justify-between mt-1">
-                  <p className="text-xs text-muted-foreground">Recommended: 50-60 characters</p>
-                  <p className={cn("text-xs", (editingTool.meta_title || "").length > 60 ? "text-destructive" : "text-muted-foreground")}>
-                    {(editingTool.meta_title || "").length}/60
-                  </p>
+          <div className="space-y-5">
+            <Card className="border-border/60">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-primary" /> Search Engine Optimization
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div>
+                  <Label className="text-sm font-semibold">Meta Title</Label>
+                  <Input value={editingTool.meta_title || ""} onChange={e => updateField("meta_title", e.target.value)} placeholder="Custom meta title (leave empty to use tool name)" className="mt-1.5" />
+                  <div className="flex justify-between mt-1">
+                    <p className="text-xs text-muted-foreground">Recommended: 50-60 characters</p>
+                    <p className={cn("text-xs", (editingTool.meta_title || "").length > 60 ? "text-destructive" : "text-muted-foreground")}>
+                      {(editingTool.meta_title || "").length}/60
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <Label className="text-sm font-semibold">Meta Description</Label>
-                <Textarea
-                  value={editingTool.meta_description || ""}
-                  onChange={e => updateField("meta_description", e.target.value)}
-                  placeholder="Custom meta description for search engines..."
-                  rows={3}
-                  className="mt-1.5"
-                />
-                <div className="flex justify-between mt-1">
-                  <p className="text-xs text-muted-foreground">Recommended: 120-160 characters</p>
-                  <p className={cn("text-xs", (editingTool.meta_description || "").length > 160 ? "text-destructive" : "text-muted-foreground")}>
-                    {(editingTool.meta_description || "").length}/160
-                  </p>
+                <div>
+                  <Label className="text-sm font-semibold">Meta Description</Label>
+                  <Textarea value={editingTool.meta_description || ""} onChange={e => updateField("meta_description", e.target.value)} placeholder="Custom meta description for search engines..." rows={3} className="mt-1.5" />
+                  <div className="flex justify-between mt-1">
+                    <p className="text-xs text-muted-foreground">Recommended: 120-160 characters</p>
+                    <p className={cn("text-xs", (editingTool.meta_description || "").length > 160 ? "text-destructive" : "text-muted-foreground")}>
+                      {(editingTool.meta_description || "").length}/160
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <Label className="text-sm font-semibold">Meta Keywords</Label>
-                <Input
-                  value={editingTool.meta_keywords || ""}
-                  onChange={e => updateField("meta_keywords", e.target.value)}
-                  placeholder="keyword1, keyword2, keyword3"
-                  className="mt-1.5"
-                />
-              </div>
+                <div>
+                  <Label className="text-sm font-semibold">Meta Keywords</Label>
+                  <Input value={editingTool.meta_keywords || ""} onChange={e => updateField("meta_keywords", e.target.value)} placeholder="keyword1, keyword2, keyword3" className="mt-1.5" />
+                  <p className="text-xs text-muted-foreground mt-1">Separate keywords with commas</p>
+                </div>
+              </CardContent>
+            </Card>
 
-              {/* SEO Preview */}
-              <div className="mt-4 p-4 rounded-xl bg-muted/30 border border-border/40">
-                <p className="text-xs font-semibold text-muted-foreground mb-2">🔍 Google Preview</p>
-                <div className="space-y-1">
-                  <p className="text-blue-600 text-sm font-medium truncate">
-                    {editingTool.meta_title || editingTool.name || "Tool Title"}
-                  </p>
-                  <p className="text-green-700 text-xs truncate">
-                    yoursite.com/tools/custom/{editingTool.slug || "your-slug"}
-                  </p>
-                  <p className="text-xs text-muted-foreground line-clamp-2">
-                    {editingTool.meta_description || editingTool.description || "Tool description will appear here..."}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            {/* SEO Score & Preview */}
+            <div className="grid sm:grid-cols-2 gap-5">
+              <Card className="border-border/60">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm">🔍 Google Preview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-1 p-3 rounded-xl bg-white border border-border/40">
+                    <p className="text-[#1a0dab] text-sm font-medium truncate">
+                      {editingTool.meta_title || editingTool.name || "Tool Title"}
+                    </p>
+                    <p className="text-[#006621] text-xs truncate">
+                      yoursite.com › tools › custom › {editingTool.slug || "your-slug"}
+                    </p>
+                    <p className="text-xs text-[#545454] line-clamp-2">
+                      {editingTool.meta_description || editingTool.description || "Tool description will appear here..."}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/60">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm">📊 SEO Score</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {[
+                      { label: "Meta Title", ok: !!(editingTool.meta_title || editingTool.name), warn: (editingTool.meta_title || "").length > 60 },
+                      { label: "Meta Description", ok: (editingTool.meta_description || "").length >= 50, warn: (editingTool.meta_description || "").length > 160 },
+                      { label: "Keywords", ok: !!(editingTool.meta_keywords), warn: false },
+                      { label: "URL Slug", ok: !!(editingTool.slug), warn: (editingTool.slug || "").includes(" ") },
+                    ].map(item => (
+                      <div key={item.label} className="flex items-center gap-2 text-xs">
+                        {item.warn ? (
+                          <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        ) : item.ok ? (
+                          <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                        ) : (
+                          <X className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        )}
+                        <span className={item.ok ? "text-foreground" : "text-muted-foreground"}>{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         )}
       </div>
     );
   }
 
   // LIST VIEW
-  const activeTools = tools.filter(t => t.is_enabled);
-  const disabledTools = tools.filter(t => !t.is_enabled);
-
   return (
     <div className="space-y-6">
+      <DeleteConfirmDialog />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -636,20 +804,31 @@ export default function AdminCustomTools() {
             Custom Tools
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Upload HTML tools • {tools.length} total • {activeTools.length} active
+            {activeToolsList.length} tools • {enabledCount} active
           </p>
         </div>
-        <Button onClick={handleCreate} className="gap-2 shadow-sm">
-          <Plus className="w-4 h-4" /> New Custom Tool
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setView("trash")} className="gap-1.5 relative">
+            <Trash2 className="w-4 h-4" /> Trash
+            {trashedTools.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-[10px] flex items-center justify-center font-bold">
+                {trashedTools.length}
+              </span>
+            )}
+          </Button>
+          <Button onClick={handleCreate} className="gap-2 shadow-sm">
+            <Plus className="w-4 h-4" /> New Tool
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Total Tools", value: tools.length, icon: Layers, color: "text-primary" },
-          { label: "Active", value: activeTools.length, icon: Zap, color: "text-green-500" },
-          { label: "Disabled", value: disabledTools.length, icon: AlertCircle, color: "text-muted-foreground" },
+          { label: "Total", value: activeToolsList.length, icon: Layers, color: "text-primary" },
+          { label: "Active", value: enabledCount, icon: Zap, color: "text-green-500" },
+          { label: "Disabled", value: activeToolsList.length - enabledCount, icon: AlertCircle, color: "text-muted-foreground" },
+          { label: "In Trash", value: trashedTools.length, icon: Trash2, color: "text-destructive" },
         ].map(stat => (
           <Card key={stat.label} className="border-border/60">
             <CardContent className="pt-4 pb-4 flex items-center gap-3">
@@ -663,12 +842,25 @@ export default function AdminCustomTools() {
         ))}
       </div>
 
+      {/* Search */}
+      {activeToolsList.length > 0 && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Search tools by name or slug..."
+            className="pl-9"
+          />
+        </div>
+      )}
+
       {loading ? (
         <div className="text-center py-16">
           <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-sm text-muted-foreground">Loading tools...</p>
         </div>
-      ) : tools.length === 0 ? (
+      ) : activeToolsList.length === 0 ? (
         <Card className="border-dashed border-2 border-border/60">
           <CardContent className="text-center py-20">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
@@ -676,16 +868,23 @@ export default function AdminCustomTools() {
             </div>
             <h3 className="text-lg font-bold mb-2">No Custom Tools Yet</h3>
             <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-              Create your first custom tool by uploading an HTML file or writing code directly in the editor.
+              Create your first custom tool by uploading an HTML file or writing code directly.
             </p>
             <Button onClick={handleCreate} size="lg" className="gap-2">
               <Plus className="w-4 h-4" /> Create Your First Tool
             </Button>
           </CardContent>
         </Card>
+      ) : filteredTools.length === 0 ? (
+        <Card className="border-border/60">
+          <CardContent className="text-center py-12">
+            <Search className="w-8 h-8 mx-auto text-muted-foreground/30 mb-3" />
+            <p className="text-sm text-muted-foreground">No tools match "{searchQuery}"</p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-3">
-          {tools.map(tool => (
+          {filteredTools.map(tool => (
             <Card key={tool.id} className={cn(
               "border-border/60 overflow-hidden transition-all hover:shadow-md",
               !tool.is_enabled && "opacity-60"
@@ -704,10 +903,7 @@ export default function AdminCustomTools() {
                         <h3 className="font-semibold text-sm truncate">{tool.name}</h3>
                         <Badge
                           variant={tool.is_enabled ? "default" : "secondary"}
-                          className={cn(
-                            "text-[10px] shrink-0",
-                            tool.is_enabled ? "bg-green-500/10 text-green-600 border-green-500/20" : ""
-                          )}
+                          className={cn("text-[10px] shrink-0", tool.is_enabled ? "bg-green-500/10 text-green-600 border-green-500/20" : "")}
                         >
                           {tool.is_enabled ? "Active" : "Disabled"}
                         </Badge>
@@ -720,10 +916,7 @@ export default function AdminCustomTools() {
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <Switch
-                      checked={tool.is_enabled}
-                      onCheckedChange={() => handleToggle(tool.id, tool.is_enabled)}
-                    />
+                    <Switch checked={tool.is_enabled} onCheckedChange={() => handleToggle(tool.id, tool.is_enabled)} />
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setPreviewTool(tool); setView("preview"); }} title="Preview">
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -733,7 +926,13 @@ export default function AdminCustomTools() {
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDuplicate(tool)} title="Duplicate">
                       <Copy className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(tool.id, tool.name)} title="Delete">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={() => setDeleteDialog({ open: true, tool, permanent: false })}
+                      title="Move to Trash"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
