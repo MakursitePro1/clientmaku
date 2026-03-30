@@ -36,6 +36,7 @@ export function ToolCatalogProvider({ children }: { children: ReactNode }) {
       .from("custom_tools")
       .select("*")
       .eq("is_enabled", true)
+      .is("deleted_at", null)
       .then(({ data, error }) => {
         if (!mounted) return;
 
