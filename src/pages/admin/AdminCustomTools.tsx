@@ -609,6 +609,60 @@ export default function AdminCustomTools() {
                 </CardContent>
               </Card>
 
+              {/* Icon Picker */}
+              <Card className="border-border/60">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" /> Tool Icon
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Input
+                      value={iconSearch}
+                      onChange={e => setIconSearch(e.target.value)}
+                      placeholder="Search icons..."
+                      className="pl-9 h-9 text-xs"
+                    />
+                  </div>
+                  <div className="grid grid-cols-8 gap-1.5 max-h-[200px] overflow-y-auto p-1">
+                    {filteredIcons.map(name => {
+                      const IconComp = getIconComponent(name);
+                      const isSelected = editingTool.icon_name === name;
+                      return (
+                        <button
+                          key={name}
+                          onClick={() => updateField("icon_name", name)}
+                          title={name}
+                          className={cn(
+                            "w-full aspect-square rounded-lg flex items-center justify-center transition-all border",
+                            isSelected
+                              ? "bg-primary/10 border-primary/40 text-primary scale-105 shadow-sm"
+                              : "border-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          <IconComp className="w-4 h-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      Selected: <span className="font-medium text-foreground">{editingTool.icon_name || "FileCode"}</span>
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs h-7"
+                      onClick={() => { setShowAllIcons(!showAllIcons); setIconSearch(""); }}
+                    >
+                      {showAllIcons ? "Show Popular" : `Show All (${allIconNames.length})`}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card className="border-border/60">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
