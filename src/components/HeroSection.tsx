@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Play, Zap, Code2, Image, Shield, Globe, Search, BarChart3, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
