@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Save, Globe, FileText, MessageCircle, Layout,
   ExternalLink, Type, Mail, Phone, MapPin, Facebook, Twitter,
-  Instagram, Youtube, Linkedin, Github, Star, Megaphone
+  Instagram, Youtube, Linkedin, Github, Star, Megaphone, Key, Link2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { ImageUploadField } from "@/components/ImageUploadField";
@@ -62,6 +62,8 @@ interface SiteSettings {
   // Announcements
   announcement_text: string;
   announcement_enabled: string;
+  // Admin
+  admin_slug: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -101,6 +103,7 @@ const defaultSettings: SiteSettings = {
   stats_categories_count: "12",
   announcement_text: "",
   announcement_enabled: "false",
+  admin_slug: "makuadmingowebs99",
 };
 
 type SettingField = {
@@ -168,6 +171,7 @@ export default function AdminSettings() {
     { id: "social", label: "Social", icon: ExternalLink },
     { id: "seo", label: "SEO", icon: Megaphone },
     { id: "navbar", label: "Navbar", icon: Type },
+    { id: "admin", label: "Admin", icon: Key },
   ];
 
   const sections: Record<string, SettingSection[]> = {
@@ -288,6 +292,16 @@ export default function AdminSettings() {
         fields: [
           { key: "navbar_brand_text", label: "Brand Text (Part 1)", type: "input", placeholder: "Cyber" },
           { key: "navbar_brand_accent", label: "Brand Accent (Part 2)", type: "input", placeholder: "Venom" },
+        ],
+      },
+    ],
+    admin: [
+      {
+        title: "Admin Panel URL",
+        icon: Link2,
+        description: "Change the admin panel URL slug. After saving, use the new URL to access admin.",
+        fields: [
+          { key: "admin_slug", label: "Admin URL Slug", type: "input", placeholder: "makuadmingowebs99" },
         ],
       },
     ],
