@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef, useMemo } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ArrowLeft, Maximize2, Minimize2, Share2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
