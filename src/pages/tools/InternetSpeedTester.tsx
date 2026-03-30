@@ -70,39 +70,7 @@ function SpeedGauge({
     return `M ${a.x} ${a.y} A ${radius} ${radius} 0 ${large} 1 ${b.x} ${b.y}`;
   };
 
-  // Animated needle value with wobble during testing
-  const [animValue, setAnimValue] = useState(0);
-  const wobbleRef = useRef(0);
-
-  useEffect(() => {
-    if (!testing) {
-      setAnimValue(value);
-      return;
-    }
-
-    let raf = 0;
-    const startTime = performance.now();
-
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
-      // Smooth interpolation toward target
-      setAnimValue(prev => {
-        const target = value;
-        const smooth = prev + (target - prev) * 0.15;
-        // Add wobble effect during testing
-        const wobbleAmount = Math.min(target * 0.08, 4);
-        const wobble = wobbleAmount * Math.sin(elapsed / 100) * Math.cos(elapsed / 67);
-        wobbleRef.current = wobble;
-        return Math.max(0, smooth + wobble);
-      });
-      raf = requestAnimationFrame(animate);
-    };
-
-    raf = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(raf);
-  }, [testing, value]);
-
-  const displayVal = testing ? animValue : value;
+  const displayVal = value;
   const angle = speedToAngle(displayVal);
   const needleEnd = polar(angle, r - 8);
   const needleBase1 = polar(angle + 90, 4);
@@ -112,16 +80,17 @@ function SpeedGauge({
 
   const isDownload = phase === "download";
   const isUpload = phase === "upload";
+  const isResetting = phase === "resetting";
   const isDone = phase === "done";
 
   const phaseLabel = isDownload
     ? "DOWNLOAD"
     : isUpload
       ? "UPLOAD"
-      : isDone
-        ? "COMPLETE"
-        : phase === "resetting"
-          ? "PREPARING..."
+      : isResetting
+        ? "RESETTING"
+        : isDone
+          ? "COMPLETE"
           : phase === "error"
             ? "FAILED"
             : "READY";
