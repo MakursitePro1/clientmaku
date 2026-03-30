@@ -173,6 +173,11 @@ export default function CcChecker() {
             >
               <Plus className="w-4 h-4" /> Load Samples
             </Button>
+            {results.length > 0 && (
+              <Button variant="outline" onClick={exportCsv} className="gap-2">
+                <Download className="w-4 h-4" /> Export CSV
+              </Button>
+            )}
           </div>
         </motion.div>
 
