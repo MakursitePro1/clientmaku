@@ -268,6 +268,7 @@ export function HeroSection() {
               size="lg"
               variant="outline"
               className="rounded-2xl px-10 py-6 font-bold text-base border-border/50 hover:bg-accent hover:border-primary/30 transition-all"
+              onClick={() => navigate("/categories")}
             >
               <Play className="mr-2 w-5 h-5" /> Watch Demo
             </Button>
