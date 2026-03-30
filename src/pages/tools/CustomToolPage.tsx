@@ -5,7 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { ArrowLeft, Maximize2, Minimize2, Share2, ChevronRight, FileCode } from "lucide-react";
+import { ArrowLeft, Maximize2, Minimize2, Share2, ChevronRight, FileCode, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { toast } from "sonner";
@@ -65,7 +65,7 @@ export default function CustomToolPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-14 h-14 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-muted-foreground animate-pulse">Loading tool...</p>
         </div>
       </div>
@@ -96,15 +96,18 @@ export default function CustomToolPage() {
   if (isFullscreen) {
     return (
       <div className="fixed inset-0 z-50 bg-background flex flex-col">
-        <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card/90 backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: tool.color + "22", color: tool.color }}>
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: tool.color + "22", color: tool.color }}
+            >
               <span className="text-sm font-bold">{tool.name.charAt(0)}</span>
             </div>
             <h2 className="font-semibold text-sm">{tool.name}</h2>
           </div>
           <Button variant="outline" size="sm" onClick={() => setIsFullscreen(false)} className="gap-1.5">
-            <Minimize2 className="w-4 h-4" /> Exit Fullscreen
+            <Minimize2 className="w-4 h-4" /> Exit
           </Button>
         </div>
         <iframe
@@ -128,77 +131,138 @@ export default function CustomToolPage() {
       <Navbar />
       <ScrollToTop />
 
-      {/* Compact premium header */}
-      <div className="w-full border-b border-border/50 bg-gradient-to-r from-card/80 via-background to-card/80 backdrop-blur-md">
-        <div className="w-full px-3 sm:px-6 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/tools")} className="shrink-0 h-9 w-9">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
-              style={{ backgroundColor: tool.color + "18", color: tool.color }}
+      {/* Premium sticky toolbar */}
+      <div className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
+        <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-5 lg:px-8 py-2.5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/tools")}
+              className="shrink-0 h-9 w-9 rounded-xl hover:bg-accent"
             >
-              <span className="text-base font-bold">{tool.name.charAt(0)}</span>
+              <ArrowLeft className="w-4.5 h-4.5" />
+            </Button>
+
+            <div
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ring-1 ring-border/50"
+              style={{ backgroundColor: tool.color + "15", color: tool.color }}
+            >
+              <span className="text-sm sm:text-base font-bold">{tool.name.charAt(0)}</span>
             </div>
+
             <div className="min-w-0">
-              <h1 className="text-base sm:text-lg font-bold truncate">{tool.name}</h1>
-              {tool.description && (
-                <p className="text-xs text-muted-foreground truncate hidden sm:block">{tool.description}</p>
-              )}
+              <h1 className="text-sm sm:text-base font-bold truncate leading-tight">{tool.name}</h1>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: tool.color }}
+                />
+                <span className="text-[11px] text-muted-foreground truncate">{tool.category}</span>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5 hidden sm:flex h-8">
-              <Share2 className="w-3.5 h-3.5" /> Share
+
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleShare}
+              className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl"
+            >
+              <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-1.5 h-8">
-              <Maximize2 className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Fullscreen</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsFullscreen(true)}
+              className="gap-1.5 h-8 sm:h-9 rounded-xl text-xs sm:text-sm px-2.5 sm:px-3"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Fullscreen</span>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Full-width edge-to-edge tool area */}
-      <div className="flex-1 w-full">
+      {/* FULL WIDTH TOOL AREA — no padding, no container, edge-to-edge */}
+      <div className="w-full flex-1" style={{ minHeight: 0 }}>
         <iframe
           ref={iframeRef}
           srcDoc={tool.html_content}
-          className="w-full border-0"
-          style={{ minHeight: "calc(100vh - 120px)" }}
-          sandbox="allow-scripts allow-forms allow-modals allow-popups"
           title={tool.name}
+          sandbox="allow-scripts allow-forms allow-modals allow-popups"
+          className="w-full border-0 block"
+          style={{
+            height: "calc(100vh - 52px)",
+            minHeight: "500px",
+          }}
         />
+      </div>
+
+      {/* Tool info strip */}
+      <div className="w-full border-t border-border/50 bg-card/50 backdrop-blur-sm">
+        <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-11 h-11 rounded-2xl flex items-center justify-center ring-1 ring-border/50 shadow-sm"
+              style={{ backgroundColor: tool.color + "12", color: tool.color }}
+            >
+              <span className="text-lg font-bold">{tool.name.charAt(0)}</span>
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-bold">{tool.name}</h2>
+              {tool.description && (
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 max-w-lg">{tool.description}</p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5 rounded-xl h-9 text-xs">
+              <Share2 className="w-3.5 h-3.5" /> Share Tool
+            </Button>
+            <Button size="sm" onClick={() => setIsFullscreen(true)} className="gap-1.5 rounded-xl h-9 text-xs">
+              <Maximize2 className="w-3.5 h-3.5" /> Open Fullscreen
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Related Tools */}
       {relatedTools.length > 0 && (
-        <div className="w-full border-t border-border bg-muted/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold">Related Tools</h2>
-              <Link to="/tools" className="text-sm text-primary hover:underline flex items-center gap-1">
+        <div className="w-full border-t border-border/40 bg-muted/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div className="flex items-center justify-between mb-5 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-bold">Related Tools</h2>
+              <Link
+                to="/tools"
+                className="text-sm text-primary hover:underline flex items-center gap-1 font-medium"
+              >
                 View All <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {relatedTools.map(rt => {
                 const Icon = rt.icon || FileCode;
                 return (
                   <Link
                     key={rt.id}
                     to={rt.path}
-                    className="group flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:shadow-md hover:border-primary/30 transition-all"
+                    className="group flex items-center gap-3 p-3.5 rounded-2xl border border-border/60 bg-card hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-300"
                   >
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: rt.color + "18", color: rt.color }}
+                      style={{ backgroundColor: rt.color + "15", color: rt.color }}
                     >
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-sm font-medium truncate group-hover:text-primary transition-colors">
-                      {rt.name}
-                    </span>
+                    <div className="min-w-0">
+                      <span className="text-sm font-medium truncate block group-hover:text-primary transition-colors">
+                        {rt.name}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground">{rt.category}</span>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/40 ml-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
                 );
               })}
