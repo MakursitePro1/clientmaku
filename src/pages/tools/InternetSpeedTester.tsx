@@ -446,6 +446,10 @@ export default function InternetSpeedTester() {
   const [connType, setConnType] = useState("—");
   const [testHistory, setTestHistory] = useState<{ dl: number; ul: number; ping: number; time: string }[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isp, setIsp] = useState("—");
+  const [location_, setLocation_] = useState("—");
+  const [downlink, setDownlink] = useState("—");
+  const [rtt, setRtt] = useState("—");
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
