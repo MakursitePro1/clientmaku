@@ -499,52 +499,64 @@ export default function InternetSpeedTester() {
     try { setTestHistory(JSON.parse(localStorage.getItem("cv_speed_history") || "[]")); } catch { /* */ }
   }, []);
 
-  // Gauge animation loop — produces dramatic needle movement immediately
+  // Gauge animation loop
   useEffect(() => {
-    if (!testing) {
-      animStartRef.current = 0;
-      if (phase === "done") {
-        setDisplaySpeed(upload ?? download ?? 0);
-      } else if (phase === "idle") {
-        setDisplaySpeed(0);
-      }
+    if (phase === "idle") {
+      setDisplaySpeed(0);
       return;
     }
+    if (phase === "done") {
+      // Show final upload speed briefly, then hold
+      setDisplaySpeed(upload ?? 0);
+      return;
+    }
+    if (phase === "error") return;
 
+    // "resetting" phase: smooth decay to zero
+    if (phase === "resetting") {
+      let raf = 0;
+      const decay = () => {
+        setDisplaySpeed(prev => {
+          if (prev < 0.3) return 0;
+          return +(prev * 0.88).toFixed(2);
+        });
+        raf = requestAnimationFrame(decay);
+      };
+      raf = requestAnimationFrame(decay);
+      return () => cancelAnimationFrame(raf);
+    }
+
+    // Active phases: download or upload
     let raf = 0;
-    if (!animStartRef.current) animStartRef.current = performance.now();
+    const phaseStart = performance.now();
 
-    const tick = (time: number) => {
-      setDisplaySpeed((prev) => {
+    const tick = (now: number) => {
+      const elapsed = now - phaseStart;
+      setDisplaySpeed(prev => {
         const target = liveSpeedRef.current;
-        const elapsed = time - animStartRef.current;
-
-        // When target is near zero (resetting between phases), smoothly decay to 0
-        if (target < 0.5 && prev < 1) {
-          return +Math.max(0, prev * 0.85).toFixed(2);
-        }
 
         if (target > 0.5) {
-          // Real data: smooth toward it with visible wobble
-          const smooth = prev + (target - prev) * 0.12;
-          const wobble = Math.sin(elapsed / 90) * Math.min(target * 0.06, 3.5)
-            + Math.sin(elapsed / 55) * Math.min(target * 0.03, 1.5);
-          return +Math.max(0.1, smooth + wobble).toFixed(2);
+          // Real data coming in — smoothly chase target with wobble
+          const diff = target - prev;
+          const smooth = prev + diff * 0.14;
+          const w1 = Math.sin(elapsed / 85) * Math.min(target * 0.06, 3);
+          const w2 = Math.sin(elapsed / 50) * Math.min(target * 0.025, 1.2);
+          return +Math.max(0.1, smooth + w1 + w2).toFixed(2);
         }
 
-        // Synthetic dramatic sweep while waiting for server data
-        const peak = phase === "download" ? 35 : 20;
-        const sweep = peak * Math.abs(Math.sin(elapsed / 300));
-        const jitterAmt = (peak * 0.15) * Math.sin(elapsed / 70);
-        const burst = (peak * 0.1) * Math.abs(Math.cos(elapsed / 120));
-        return +Math.max(0.5, sweep + jitterAmt + burst).toFixed(2);
+        // No data yet — dramatic synthetic sweep to show activity
+        const peak = phase === "download" ? 40 : 25;
+        const base = peak * 0.5 * (1 - Math.cos(elapsed / 250));
+        const jit = peak * 0.12 * Math.sin(elapsed / 65);
+        const burst = peak * 0.08 * Math.abs(Math.cos(elapsed / 110));
+        return +Math.max(0.5, base + jit + burst).toFixed(2);
       });
       raf = requestAnimationFrame(tick);
     };
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [testing, phase, upload, download]);
+  }, [phase, upload]);
 
   const reset = useCallback(() => {
     setTesting(false);
