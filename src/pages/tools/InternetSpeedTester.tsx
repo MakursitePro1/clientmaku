@@ -314,10 +314,25 @@ export default function InternetSpeedTester() {
 
   return (
     <ToolLayout title="Internet Speed Tester" description="Analyze your internet connection speed with advanced metrics">
-      <div className="max-w-xl mx-auto space-y-6">
+      <div className="max-w-xl mx-auto space-y-6 relative">
+        {/* Deep Green Gradient Background */}
+        <div className="absolute -inset-6 -top-10 rounded-3xl overflow-hidden pointer-events-none -z-10">
+          <div className="absolute inset-0" style={{
+            background: "linear-gradient(135deg, #064e3b 0%, #065f46 20%, #047857 40%, #059669 60%, #10b981 80%, #064e3b 100%)"
+          }} />
+          <div className="absolute inset-0 opacity-30" style={{
+            background: "radial-gradient(ellipse at 20% 20%, #34d399 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, #6ee7b7 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, #047857 0%, transparent 60%)"
+          }} />
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)",
+            backgroundSize: "24px 24px"
+          }} />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full blur-[120px] opacity-20 bg-emerald-300" />
+          <div className="absolute bottom-0 right-0 w-[300px] h-[200px] rounded-full blur-[100px] opacity-15 bg-teal-400" />
+        </div>
 
         {/* Server Selection */}
-        <div className="rounded-xl border border-border/30 bg-card p-4">
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/60 backdrop-blur-sm p-4 shadow-lg shadow-emerald-900/20">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <Server className="w-4 h-4 text-primary" />
@@ -346,15 +361,15 @@ export default function InternetSpeedTester() {
         <AnimatePresence>
           {phase === "error" && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
+              className="rounded-xl border border-red-500/40 bg-red-950/40 backdrop-blur-sm p-4">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-destructive">Speed Test Failed</p>
-                  <p className="text-xs text-muted-foreground mt-1">{errorMsg}</p>
-                  {retryCount > 1 && <p className="text-[10px] text-muted-foreground mt-1">Try switching to a different server or check your connection.</p>}
+                  <p className="text-sm font-bold text-red-400">Speed Test Failed</p>
+                  <p className="text-xs text-emerald-200/60 mt-1">{errorMsg}</p>
+                  {retryCount > 1 && <p className="text-[10px] text-emerald-200/50 mt-1">Try switching to a different server or check your connection.</p>}
                 </div>
-                <Button type="button" size="sm" variant="outline" onClick={runTest} className="shrink-0 text-xs gap-1.5">
+                <Button type="button" size="sm" variant="outline" onClick={runTest} className="shrink-0 text-xs gap-1.5 border-emerald-500/30 text-emerald-200 hover:bg-emerald-800/40">
                   <RotateCcw className="w-3 h-3" /> Retry{retryCount > 0 && ` (${retryCount})`}
                 </Button>
               </div>
@@ -363,31 +378,33 @@ export default function InternetSpeedTester() {
         </AnimatePresence>
 
         {/* Gauge */}
-        <div className="relative rounded-2xl border border-border/40 bg-gradient-to-b from-card to-accent/10 p-6 text-center overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 opacity-[0.03]"
-            style={{ backgroundImage: "radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)", backgroundSize: "20px 20px" }} />
+        <div className="relative rounded-2xl border border-emerald-500/40 bg-emerald-950/70 backdrop-blur-sm p-6 text-center overflow-hidden shadow-2xl shadow-emerald-900/30">
+          <div className="pointer-events-none absolute inset-0 opacity-[0.04]"
+            style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #6ee7b7 1px, transparent 0)", backgroundSize: "20px 20px" }} />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[350px] h-[150px] rounded-full blur-[80px] pointer-events-none opacity-15 bg-emerald-400" />
           <div className="relative z-10">
             <SpeedGauge value={gaugeVal} maxSpeed={maxSpeed} phase={phase} testing={testing} />
-            <div className="grid grid-cols-2 gap-4 mt-2 pt-4 border-t border-border/20">
-              <div className={`relative rounded-xl bg-accent/30 p-3 overflow-hidden ${phase === "download" ? "ring-1 ring-primary/50" : ""}`}>
+            <div className="grid grid-cols-2 gap-4 mt-2 pt-4 border-t border-emerald-500/20">
+              <div className={`relative rounded-xl bg-emerald-900/40 border border-emerald-500/20 p-3 overflow-hidden ${phase === "download" ? "ring-1 ring-emerald-400/50" : ""}`}>
                 <div className="flex items-center justify-center gap-1.5 mb-1">
-                  <Download className="w-4 h-4 text-blue-500" /><span className="text-[11px] font-semibold text-muted-foreground">Download</span>
+                  <Download className="w-4 h-4 text-blue-400" /><span className="text-[11px] font-semibold text-emerald-300/70">Download</span>
                 </div>
-                <div className="text-2xl font-black">{download !== null ? download : "—"}<span className="text-xs font-normal text-muted-foreground ml-1">Mbps</span></div>
+                <div className="text-2xl font-black text-white">{download !== null ? download : "—"}<span className="text-xs font-normal text-emerald-300/60 ml-1">Mbps</span></div>
               </div>
-              <div className={`relative rounded-xl bg-accent/30 p-3 overflow-hidden ${phase === "upload" ? "ring-1 ring-primary/50" : ""}`}>
+              <div className={`relative rounded-xl bg-emerald-900/40 border border-emerald-500/20 p-3 overflow-hidden ${phase === "upload" ? "ring-1 ring-emerald-400/50" : ""}`}>
                 <div className="flex items-center justify-center gap-1.5 mb-1">
-                  <Upload className="w-4 h-4 text-green-500" /><span className="text-[11px] font-semibold text-muted-foreground">Upload</span>
+                  <Upload className="w-4 h-4 text-green-400" /><span className="text-[11px] font-semibold text-emerald-300/70">Upload</span>
                 </div>
-                <div className="text-2xl font-black">{upload !== null ? upload : "—"}<span className="text-xs font-normal text-muted-foreground ml-1">Mbps</span></div>
+                <div className="text-2xl font-black text-white">{upload !== null ? upload : "—"}<span className="text-xs font-normal text-emerald-300/60 ml-1">Mbps</span></div>
               </div>
             </div>
             <div className="mt-5">
               {testing ? (
-                <Button type="button" variant="outline" onClick={cancel} className="rounded-full px-10 py-5 text-primary border-primary/30 font-bold">Cancel Test</Button>
+                <Button type="button" variant="outline" onClick={cancel} className="rounded-full px-10 py-5 text-emerald-300 border-emerald-500/40 font-bold hover:bg-emerald-800/40">Cancel Test</Button>
               ) : (
                 <Button type="button" onClick={runTest}
-                  className="gradient-bg text-primary-foreground rounded-full px-10 py-6 font-bold text-base shadow-xl shadow-primary/25">
+                  className="rounded-full px-10 py-6 font-bold text-base text-white shadow-xl shadow-emerald-700/40"
+                  style={{ background: "linear-gradient(135deg, #059669, #10b981, #34d399)" }}>
                   <Zap className="w-5 h-5 mr-2" />{phase === "done" ? "Test Again" : phase === "error" ? "Retry Test" : "Start Speed Test"}
                 </Button>
               )}
@@ -399,7 +416,7 @@ export default function InternetSpeedTester() {
         <AnimatePresence>
           {phase === "done" && download !== null && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="rounded-xl border border-border/30 bg-card p-4 text-center">
+              className="rounded-xl border border-emerald-500/30 bg-emerald-950/60 backdrop-blur-sm p-4 text-center">
               {(() => {
                 const q = getQuality(download);
                 return (
@@ -407,7 +424,7 @@ export default function InternetSpeedTester() {
                     <span className="text-3xl">{q.emoji}</span>
                     <div>
                       <p className={`text-lg font-bold ${q.color}`}>{q.label} Connection</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-emerald-300/60">
                         {download >= 25 ? "Great for HD streaming & gaming" : download >= 10 ? "Good for browsing & SD streaming" : "May experience buffering on video"}
                       </p>
                     </div>
@@ -421,16 +438,16 @@ export default function InternetSpeedTester() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { icon: Activity, label: "Ping", val: ping !== null ? `${ping}ms` : "—", color: "text-yellow-500", desc: "Latency" },
-            { icon: Wifi, label: "Jitter", val: jitter !== null ? `${jitter}ms` : "—", color: "text-orange-500", desc: "Stability" },
-            { icon: Download, label: "Download", val: download !== null ? `${download}` : "—", color: "text-blue-500", desc: "Mbps" },
-            { icon: Upload, label: "Upload", val: upload !== null ? `${upload}` : "—", color: "text-green-500", desc: "Mbps" },
+            { icon: Activity, label: "Ping", val: ping !== null ? `${ping}ms` : "—", color: "text-yellow-400", desc: "Latency" },
+            { icon: Wifi, label: "Jitter", val: jitter !== null ? `${jitter}ms` : "—", color: "text-orange-400", desc: "Stability" },
+            { icon: Download, label: "Download", val: download !== null ? `${download}` : "—", color: "text-blue-400", desc: "Mbps" },
+            { icon: Upload, label: "Upload", val: upload !== null ? `${upload}` : "—", color: "text-green-400", desc: "Mbps" },
           ].map(s => (
-            <div key={s.label} className="bg-card rounded-xl border border-border/30 p-3 text-center group hover:border-primary/30 transition-colors">
+            <div key={s.label} className="rounded-xl border border-emerald-500/25 bg-emerald-950/50 backdrop-blur-sm p-3 text-center group hover:border-emerald-400/40 transition-colors">
               <s.icon className={`w-4 h-4 mx-auto mb-1.5 ${s.color} group-hover:scale-110 transition-transform`} />
-              <div className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">{s.label}</div>
-              <div className="text-lg font-black mt-0.5">{s.val}</div>
-              <div className="text-[9px] text-muted-foreground/50">{s.desc}</div>
+              <div className="text-[10px] text-emerald-300/60 font-semibold uppercase tracking-wider">{s.label}</div>
+              <div className="text-lg font-black mt-0.5 text-white">{s.val}</div>
+              <div className="text-[9px] text-emerald-400/40">{s.desc}</div>
             </div>
           ))}
         </div>
@@ -439,8 +456,8 @@ export default function InternetSpeedTester() {
         <LatencyChart pings={pingSamples} />
 
         {/* Network Info */}
-        <div className="rounded-xl border border-border/30 bg-card p-4">
-          <h3 className="text-xs font-bold mb-3 flex items-center gap-1.5"><Globe className="w-3.5 h-3.5 text-primary" /> Network Information</h3>
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/60 backdrop-blur-sm p-4">
+          <h3 className="text-xs font-bold mb-3 flex items-center gap-1.5 text-emerald-300"><Globe className="w-3.5 h-3.5 text-emerald-400" /> Network Information</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             {[
               { icon: Globe, label: "IP Address", value: ip },
@@ -450,10 +467,10 @@ export default function InternetSpeedTester() {
               { icon: Clock, label: "Last Test", value: testHistory[0]?.time || "Never" },
               { icon: Activity, label: "Tests Run", value: `${testHistory.length}` },
             ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex items-center gap-2.5 py-2 px-3 rounded-lg bg-accent/20">
-                <Icon className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
-                <span className="text-muted-foreground/70">{label}</span>
-                <span className="font-bold truncate ml-auto text-right max-w-[140px]">{value}</span>
+              <div key={label} className="flex items-center gap-2.5 py-2 px-3 rounded-lg bg-emerald-900/40 border border-emerald-500/10">
+                <Icon className="w-3.5 h-3.5 text-emerald-400/50 shrink-0" />
+                <span className="text-emerald-300/60">{label}</span>
+                <span className="font-bold truncate ml-auto text-right max-w-[140px] text-white">{value}</span>
               </div>
             ))}
           </div>
@@ -461,15 +478,15 @@ export default function InternetSpeedTester() {
 
         {/* Test History */}
         {testHistory.length > 0 && (
-          <div className="rounded-xl border border-border/30 bg-card p-4">
-            <h3 className="text-xs font-bold mb-3 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary" /> Test History</h3>
+          <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/60 backdrop-blur-sm p-4">
+            <h3 className="text-xs font-bold mb-3 flex items-center gap-1.5 text-emerald-300"><Clock className="w-3.5 h-3.5 text-emerald-400" /> Test History</h3>
             <div className="space-y-2">
               {testHistory.map((h, i) => (
-                <div key={i} className="flex items-center gap-3 text-xs py-2 px-3 rounded-lg bg-accent/20">
-                  <span className="text-muted-foreground/50 text-[10px] w-28 shrink-0">{h.time}</span>
-                  <div className="flex items-center gap-1 text-blue-500"><Download className="w-3 h-3" /><span className="font-bold">{h.dl}</span></div>
-                  <div className="flex items-center gap-1 text-green-500"><Upload className="w-3 h-3" /><span className="font-bold">{h.ul}</span></div>
-                  <div className="flex items-center gap-1 text-yellow-500 ml-auto"><Activity className="w-3 h-3" /><span className="font-bold">{h.ping}ms</span></div>
+                <div key={i} className="flex items-center gap-3 text-xs py-2 px-3 rounded-lg bg-emerald-900/40 border border-emerald-500/10">
+                  <span className="text-emerald-300/40 text-[10px] w-28 shrink-0">{h.time}</span>
+                  <div className="flex items-center gap-1 text-blue-400"><Download className="w-3 h-3" /><span className="font-bold">{h.dl}</span></div>
+                  <div className="flex items-center gap-1 text-green-400"><Upload className="w-3 h-3" /><span className="font-bold">{h.ul}</span></div>
+                  <div className="flex items-center gap-1 text-yellow-400 ml-auto"><Activity className="w-3 h-3" /><span className="font-bold">{h.ping}ms</span></div>
                 </div>
               ))}
             </div>
