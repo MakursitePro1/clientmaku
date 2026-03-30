@@ -275,7 +275,7 @@ export default function CustomToolPage() {
           title={tool.name}
           sandbox="allow-scripts allow-forms allow-modals allow-popups"
           className="w-full border-0 block"
-          style={{ height: "calc(100vh - 96px)", minHeight: "500px" }}
+          style={{ height: "calc(100vh - 160px)", minHeight: "500px" }}
         />
       </div>
 
