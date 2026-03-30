@@ -82,6 +82,7 @@ function SpeedGauge({
   const isUpload = phase === "upload";
   const isResetting = phase === "resetting";
   const isDone = phase === "done";
+  const isGreenPhase = isUpload || isDone;
 
   const phaseLabel = isDownload
     ? "DOWNLOAD"
@@ -95,7 +96,7 @@ function SpeedGauge({
             ? "FAILED"
             : "READY";
 
-  const activeColor = (isUpload || isDone) ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)";
+  const activeColor = isGreenPhase ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)";
 
   // Minor tick marks
   const ticks = [];
@@ -168,7 +169,7 @@ function SpeedGauge({
           <path
             d={arcPath(START_ANGLE, angle, r)}
             fill="none"
-            stroke={isUpload ? "url(#gaugeUpGrad)" : "url(#gaugeDownGrad)"}
+            stroke={isGreenPhase ? "url(#gaugeUpGrad)" : "url(#gaugeDownGrad)"}
             strokeWidth="18"
             strokeLinecap="round"
             filter="url(#arcGlow2)"
@@ -562,17 +563,17 @@ export default function InternetSpeedTester() {
         setJitter(pingResult.avgJitter);
       }
 
-      // Hold final download speed visibly for 2 seconds
-      await wait(2000);
-      if (cancelRef.current) return reset();
-
-      // Smooth reset to zero
+      // Immediately after download completes: smooth reset to zero
       setPhase("resetting");
       liveSpeedRef.current = 0;
-      // Wait long enough for the smooth decay animation to reach zero
-      await wait(1800);
+      // Let the needle glide down naturally
+      await wait(2400);
       if (cancelRef.current) return reset();
       setDisplaySpeed(0);
+
+      // Keep gauge at true zero for 2 seconds before upload starts
+      await wait(2000);
+      if (cancelRef.current) return reset();
 
       // Phase 2: upload starts fresh in green
       setPhase("upload");
