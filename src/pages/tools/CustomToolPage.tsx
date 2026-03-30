@@ -213,20 +213,6 @@ export default function CustomToolPage() {
       <Navbar />
       <ScrollToTop />
 
-      {/* Breadcrumb */}
-      <div className="w-full border-b border-border/40 bg-muted/30">
-        <nav className="max-w-[2000px] mx-auto px-3 sm:px-5 lg:px-8 py-2.5 flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
-          <Link to="/" className="flex items-center gap-1 hover:text-foreground transition-colors shrink-0">
-            <Home className="w-3.5 h-3.5" /> Home
-          </Link>
-          <ChevronRight className="w-3 h-3 shrink-0" />
-          <Link to="/tools" className="hover:text-foreground transition-colors shrink-0">Tools</Link>
-          <ChevronRight className="w-3 h-3 shrink-0" />
-          <Link to={`/categories`} className="hover:text-foreground transition-colors shrink-0">{tool.category}</Link>
-          <ChevronRight className="w-3 h-3 shrink-0" />
-          <span className="text-foreground font-medium truncate">{tool.name}</span>
-        </nav>
-      </div>
 
       {/* Sticky toolbar */}
       <div className="sticky top-[72px] sm:top-[80px] lg:top-[88px] z-30 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
