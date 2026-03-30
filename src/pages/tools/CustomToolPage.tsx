@@ -21,6 +21,7 @@ interface CustomTool {
   description: string;
   category: string;
   html_content: string;
+  embed_url: string;
   color: string;
   meta_title: string;
   meta_description: string;
