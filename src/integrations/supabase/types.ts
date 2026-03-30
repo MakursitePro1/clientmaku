@@ -128,6 +128,7 @@ export type Database = {
           name: string
           slug: string
           updated_at: string
+          view_count: number
         }
         Insert: {
           category?: string
@@ -146,6 +147,7 @@ export type Database = {
           name: string
           slug: string
           updated_at?: string
+          view_count?: number
         }
         Update: {
           category?: string
@@ -164,6 +166,7 @@ export type Database = {
           name?: string
           slug?: string
           updated_at?: string
+          view_count?: number
         }
         Relationships: []
       }
@@ -304,6 +307,41 @@ export type Database = {
           value?: Json
         }
         Relationships: []
+      }
+      tool_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          tool_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          tool_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          tool_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tool_ratings_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "custom_tools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tool_seo: {
         Row: {
@@ -460,6 +498,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_tool_rating: {
+        Args: { p_tool_id: string }
+        Returns: {
+          avg_rating: number
+          total_ratings: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -467,6 +512,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_tool_view: { Args: { tool_slug: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

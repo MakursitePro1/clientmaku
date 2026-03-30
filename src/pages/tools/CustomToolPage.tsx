@@ -1,14 +1,18 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 import { ScrollToTop } from "@/components/ScrollToTop";
-import { ArrowLeft, Maximize2, Minimize2, Share2, ChevronRight, FileCode, ExternalLink } from "lucide-react";
+import {
+  ArrowLeft, Maximize2, Minimize2, Share2, ChevronRight,
+  FileCode, ExternalLink, Eye, Star, Home
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SEOHead } from "@/components/SEOHead";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CustomTool {
   id: string;
@@ -21,17 +25,27 @@ interface CustomTool {
   meta_title: string;
   meta_description: string;
   meta_keywords: string;
+  view_count: number;
 }
 
 export default function CustomToolPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [tool, setTool] = useState<CustomTool | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const { tools: allTools } = useToolCatalog();
+  const viewCounted = useRef(false);
+
+  // Rating state
+  const [avgRating, setAvgRating] = useState(0);
+  const [totalRatings, setTotalRatings] = useState(0);
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [ratingLoading, setRatingLoading] = useState(false);
 
   const relatedTools = useMemo(() => {
     if (!tool) return [];
@@ -40,6 +54,7 @@ export default function CustomToolPage() {
       .slice(0, 8);
   }, [tool, allTools]);
 
+  // Fetch tool
   useEffect(() => {
     if (!slug) return;
     supabase
@@ -55,6 +70,49 @@ export default function CustomToolPage() {
         setLoading(false);
       });
   }, [slug]);
+
+  // Increment view count once
+  useEffect(() => {
+    if (!slug || viewCounted.current) return;
+    viewCounted.current = true;
+    supabase.rpc("increment_tool_view", { tool_slug: slug }).then(() => {
+      setTool(prev => prev ? { ...prev, view_count: (prev.view_count || 0) + 1 } : prev);
+    });
+  }, [slug]);
+
+  // Fetch ratings
+  const fetchRatings = useCallback(async () => {
+    if (!tool) return;
+    const { data } = await supabase.rpc("get_tool_rating", { p_tool_id: tool.id });
+    if (data && data[0]) {
+      setAvgRating(Number(data[0].avg_rating));
+      setTotalRatings(Number(data[0].total_ratings));
+    }
+    if (user) {
+      const { data: ur } = await supabase
+        .from("tool_ratings")
+        .select("rating")
+        .eq("tool_id", tool.id)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (ur) setUserRating(ur.rating);
+    }
+  }, [tool, user]);
+
+  useEffect(() => { fetchRatings(); }, [fetchRatings]);
+
+  const handleRate = async (rating: number) => {
+    if (!user) { toast.error("Please login to rate this tool"); return; }
+    if (!tool) return;
+    setRatingLoading(true);
+    const { error } = await supabase
+      .from("tool_ratings")
+      .upsert({ tool_id: tool.id, user_id: user.id, rating, updated_at: new Date().toISOString() },
+        { onConflict: "tool_id,user_id" });
+    if (error) toast.error("Failed to submit rating");
+    else { setUserRating(rating); toast.success("Rating submitted!"); await fetchRatings(); }
+    setRatingLoading(false);
+  };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -82,7 +140,7 @@ export default function CustomToolPage() {
           </div>
           <h1 className="text-2xl font-bold mb-2">Tool Not Found</h1>
           <p className="text-muted-foreground mb-8 text-center max-w-md">
-            This tool doesn't exist or has been disabled by the administrator.
+            This tool doesn't exist or has been disabled.
           </p>
           <Button onClick={() => navigate("/tools")} size="lg" className="gap-2">
             <ArrowLeft className="w-4 h-4" /> Browse All Tools
@@ -92,6 +150,30 @@ export default function CustomToolPage() {
       </div>
     );
   }
+
+  const StarRating = ({ interactive = false }: { interactive?: boolean }) => (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map(star => {
+        const filled = interactive
+          ? star <= (hoverRating || userRating)
+          : star <= Math.round(avgRating);
+        return (
+          <button
+            key={star}
+            disabled={!interactive || ratingLoading}
+            onClick={() => interactive && handleRate(star)}
+            onMouseEnter={() => interactive && setHoverRating(star)}
+            onMouseLeave={() => interactive && setHoverRating(0)}
+            className={`transition-all duration-150 ${interactive ? "cursor-pointer hover:scale-125" : "cursor-default"} disabled:opacity-50`}
+          >
+            <Star
+              className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${filled ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`}
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
 
   if (isFullscreen) {
     return (
@@ -131,53 +213,53 @@ export default function CustomToolPage() {
       <Navbar />
       <ScrollToTop />
 
-      {/* Premium sticky toolbar */}
+      {/* Breadcrumb */}
+      <div className="w-full border-b border-border/40 bg-muted/30">
+        <nav className="max-w-[2000px] mx-auto px-3 sm:px-5 lg:px-8 py-2.5 flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
+          <Link to="/" className="flex items-center gap-1 hover:text-foreground transition-colors shrink-0">
+            <Home className="w-3.5 h-3.5" /> Home
+          </Link>
+          <ChevronRight className="w-3 h-3 shrink-0" />
+          <Link to="/tools" className="hover:text-foreground transition-colors shrink-0">Tools</Link>
+          <ChevronRight className="w-3 h-3 shrink-0" />
+          <Link to={`/categories`} className="hover:text-foreground transition-colors shrink-0">{tool.category}</Link>
+          <ChevronRight className="w-3 h-3 shrink-0" />
+          <span className="text-foreground font-medium truncate">{tool.name}</span>
+        </nav>
+      </div>
+
+      {/* Sticky toolbar */}
       <div className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl">
         <div className="w-full max-w-[2000px] mx-auto px-3 sm:px-5 lg:px-8 py-2.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/tools")}
-              className="shrink-0 h-9 w-9 rounded-xl hover:bg-accent"
-            >
-              <ArrowLeft className="w-4.5 h-4.5" />
+            <Button variant="ghost" size="icon" onClick={() => navigate("/tools")} className="shrink-0 h-9 w-9 rounded-xl hover:bg-accent">
+              <ArrowLeft className="w-4 h-4" />
             </Button>
-
             <div
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ring-1 ring-border/50"
               style={{ backgroundColor: tool.color + "15", color: tool.color }}
             >
               <span className="text-sm sm:text-base font-bold">{tool.name.charAt(0)}</span>
             </div>
-
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base font-bold truncate leading-tight">{tool.name}</h1>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span
-                  className="inline-block w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: tool.color }}
-                />
-                <span className="text-[11px] text-muted-foreground truncate">{tool.category}</span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <Eye className="w-3 h-3" /> {tool.view_count || 0}
+                </span>
+                <span className="text-border">•</span>
+                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" /> {avgRating > 0 ? avgRating.toFixed(1) : "—"}
+                  <span className="hidden sm:inline">({totalRatings})</span>
+                </span>
               </div>
             </div>
           </div>
-
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleShare}
-              className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl"
-            >
+            <Button variant="ghost" size="icon" onClick={handleShare} className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl">
               <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsFullscreen(true)}
-              className="gap-1.5 h-8 sm:h-9 rounded-xl text-xs sm:text-sm px-2.5 sm:px-3"
-            >
+            <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-1.5 h-8 sm:h-9 rounded-xl text-xs sm:text-sm px-2.5 sm:px-3">
               <Maximize2 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Fullscreen</span>
             </Button>
@@ -185,7 +267,7 @@ export default function CustomToolPage() {
         </div>
       </div>
 
-      {/* FULL WIDTH TOOL AREA — no padding, no container, edge-to-edge */}
+      {/* FULL WIDTH TOOL IFRAME */}
       <div className="w-full flex-1" style={{ minHeight: 0 }}>
         <iframe
           ref={iframeRef}
@@ -193,37 +275,51 @@ export default function CustomToolPage() {
           title={tool.name}
           sandbox="allow-scripts allow-forms allow-modals allow-popups"
           className="w-full border-0 block"
-          style={{
-            height: "calc(100vh - 52px)",
-            minHeight: "500px",
-          }}
+          style={{ height: "calc(100vh - 96px)", minHeight: "500px" }}
         />
       </div>
 
-      {/* Tool info strip */}
-      <div className="w-full border-t border-border/50 bg-card/50 backdrop-blur-sm">
-        <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center ring-1 ring-border/50 shadow-sm"
-              style={{ backgroundColor: tool.color + "12", color: tool.color }}
-            >
-              <span className="text-lg font-bold">{tool.name.charAt(0)}</span>
+      {/* Info + Rating strip */}
+      <div className="w-full border-t border-border/50 bg-card/60 backdrop-blur-sm">
+        <div className="max-w-[2000px] mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center ring-1 ring-border/50 shadow-sm"
+                style={{ backgroundColor: tool.color + "12", color: tool.color }}
+              >
+                <span className="text-xl font-bold">{tool.name.charAt(0)}</span>
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold">{tool.name}</h2>
+                {tool.description && (
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 max-w-lg">{tool.description}</p>
+                )}
+              </div>
             </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-bold">{tool.name}</h2>
-              {tool.description && (
-                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1 max-w-lg">{tool.description}</p>
-              )}
+
+            {/* Stats & Rating */}
+            <div className="flex items-center gap-4 sm:gap-6 flex-wrap">
+              {/* Views */}
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Eye className="w-4 h-4" />
+                <span className="font-semibold text-foreground">{tool.view_count || 0}</span>
+                <span className="hidden sm:inline">views</span>
+              </div>
+
+              {/* Rating display */}
+              <div className="flex items-center gap-2">
+                <StarRating interactive={false} />
+                <span className="text-sm font-semibold text-foreground">{avgRating > 0 ? avgRating.toFixed(1) : "0"}</span>
+                <span className="text-xs text-muted-foreground">({totalRatings})</span>
+              </div>
+
+              {/* User rating */}
+              <div className="flex items-center gap-2 pl-2 sm:pl-4 border-l border-border/50">
+                <span className="text-xs text-muted-foreground hidden sm:inline">Your rating:</span>
+                <StarRating interactive={true} />
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5 rounded-xl h-9 text-xs">
-              <Share2 className="w-3.5 h-3.5" /> Share Tool
-            </Button>
-            <Button size="sm" onClick={() => setIsFullscreen(true)} className="gap-1.5 rounded-xl h-9 text-xs">
-              <Maximize2 className="w-3.5 h-3.5" /> Open Fullscreen
-            </Button>
           </div>
         </div>
       </div>
@@ -234,10 +330,7 @@ export default function CustomToolPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
             <div className="flex items-center justify-between mb-5 sm:mb-6">
               <h2 className="text-lg sm:text-xl font-bold">Related Tools</h2>
-              <Link
-                to="/tools"
-                className="text-sm text-primary hover:underline flex items-center gap-1 font-medium"
-              >
+              <Link to="/tools" className="text-sm text-primary hover:underline flex items-center gap-1 font-medium">
                 View All <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -257,9 +350,7 @@ export default function CustomToolPage() {
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <span className="text-sm font-medium truncate block group-hover:text-primary transition-colors">
-                        {rt.name}
-                      </span>
+                      <span className="text-sm font-medium truncate block group-hover:text-primary transition-colors">{rt.name}</span>
                       <span className="text-[11px] text-muted-foreground">{rt.category}</span>
                     </div>
                     <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/40 ml-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
