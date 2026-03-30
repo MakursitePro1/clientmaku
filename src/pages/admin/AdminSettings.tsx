@@ -103,6 +103,7 @@ const defaultSettings: SiteSettings = {
   stats_categories_count: "12",
   announcement_text: "",
   announcement_enabled: "false",
+  admin_slug: "makuadmingowebs99",
 };
 
 type SettingField = {
