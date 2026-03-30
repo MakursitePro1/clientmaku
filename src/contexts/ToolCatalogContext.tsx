@@ -47,7 +47,7 @@ export function ToolCatalogProvider({ children }: { children: ReactNode }) {
               id: `custom-${tool.slug}`,
               name: tool.name,
               description: tool.description || "Custom tool",
-              icon: FileCode,
+              icon: ((lucideIcons as Record<string, LucideIcon>)[tool.icon_name]) || FileCode,
               category: (tool.category || "utility") as ToolCategory,
               path: `/tools/custom/${tool.slug}`,
               color: tool.color || "hsl(263, 85%, 58%)",
