@@ -119,7 +119,7 @@ export default function CustomToolPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
         title={tool.meta_title || tool.name}
         description={tool.meta_description || tool.description}
@@ -128,51 +128,53 @@ export default function CustomToolPage() {
       <Navbar />
       <ScrollToTop />
 
-      {/* Minimal header */}
-      <div className="w-full border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+      {/* Compact premium header */}
+      <div className="w-full border-b border-border/50 bg-gradient-to-r from-card/80 via-background to-card/80 backdrop-blur-md">
+        <div className="w-full px-3 sm:px-6 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/tools")} className="shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/tools")} className="shrink-0 h-9 w-9">
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: tool.color + "22", color: tool.color }}>
-              <span className="text-lg font-bold">{tool.name.charAt(0)}</span>
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
+              style={{ backgroundColor: tool.color + "18", color: tool.color }}
+            >
+              <span className="text-base font-bold">{tool.name.charAt(0)}</span>
             </div>
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-xl font-bold truncate">{tool.name}</h1>
+              <h1 className="text-base sm:text-lg font-bold truncate">{tool.name}</h1>
+              {tool.description && (
+                <p className="text-xs text-muted-foreground truncate hidden sm:block">{tool.description}</p>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5 hidden sm:flex">
-              <Share2 className="w-4 h-4" /> Share
+            <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5 hidden sm:flex h-8">
+              <Share2 className="w-3.5 h-3.5" /> Share
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-1.5">
-              <Maximize2 className="w-4 h-4" /> <span className="hidden sm:inline">Fullscreen</span>
+            <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="gap-1.5 h-8">
+              <Maximize2 className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Fullscreen</span>
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Full-width tool area */}
-      <div className="w-full">
-        <div className="max-w-[1600px] mx-auto px-2 sm:px-4 py-4">
-          <div className="rounded-2xl border border-border overflow-hidden bg-white shadow-lg" style={{ minHeight: "80vh" }}>
-            <iframe
-              ref={iframeRef}
-              srcDoc={tool.html_content}
-              className="w-full border-0"
-              style={{ minHeight: "80vh" }}
-              sandbox="allow-scripts allow-forms allow-modals allow-popups"
-              title={tool.name}
-            />
-          </div>
-        </div>
+      {/* Full-width edge-to-edge tool area */}
+      <div className="flex-1 w-full">
+        <iframe
+          ref={iframeRef}
+          srcDoc={tool.html_content}
+          className="w-full border-0"
+          style={{ minHeight: "calc(100vh - 120px)" }}
+          sandbox="allow-scripts allow-forms allow-modals allow-popups"
+          title={tool.name}
+        />
       </div>
 
       {/* Related Tools */}
       {relatedTools.length > 0 && (
         <div className="w-full border-t border-border bg-muted/30">
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold">Related Tools</h2>
               <Link to="/tools" className="text-sm text-primary hover:underline flex items-center gap-1">
