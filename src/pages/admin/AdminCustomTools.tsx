@@ -272,6 +272,7 @@ export default function AdminCustomTools() {
       icon_name: tool.icon_name,
       color: tool.color,
       html_content: tool.html_content,
+      embed_url: tool.embed_url || "",
       is_enabled: false,
       meta_title: tool.meta_title,
       meta_description: tool.meta_description,
