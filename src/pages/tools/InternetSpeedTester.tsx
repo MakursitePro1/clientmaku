@@ -95,7 +95,7 @@ function SpeedGauge({
             ? "FAILED"
             : "READY";
 
-  const activeColor = isUpload ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)";
+  const activeColor = (isUpload || isDone) ? "hsl(142 76% 40%)" : "hsl(263 70% 55%)";
 
   // Minor tick marks
   const ticks = [];
