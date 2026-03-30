@@ -515,23 +515,29 @@ export default function InternetSpeedTester() {
     if (!animStartRef.current) animStartRef.current = performance.now();
 
     const tick = (time: number) => {
-      setDisplaySpeed(() => {
+      setDisplaySpeed((prev) => {
         const target = liveSpeedRef.current;
         const elapsed = time - animStartRef.current;
 
-        if (target > 0.5) {
-          // Real data: smooth toward it with visible wobble
-          const wobble = Math.sin(elapsed / 90) * Math.min(target * 0.06, 3.5)
-            + Math.sin(elapsed / 55) * Math.min(target * 0.03, 1.5);
-          return +Math.max(0.1, target + wobble).toFixed(2);
+        // When target is near zero (resetting between phases), smoothly decay to 0
+        if (target < 0.5 && prev < 1) {
+          return +Math.max(0, prev * 0.85).toFixed(2);
         }
 
-        // Synthetic dramatic sweep while waiting for data
+        if (target > 0.5) {
+          // Real data: smooth toward it with visible wobble
+          const smooth = prev + (target - prev) * 0.12;
+          const wobble = Math.sin(elapsed / 90) * Math.min(target * 0.06, 3.5)
+            + Math.sin(elapsed / 55) * Math.min(target * 0.03, 1.5);
+          return +Math.max(0.1, smooth + wobble).toFixed(2);
+        }
+
+        // Synthetic dramatic sweep while waiting for server data
         const peak = phase === "download" ? 35 : 20;
         const sweep = peak * Math.abs(Math.sin(elapsed / 300));
-        const jitter = (peak * 0.15) * Math.sin(elapsed / 70);
+        const jitterAmt = (peak * 0.15) * Math.sin(elapsed / 70);
         const burst = (peak * 0.1) * Math.abs(Math.cos(elapsed / 120));
-        return +Math.max(0.5, sweep + jitter + burst).toFixed(2);
+        return +Math.max(0.5, sweep + jitterAmt + burst).toFixed(2);
       });
       raf = requestAnimationFrame(tick);
     };
