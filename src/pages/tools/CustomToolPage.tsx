@@ -47,6 +47,7 @@ export default function CustomToolPage() {
       .select("*")
       .eq("slug", slug)
       .eq("is_enabled", true)
+      .is("deleted_at", null)
       .maybeSingle()
       .then(({ data, error }) => {
         if (error || !data) setNotFound(true);
