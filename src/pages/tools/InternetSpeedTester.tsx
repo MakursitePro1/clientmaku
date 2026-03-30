@@ -460,15 +460,27 @@ export default function InternetSpeedTester() {
 
   // Fetch IP & connection type
   useEffect(() => {
-    const conn = (navigator as Navigator & { connection?: { effectiveType?: string; type?: string } }).connection;
-    if (conn) setConnType((conn.effectiveType || conn.type || "Unknown").toUpperCase());
+    const conn = (navigator as Navigator & { connection?: { effectiveType?: string; type?: string; downlink?: number; rtt?: number } }).connection;
+    if (conn) {
+      setConnType((conn.effectiveType || conn.type || "Unknown").toUpperCase());
+      if (conn.downlink) setDownlink(`${conn.downlink} Mbps`);
+      if (conn.rtt) setRtt(`${conn.rtt} ms`);
+    }
 
     (async () => {
       try {
-        const res = await fetch("https://api.ipify.org?format=json");
+        const res = await fetch("https://ipinfo.io/json");
         const data = await res.json();
         setIp(data.ip || "—");
-      } catch { setIp("Unknown"); }
+        setIsp(data.org || "—");
+        setLocation_(data.city && data.country ? `${data.city}, ${data.country}` : "—");
+      } catch {
+        try {
+          const res = await fetch("https://api.ipify.org?format=json");
+          const data = await res.json();
+          setIp(data.ip || "—");
+        } catch { setIp("Unknown"); }
+      }
     })();
 
     try { setTestHistory(JSON.parse(localStorage.getItem("cv_speed_history") || "[]")); } catch { /* */ }
