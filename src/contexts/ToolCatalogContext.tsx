@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { FileCode } from "lucide-react";
+import { FileCode, icons as lucideIcons } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { tools as staticTools, categories as staticCategories, type Tool, type ToolCategory } from "@/data/tools";
 
@@ -46,7 +47,7 @@ export function ToolCatalogProvider({ children }: { children: ReactNode }) {
               id: `custom-${tool.slug}`,
               name: tool.name,
               description: tool.description || "Custom tool",
-              icon: FileCode,
+              icon: ((lucideIcons as Record<string, LucideIcon>)[tool.icon_name]) || FileCode,
               category: (tool.category || "utility") as ToolCategory,
               path: `/tools/custom/${tool.slug}`,
               color: tool.color || "hsl(263, 85%, 58%)",

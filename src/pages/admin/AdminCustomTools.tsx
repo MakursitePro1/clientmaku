@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,30 @@ import {
   Plus, Trash2, Edit, Eye, Upload, FileCode, ArrowLeft, X,
   CheckCircle, AlertCircle, Code2, Palette, Tag, Globe, Copy,
   Sparkles, Layers, Zap, LayoutGrid, RotateCcw, Archive,
-  Search, ExternalLink, AlertTriangle
+  Search, ExternalLink, AlertTriangle, icons as lucideIcons
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { categories as toolCategories } from "@/data/tools";
 import { cn } from "@/lib/utils";
+
+// Popular icons to show first
+const POPULAR_ICON_NAMES = [
+  "Wrench", "Code2", "Calculator", "FileText", "Image", "Globe", "Lock",
+  "Palette", "Mail", "Shield", "PiggyBank", "Share2", "Zap", "Sparkles",
+  "Star", "Heart", "Camera", "Music", "Video", "Database", "Cloud",
+  "Map", "Clock", "Calendar", "Bookmark", "Search", "Settings", "Terminal",
+  "Hash", "Link", "Key", "Cpu", "Wifi", "QrCode", "Smartphone", "Monitor",
+  "Gamepad2", "Scissors", "Ruler", "Compass", "Pen", "Type", "Binary",
+  "Braces", "Bug", "Cog", "Fingerprint", "Flask", "Gauge", "Gift",
+  "HardDrive", "Headphones", "Layers", "LayoutGrid", "Lightbulb", "Megaphone",
+  "Microscope", "Package", "Paintbrush", "Puzzle", "Rocket", "ScanLine",
+  "Server", "Sigma", "Sliders", "Swords", "Target", "Thermometer", "Timer",
+  "Truck", "Umbrella", "Users", "Wand2", "Workflow", "Boxes", "FileCode"
+];
+
+function getIconComponent(name: string): LucideIcon {
+  return (lucideIcons as Record<string, LucideIcon>)[name] || FileCode;
+}
 
 interface CustomTool {
   id: string;
@@ -95,7 +115,17 @@ export default function AdminCustomTools() {
   const [activeTab, setActiveTab] = useState<"info" | "code" | "seo">("info");
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; tool: CustomTool | null; permanent: boolean }>({ open: false, tool: null, permanent: false });
+  const [iconSearch, setIconSearch] = useState("");
+  const [showAllIcons, setShowAllIcons] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const allIconNames = useMemo(() => Object.keys(lucideIcons), []);
+  const filteredIcons = useMemo(() => {
+    const base = showAllIcons ? allIconNames : POPULAR_ICON_NAMES.filter(n => n in lucideIcons);
+    if (!iconSearch) return base.slice(0, showAllIcons ? 200 : base.length);
+    const q = iconSearch.toLowerCase();
+    return (showAllIcons ? allIconNames : base).filter(n => n.toLowerCase().includes(q)).slice(0, 200);
+  }, [iconSearch, showAllIcons, allIconNames]);
 
   useEffect(() => { fetchTools(); }, []);
 
@@ -289,7 +319,7 @@ export default function AdminCustomTools() {
               className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
               style={{ backgroundColor: deleteDialog.tool.color + "22", color: deleteDialog.tool.color }}
             >
-              <FileCode className="w-5 h-5" />
+              {(() => { const I = getIconComponent(deleteDialog.tool.icon_name); return <I className="w-5 h-5" />; })()}
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-sm truncate">{deleteDialog.tool.name}</p>
@@ -397,7 +427,7 @@ export default function AdminCustomTools() {
                         className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 grayscale"
                         style={{ backgroundColor: tool.color + "22", color: tool.color }}
                       >
-                        <FileCode className="w-5 h-5" />
+                        {(() => { const I = getIconComponent(tool.icon_name); return <I className="w-5 h-5" />; })()}
                       </div>
                       <div className="min-w-0 flex-1">
                         <h3 className="font-semibold text-sm truncate line-through text-muted-foreground">{tool.name}</h3>
@@ -579,6 +609,60 @@ export default function AdminCustomTools() {
                 </CardContent>
               </Card>
 
+              {/* Icon Picker */}
+              <Card className="border-border/60">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" /> Tool Icon
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Input
+                      value={iconSearch}
+                      onChange={e => setIconSearch(e.target.value)}
+                      placeholder="Search icons..."
+                      className="pl-9 h-9 text-xs"
+                    />
+                  </div>
+                  <div className="grid grid-cols-8 gap-1.5 max-h-[200px] overflow-y-auto p-1">
+                    {filteredIcons.map(name => {
+                      const IconComp = getIconComponent(name);
+                      const isSelected = editingTool.icon_name === name;
+                      return (
+                        <button
+                          key={name}
+                          onClick={() => updateField("icon_name", name)}
+                          title={name}
+                          className={cn(
+                            "w-full aspect-square rounded-lg flex items-center justify-center transition-all border",
+                            isSelected
+                              ? "bg-primary/10 border-primary/40 text-primary scale-105 shadow-sm"
+                              : "border-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          <IconComp className="w-4 h-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      Selected: <span className="font-medium text-foreground">{editingTool.icon_name || "FileCode"}</span>
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs h-7"
+                      onClick={() => { setShowAllIcons(!showAllIcons); setIconSearch(""); }}
+                    >
+                      {showAllIcons ? "Show Popular" : `Show All (${allIconNames.length})`}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card className="border-border/60">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
@@ -599,7 +683,7 @@ export default function AdminCustomTools() {
                   <CardContent>
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm" style={{ backgroundColor: (editingTool.color || "hsl(263,85%,58%)") + "22", color: editingTool.color || "hsl(263,85%,58%)" }}>
-                        <FileCode className="w-6 h-6" />
+                        {(() => { const I = getIconComponent(editingTool.icon_name || "FileCode"); return <I className="w-6 h-6" />; })()}
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-sm truncate">{editingTool.name}</p>
@@ -896,7 +980,7 @@ export default function AdminCustomTools() {
                       className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm"
                       style={{ backgroundColor: tool.color + "22", color: tool.color }}
                     >
-                      <FileCode className="w-5 h-5" />
+                      {(() => { const I = getIconComponent(tool.icon_name); return <I className="w-5 h-5" />; })()}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
