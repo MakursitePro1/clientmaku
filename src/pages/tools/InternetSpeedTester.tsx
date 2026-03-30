@@ -680,8 +680,8 @@ export default function InternetSpeedTester() {
             </motion.div>
           )}
 
-          {/* Action button */}
-          <div className="mt-6 flex justify-center">
+          {/* Action buttons */}
+          <div className="mt-6 flex items-center justify-center gap-3">
             {testing ? (
               <Button
                 variant="outline"
@@ -691,13 +691,30 @@ export default function InternetSpeedTester() {
                 Cancel
               </Button>
             ) : (
-              <Button
-                onClick={runTest}
-                className="rounded-full bg-primary px-10 py-5 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary/90"
-              >
-                <Gauge className="mr-2 h-4 w-4" />
-                {phase === "done" ? "Test Again" : phase === "error" ? "Retry" : "Run Speed Test"}
-              </Button>
+              <>
+                <Button
+                  onClick={runTest}
+                  className="rounded-full bg-primary px-10 py-5 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary/90"
+                >
+                  <Gauge className="mr-2 h-4 w-4" />
+                  {phase === "done" ? "Test Again" : phase === "error" ? "Retry" : "Run Speed Test"}
+                </Button>
+                {(phase === "done" || phase === "error") && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      reset();
+                      setDownload(null);
+                      setUpload(null);
+                      setPing(null);
+                      setJitter(null);
+                    }}
+                    className="rounded-full border-2 border-foreground/15 px-6 py-5 text-sm font-medium gap-1.5"
+                  >
+                    <RotateCcw className="h-4 w-4" /> Restart
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </div>
