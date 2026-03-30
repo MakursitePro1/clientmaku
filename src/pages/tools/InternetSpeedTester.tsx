@@ -499,13 +499,13 @@ export default function InternetSpeedTester() {
     try { setTestHistory(JSON.parse(localStorage.getItem("cv_speed_history") || "[]")); } catch { /* */ }
   }, []);
 
-  // Gauge animation loop
+  // Gauge animation loop — produces dramatic needle movement immediately
   useEffect(() => {
     if (!testing) {
       animStartRef.current = 0;
       if (phase === "done") {
         setDisplaySpeed(upload ?? download ?? 0);
-      } else {
+      } else if (phase === "idle") {
         setDisplaySpeed(0);
       }
       return;
@@ -515,21 +515,23 @@ export default function InternetSpeedTester() {
     if (!animStartRef.current) animStartRef.current = performance.now();
 
     const tick = (time: number) => {
-      setDisplaySpeed((prev) => {
+      setDisplaySpeed(() => {
         const target = liveSpeedRef.current;
         const elapsed = time - animStartRef.current;
 
         if (target > 0.5) {
-          const smooth = prev + (target - prev) * 0.25;
-          const wobble = Math.sin(elapsed / 80) * Math.min(target * 0.03, 2);
-          return +Math.max(0, smooth + wobble).toFixed(2);
+          // Real data: smooth toward it with visible wobble
+          const wobble = Math.sin(elapsed / 90) * Math.min(target * 0.06, 3.5)
+            + Math.sin(elapsed / 55) * Math.min(target * 0.03, 1.5);
+          return +Math.max(0.1, target + wobble).toFixed(2);
         }
 
-        // Synthetic wave while waiting
-        const base = phase === "download" ? 8 : 5;
-        const wave1 = (phase === "download" ? 12 : 8) * Math.abs(Math.sin(elapsed / 150));
-        const wave2 = (phase === "download" ? 5 : 3) * Math.abs(Math.sin(elapsed / 60));
-        return +(base + wave1 + wave2).toFixed(2);
+        // Synthetic dramatic sweep while waiting for data
+        const peak = phase === "download" ? 35 : 20;
+        const sweep = peak * Math.abs(Math.sin(elapsed / 300));
+        const jitter = (peak * 0.15) * Math.sin(elapsed / 70);
+        const burst = (peak * 0.1) * Math.abs(Math.cos(elapsed / 120));
+        return +Math.max(0.5, sweep + jitter + burst).toFixed(2);
       });
       raf = requestAnimationFrame(tick);
     };
