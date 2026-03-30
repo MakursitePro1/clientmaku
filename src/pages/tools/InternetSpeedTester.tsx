@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, type MutableRefObject } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
-import { Download, Upload, Activity, Globe, Server, Clock, Shield, RotateCcw, AlertTriangle, Gauge } from "lucide-react";
+import { Download, Upload, Activity, Globe, Server, Clock, Shield, RotateCcw, AlertTriangle, Gauge, Wifi, Monitor, MapPin, Zap, BarChart3, TrendingUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TEST_SERVER_URL = "https://speed.cloudflare.com";
