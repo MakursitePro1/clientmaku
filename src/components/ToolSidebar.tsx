@@ -36,7 +36,7 @@ function ToolItem({ tool, delay = 0 }: { tool: Tool; delay?: number }) {
       <Link
         to={tool.path}
         onClick={() => saveRecentTool(tool.id)}
-        className="group flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-accent/60 transition-colors"
+        className="group flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-foreground/5 transition-all duration-200"
       >
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform"
@@ -45,10 +45,10 @@ function ToolItem({ tool, delay = 0 }: { tool: Tool; delay?: number }) {
           <tool.icon className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold truncate group-hover:text-primary transition-colors">{tool.name}</p>
-          <p className="text-[10px] text-muted-foreground/50 truncate">{tool.description}</p>
+          <p className="text-xs font-semibold truncate group-hover:text-foreground transition-colors">{tool.name}</p>
+          <p className="text-[10px] text-muted-foreground/60 truncate">{tool.description}</p>
         </div>
-        <ArrowRight className="w-3 h-3 text-muted-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+        <ArrowRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-foreground group-hover:translate-x-0.5 transition-all shrink-0" />
       </Link>
     </motion.div>
   );
@@ -56,18 +56,13 @@ function ToolItem({ tool, delay = 0 }: { tool: Tool; delay?: number }) {
 
 function SidebarSection({ icon: Icon, label, children, shineDelay = "0s" }: { icon: any; label: string; children: React.ReactNode; shineDelay?: string }) {
   return (
-    <div className="relative group rounded-2xl border border-border/50 bg-card overflow-hidden shadow-sm">
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-        <div className="absolute -inset-[100%] bg-[conic-gradient(from_0deg,transparent_0%,hsl(var(--primary)/0.05)_8%,transparent_16%)]" style={{ animation: `spin 8s linear infinite`, animationDelay: shineDelay }} />
+    <div className="tool-section-card overflow-hidden">
+      <div className="p-4 pb-2 flex items-center gap-2">
+        <Icon className="w-4 h-4 text-primary" />
+        <span className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground/75">{label}</span>
       </div>
-      <div className="relative bg-card m-[1px] rounded-2xl">
-        <div className="p-4 pb-2 flex items-center gap-2">
-          <Icon className="w-4 h-4 text-primary" />
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">{label}</span>
-        </div>
-        <div className="px-2 pb-3 space-y-0.5">
-          {children}
-        </div>
+      <div className="px-2 pb-3 space-y-0.5">
+        {children}
       </div>
     </div>
   );
@@ -121,7 +116,7 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={`Search from ${totalTools} tools...`}
-              className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-accent/40 border border-border/30 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+              className="tool-input-colorful w-full pl-9 pr-8 py-2.5 text-sm placeholder:text-muted-foreground/40 focus:outline-none transition-all"
             />
             {search && (
               <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-foreground">
@@ -167,7 +162,7 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
       <AnimatePresence mode="wait">
         {showFiltered && filteredTools.length > 0 && (
           <motion.div key="filtered" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="rounded-2xl border border-border/50 bg-card overflow-hidden shadow-sm"
+            className="tool-section-card overflow-hidden"
           >
             <div className="p-4 pb-2">
               <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
@@ -203,15 +198,15 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
       )}
 
       {/* Quick Stats */}
-      <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm">
+      <div className="tool-section-card p-4">
         <div className="grid grid-cols-2 gap-3">
           {[
             { label: "Total Tools", value: totalTools, color: "text-primary" },
             { label: "Categories", value: totalCategories, color: "text-primary" },
           ].map(s => (
-            <div key={s.label} className="text-center p-2 rounded-xl bg-accent/30">
-              <p className={cn("text-xl font-bold", s.color)}>{s.value}</p>
-              <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider">{s.label}</p>
+            <div key={s.label} className="tool-stat-card">
+              <div className="stat-value text-xl">{s.value}</div>
+              <div className="stat-label">{s.label}</div>
             </div>
           ))}
         </div>
