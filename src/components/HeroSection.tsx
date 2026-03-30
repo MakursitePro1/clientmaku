@@ -124,6 +124,7 @@ function AnimatedCounter({ target, duration = 2 }: { target: string; duration?: 
 }
 
 export function HeroSection() {
+  const navigate = useNavigate();
   const { settings } = useSiteSettings();
   const { totalTools, totalCategories } = useToolCatalog();
   const typedText = useTypingEffect(defaultTypingWords);
