@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Upload, Activity, Globe, Server, Clock, Shield, RotateCcw, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-/* ── Google-style Gauge ── */
+const TEST_SERVER_URL = "https://speed.cloudflare.com";
 const SCALE_LABELS = [
   { value: 0, angle: -225 },
   { value: 1, angle: -191 },
@@ -14,7 +14,6 @@ const SCALE_LABELS = [
   { value: 50, angle: -13 },
   { value: 100, angle: 45 },
 ];
-
 const START_ANGLE = -225;
 const END_ANGLE = 45;
 const TOTAL_ARC = END_ANGLE - START_ANGLE;
@@ -31,7 +30,8 @@ function speedToAngle(speed: number): number {
   ];
 
   const clamped = Math.min(Math.max(speed, 0), 120);
-  let lower = stops[0], upper = stops[stops.length - 1];
+  let lower = stops[0];
+  let upper = stops[stops.length - 1];
 
   for (let i = 0; i < stops.length - 1; i++) {
     if (clamped >= stops[i].speed && clamped <= stops[i + 1].speed) {
@@ -46,15 +46,7 @@ function speedToAngle(speed: number): number {
   return START_ANGLE + TOTAL_ARC * pct;
 }
 
-function SpeedGauge({
-  value,
-  phase,
-  testing,
-}: {
-  value: number;
-  phase: string;
-  testing: boolean;
-}) {
+function SpeedGauge({ value, phase, testing }: { value: number; phase: string; testing: boolean }) {
   const cx = 200;
   const cy = 200;
   const r = 150;
@@ -72,43 +64,39 @@ function SpeedGauge({
     return `M ${a.x} ${a.y} A ${radius} ${radius} 0 ${large} 1 ${b.x} ${b.y}`;
   };
 
-  const needleAngle = speedToAngle(value);
-  const needleDot = polar(needleAngle, r + 2);
-
+  const angle = speedToAngle(value);
+  const needleDot = polar(angle, r + 2);
   const intPart = Math.floor(value);
   const decPart = (value % 1).toFixed(2).slice(1);
-
   const phaseIcon = phase === "download" ? "↓" : phase === "upload" ? "↑" : "";
   const phaseText =
-    phase === "ping"
-      ? "Measuring latency…"
-      : phase === "download"
+    phase === "download"
       ? "Testing download…"
       : phase === "upload"
-      ? "Testing upload…"
-      : phase === "done"
-      ? "Test complete"
-      : phase === "error"
-      ? "Test failed"
-      : "Ready to test";
+        ? "Testing upload…"
+        : phase === "done"
+          ? "Test complete"
+          : phase === "error"
+            ? "Test failed"
+            : "Preparing test…";
 
   return (
     <div className="relative flex flex-col items-center">
       {testing && (
         <motion.div
-          animate={{ opacity: [0.1, 0.25, 0.1], scale: [0.97, 1.02, 0.97] }}
-          transition={{ duration: 2.2, repeat: Infinity }}
+          animate={{ opacity: [0.12, 0.22, 0.12], scale: [0.96, 1.02, 0.96] }}
+          transition={{ duration: 1.8, repeat: Infinity }}
           className="pointer-events-none absolute top-0 h-[280px] w-[280px] rounded-full blur-3xl sm:h-[360px] sm:w-[360px]"
-          style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.2), transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.18), transparent 70%)" }}
         />
       )}
 
       <svg viewBox="0 0 400 280" className="relative w-full max-w-[400px]">
         <defs>
           <linearGradient id="gaugeArcGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="hsl(265 76% 56%)" />
-            <stop offset="55%" stopColor="hsl(var(--primary))" />
-            <stop offset="100%" stopColor="hsl(266 65% 74%)" />
+            <stop offset="0%" stopColor="hsl(var(--primary) / 1)" />
+            <stop offset="60%" stopColor="hsl(var(--primary) / 0.92)" />
+            <stop offset="100%" stopColor="hsl(var(--primary) / 0.65)" />
           </linearGradient>
           <filter id="arcGlow">
             <feGaussianBlur stdDeviation="4" result="b" />
@@ -129,21 +117,21 @@ function SpeedGauge({
 
         {value > 0 && (
           <path
-            d={arcPath(START_ANGLE, needleAngle, r)}
+            d={arcPath(START_ANGLE, angle, r)}
             fill="none"
             stroke="url(#gaugeArcGrad)"
             strokeWidth="18"
             strokeLinecap="round"
             filter="url(#arcGlow)"
-            style={{ transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)" }}
+            style={{ transition: "all 0.22s linear" }}
           />
         )}
 
-        {SCALE_LABELS.map(({ value: v, angle }) => {
-          const p = polar(angle, r + 30);
+        {SCALE_LABELS.map(({ value: label, angle: labelAngle }) => {
+          const p = polar(labelAngle, r + 30);
           return (
             <text
-              key={v}
+              key={label}
               x={p.x}
               y={p.y}
               textAnchor="middle"
@@ -151,7 +139,7 @@ function SpeedGauge({
               className="fill-muted-foreground"
               style={{ fontSize: "13px", fontWeight: 500 }}
             >
-              {v >= 100 ? "100+" : v}
+              {label >= 100 ? "100+" : label}
             </text>
           );
         })}
@@ -163,7 +151,7 @@ function SpeedGauge({
           fill="hsl(var(--background))"
           stroke="hsl(var(--primary))"
           strokeWidth="3"
-          style={{ transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)" }}
+          style={{ transition: "all 0.22s linear" }}
         />
 
         <text x={cx} y={cy - 10} textAnchor="middle" dominantBaseline="middle">
@@ -182,9 +170,9 @@ function SpeedGauge({
           y={cy + 30}
           textAnchor="middle"
           className="fill-muted-foreground"
-          style={{ fontSize: "13px", fontWeight: 400, letterSpacing: "0.5px" }}
+          style={{ fontSize: "13px", fontWeight: 500, letterSpacing: "0.4px" }}
         >
-          Megabits per second
+          Mbps
         </text>
 
         {(phase === "download" || phase === "upload") && (
@@ -194,8 +182,8 @@ function SpeedGauge({
             textAnchor="middle"
             className="fill-muted-foreground"
             style={{ fontSize: "22px" }}
-            animate={{ y: [cy + 60, cy + 52, cy + 60], opacity: [0.65, 1, 0.65] }}
-            transition={{ duration: 0.75, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: [cy + 60, cy + 50, cy + 60], opacity: [0.65, 1, 0.65] }}
+            transition={{ duration: 0.65, repeat: Infinity, ease: "easeInOut" }}
           >
             {phaseIcon}
           </motion.text>
@@ -215,75 +203,80 @@ function SpeedGauge({
   );
 }
 
-/* ── Network helpers ── */
 function getConnectionEstimate() {
-  const c = (navigator as any).connection;
-  const dl = c?.downlink ? +(c.downlink * 8).toFixed(2) : 0;
+  const connection = (navigator as Navigator & { connection?: { downlink?: number; rtt?: number; effectiveType?: string; type?: string } }).connection;
+  const downlinkMbps = connection?.downlink ? +(connection.downlink * 8).toFixed(2) : 0;
+
   return {
-    downlinkMbps: dl,
-    uploadMbps: dl ? +(Math.max(dl * 0.35, 1)).toFixed(2) : 0,
-    pingMs: c?.rtt ? Math.round(c.rtt) : 0,
+    downlinkMbps,
+    uploadMbps: downlinkMbps ? +(Math.max(downlinkMbps * 0.35, 1)).toFixed(2) : 0,
+    pingMs: connection?.rtt ? Math.round(connection.rtt) : 0,
   };
 }
 
 async function measureDownload(
   baseUrl: string,
   light: boolean,
-  onProgress: (s: number) => void,
+  onProgress: (speed: number) => void,
   cancelRef: MutableRefObject<boolean>
 ): Promise<number> {
   const sizes = light ? [1_000_000, 1_000_000] : [5_000_000, 10_000_000, 20_000_000];
-  const urls = sizes.map((s, i) => `${baseUrl}/__down?bytes=${s}&_=${Date.now() + i}`);
-
+  const urls = sizes.map((size, index) => `${baseUrl}/__down?bytes=${size}&_=${Date.now() + index}`);
   const start = performance.now();
-  let total = 0;
+  let totalBytes = 0;
 
   await Promise.all(
     urls.map(async (url) => {
       if (cancelRef.current) return;
+
       try {
-        const res = await fetch(url, { cache: "no-store", mode: "cors" });
-        if (!res.ok || !res.body) return;
-        const reader = res.body.getReader();
+        const response = await fetch(url, { cache: "no-store", mode: "cors" });
+        if (!response.ok || !response.body) return;
+
+        const reader = response.body.getReader();
         while (true) {
           if (cancelRef.current) {
             await reader.cancel();
             return;
           }
+
           const { done, value } = await reader.read();
           if (done) break;
-          total += value.byteLength;
+
+          totalBytes += value.byteLength;
           const elapsed = (performance.now() - start) / 1000;
-          if (elapsed > 0.1) onProgress(+((total * 8) / elapsed / 1e6).toFixed(2));
+          if (elapsed > 0.08) onProgress(+((totalBytes * 8) / elapsed / 1e6).toFixed(2));
         }
       } catch {
-        /* skip */
+        return;
       }
     })
   );
 
   const elapsed = (performance.now() - start) / 1000;
-  if (total > 0 && elapsed > 0) return +((total * 8) / elapsed / 1e6).toFixed(2);
+  if (totalBytes > 0 && elapsed > 0) return +((totalBytes * 8) / elapsed / 1e6).toFixed(2);
 
-  const est = getConnectionEstimate();
-  if (est.downlinkMbps > 0) {
-    onProgress(est.downlinkMbps);
-    return est.downlinkMbps;
+  const estimate = getConnectionEstimate();
+  if (estimate.downlinkMbps > 0) {
+    onProgress(estimate.downlinkMbps);
+    return estimate.downlinkMbps;
   }
+
   return 0;
 }
 
 async function measureUpload(
   baseUrl: string,
-  onProgress: (s: number) => void,
+  onProgress: (speed: number) => void,
   cancelRef: MutableRefObject<boolean>
 ): Promise<number> {
-  const sizes = [1_200_000, 2_400_000, 4_800_000];
+  const sizes = [1_200_000, 2_400_000, 4_800_000, 7_200_000];
   const start = performance.now();
-  let total = 0;
+  let totalBytes = 0;
 
   for (const size of sizes) {
     if (cancelRef.current) break;
+
     try {
       await fetch(`${baseUrl}/__up`, {
         method: "POST",
@@ -291,16 +284,17 @@ async function measureUpload(
         cache: "no-store",
         mode: "cors",
       });
-      total += size;
+
+      totalBytes += size;
       const elapsed = (performance.now() - start) / 1000;
-      if (elapsed > 0.08) onProgress(+((total * 8) / elapsed / 1e6).toFixed(2));
+      if (elapsed > 0.08) onProgress(+((totalBytes * 8) / elapsed / 1e6).toFixed(2));
     } catch {
-      /* skip */
+      return 0;
     }
   }
 
   const elapsed = (performance.now() - start) / 1000;
-  if (total > 0 && elapsed > 0) return +((total * 8) / elapsed / 1e6).toFixed(2);
+  if (totalBytes > 0 && elapsed > 0) return +((totalBytes * 8) / elapsed / 1e6).toFixed(2);
   return getConnectionEstimate().uploadMbps;
 }
 
@@ -309,47 +303,43 @@ async function measurePing(baseUrl: string, cancelRef: MutableRefObject<boolean>
 
   for (let i = 0; i < 12; i++) {
     if (cancelRef.current) return { avgPing: 0, avgJitter: 0 };
-    const s = performance.now();
+
+    const startedAt = performance.now();
     try {
-      await fetch(`${baseUrl}/__down?bytes=0&_=${Date.now()}_${i}`, {
-        cache: "no-store",
-        mode: "cors",
-      });
-      pings.push(Math.round(performance.now() - s));
+      await fetch(`${baseUrl}/__down?bytes=0&_=${Date.now()}_${i}`, { cache: "no-store", mode: "cors" });
+      pings.push(Math.round(performance.now() - startedAt));
     } catch {
-      const est = getConnectionEstimate();
-      if (est.pingMs > 0) pings.push(est.pingMs);
+      const estimate = getConnectionEstimate();
+      if (estimate.pingMs > 0) pings.push(estimate.pingMs);
     }
   }
 
   if (!pings.length) {
-    const est = getConnectionEstimate();
+    const estimate = getConnectionEstimate();
     return {
-      avgPing: est.pingMs || 20,
-      avgJitter: Math.max(Math.round((est.pingMs || 20) * 0.12), 2),
+      avgPing: estimate.pingMs || 20,
+      avgJitter: Math.max(Math.round((estimate.pingMs || 20) * 0.12), 2),
     };
   }
 
   const sorted = [...pings].sort((a, b) => a - b);
-  const core = sorted.length > 4 ? sorted.slice(1, -1) : sorted;
-
-  const avgPing = Math.round(core.reduce((a, b) => a + b, 0) / core.length);
+  const stable = sorted.length > 4 ? sorted.slice(1, -1) : sorted;
+  const avgPing = Math.round(stable.reduce((sum, value) => sum + value, 0) / stable.length);
   const avgJitter = Math.round(
-    core.slice(1).reduce((s, v, i) => s + Math.abs(v - core[i]), 0) / Math.max(core.length - 1, 1)
+    stable.slice(1).reduce((sum, value, index) => sum + Math.abs(value - stable[index]), 0) /
+      Math.max(stable.length - 1, 1)
   );
 
   return { avgPing, avgJitter };
 }
 
-/* ── Main Component ── */
 export default function InternetSpeedTester() {
   const [testing, setTesting] = useState(false);
-  const [phase, setPhase] = useState<"idle" | "ping" | "download" | "upload" | "done" | "error">("idle");
+  const [phase, setPhase] = useState<"idle" | "download" | "upload" | "done" | "error">("idle");
   const [download, setDownload] = useState<number | null>(null);
   const [upload, setUpload] = useState<number | null>(null);
   const [ping, setPing] = useState<number | null>(null);
   const [jitter, setJitter] = useState<number | null>(null);
-  const [liveSpeed, setLiveSpeed] = useState(0);
   const [displaySpeed, setDisplaySpeed] = useState(0);
   const [ip, setIp] = useState("—");
   const [connType, setConnType] = useState("—");
@@ -358,25 +348,21 @@ export default function InternetSpeedTester() {
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
-  const animStartRef = useRef(0);
-
-  const baseUrl = "https://speed.cloudflare.com";
+  const animationStartedAtRef = useRef(0);
 
   const updateLiveSpeed = useCallback((speed: number) => {
-    const next = Math.max(0, speed);
-    liveSpeedRef.current = next;
-    setLiveSpeed(next);
+    liveSpeedRef.current = Math.max(0, speed);
   }, []);
 
   useEffect(() => {
-    const c = (navigator as any).connection;
-    if (c) setConnType((c.effectiveType || c.type || "Unknown").toUpperCase());
+    const connection = (navigator as Navigator & { connection?: { effectiveType?: string; type?: string } }).connection;
+    if (connection) setConnType((connection.effectiveType || connection.type || "Unknown").toUpperCase());
 
     (async () => {
       try {
-        const r = await fetch("https://api.ipify.org?format=json");
-        const d = await r.json();
-        setIp(d.ip || "—");
+        const response = await fetch("https://api.ipify.org?format=json");
+        const data = await response.json();
+        setIp(data.ip || "—");
       } catch {
         setIp("Unknown");
       }
@@ -385,34 +371,41 @@ export default function InternetSpeedTester() {
     try {
       setTestHistory(JSON.parse(localStorage.getItem("cv_speed_history") || "[]"));
     } catch {
-      /* empty */
+      return;
     }
   }, []);
 
   useEffect(() => {
     if (!testing) {
+      animationStartedAtRef.current = 0;
       setDisplaySpeed(phase === "done" ? upload ?? download ?? 0 : 0);
-      animStartRef.current = 0;
       return;
     }
 
     let raf = 0;
-    if (!animStartRef.current) animStartRef.current = performance.now();
+    if (!animationStartedAtRef.current) animationStartedAtRef.current = performance.now();
 
     const tick = (time: number) => {
-      setDisplaySpeed((prev) => {
+      setDisplaySpeed((previous) => {
         const target = liveSpeedRef.current;
+        const elapsed = time - animationStartedAtRef.current;
 
-        if (target > 0.25) {
-          const eased = prev + (target - prev) * 0.2;
-          return +eased.toFixed(2);
+        if (target > 0.4) {
+          const smooth = previous + (target - previous) * 0.22;
+          const wobbleStrength = Math.min(Math.max(target * 0.02, 0.18), 1.15);
+          const wobble = Math.sin(elapsed / 120) * wobbleStrength;
+          return +Math.max(0, smooth + wobble).toFixed(2);
         }
 
-        const elapsed = time - animStartRef.current;
-        const base = phase === "download" ? 14 : phase === "upload" ? 10 : 4;
-        const amp = phase === "download" ? 10 : phase === "upload" ? 8 : 3;
-        const wave = base + Math.abs(Math.sin(elapsed / 240)) * amp + Math.abs(Math.sin(elapsed / 92)) * 1.3;
-        return +wave.toFixed(2);
+        const base = phase === "download" ? 8 : 5;
+        const waveA = phase === "download" ? 13 : 10;
+        const waveB = phase === "download" ? 5 : 4;
+        const synthetic =
+          base +
+          Math.abs(Math.sin(elapsed / 210)) * waveA +
+          Math.abs(Math.sin(elapsed / 88)) * waveB;
+
+        return +synthetic.toFixed(2);
       });
 
       raf = requestAnimationFrame(tick);
@@ -427,65 +420,65 @@ export default function InternetSpeedTester() {
     setPhase("idle");
     setErrorMsg("");
     liveSpeedRef.current = 0;
-    setLiveSpeed(0);
     setDisplaySpeed(0);
   }, []);
 
   const runTest = useCallback(async () => {
     cancelRef.current = false;
     setTesting(true);
+    setPhase("download");
     setDownload(null);
     setUpload(null);
     setPing(null);
     setJitter(null);
     setErrorMsg("");
-    setPhase("ping");
-
     liveSpeedRef.current = 0;
-    setLiveSpeed(0);
-    setDisplaySpeed(0);
+    animationStartedAtRef.current = performance.now();
+    setDisplaySpeed(6.5);
 
     try {
-      const { avgPing, avgJitter } = await measurePing(baseUrl, cancelRef);
+      const pingPromise = measurePing(TEST_SERVER_URL, cancelRef);
+      const downloadSpeed = await measureDownload(TEST_SERVER_URL, false, updateLiveSpeed, cancelRef);
       if (cancelRef.current) return reset();
-      setPing(avgPing);
-      setJitter(avgJitter);
+      if (downloadSpeed === 0) throw new Error("Download test failed");
 
-      setPhase("download");
-      liveSpeedRef.current = 0;
-      setLiveSpeed(0);
-      const dlSpeed = await measureDownload(baseUrl, false, updateLiveSpeed, cancelRef);
-      if (cancelRef.current) return reset();
-      if (dlSpeed === 0) throw new Error("Download test failed");
-      setDownload(dlSpeed);
-      updateLiveSpeed(dlSpeed);
+      setDownload(downloadSpeed);
+      updateLiveSpeed(downloadSpeed);
+
+      const pingResult = await pingPromise;
+      if (!cancelRef.current) {
+        setPing(pingResult.avgPing);
+        setJitter(pingResult.avgJitter);
+      }
 
       setPhase("upload");
       liveSpeedRef.current = 0;
-      setLiveSpeed(0);
-      const ulSpeed = await measureUpload(baseUrl, updateLiveSpeed, cancelRef);
+      animationStartedAtRef.current = performance.now();
+      const uploadSpeed = await measureUpload(TEST_SERVER_URL, updateLiveSpeed, cancelRef);
       if (cancelRef.current) return reset();
-      setUpload(ulSpeed);
-      updateLiveSpeed(ulSpeed);
+
+      setUpload(uploadSpeed);
+      updateLiveSpeed(uploadSpeed);
 
       const entry = {
-        dl: +dlSpeed.toFixed(2),
-        ul: +ulSpeed.toFixed(2),
-        ping: avgPing,
+        dl: +downloadSpeed.toFixed(2),
+        ul: +uploadSpeed.toFixed(2),
+        ping: pingResult.avgPing,
         time: new Date().toLocaleString(),
       };
-      const hist = [entry, ...testHistory].slice(0, 10);
-      setTestHistory(hist);
-      localStorage.setItem("cv_speed_history", JSON.stringify(hist));
+      const nextHistory = [entry, ...testHistory].slice(0, 10);
+      setTestHistory(nextHistory);
+      localStorage.setItem("cv_speed_history", JSON.stringify(nextHistory));
 
       setPhase("done");
       setTesting(false);
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Speed test failed.";
       setPhase("error");
-      setErrorMsg(err?.message || "Speed test failed.");
+      setErrorMsg(message);
       setTesting(false);
     }
-  }, [baseUrl, reset, testHistory, updateLiveSpeed]);
+  }, [reset, testHistory, updateLiveSpeed]);
 
   const cancel = useCallback(() => {
     cancelRef.current = true;
@@ -521,14 +514,14 @@ export default function InternetSpeedTester() {
           <SpeedGauge value={displaySpeed} phase={phase} testing={testing} />
 
           <div className="mt-4 grid grid-cols-2 divide-x divide-foreground/10 border-t border-foreground/10 pt-4">
-            <div className="flex flex-col items-center gap-1 px-4">
+            <div className="flex flex-col items-center gap-1 px-4 text-center">
               <div className="flex items-center gap-2">
                 <Download className="h-4 w-4 text-muted-foreground" />
                 <span className="text-2xl font-light text-foreground">{download !== null ? download.toFixed(2) : "—"}</span>
               </div>
               <span className="text-xs text-muted-foreground">Mbps download</span>
             </div>
-            <div className="flex flex-col items-center gap-1 px-4">
+            <div className="flex flex-col items-center gap-1 px-4 text-center">
               <div className="flex items-center gap-2">
                 <Upload className="h-4 w-4 text-muted-foreground" />
                 <span className="text-2xl font-light text-foreground">{upload !== null ? upload.toFixed(2) : "—"}</span>
@@ -537,10 +530,10 @@ export default function InternetSpeedTester() {
             </div>
           </div>
 
-          {ping !== null && (
+          {(ping !== null || jitter !== null) && (
             <div className="mt-3 grid grid-cols-2 divide-x divide-foreground/10 border-t border-foreground/10 pt-3">
               <div className="flex flex-col items-center gap-0.5">
-                <span className="text-lg font-light text-foreground">{ping} ms</span>
+                <span className="text-lg font-light text-foreground">{ping ?? "—"} ms</span>
                 <span className="text-[11px] text-muted-foreground">Latency</span>
               </div>
               <div className="flex flex-col items-center gap-0.5">
