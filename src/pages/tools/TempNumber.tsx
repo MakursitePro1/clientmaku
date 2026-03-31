@@ -130,7 +130,12 @@ export default function TempNumber() {
     if (!activeNumber) return;
     setRefreshing(true);
     try {
-      const data = await callAPI("getMessages", { numberSlug: activeNumber.slug });
+      const params: Record<string, string> = { numberSlug: activeNumber.slug };
+      if (activeNumber.source === "receivesms-co" && activeNumber.pageUrl) {
+        params.source = "receivesms-co";
+        params.pageUrl = activeNumber.pageUrl;
+      }
+      const data = await callAPI("getMessages", params);
       const msgs: SMSMessage[] = data?.messages || [];
       if (msgs.length > prevMsgCountRef.current && prevMsgCountRef.current > 0) {
         if (soundEnabled) playNotifSound();
@@ -147,6 +152,35 @@ export default function TempNumber() {
       setRefreshing(false);
     }
   }, [activeNumber, soundEnabled, notifEnabled]);
+
+  // Fetch country pages list
+  const fetchCountryPages = useCallback(async () => {
+    try {
+      const data = await callAPI("getCountryList");
+      setCountryPages(data?.countries || []);
+    } catch {}
+  }, []);
+
+  // Load more numbers from a specific country
+  const loadMoreNumbers = useCallback(async (cp: CountryPage) => {
+    setLoadingMore(true);
+    try {
+      const data = await callAPI("getCountryNumbers", { countryUrl: cp.url, countryName: cp.country });
+      const newNums: NumberInfo[] = data?.numbers || [];
+      if (newNums.length === 0) { toast.error("No additional numbers found"); return; }
+      setNumbers(prev => {
+        const existingSlugs = new Set(prev.map(n => n.slug));
+        const unique = newNums.filter(n => !existingSlugs.has(n.slug));
+        return [...prev, ...unique];
+      });
+      setLoadedCountries(prev => new Set(prev).add(cp.country));
+      toast.success(`${newNums.length} numbers loaded for ${cp.country}!`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to load more numbers");
+    } finally {
+      setLoadingMore(false);
+    }
+  }, []);
 
   // Initial load
   useEffect(() => { fetchNumbers(); }, []);
