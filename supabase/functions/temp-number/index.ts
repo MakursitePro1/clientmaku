@@ -99,18 +99,23 @@ function parseCountryPages(html: string): CountryPage[] {
 
 function parseSource2Numbers(html: string, country: string): NumberInfo[] {
   const numbers: NumberInfo[] = [];
-  // Match: <strong>+1 219-295-8005</strong> inside card links
-  const regex = /<a class="card card-link" href="(https:\/\/www\.receivesms\.co\/[^"]+\/(\d+)\/)">\s*<div class="row">\s*<img[^>]*>\s*<strong>([^<]+)<\/strong>/g;
+  // More flexible regex for country number pages
+  const regex = /<a\s+class="card card-link"\s+href="([^"]+)"[\s\S]*?<strong>([^<]+)<\/strong>/g;
   let m;
   while ((m = regex.exec(html)) !== null) {
-    const num = m[3].trim();
+    const url = m[1];
+    // Only individual number pages (contain a numeric ID)
+    if (!url.match(/\/\d+\/$/)) continue;
+    const num = m[2].trim();
     const digits = num.replace(/[^0-9]/g, "");
+    if (!digits || digits.length < 7) continue;
+    const fullUrl = url.startsWith("http") ? url : `${BASE_URL_2}${url.startsWith("/") ? "" : "/"}${url}`;
     numbers.push({
       number: num,
       country,
       slug: digits,
       source: "receivesms-co",
-      pageUrl: m[1],
+      pageUrl: fullUrl,
     });
   }
   return numbers;
