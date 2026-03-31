@@ -778,18 +778,31 @@ export default function InternetSpeedTester() {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={phaseNotice || phase}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.25 }}
-                    className="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-background px-3 py-1"
+                    initial={{ opacity: 0, y: 4, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -3, filter: "blur(4px)" }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    className="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/80 backdrop-blur-sm px-3 py-1 shadow-[0_0_12px_-4px_hsl(var(--primary)/0.25)]"
                   >
-                    <motion.span
-                      className="h-1.5 w-1.5 rounded-full bg-primary"
-                      animate={testing ? { opacity: [0.35, 1, 0.35], scale: [0.9, 1.15, 0.9] } : { opacity: 1, scale: 1 }}
-                      transition={{ duration: 1.1, repeat: testing ? Infinity : 0 }}
-                    />
-                    <p className="text-[11px] font-medium text-foreground/90">{phaseNotice || phaseDetails[phase].subtitle}</p>
+                    {testing ? (
+                      <motion.span
+                        className="relative flex h-2 w-2"
+                      >
+                        <motion.span
+                          className="absolute inline-flex h-full w-full rounded-full bg-primary"
+                          animate={{ scale: [1, 1.8, 1], opacity: [0.7, 0, 0.7] }}
+                          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                      </motion.span>
+                    ) : phase === "done" ? (
+                      <CheckCircle2 className="h-3 w-3 text-primary" />
+                    ) : phase === "error" ? (
+                      <AlertTriangle className="h-3 w-3 text-destructive" />
+                    ) : (
+                      <Gauge className="h-3 w-3 text-muted-foreground" />
+                    )}
+                    <p className="text-[11px] font-medium text-foreground/80">{phaseNotice || phaseDetails[phase].subtitle}</p>
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -850,21 +863,6 @@ export default function InternetSpeedTester() {
               </div>
             </div>
           </div>
-
-          {/* Two-phase result cards */}
-          <AnimatePresence>
-            {phaseNotice && (
-              <motion.div
-                initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                transition={{ duration: 0.35 }}
-                className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-center"
-              >
-                <p className="text-xs font-semibold tracking-wide text-foreground">{phaseNotice}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           <div className="mt-4 grid grid-cols-2 gap-3">
             <PhaseResult
