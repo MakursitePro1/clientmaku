@@ -171,7 +171,7 @@ function SpeedGauge({
             fill="none"
             stroke={isGreenPhase ? "url(#gaugeUpGrad)" : "url(#gaugeDownGrad)"}
             strokeWidth="18"
-            strokeLinecap="round"
+            strokeLinecap="butt"
             filter="url(#arcGlow2)"
           />
         )}
