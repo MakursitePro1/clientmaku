@@ -358,6 +358,25 @@ export default function TempNumber() {
               )}
             </div>
             <motion.div whileTap={{ scale: 0.92 }}>
+              <Button variant="ghost" size="icon"
+                disabled={numbers.length < 2}
+                className="shrink-0 h-9 w-9 rounded-xl hover:text-primary hover:bg-primary/10 transition-all"
+                onClick={() => {
+                  const pool = countryFilter
+                    ? numbers.filter(n => n.country.toLowerCase() === countryFilter.toLowerCase())
+                    : numbers;
+                  if (pool.length < 2) return;
+                  const currentIdx = pool.findIndex(n => n.slug === activeNumber?.slug);
+                  const nextIdx = (currentIdx + 1) % pool.length;
+                  selectNumber(pool[nextIdx]);
+                  toast.success(`Switched to number ${nextIdx + 1}/${pool.length}`);
+                }}
+                title="Next number"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+            </motion.div>
+            <motion.div whileTap={{ scale: 0.92 }}>
               <Button variant="ghost" size="icon" disabled={!activeNumber}
                 className={`shrink-0 h-9 w-9 rounded-xl transition-all ${copiedKey === "number" ? "bg-primary/10 text-primary" : "hover:text-primary hover:bg-primary/10"}`}
                 onClick={() => activeNumber && handleCopy(activeNumber.number, "Number copied!", "number")}>
