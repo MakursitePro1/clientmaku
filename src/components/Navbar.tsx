@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Zap, Heart, LogIn, LogOut, User, Settings, Wrench } from "lucide-react";
+import { Menu, X, Zap, Heart, LogIn, LogOut, User, Settings, Wrench, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -196,7 +196,16 @@ export function Navbar() {
           </div>
 
           {/* Desktop Right Side */}
-          <div className={cn("relative z-10 ml-auto items-center gap-3 hidden lg:flex", isCompactNav ? "!hidden" : "")}>
+          <div className={cn("relative z-10 ml-auto items-center gap-2 hidden lg:flex", isCompactNav ? "!hidden" : "")}>
+            <motion.button
+              onClick={() => navigate("/pricing")}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all"
+            >
+              <Crown className="w-4 h-4" />
+              Premium
+            </motion.button>
             <motion.button
               onClick={() => navigate("/favorites")}
               whileHover={{ scale: 1.05 }}
@@ -379,6 +388,13 @@ export function Navbar() {
                 {link.name}
               </button>
             ))}
+
+            <button
+              onClick={() => { setIsOpen(false); navigate("/pricing"); }}
+              className="w-full text-left px-4 py-3 rounded-lg text-amber-600 hover:bg-amber-500/10 transition-all flex items-center gap-2 font-semibold"
+            >
+              <Crown className="w-4 h-4" /> Premium
+            </button>
 
             <button
               onClick={() => { setIsOpen(false); navigate("/favorites"); }}

@@ -260,6 +260,107 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_requests: {
+        Row: {
+          admin_note: string
+          amount: number
+          billing_period: string
+          created_at: string
+          id: string
+          payment_method: string
+          plan_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sender_number: string
+          status: string
+          subscription_id: string | null
+          transaction_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string
+          amount?: number
+          billing_period?: string
+          created_at?: string
+          id?: string
+          payment_method?: string
+          plan_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_number?: string
+          status?: string
+          subscription_id?: string | null
+          transaction_id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_note?: string
+          amount?: number
+          billing_period?: string
+          created_at?: string
+          id?: string
+          payment_method?: string
+          plan_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_number?: string
+          status?: string
+          subscription_id?: string | null
+          transaction_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_requests_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_requests_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "user_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      premium_tools: {
+        Row: {
+          created_at: string
+          id: string
+          min_plan_id: string | null
+          tool_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          min_plan_id?: string | null
+          tool_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          min_plan_id?: string | null
+          tool_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_tools_min_plan_id_fkey"
+            columns: ["min_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -311,6 +412,60 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          badge_text: string
+          color: string
+          created_at: string
+          description: string
+          display_order: number
+          features: Json
+          id: string
+          is_enabled: boolean
+          is_popular: boolean
+          name: string
+          price_annual: number
+          price_lifetime: number
+          price_monthly: number
+          price_semi_annual: number
+          updated_at: string
+        }
+        Insert: {
+          badge_text?: string
+          color?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          features?: Json
+          id?: string
+          is_enabled?: boolean
+          is_popular?: boolean
+          name: string
+          price_annual?: number
+          price_lifetime?: number
+          price_monthly?: number
+          price_semi_annual?: number
+          updated_at?: string
+        }
+        Update: {
+          badge_text?: string
+          color?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          features?: Json
+          id?: string
+          is_enabled?: boolean
+          is_popular?: boolean
+          name?: string
+          price_annual?: number
+          price_lifetime?: number
+          price_monthly?: number
+          price_semi_annual?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -498,6 +653,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          approved_by: string | null
+          billing_period: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan_id: string
+          starts_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_by?: string | null
+          billing_period?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id: string
+          starts_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_by?: string | null
+          billing_period?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id?: string
+          starts_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

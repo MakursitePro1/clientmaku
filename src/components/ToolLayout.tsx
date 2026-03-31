@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { ArrowLeft, Share2, Facebook, Twitter, Linkedin, Copy, Check, Sparkles } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft, Share2, Facebook, Twitter, Linkedin, Copy, Check, Sparkles, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 interface ToolLayoutProps {
   title: string;
@@ -39,9 +40,11 @@ const shareOptions = [
 
 export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [toolSeo, setToolSeo] = useState<any>(null);
+  const { isToolLocked } = useSubscription();
 
   const currentTool = useMemo(() => tools.find(t => t.path === location.pathname), [location.pathname]);
 
@@ -259,7 +262,24 @@ export function ToolLayout({ title, description, children }: ToolLayoutProps) {
                   style={{ backgroundColor: toolColor }} />
 
               <div className="p-4 sm:p-6 lg:p-8 relative" style={{ '--tool-color': toolColor } as React.CSSProperties}>
-                  {children}
+                  {currentTool && isToolLocked(currentTool.id) ? (
+                    <div className="py-16 flex flex-col items-center justify-center text-center">
+                      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6">
+                        <Lock className="w-10 h-10 text-amber-500" />
+                      </div>
+                      <h3 className="text-2xl font-bold mb-3">Premium Tool</h3>
+                      <p className="text-muted-foreground mb-6 max-w-md">
+                        This tool requires a premium subscription. Upgrade your plan to unlock all premium features.
+                      </p>
+                      <Button
+                        onClick={() => navigate("/pricing")}
+                        className="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl px-8 h-12 hover:opacity-90"
+                      >
+                        <Crown className="w-5 h-5 mr-2" />
+                        Upgrade to Premium
+                      </Button>
+                    </div>
+                  ) : children}
                   <AdSlotDisplay placement="in_content" className="mt-6 pt-5 border-t border-border/20" />
                 </div>
               </motion.div>

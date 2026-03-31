@@ -6,7 +6,7 @@ import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import {
   LayoutDashboard, Wrench, Users, Settings, ChevronLeft, ChevronRight,
-  LogOut, Home, Shield, Menu, X, FileText, Megaphone, UserCog, Search, Upload
+  LogOut, Home, Shield, Menu, X, FileText, Megaphone, UserCog, Search, Upload, Crown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,6 +29,7 @@ export default function AdminLayout() {
     { name: "Ads", path: `${ADMIN_BASE}/ads`, icon: Megaphone },
     { name: "SEO", path: `${ADMIN_BASE}/seo`, icon: Search },
     { name: "Custom Tools", path: `${ADMIN_BASE}/custom-tools`, icon: Upload },
+    { name: "Subscriptions", path: `${ADMIN_BASE}/subscriptions`, icon: Crown },
     { name: "Users", path: `${ADMIN_BASE}/users`, icon: Users },
     { name: "Admin Roles", path: `${ADMIN_BASE}/roles`, icon: UserCog },
     { name: "Security", path: `${ADMIN_BASE}/security`, icon: Shield },

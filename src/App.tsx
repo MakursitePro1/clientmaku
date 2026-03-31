@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { ToolCatalogProvider } from "@/contexts/ToolCatalogContext";
+import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -22,7 +23,9 @@ const AdminAds = lazy(() => import("./pages/admin/AdminAds"));
 const AdminRoles = lazy(() => import("./pages/admin/AdminRoles"));
 const AdminSEO = lazy(() => import("./pages/admin/AdminSEO"));
 const AdminCustomTools = lazy(() => import("./pages/admin/AdminCustomTools"));
+const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions"));
 import { AdminSlugChecker } from "@/components/AdminRouteWrapper";
+const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
 const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
@@ -106,6 +109,7 @@ const App = () => (
       <FavoritesProvider>
         <SiteSettingsProvider>
           <ToolCatalogProvider>
+          <SubscriptionProvider>
             <TooltipProvider>
               <Toaster />
               <Sonner />
@@ -123,6 +127,7 @@ const App = () => (
             <Route path="/categories" element={<Suspense fallback={<Loading />}><CategoriesPage /></Suspense>} />
             <Route path="/about" element={<Suspense fallback={<Loading />}><AboutPage /></Suspense>} />
             <Route path="/faq" element={<Suspense fallback={<Loading />}><FAQPage /></Suspense>} />
+            <Route path="/pricing" element={<Suspense fallback={<Loading />}><PricingPage /></Suspense>} />
             <Route path="/tools/custom/:slug" element={<Suspense fallback={<Loading />}><CustomToolPage /></Suspense>} />
             {/* Tools */}
             <Route path="/tools/internet-speed-tester" element={<InternetSpeedTester />} />
@@ -187,6 +192,7 @@ const App = () => (
               <Route path="ads" element={<AdminAds />} />
               <Route path="seo" element={<AdminSEO />} />
               <Route path="custom-tools" element={<AdminCustomTools />} />
+              <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="roles" element={<AdminRoles />} />
               <Route path="security" element={<AdminSecurity />} />
@@ -197,6 +203,7 @@ const App = () => (
                 </Suspense>
               </BrowserRouter>
             </TooltipProvider>
+          </SubscriptionProvider>
           </ToolCatalogProvider>
         </SiteSettingsProvider>
       </FavoritesProvider>
