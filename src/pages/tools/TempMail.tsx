@@ -408,6 +408,43 @@ export default function TempMail() {
     return `${Math.floor(s / 86400)}d ago`;
   };
 
+  // Switch inbox
+  const switchInbox = (idx: number) => {
+    if (idx === activeInboxIdx) return;
+    setActiveInboxIdx(idx);
+    const target = inboxes[idx];
+    if (target) {
+      setAccount(target);
+      setMessages([]);
+      setSelected(null);
+      prevMsgCountRef.current = 0;
+      setCreatedAt(Date.now());
+    }
+  };
+
+  const removeInbox = (idx: number) => {
+    if (inboxes.length <= 1) { toast.error("At least one inbox required"); return; }
+    const updated = inboxes.filter((_, i) => i !== idx);
+    setInboxes(updated);
+    const newIdx = idx >= updated.length ? updated.length - 1 : idx;
+    setActiveInboxIdx(newIdx);
+    setAccount(updated[newIdx]);
+    setMessages([]);
+    setSelected(null);
+    prevMsgCountRef.current = 0;
+  };
+
+  // Filtered messages
+  const filteredMessages = searchQuery.trim()
+    ? messages.filter(m => {
+        const q = searchQuery.toLowerCase();
+        return (m.subject || "").toLowerCase().includes(q) ||
+               (m.from?.address || "").toLowerCase().includes(q) ||
+               (m.from?.name || "").toLowerCase().includes(q) ||
+               (m.intro || "").toLowerCase().includes(q);
+      })
+    : messages;
+
   return (
     <ToolLayout title="Temp Mail" description="Get a real temporary disposable email address instantly — receive OTPs, verification codes & more">
       <div className="space-y-4 max-w-2xl mx-auto">
