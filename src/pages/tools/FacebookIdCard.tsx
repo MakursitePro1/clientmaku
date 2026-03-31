@@ -374,7 +374,7 @@ export default function FacebookIdCard() {
       const img = new Image();
       img.onload = () => {
         ctx.save();
-        rr(0, 0, W, 200);
+        rr(0, 0, W, 200, 16);
         ctx.clip();
         const a = img.width / img.height;
         let dw = W, dh = 200;
