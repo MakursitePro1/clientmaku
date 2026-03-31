@@ -124,8 +124,26 @@ export default function TempMail() {
   const [availableDomains, setAvailableDomains] = useState<{ domain: string }[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>("");
   const [providerBaseCache, setProviderBaseCache] = useState<string>("");
-  const [domainsLoaded, setDomainsLoaded] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const prevMsgCountRef = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Request notification permission
+  const requestNotifPermission = useCallback(async () => {
+    if (!("Notification" in window)) {
+      toast.error("This browser doesn't support notifications");
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    if (perm === "granted") {
+      setNotifEnabled(true);
+      toast.success("Notifications enabled!");
+    } else {
+      setNotifEnabled(false);
+      toast.error("Notification permission denied");
+    }
+  }, []);
 
   // Fetch domains on mount
   const fetchDomains = useCallback(async () => {
