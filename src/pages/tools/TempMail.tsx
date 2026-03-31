@@ -971,10 +971,12 @@ export default function TempMail() {
                             className={`h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold px-2 sm:px-3 transition-all ${copiedKey === `message-${m.id}` ? "border-primary/40 bg-primary/10 text-primary" : "border-primary/20 text-primary hover:bg-primary/10 hover:text-primary"}`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleCopy(m.intro || m.subject || "", "Email content copied!", `message-${m.id}`);
+                              const textToCopy = otp || m.intro || m.subject || "";
+                              const successMessage = otp ? `OTP "${otp}" copied!` : "Email content copied!";
+                              handleCopy(textToCopy, successMessage, `message-${m.id}`);
                             }}
                           >
-                            {copiedKey === `message-${m.id}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />} {copiedKey === `message-${m.id}` ? "Copied" : "Copy"}
+                            {copiedKey === `message-${m.id}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />} {copiedKey === `message-${m.id}` ? "Copied" : otp ? "Copy OTP" : "Copy"}
                           </Button>
                         </motion.div>
                         <Button
