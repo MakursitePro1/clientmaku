@@ -110,6 +110,8 @@ export function Navbar() {
   const isActive = (link: typeof navLinks[0]) => {
     if (link.path === "/tools") return location.pathname === "/tools" || location.pathname.startsWith("/tools/");
     if (link.path === "/blog") return location.pathname === "/blog" || location.pathname.startsWith("/blog/");
+    if (link.path === "/about") return location.pathname === "/about";
+    if (link.path === "/faq") return location.pathname === "/faq";
     if (location.pathname !== "/") return false;
     return link.hash === activeHash;
   };
