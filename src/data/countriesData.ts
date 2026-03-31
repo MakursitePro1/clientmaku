@@ -1314,3 +1314,33 @@ export const countriesData: Record<string, CountryData> = {
     stdFmt("Saint Vincent"), () => ""
   ),
 };
+
+export type ContinentKey = "North America" | "South America" | "Europe" | "Middle East" | "South Asia" | "East Asia" | "Southeast Asia" | "Central Asia" | "Oceania" | "Africa" | "Caribbean";
+
+export const continentCountries: Record<ContinentKey, string[]> = {
+  "North America": ["United States", "Canada", "Mexico", "Cuba", "Jamaica", "Costa Rica", "Panama", "Guatemala", "Honduras", "Dominican Republic", "Trinidad and Tobago", "Haiti", "El Salvador", "Nicaragua"],
+  "South America": ["Brazil", "Argentina", "Colombia", "Chile", "Peru", "Venezuela", "Ecuador", "Bolivia", "Paraguay", "Uruguay", "Suriname", "Guyana"],
+  "Europe": ["United Kingdom", "Germany", "France", "Italy", "Spain", "Portugal", "Netherlands", "Belgium", "Switzerland", "Austria", "Sweden", "Norway", "Denmark", "Finland", "Iceland", "Ireland", "Poland", "Czech Republic", "Slovakia", "Hungary", "Romania", "Bulgaria", "Greece", "Croatia", "Serbia", "Slovenia", "Bosnia and Herzegovina", "Montenegro", "North Macedonia", "Albania", "Kosovo", "Ukraine", "Belarus", "Moldova", "Lithuania", "Latvia", "Estonia", "Luxembourg", "Malta", "Cyprus", "Russia", "Georgia", "Armenia", "Azerbaijan"],
+  "Middle East": ["Turkey", "Saudi Arabia", "United Arab Emirates", "Qatar", "Kuwait", "Bahrain", "Oman", "Yemen", "Iraq", "Iran", "Jordan", "Lebanon", "Israel", "Palestine", "Syria"],
+  "South Asia": ["India", "Bangladesh", "Pakistan", "Sri Lanka", "Nepal", "Bhutan", "Maldives", "Afghanistan"],
+  "East Asia": ["Japan", "South Korea", "China", "Taiwan", "Hong Kong", "Mongolia", "North Korea"],
+  "Southeast Asia": ["Thailand", "Vietnam", "Philippines", "Malaysia", "Singapore", "Indonesia", "Myanmar", "Cambodia", "Laos", "Brunei", "Timor-Leste"],
+  "Central Asia": ["Kazakhstan", "Uzbekistan", "Turkmenistan", "Kyrgyzstan", "Tajikistan"],
+  "Oceania": ["Australia", "New Zealand", "Fiji", "Papua New Guinea", "Samoa", "Tonga", "Vanuatu", "Solomon Islands", "Micronesia", "Palau", "Marshall Islands", "Kiribati", "Tuvalu", "Nauru"],
+  "Africa": ["South Africa", "Nigeria", "Egypt", "Kenya", "Ghana", "Ethiopia", "Tanzania", "Uganda", "Rwanda", "Morocco", "Tunisia", "Algeria", "Libya", "Sudan", "South Sudan", "Senegal", "Ivory Coast", "Cameroon", "DR Congo", "Angola", "Mozambique", "Zimbabwe", "Zambia", "Botswana", "Namibia", "Madagascar", "Mauritius", "Seychelles", "Mali", "Burkina Faso", "Niger", "Chad", "Guinea", "Benin", "Togo", "Sierra Leone", "Liberia", "Gambia", "Mauritania", "Cape Verde", "São Tomé and Príncipe", "Equatorial Guinea", "Gabon", "Republic of the Congo", "Central African Republic", "Eritrea", "Djibouti", "Somalia", "Comoros", "Malawi", "Lesotho", "Eswatini", "Burundi"],
+  "Caribbean": ["Bahamas", "Barbados", "Belize", "Grenada", "Saint Lucia", "Antigua and Barbuda", "Saint Kitts and Nevis", "Dominica", "Saint Vincent"],
+};
+
+export const continentEmojis: Record<ContinentKey, string> = {
+  "North America": "🌎",
+  "South America": "🌎",
+  "Europe": "🌍",
+  "Middle East": "🌍",
+  "South Asia": "🌏",
+  "East Asia": "🌏",
+  "Southeast Asia": "🌏",
+  "Central Asia": "🌏",
+  "Oceania": "🌏",
+  "Africa": "🌍",
+  "Caribbean": "🌎",
+};

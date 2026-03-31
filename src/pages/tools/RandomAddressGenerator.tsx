@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -6,14 +6,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Copy, RefreshCw, Download, MapPin, Globe, Map, Building, Navigation,
   User, Phone, Mail, Hash, Clock, Compass, Check, ChevronDown, ChevronUp,
-  Search, Bookmark, BookmarkCheck, Trash2
+  Search, Bookmark, BookmarkCheck, Trash2, Heart, Calendar, Ruler, Droplet,
+  CreditCard, Car, Briefcase, GraduationCap, Wifi, Shield
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { countriesData, type CityData, type CountryData } from "@/data/countriesData";
+import { countriesData, continentCountries, continentEmojis, type CityData, type CountryData, type ContinentKey } from "@/data/countriesData";
 
 function rand<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
 function randNum(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function randFloat(min: number, max: number) { return (Math.random() * (max - min) + min).toFixed(6); }
+function randChar() { return String.fromCharCode(65 + randNum(0, 25)); }
 function randPhone(format: string) {
   return format.replace(/#/g, () => String(randNum(0, 9)));
 }
@@ -29,6 +31,62 @@ const lastNames = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller
 const companySuffixes = ["Inc.", "LLC", "Corp.", "Ltd.", "Group", "Solutions", "Technologies", "Industries", "Enterprises", "Co."];
 const companyWords = ["Global", "Pacific", "Summit", "Atlas", "Apex", "Nova", "Prime", "Pinnacle", "Sterling", "Vertex", "Horizon", "Alpha", "Omega", "Titan", "Phoenix"];
 
+const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const eyeColors = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"];
+const hairColors = ["Black", "Brown", "Blonde", "Red", "Gray", "Auburn", "White"];
+const occupations = ["Software Engineer", "Teacher", "Doctor", "Accountant", "Designer", "Nurse", "Manager", "Lawyer", "Architect", "Analyst", "Consultant", "Marketing Specialist", "Writer", "Electrician", "Chef", "Photographer", "Pharmacist", "Scientist", "Mechanic", "Sales Executive"];
+const universities = ["MIT", "Harvard", "Stanford", "Oxford", "Cambridge", "Yale", "Princeton", "Columbia", "UCLA", "NYU", "University of Tokyo", "ETH Zurich", "Sorbonne", "NUS", "Tsinghua"];
+const carBrands = ["Toyota", "Honda", "BMW", "Mercedes", "Audi", "Tesla", "Ford", "Volkswagen", "Hyundai", "Kia", "Nissan", "Chevrolet", "Lexus", "Porsche", "Mazda"];
+const carModels: Record<string, string[]> = {
+  Toyota: ["Camry", "Corolla", "RAV4", "Highlander"], Honda: ["Civic", "Accord", "CR-V"], BMW: ["3 Series", "5 Series", "X5"],
+  Mercedes: ["C-Class", "E-Class", "GLC"], Audi: ["A4", "A6", "Q5"], Tesla: ["Model 3", "Model Y", "Model S"],
+  Ford: ["F-150", "Mustang", "Explorer"], Volkswagen: ["Golf", "Passat", "Tiguan"], Hyundai: ["Elantra", "Tucson", "Sonata"],
+  Kia: ["Sportage", "Seltos", "K5"], Nissan: ["Altima", "Rogue", "Sentra"], Chevrolet: ["Malibu", "Equinox", "Silverado"],
+  Lexus: ["IS", "RX", "ES"], Porsche: ["911", "Cayenne", "Macan"], Mazda: ["CX-5", "Mazda3", "CX-30"],
+};
+const zodiacSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+
+function generateMAC(): string {
+  return Array.from({ length: 6 }, () => randNum(0, 255).toString(16).padStart(2, "0").toUpperCase()).join(":");
+}
+function generateIP(): string {
+  return `${randNum(1, 254)}.${randNum(0, 255)}.${randNum(0, 255)}.${randNum(1, 254)}`;
+}
+function generateCreditCard(): string {
+  const prefix = rand(["4", "5", "37", "6011"]);
+  let num = prefix;
+  while (num.length < 15) num += randNum(0, 9);
+  // Luhn checksum
+  let sum = 0;
+  for (let i = 0; i < num.length; i++) {
+    let d = parseInt(num[num.length - 1 - i]);
+    if (i % 2 === 0) { d *= 2; if (d > 9) d -= 9; }
+    sum += d;
+  }
+  num += ((10 - (sum % 10)) % 10).toString();
+  return num.replace(/(.{4})/g, "$1 ").trim();
+}
+function generateDOB(): { dob: string; age: number; zodiac: string } {
+  const year = randNum(1960, 2005);
+  const month = randNum(1, 12);
+  const day = randNum(1, 28);
+  const age = new Date().getFullYear() - year;
+  const monthDay = month * 100 + day;
+  let zodiac = "Capricorn";
+  if (monthDay >= 120 && monthDay <= 218) zodiac = "Aquarius";
+  else if (monthDay >= 219 && monthDay <= 320) zodiac = "Pisces";
+  else if (monthDay >= 321 && monthDay <= 419) zodiac = "Aries";
+  else if (monthDay >= 420 && monthDay <= 520) zodiac = "Taurus";
+  else if (monthDay >= 521 && monthDay <= 620) zodiac = "Gemini";
+  else if (monthDay >= 621 && monthDay <= 722) zodiac = "Cancer";
+  else if (monthDay >= 723 && monthDay <= 822) zodiac = "Leo";
+  else if (monthDay >= 823 && monthDay <= 922) zodiac = "Virgo";
+  else if (monthDay >= 923 && monthDay <= 1022) zodiac = "Libra";
+  else if (monthDay >= 1023 && monthDay <= 1121) zodiac = "Scorpio";
+  else if (monthDay >= 1122 && monthDay <= 1221) zodiac = "Sagittarius";
+  return { dob: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`, age, zodiac };
+}
+
 type CountryKey = keyof typeof countriesData;
 
 interface FullAddress {
@@ -41,6 +99,17 @@ interface FullAddress {
   timezone: string; currency: string; countryCode: string;
   company: string;
   nationalId: string;
+  // Extended details
+  dob: string; age: number; zodiac: string;
+  bloodType: string; height: string; weight: string;
+  eyeColor: string; hairColor: string;
+  occupation: string; education: string;
+  vehicle: string; licensePlate: string;
+  creditCard: string; cvv: string; cardExpiry: string;
+  ipAddress: string; macAddress: string; userAgent: string;
+  password: string; website: string;
+  motherMaiden: string;
+  ssn: string;
 }
 
 function generateNationalId(country: string): string {
@@ -53,6 +122,19 @@ function generateNationalId(country: string): string {
   }
 }
 
+function randPassword(): string {
+  const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%";
+  return Array.from({ length: randNum(12, 16) }, () => chars[randNum(0, chars.length - 1)]).join("");
+}
+
+const userAgents = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) Safari/17.0",
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Mobile/15E148",
+  "Mozilla/5.0 (Linux; Android 14) Chrome/120.0.6099.43",
+  "Mozilla/5.0 (X11; Linux x86_64) Firefox/121.0",
+];
+
 export default function RandomAddressGenerator() {
   const [country, setCountry] = useState<CountryKey>("United States");
   const [count, setCount] = useState(3);
@@ -62,6 +144,17 @@ export default function RandomAddressGenerator() {
   const [bookmarked, setBookmarked] = useState<Set<number>>(new Set());
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [countrySearch, setCountrySearch] = useState("");
+  const [activeContinent, setActiveContinent] = useState<ContinentKey | "All">("All");
+
+  const filteredCountries = useMemo(() => {
+    let countries = activeContinent === "All" 
+      ? Object.keys(countriesData) as CountryKey[]
+      : (continentCountries[activeContinent] || []).filter(c => c in countriesData) as CountryKey[];
+    if (countrySearch) {
+      countries = countries.filter(c => c.toLowerCase().includes(countrySearch.toLowerCase()));
+    }
+    return countries;
+  }, [activeContinent, countrySearch]);
 
   const copyText = useCallback((text: string, label: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -84,6 +177,9 @@ export default function RandomAddressGenerator() {
       const phone = randPhone(data.phoneFormat);
       const latOff = parseFloat(randFloat(-0.05, 0.05));
       const lngOff = parseFloat(randFloat(-0.05, 0.05));
+      const { dob, age, zodiac } = generateDOB();
+      const carBrand = rand(carBrands);
+      const carModel = rand(carModels[carBrand] || ["Sedan"]);
 
       const a = { num, street, city: cityData.city, state: cityData.state, zip };
       result.push({
@@ -100,13 +196,33 @@ export default function RandomAddressGenerator() {
         countryCode: data.code,
         company: `${rand(companyWords)} ${rand(companyWords)} ${rand(companySuffixes)}`,
         nationalId: generateNationalId(country),
+        dob, age, zodiac,
+        bloodType: rand(bloodTypes),
+        height: `${randNum(150, 195)} cm`,
+        weight: `${randNum(50, 100)} kg`,
+        eyeColor: rand(eyeColors),
+        hairColor: rand(hairColors),
+        occupation: rand(occupations),
+        education: rand(universities),
+        vehicle: `${carBrand} ${carModel} (${randNum(2015, 2024)})`,
+        licensePlate: `${randChar()}${randChar()}${randChar()}-${randNum(1000, 9999)}`,
+        creditCard: generateCreditCard(),
+        cvv: String(randNum(100, 999)),
+        cardExpiry: `${String(randNum(1, 12)).padStart(2, "0")}/${randNum(25, 30)}`,
+        ipAddress: generateIP(),
+        macAddress: generateMAC(),
+        userAgent: rand(userAgents),
+        password: randPassword(),
+        website: `https://${firstName.toLowerCase()}${lastName.toLowerCase()}.${rand(["com", "org", "net", "io", "dev"])}`,
+        motherMaiden: rand(lastNames),
+        ssn: generateNationalId(country),
       });
     }
     setAddresses(result);
     setExpandedIdx(0);
     setBookmarked(new Set());
     setSearchTerm("");
-    toast.success(`${count} detailed addresses generated!`);
+    toast.success(`${count} detailed identities generated!`);
   };
 
   const copyAll = () => {
@@ -195,12 +311,33 @@ export default function RandomAddressGenerator() {
             <h3 className="text-xs sm:text-sm font-bold">Configuration</h3>
           </div>
 
+          {/* Continent Tabs */}
+          <div className="flex flex-wrap gap-1 sm:gap-1.5">
+            <button
+              onClick={() => setActiveContinent("All")}
+              className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold transition-all border
+                ${activeContinent === "All" ? "border-primary bg-primary/15 text-primary" : "border-transparent hover:bg-muted/50 text-muted-foreground"}`}
+            >
+              🌐 All ({Object.keys(countriesData).length})
+            </button>
+            {(Object.keys(continentCountries) as ContinentKey[]).map(cont => (
+              <button
+                key={cont}
+                onClick={() => setActiveContinent(cont)}
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold transition-all border
+                  ${activeContinent === cont ? "border-primary bg-primary/15 text-primary" : "border-transparent hover:bg-muted/50 text-muted-foreground"}`}
+              >
+                {continentEmojis[cont]} {cont} ({continentCountries[cont].filter(c => c in countriesData).length})
+              </button>
+            ))}
+          </div>
+
           {/* Country Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
               type="text"
-              placeholder={`Search ${Object.keys(countriesData).length}+ countries...`}
+              placeholder={`Search countries...`}
               value={countrySearch}
               onChange={e => setCountrySearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 rounded-xl tool-input-colorful text-xs sm:text-sm bg-background"
@@ -208,10 +345,8 @@ export default function RandomAddressGenerator() {
           </div>
 
           {/* Country Grid */}
-          <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-1 sm:gap-1.5 max-h-[280px] overflow-y-auto rounded-xl p-1">
-            {(Object.keys(countriesData) as CountryKey[])
-              .filter(c => !countrySearch || c.toLowerCase().includes(countrySearch.toLowerCase()))
-              .map(c => (
+          <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-1 sm:gap-1.5 max-h-[240px] overflow-y-auto rounded-xl p-1">
+            {filteredCountries.map(c => (
               <button
                 key={c}
                 onClick={() => { setCountry(c); setCountrySearch(""); }}
@@ -227,6 +362,9 @@ export default function RandomAddressGenerator() {
                 </span>
               </button>
             ))}
+            {filteredCountries.length === 0 && (
+              <div className="col-span-full text-center py-4 text-xs text-muted-foreground">No countries found</div>
+            )}
           </div>
           
           <div className="text-[10px] sm:text-xs text-muted-foreground text-center">
@@ -245,8 +383,8 @@ export default function RandomAddressGenerator() {
                 ))}
               </SelectContent>
             </Select>
-            <button onClick={generate} className="tool-btn-primary flex-1 py-2.5 sm:py-3 flex items-center justify-center gap-2 text-sm sm:text-base">
-              <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" /> Generate Addresses
+            <button onClick={generate} className="tool-btn-primary flex-1 py-2.5 sm:py-3 flex items-center justify-center gap-2 text-sm sm:text-base text-primary-foreground">
+              <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" /> Generate Identities
             </button>
           </div>
         </div>
@@ -383,7 +521,23 @@ export default function RandomAddressGenerator() {
                                 <DetailRow icon={Mail} label="Email" value={a.email} iconColor="text-blue-500" />
                                 <DetailRow icon={Phone} label="Phone" value={a.phone} iconColor="text-green-500" />
                                 <DetailRow icon={Hash} label="Username" value={a.username} iconColor="text-purple-500" />
+                                <DetailRow icon={Shield} label="Password" value={a.password} iconColor="text-red-500" />
                                 <DetailRow icon={Hash} label="National ID" value={a.nationalId} iconColor="text-orange-500" />
+                                <DetailRow icon={Calendar} label="Date of Birth" value={`${a.dob} (Age: ${a.age})`} iconColor="text-pink-500" />
+                                <DetailRow icon={Heart} label="Zodiac" value={a.zodiac} iconColor="text-rose-400" />
+                                <DetailRow icon={User} label="Mother's Maiden" value={a.motherMaiden} iconColor="text-fuchsia-500" />
+                              </div>
+
+                              {/* Physical */}
+                              <div className="mb-2 sm:mb-3">
+                                <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                                  🧬 Physical Attributes
+                                </h5>
+                                <DetailRow icon={Droplet} label="Blood Type" value={a.bloodType} iconColor="text-red-500" />
+                                <DetailRow icon={Ruler} label="Height" value={a.height} iconColor="text-teal-500" />
+                                <DetailRow icon={Ruler} label="Weight" value={a.weight} iconColor="text-cyan-500" />
+                                <DetailRow icon={User} label="Eye Color" value={a.eyeColor} iconColor="text-blue-400" />
+                                <DetailRow icon={User} label="Hair Color" value={a.hairColor} iconColor="text-amber-600" />
                               </div>
 
                               {/* Address Section */}
@@ -405,17 +559,50 @@ export default function RandomAddressGenerator() {
                                 </h5>
                                 <DetailRow icon={Compass} label="Latitude" value={a.lat} iconColor="text-emerald-500" />
                                 <DetailRow icon={Compass} label="Longitude" value={a.lng} iconColor="text-emerald-500" />
+                                <DetailRow icon={Navigation} label="Google Maps" value={`https://maps.google.com/?q=${a.lat},${a.lng}`} iconColor="text-blue-500" />
                                 <DetailRow icon={Clock} label="Timezone" value={a.timezone} iconColor="text-amber-500" />
                                 <DetailRow icon={Hash} label="Currency" value={a.currency} iconColor="text-yellow-500" />
                                 <DetailRow icon={Phone} label="Dial Code" value={a.countryCode} iconColor="text-sky-500" />
                               </div>
 
-                              {/* Company */}
-                              <div>
+                              {/* Employment & Education */}
+                              <div className="mb-2 sm:mb-3">
                                 <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
-                                  🏢 Company
+                                  💼 Employment & Education
                                 </h5>
                                 <DetailRow icon={Building} label="Company" value={a.company} iconColor="text-violet-500" />
+                                <DetailRow icon={Briefcase} label="Occupation" value={a.occupation} iconColor="text-indigo-500" />
+                                <DetailRow icon={GraduationCap} label="Education" value={a.education} iconColor="text-blue-600" />
+                                <DetailRow icon={Globe} label="Website" value={a.website} iconColor="text-cyan-600" />
+                              </div>
+
+                              {/* Vehicle */}
+                              <div className="mb-2 sm:mb-3">
+                                <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                                  🚗 Vehicle
+                                </h5>
+                                <DetailRow icon={Car} label="Vehicle" value={a.vehicle} iconColor="text-slate-500" />
+                                <DetailRow icon={Hash} label="License Plate" value={a.licensePlate} iconColor="text-gray-500" />
+                              </div>
+
+                              {/* Financial */}
+                              <div className="mb-2 sm:mb-3">
+                                <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                                  💳 Financial
+                                </h5>
+                                <DetailRow icon={CreditCard} label="Card Number" value={a.creditCard} iconColor="text-emerald-600" />
+                                <DetailRow icon={Hash} label="CVV" value={a.cvv} iconColor="text-orange-600" />
+                                <DetailRow icon={Calendar} label="Expiry" value={a.cardExpiry} iconColor="text-amber-600" />
+                              </div>
+
+                              {/* Digital */}
+                              <div className="mb-2 sm:mb-3">
+                                <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                                  💻 Digital & Network
+                                </h5>
+                                <DetailRow icon={Wifi} label="IP Address" value={a.ipAddress} iconColor="text-green-600" />
+                                <DetailRow icon={Hash} label="MAC Address" value={a.macAddress} iconColor="text-purple-600" />
+                                <DetailRow icon={Globe} label="User Agent" value={a.userAgent} iconColor="text-slate-600" />
                               </div>
 
                               {/* Copy All Details */}
@@ -423,7 +610,7 @@ export default function RandomAddressGenerator() {
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    const text = `Name: ${a.fullName}\nEmail: ${a.email}\nPhone: ${a.phone}\nUsername: ${a.username}\nNational ID: ${a.nationalId}\n\nStreet: ${a.fullStreet}\nCity: ${a.city}\nState: ${a.state}\nZIP: ${a.zip}\nCountry: ${a.country}\n\nLatitude: ${a.lat}\nLongitude: ${a.lng}\nTimezone: ${a.timezone}\nCurrency: ${a.currency}\nDial Code: ${a.countryCode}\n\nCompany: ${a.company}`;
+                                    const text = `═══ PERSONAL ═══\nName: ${a.fullName}\nEmail: ${a.email}\nPhone: ${a.phone}\nUsername: ${a.username}\nPassword: ${a.password}\nNational ID: ${a.nationalId}\nDOB: ${a.dob} (Age: ${a.age})\nZodiac: ${a.zodiac}\nMother's Maiden: ${a.motherMaiden}\n\n═══ PHYSICAL ═══\nBlood Type: ${a.bloodType}\nHeight: ${a.height}\nWeight: ${a.weight}\nEye Color: ${a.eyeColor}\nHair Color: ${a.hairColor}\n\n═══ ADDRESS ═══\nStreet: ${a.fullStreet}\nCity: ${a.city}\nState: ${a.state}\nZIP: ${a.zip}\nCountry: ${a.country}\n\n═══ GEO ═══\nLatitude: ${a.lat}\nLongitude: ${a.lng}\nTimezone: ${a.timezone}\nCurrency: ${a.currency}\nDial Code: ${a.countryCode}\n\n═══ EMPLOYMENT ═══\nCompany: ${a.company}\nOccupation: ${a.occupation}\nEducation: ${a.education}\nWebsite: ${a.website}\n\n═══ VEHICLE ═══\nVehicle: ${a.vehicle}\nLicense: ${a.licensePlate}\n\n═══ FINANCIAL ═══\nCard: ${a.creditCard}\nCVV: ${a.cvv}\nExpiry: ${a.cardExpiry}\n\n═══ DIGITAL ═══\nIP: ${a.ipAddress}\nMAC: ${a.macAddress}\nUser Agent: ${a.userAgent}`;
                                     copyText(text, `all-details-${realIdx}`);
                                   }}
                                   className="w-full py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all"
