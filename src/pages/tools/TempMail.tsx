@@ -899,11 +899,13 @@ export default function TempMail() {
                               <span className="font-mono font-extrabold text-sm text-primary tracking-widest">{otp}</span>
                               <button
                                 className="ml-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                   e.stopPropagation();
-                                  copyToClipboard(otp);
-                                  toast.success(`OTP "${otp}" copied!`);
+                                  const ok = await copyToClipboard(otp);
+                                  if (ok) toast.success(`OTP "${otp}" copied!`);
+                                  else toast.error("Copy failed");
                                 }}
+                              >
                               >
                                 Copy OTP
                               </button>
