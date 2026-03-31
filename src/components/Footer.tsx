@@ -68,17 +68,17 @@ export function Footer() {
               </nav>
 
               {/* Social */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                {socialLinks.map((s) => (
+              <div className="flex items-center gap-2 shrink-0">
+                {activeSocials.map((s) => (
                   <a
-                    key={s.name}
-                    href={s.url}
+                    key={s.key}
+                    href={settings[s.key]}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={s.name}
-                    className={`w-8 h-8 rounded-lg border border-border/30 bg-accent/20 flex items-center justify-center text-muted-foreground/50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${s.color}`}
+                    className={`w-9 h-9 rounded-xl border-2 border-border/60 bg-accent/30 flex items-center justify-center text-muted-foreground/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${s.color}`}
                   >
-                    <s.icon className="w-3.5 h-3.5" />
+                    <s.icon className="w-4 h-4" />
                   </a>
                 ))}
               </div>
