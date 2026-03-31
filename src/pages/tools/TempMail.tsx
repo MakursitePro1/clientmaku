@@ -466,80 +466,82 @@ export default function TempMail() {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-3">
-          <div className="tool-stat-card">
-            <Inbox className="w-5 h-5 mx-auto text-primary mb-1" />
-            <div className="stat-value text-lg">{messages.length}</div>
-            <div className="stat-label">Messages</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          <div className="tool-stat-card p-3 sm:p-4">
+            <Inbox className="w-4 h-4 sm:w-5 sm:h-5 mx-auto text-primary mb-1" />
+            <div className="stat-value text-base sm:text-lg">{messages.length}</div>
+            <div className="stat-label text-[9px] sm:text-xs">Messages</div>
           </div>
-          <div className="tool-stat-card">
-            <Timer className="w-5 h-5 mx-auto mb-1" style={{ color: expiryText === "Expired" ? "hsl(var(--destructive))" : "hsl(var(--primary))" }} />
-            <div className={`stat-value text-lg font-mono ${expiryText === "Expired" ? "text-destructive" : ""}`}>{expiryText}</div>
-            <div className="stat-label">Expires In</div>
+          <div className="tool-stat-card p-3 sm:p-4">
+            <Timer className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1" style={{ color: expiryText === "Expired" ? "hsl(var(--destructive))" : "hsl(var(--primary))" }} />
+            <div className={`stat-value text-base sm:text-lg font-mono ${expiryText === "Expired" ? "text-destructive" : ""}`}>{expiryText}</div>
+            <div className="stat-label text-[9px] sm:text-xs">Expires In</div>
           </div>
-          <div className="tool-stat-card">
-            <Shield className="w-5 h-5 mx-auto text-primary mb-1" />
-            <div className="stat-value text-lg">{autoRefresh ? "Active" : "Paused"}</div>
-            <div className="stat-label">Auto Refresh</div>
+          <div className="tool-stat-card p-3 sm:p-4">
+            <Shield className="w-4 h-4 sm:w-5 sm:h-5 mx-auto text-primary mb-1" />
+            <div className="stat-value text-base sm:text-lg">{autoRefresh ? "Active" : "Paused"}</div>
+            <div className="stat-label text-[9px] sm:text-xs">Auto Refresh</div>
           </div>
-          <div className="tool-stat-card">
-            <Clock className="w-5 h-5 mx-auto text-primary mb-1" />
-            <div className="stat-value text-lg">5s</div>
-            <div className="stat-label">Refresh Rate</div>
+          <div className="tool-stat-card p-3 sm:p-4">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5 mx-auto text-primary mb-1" />
+            <div className="stat-value text-base sm:text-lg">5s</div>
+            <div className="stat-label text-[9px] sm:text-xs">Refresh Rate</div>
           </div>
         </div>
 
         {/* Controls */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center gap-2">
               <Inbox className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium">{messages.length} messages</span>
+              <span className="text-xs sm:text-sm font-medium">{messages.length} messages</span>
               {autoRefresh && refreshing && <Loader2 className="w-3 h-3 animate-spin text-primary" />}
               {autoRefresh && !refreshing && (
                 <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
                   className="w-2 h-2 rounded-full bg-primary" />
               )}
             </div>
-            <div className="flex gap-1.5 flex-wrap justify-end">
+            <div className="grid grid-cols-4 sm:flex gap-1.5">
               <Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`rounded-xl text-xs gap-1 ${soundEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+                className={`rounded-xl text-[10px] sm:text-xs gap-1 h-7 sm:h-9 px-2 sm:px-3 ${soundEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
                 {soundEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
-                {soundEnabled ? "Sound" : "Mute"}
+                <span className="hidden sm:inline">{soundEnabled ? "Sound" : "Mute"}</span>
               </Button>
               <Button variant="outline" size="sm" onClick={() => notifEnabled ? setNotifEnabled(false) : requestNotifPermission()}
-                className={`rounded-xl text-xs gap-1 ${notifEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+                className={`rounded-xl text-[10px] sm:text-xs gap-1 h-7 sm:h-9 px-2 sm:px-3 ${notifEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
                 {notifEnabled ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
-                {notifEnabled ? "Notif" : "Notif"}
+                <span className="hidden sm:inline">Notif</span>
               </Button>
               <Button variant="outline" size="sm" onClick={fetchMessages} disabled={!account || refreshing}
-                className="rounded-xl text-xs gap-1">
-                <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} /> Refresh
+                className="rounded-xl text-[10px] sm:text-xs gap-1 h-7 sm:h-9 px-2 sm:px-3">
+                <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+                <span className="hidden sm:inline">Refresh</span>
               </Button>
               <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}
-                className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-primary/30 text-primary" : "border-border"}`}>
-                {autoRefresh ? "⏸ Pause" : "▶ Resume"}
+                className={`rounded-xl text-[10px] sm:text-xs border-2 h-7 sm:h-9 px-2 sm:px-3 ${autoRefresh ? "border-primary/30 text-primary" : "border-border"}`}>
+                {autoRefresh ? "⏸" : "▶"}
+                <span className="hidden sm:inline">{autoRefresh ? "Pause" : "Resume"}</span>
               </Button>
             </div>
           </div>
           {/* Export & Clear buttons */}
           {messages.length > 0 && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Download className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground font-medium">Export:</span>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
+                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">Export:</span>
                 <Button variant="outline" size="sm" onClick={exportJSON}
-                  className="rounded-xl text-xs gap-1 h-7">
+                  className="rounded-xl text-[10px] sm:text-xs gap-1 h-6 sm:h-7 px-2">
                   <FileJson className="w-3 h-3" /> JSON
                 </Button>
                 <Button variant="outline" size="sm" onClick={exportCSV}
-                  className="rounded-xl text-xs gap-1 h-7">
+                  className="rounded-xl text-[10px] sm:text-xs gap-1 h-6 sm:h-7 px-2">
                   <FileSpreadsheet className="w-3 h-3" /> CSV
                 </Button>
               </div>
               <Button variant="outline" size="sm" onClick={clearAllMessages}
-                className="rounded-xl text-xs gap-1 h-7 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
-                <Trash2 className="w-3 h-3" /> Clear All ({messages.length})
+                className="rounded-xl text-[10px] sm:text-xs gap-1 h-6 sm:h-7 px-2 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
+                <Trash2 className="w-3 h-3" /> Clear ({messages.length})
               </Button>
             </div>
           )}
@@ -559,12 +561,12 @@ export default function TempMail() {
                 className="flex flex-col">
                 
                 {/* Detail Header */}
-                <div className="flex items-center justify-between px-5 py-3 border-b border-border/20 bg-accent/20">
-                  <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-xs text-primary hover:underline font-bold">
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Inbox
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3 border-b border-border/20 bg-accent/20 gap-2">
+                  <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-[11px] sm:text-xs text-primary hover:underline font-bold">
+                    <ArrowLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Back to Inbox
                   </button>
-                  <div className="flex items-center gap-1.5">
-                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1"
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2"
                       onClick={() => {
                         const content = selected.text || selected.intro || selected.subject || "";
                         navigator.clipboard.writeText(content);
@@ -572,55 +574,59 @@ export default function TempMail() {
                       }}>
                       <Copy className="w-3 h-3" /> Copy
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-primary hover:bg-primary/10"
+                    <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2 text-primary hover:bg-primary/10"
                       onClick={() => forwardEmail(selected)}>
-                      <Forward className="w-3 h-3" /> Forward
+                      <Forward className="w-3 h-3" /> Fwd
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-destructive hover:bg-destructive/10"
+                    <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2 text-destructive hover:bg-destructive/10"
                       onClick={() => deleteMessage(selected.id)}>
-                      <Trash2 className="w-3 h-3" /> Delete
+                      <Trash2 className="w-3 h-3" />
                     </Button>
                   </div>
                 </div>
 
                 {/* Subject */}
-                <div className="px-5 pt-4 pb-3">
-                  <h3 className="font-bold text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
+                <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-2 sm:pb-3">
+                  <h3 className="font-bold text-sm sm:text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
                 </div>
 
                 {/* OTP Banner */}
-                <div className="px-5">
+                <div className="px-3 sm:px-5">
                   <OTPBanner text={selected.text || selected.intro || ""} subject={selected.subject} />
                 </div>
 
                 {/* Sender Info Card */}
-                <div className="mx-5 mt-3 p-3 rounded-xl bg-accent/30 border border-border/20">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                <div className="mx-3 sm:mx-5 mt-2 sm:mt-3 p-2.5 sm:p-3 rounded-xl bg-accent/30 border border-border/20">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-xs sm:text-sm shrink-0">
                       {(selected.from?.name || selected.from?.address || "?")[0].toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <User className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-sm font-semibold text-foreground truncate">{selected.from?.name || "Unknown"}</span>
+                        <User className="w-3 h-3 text-muted-foreground hidden sm:block" />
+                        <span className="text-xs sm:text-sm font-semibold text-foreground truncate">{selected.from?.name || "Unknown"}</span>
                       </div>
-                      <p className="text-[11px] text-muted-foreground truncate">{selected.from?.address}</p>
+                      <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">{selected.from?.address}</p>
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 sm:hidden">
+                        <Calendar className="w-2.5 h-2.5" />
+                        {new Date(selected.createdAt).toLocaleString()}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
+                    <div className="hidden sm:flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
                       <Calendar className="w-3 h-3" />
                       {new Date(selected.createdAt).toLocaleString()}
                     </div>
                   </div>
                   {selected.to && selected.to.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-border/20 text-[11px] text-muted-foreground">
+                    <div className="mt-2 pt-2 border-t border-border/20 text-[10px] sm:text-[11px] text-muted-foreground">
                       <span className="font-medium">To:</span> {selected.to.map(t => t.address).join(", ")}
                     </div>
                   )}
                 </div>
 
                 {/* Email Body */}
-                <div className="px-5 pt-3 pb-2">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Message Body</p>
+                <div className="px-3 sm:px-5 pt-2 sm:pt-3 pb-2">
+                  <p className="text-[9px] sm:text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Message Body</p>
                   {selected.html && selected.html.length > 0 ? (
                     <div className="rounded-xl border border-border/20 bg-background overflow-auto max-h-[400px]">
                       <iframe
@@ -639,8 +645,8 @@ export default function TempMail() {
 
                 {/* Attachments Section */}
                 {selected.attachments && selected.attachments.length > 0 && (
-                  <div className="px-5 pt-2 pb-4">
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2 flex items-center gap-1.5">
+                  <div className="px-3 sm:px-5 pt-2 pb-3 sm:pb-4">
+                    <p className="text-[9px] sm:text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2 flex items-center gap-1.5">
                       <Paperclip className="w-3 h-3" /> Attachments ({selected.attachments.length})
                     </p>
                     <div className="space-y-1.5">
@@ -669,7 +675,7 @@ export default function TempMail() {
 
                 {/* No attachments info */}
                 {(!selected.attachments || selected.attachments.length === 0) && (
-                  <div className="px-5 pb-4 pt-1">
+                  <div className="px-3 sm:px-5 pb-3 sm:pb-4 pt-1">
                     <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/50">
                       <Paperclip className="w-3 h-3" />
                       <span>No attachments</span>
@@ -717,24 +723,24 @@ export default function TempMail() {
                         <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full bg-primary" />
                       )}
 
-                      <div className="flex items-start gap-3">
+                       <div className="flex items-start gap-2.5 sm:gap-3">
                         {/* Avatar */}
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm font-bold ${isUnread ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 text-xs sm:text-sm font-bold ${isUnread ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
                           {(m.from?.name || m.from?.address || "?")[0].toUpperCase()}
                         </div>
 
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2 mb-0.5">
-                            <span className={`text-sm truncate ${isUnread ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>
+                            <span className={`text-xs sm:text-sm truncate ${isUnread ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>
                               {m.from?.name || m.from?.address || "Unknown"}
                             </span>
-                            <span className="text-[10px] text-muted-foreground/50 shrink-0 tabular-nums">{timeDiff(m.createdAt)}</span>
+                            <span className="text-[9px] sm:text-[10px] text-muted-foreground/50 shrink-0 tabular-nums">{timeDiff(m.createdAt)}</span>
                           </div>
-                          <p className={`text-xs truncate mb-0.5 ${isUnread ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
+                          <p className={`text-[11px] sm:text-xs truncate mb-0.5 ${isUnread ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
                             {m.subject || "(No Subject)"}
                           </p>
-                          <p className="text-[11px] text-muted-foreground/50 truncate leading-relaxed">{m.intro}</p>
+                          <p className="text-[10px] sm:text-[11px] text-muted-foreground/50 truncate leading-relaxed">{m.intro}</p>
 
                           {/* OTP Banner inline */}
                           {otp && (
@@ -760,12 +766,12 @@ export default function TempMail() {
                         </div>
                       </div>
 
-                      {/* Action buttons - always visible on mobile, hover on desktop */}
-                      <div className="flex items-center gap-1.5 mt-2.5 ml-[52px]">
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-1 sm:gap-1.5 mt-2 sm:mt-2.5 ml-[42px] sm:ml-[52px]">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold border-primary/20 text-primary hover:bg-primary/10 hover:text-primary"
+                          className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold border-primary/20 text-primary hover:bg-primary/10 hover:text-primary px-2 sm:px-3"
                           onClick={(e) => {
                             e.stopPropagation();
                             const content = m.intro || m.subject || "";
@@ -778,7 +784,7 @@ export default function TempMail() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold hover:bg-accent"
+                          className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold hover:bg-accent px-2 sm:px-3"
                           onClick={(e) => {
                             e.stopPropagation();
                             viewMessage(m);
@@ -789,7 +795,7 @@ export default function TempMail() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold text-primary border-primary/20 hover:bg-primary/10"
+                          className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold text-primary border-primary/20 hover:bg-primary/10 px-2 sm:px-3"
                           onClick={(e) => {
                             e.stopPropagation();
                             forwardEmail(m);
@@ -800,7 +806,7 @@ export default function TempMail() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 rounded-lg text-[11px] gap-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 ml-auto"
+                          className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 text-destructive/70 hover:text-destructive hover:bg-destructive/10 ml-auto px-1.5 sm:px-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             deleteMessage(m.id);
