@@ -491,55 +491,57 @@ export default function TempMail() {
 
         {/* Controls */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex items-center gap-2">
               <Inbox className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium">{messages.length} messages</span>
+              <span className="text-xs sm:text-sm font-medium">{messages.length} messages</span>
               {autoRefresh && refreshing && <Loader2 className="w-3 h-3 animate-spin text-primary" />}
               {autoRefresh && !refreshing && (
                 <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
                   className="w-2 h-2 rounded-full bg-primary" />
               )}
             </div>
-            <div className="flex gap-1.5 flex-wrap justify-end">
+            <div className="grid grid-cols-4 sm:flex gap-1.5">
               <Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`rounded-xl text-xs gap-1 ${soundEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+                className={`rounded-xl text-[10px] sm:text-xs gap-1 h-7 sm:h-9 px-2 sm:px-3 ${soundEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
                 {soundEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
-                {soundEnabled ? "Sound" : "Mute"}
+                <span className="hidden sm:inline">{soundEnabled ? "Sound" : "Mute"}</span>
               </Button>
               <Button variant="outline" size="sm" onClick={() => notifEnabled ? setNotifEnabled(false) : requestNotifPermission()}
-                className={`rounded-xl text-xs gap-1 ${notifEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+                className={`rounded-xl text-[10px] sm:text-xs gap-1 h-7 sm:h-9 px-2 sm:px-3 ${notifEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
                 {notifEnabled ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
-                {notifEnabled ? "Notif" : "Notif"}
+                <span className="hidden sm:inline">Notif</span>
               </Button>
               <Button variant="outline" size="sm" onClick={fetchMessages} disabled={!account || refreshing}
-                className="rounded-xl text-xs gap-1">
-                <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} /> Refresh
+                className="rounded-xl text-[10px] sm:text-xs gap-1 h-7 sm:h-9 px-2 sm:px-3">
+                <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+                <span className="hidden sm:inline">Refresh</span>
               </Button>
               <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}
-                className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-primary/30 text-primary" : "border-border"}`}>
-                {autoRefresh ? "⏸ Pause" : "▶ Resume"}
+                className={`rounded-xl text-[10px] sm:text-xs border-2 h-7 sm:h-9 px-2 sm:px-3 ${autoRefresh ? "border-primary/30 text-primary" : "border-border"}`}>
+                {autoRefresh ? "⏸" : "▶"}
+                <span className="hidden sm:inline">{autoRefresh ? "Pause" : "Resume"}</span>
               </Button>
             </div>
           </div>
           {/* Export & Clear buttons */}
           {messages.length > 0 && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Download className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground font-medium">Export:</span>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground" />
+                <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">Export:</span>
                 <Button variant="outline" size="sm" onClick={exportJSON}
-                  className="rounded-xl text-xs gap-1 h-7">
+                  className="rounded-xl text-[10px] sm:text-xs gap-1 h-6 sm:h-7 px-2">
                   <FileJson className="w-3 h-3" /> JSON
                 </Button>
                 <Button variant="outline" size="sm" onClick={exportCSV}
-                  className="rounded-xl text-xs gap-1 h-7">
+                  className="rounded-xl text-[10px] sm:text-xs gap-1 h-6 sm:h-7 px-2">
                   <FileSpreadsheet className="w-3 h-3" /> CSV
                 </Button>
               </div>
               <Button variant="outline" size="sm" onClick={clearAllMessages}
-                className="rounded-xl text-xs gap-1 h-7 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
-                <Trash2 className="w-3 h-3" /> Clear All ({messages.length})
+                className="rounded-xl text-[10px] sm:text-xs gap-1 h-6 sm:h-7 px-2 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
+                <Trash2 className="w-3 h-3" /> Clear ({messages.length})
               </Button>
             </div>
           )}
