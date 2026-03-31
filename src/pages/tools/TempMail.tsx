@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, type MouseEvent } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX, Download, FileJson, FileSpreadsheet, Timer, ArrowLeft, Paperclip, File, Calendar, User, Forward, Search, Plus, X } from "lucide-react";
+import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX, Download, FileJson, FileSpreadsheet, Timer, ArrowLeft, Paperclip, File, Calendar, User, Forward, Search, Plus, X, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -66,25 +66,39 @@ interface MailMessage {
 }
 
 async function copyToClipboard(text: string): Promise<boolean> {
+  if (!text) return false;
+
   try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await copyToClipboard(text);
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
       return true;
     }
   } catch {}
-  // Fallback for older browsers or non-secure contexts
+
   try {
+    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const selection = window.getSelection();
+    const previousRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
     const textarea = document.createElement("textarea");
     textarea.value = text;
+    textarea.setAttribute("readonly", "true");
+    textarea.setAttribute("aria-hidden", "true");
     textarea.style.position = "fixed";
     textarea.style.left = "-9999px";
-    textarea.style.top = "-9999px";
+    textarea.style.top = "0";
     textarea.style.opacity = "0";
+    textarea.style.pointerEvents = "none";
     document.body.appendChild(textarea);
     textarea.focus();
     textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
     const ok = document.execCommand("copy");
     document.body.removeChild(textarea);
+    if (previousRange && selection) {
+      selection.removeAllRanges();
+      selection.addRange(previousRange);
+    }
+    activeElement?.focus();
     return ok;
   } catch {
     return false;
@@ -114,12 +128,23 @@ function extractOTP(text: string): string | null {
 
 function OTPBanner({ text, subject }: { text: string; subject?: string }) {
   const otp = extractOTP(subject || "") || extractOTP(text);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timeout = setTimeout(() => setCopied(false), 1400);
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
   if (!otp) return null;
   
-  const copyOTP = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const copyOTP = async (e?: MouseEvent<HTMLElement>) => {
+    e?.stopPropagation();
     const ok = await copyToClipboard(otp);
-    if (ok) toast.success(`OTP "${otp}" copied!`);
+    if (ok) {
+      setCopied(true);
+      toast.success(`OTP "${otp}" copied!`);
+    }
     else toast.error("Copy failed. Please select and copy manually.");
   };
 
@@ -127,15 +152,16 @@ function OTPBanner({ text, subject }: { text: string; subject?: string }) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/20"
+      whileTap={{ scale: 0.985 }}
+      className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${copied ? "bg-primary/15 border-primary/40" : "bg-primary/10 border-primary/20"}`}
       onClick={copyOTP}
     >
       <KeyRound className="w-4 h-4 text-primary shrink-0" />
       <span className="text-xs font-medium text-muted-foreground">OTP Detected:</span>
       <span className="font-mono font-extrabold text-base text-primary tracking-widest">{otp}</span>
-      <Button variant="ghost" size="sm" className="ml-auto h-7 px-2 rounded-lg text-xs gap-1 hover:bg-primary/10"
+      <Button variant="ghost" size="sm" className={`ml-auto h-7 px-2 rounded-lg text-xs gap-1 ${copied ? "bg-primary/15 text-primary" : "hover:bg-primary/10"}`}
         onClick={copyOTP}>
-        <Copy className="w-3 h-3" /> Copy
+        {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />} {copied ? "Copied" : "Copy"}
       </Button>
     </motion.div>
   );
@@ -169,11 +195,39 @@ export default function TempMail() {
   const [searchQuery, setSearchQuery] = useState("");
   const [inboxes, setInboxes] = useState<MailAccount[]>([]);
   const [activeInboxIdx, setActiveInboxIdx] = useState(0);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const prevMsgCountRef = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const expiryRef = useRef<NodeJS.Timeout | null>(null);
+  const copyResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const EMAIL_LIFETIME_MS = 60 * 60 * 1000; // 1 hour
+
+  useEffect(() => {
+    return () => {
+      if (copyResetRef.current) clearTimeout(copyResetRef.current);
+    };
+  }, []);
+
+  const triggerCopyEffect = useCallback((key: string) => {
+    setCopiedKey(key);
+    if (copyResetRef.current) clearTimeout(copyResetRef.current);
+    copyResetRef.current = setTimeout(() => {
+      setCopiedKey((current) => (current === key ? null : current));
+    }, 1400);
+  }, []);
+
+  const handleCopy = useCallback(async (text: string, successMessage: string, key: string) => {
+    const ok = await copyToClipboard(text);
+    if (ok) {
+      triggerCopyEffect(key);
+      toast.success(successMessage);
+      return true;
+    }
+
+    toast.error("Copy failed. Please try again.");
+    return false;
+  }, [triggerCopyEffect]);
 
   // Expiry timer with auto-renew
   useEffect(() => {
@@ -423,9 +477,7 @@ export default function TempMail() {
 
   const copyEmail = async () => {
     if (!account) return;
-    const ok = await copyToClipboard(account.address);
-    if (ok) toast.success("Email address copied!");
-    else toast.error("Copy failed");
+    await handleCopy(account.address, "Email address copied!", "email-address");
   };
 
   const timeDiff = (dateStr: string) => {
@@ -495,10 +547,12 @@ export default function TempMail() {
                 <p className="text-sm text-muted-foreground animate-pulse">Creating email...</p>
               )}
             </div>
-            <Button variant="ghost" size="icon" onClick={copyEmail} disabled={!account}
-              className="shrink-0 h-9 w-9 hover:text-primary hover:bg-primary/10 rounded-xl">
-              <Copy className="w-4 h-4" />
-            </Button>
+            <motion.div whileTap={{ scale: 0.92 }}>
+              <Button variant="ghost" size="icon" onClick={copyEmail} disabled={!account}
+                className={`shrink-0 h-9 w-9 rounded-xl transition-all ${copiedKey === "email-address" ? "bg-primary/10 text-primary" : "hover:text-primary hover:bg-primary/10"}`}>
+                {copiedKey === "email-address" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              </Button>
+            </motion.div>
             <Button variant="ghost" size="icon" onClick={() => createAccount()} disabled={creating}
               className="shrink-0 h-9 w-9 hover:text-primary hover:bg-primary/10 rounded-xl">
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
@@ -701,15 +755,12 @@ export default function TempMail() {
                     <ArrowLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Back to Inbox
                   </button>
                   <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2"
-                      onClick={async () => {
-                        const content = selected.text || selected.intro || selected.subject || "";
-                        const ok = await copyToClipboard(content);
-                        if (ok) toast.success("Content copied!");
-                        else toast.error("Copy failed");
-                      }}>
-                      <Copy className="w-3 h-3" /> Copy
-                    </Button>
+                    <motion.div whileTap={{ scale: 0.94 }}>
+                      <Button variant="ghost" size="sm" className={`h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2 transition-all ${copiedKey === `detail-${selected.id}` ? "bg-primary/10 text-primary" : ""}`}
+                        onClick={() => handleCopy(selected.text || selected.intro || selected.subject || "", "Content copied!", `detail-${selected.id}`)}>
+                        {copiedKey === `detail-${selected.id}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />} {copiedKey === `detail-${selected.id}` ? "Copied" : "Copy"}
+                      </Button>
+                    </motion.div>
                     <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2 text-primary hover:bg-primary/10"
                       onClick={() => forwardEmail(selected)}>
                       <Forward className="w-3 h-3" /> Fwd
@@ -898,15 +949,13 @@ export default function TempMail() {
                               <KeyRound className="w-3.5 h-3.5 text-primary" />
                               <span className="font-mono font-extrabold text-sm text-primary tracking-widest">{otp}</span>
                               <button
-                                className="ml-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
+                                className={`ml-1 px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${copiedKey === `otp-${m.id}` ? "bg-primary text-primary-foreground" : "bg-primary/20 text-primary hover:bg-primary/30"}`}
                                 onClick={async (e) => {
                                   e.stopPropagation();
-                                  const ok = await copyToClipboard(otp);
-                                  if (ok) toast.success(`OTP "${otp}" copied!`);
-                                  else toast.error("Copy failed");
+                                  await handleCopy(otp, `OTP "${otp}" copied!`, `otp-${m.id}`);
                                 }}
                               >
-                                Copy OTP
+                                {copiedKey === `otp-${m.id}` ? "Copied" : "Copy OTP"}
                               </button>
                             </motion.div>
                           )}
@@ -915,20 +964,19 @@ export default function TempMail() {
 
                       {/* Action buttons */}
                       <div className="flex items-center gap-1 sm:gap-1.5 mt-2 sm:mt-2.5 ml-[42px] sm:ml-[52px]">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold border-primary/20 text-primary hover:bg-primary/10 hover:text-primary px-2 sm:px-3"
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            const content = m.intro || m.subject || "";
-                            const ok = await copyToClipboard(content);
-                            if (ok) toast.success("Email content copied!");
-                            else toast.error("Copy failed");
-                          }}
-                        >
-                          <Copy className="w-3 h-3" /> Copy
-                        </Button>
+                        <motion.div whileTap={{ scale: 0.94 }}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className={`h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold px-2 sm:px-3 transition-all ${copiedKey === `message-${m.id}` ? "border-primary/40 bg-primary/10 text-primary" : "border-primary/20 text-primary hover:bg-primary/10 hover:text-primary"}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopy(m.intro || m.subject || "", "Email content copied!", `message-${m.id}`);
+                            }}
+                          >
+                            {copiedKey === `message-${m.id}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />} {copiedKey === `message-${m.id}` ? "Copied" : "Copy"}
+                          </Button>
+                        </motion.div>
                         <Button
                           variant="outline"
                           size="sm"
