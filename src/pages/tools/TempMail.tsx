@@ -906,7 +906,6 @@ export default function TempMail() {
                                   else toast.error("Copy failed");
                                 }}
                               >
-                              >
                                 Copy OTP
                               </button>
                             </motion.div>
