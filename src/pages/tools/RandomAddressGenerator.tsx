@@ -176,6 +176,9 @@ export default function RandomAddressGenerator() {
       const phone = randPhone(data.phoneFormat);
       const latOff = parseFloat(randFloat(-0.05, 0.05));
       const lngOff = parseFloat(randFloat(-0.05, 0.05));
+      const { dob, age, zodiac } = generateDOB();
+      const carBrand = rand(carBrands);
+      const carModel = rand(carModels[carBrand] || ["Sedan"]);
 
       const a = { num, street, city: cityData.city, state: cityData.state, zip };
       result.push({
@@ -192,13 +195,33 @@ export default function RandomAddressGenerator() {
         countryCode: data.code,
         company: `${rand(companyWords)} ${rand(companyWords)} ${rand(companySuffixes)}`,
         nationalId: generateNationalId(country),
+        dob, age, zodiac,
+        bloodType: rand(bloodTypes),
+        height: `${randNum(150, 195)} cm`,
+        weight: `${randNum(50, 100)} kg`,
+        eyeColor: rand(eyeColors),
+        hairColor: rand(hairColors),
+        occupation: rand(occupations),
+        education: rand(universities),
+        vehicle: `${carBrand} ${carModel} (${randNum(2015, 2024)})`,
+        licensePlate: `${randChar()}${randChar()}${randChar()}-${randNum(1000, 9999)}`,
+        creditCard: generateCreditCard(),
+        cvv: String(randNum(100, 999)),
+        cardExpiry: `${String(randNum(1, 12)).padStart(2, "0")}/${randNum(25, 30)}`,
+        ipAddress: generateIP(),
+        macAddress: generateMAC(),
+        userAgent: rand(userAgents),
+        password: randPassword(),
+        website: `https://${firstName.toLowerCase()}${lastName.toLowerCase()}.${rand(["com", "org", "net", "io", "dev"])}`,
+        motherMaiden: rand(lastNames),
+        ssn: generateNationalId(country),
       });
     }
     setAddresses(result);
     setExpandedIdx(0);
     setBookmarked(new Set());
     setSearchTerm("");
-    toast.success(`${count} detailed addresses generated!`);
+    toast.success(`${count} detailed identities generated!`);
   };
 
   const copyAll = () => {
