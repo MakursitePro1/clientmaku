@@ -65,6 +65,32 @@ interface MailMessage {
   attachments?: MailAttachment[];
 }
 
+async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await copyToClipboard(text);
+      return true;
+    }
+  } catch {}
+  // Fallback for older browsers or non-secure contexts
+  try {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    textarea.style.top = "-9999px";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 function randomString(len: number) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
@@ -90,10 +116,11 @@ function OTPBanner({ text, subject }: { text: string; subject?: string }) {
   const otp = extractOTP(subject || "") || extractOTP(text);
   if (!otp) return null;
   
-  const copyOTP = (e: React.MouseEvent) => {
+  const copyOTP = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(otp);
-    toast.success(`OTP "${otp}" copied!`);
+    const ok = await copyToClipboard(otp);
+    if (ok) toast.success(`OTP "${otp}" copied!`);
+    else toast.error("Copy failed. Please select and copy manually.");
   };
 
   return (
@@ -394,10 +421,11 @@ export default function TempMail() {
     }
   };
 
-  const copyEmail = () => {
+  const copyEmail = async () => {
     if (!account) return;
-    navigator.clipboard.writeText(account.address);
-    toast.success("Email address copied!");
+    const ok = await copyToClipboard(account.address);
+    if (ok) toast.success("Email address copied!");
+    else toast.error("Copy failed");
   };
 
   const timeDiff = (dateStr: string) => {
@@ -674,10 +702,11 @@ export default function TempMail() {
                   </button>
                   <div className="flex items-center gap-1">
                     <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2"
-                      onClick={() => {
+                      onClick={async () => {
                         const content = selected.text || selected.intro || selected.subject || "";
-                        navigator.clipboard.writeText(content);
-                        toast.success("Content copied!");
+                        const ok = await copyToClipboard(content);
+                        if (ok) toast.success("Content copied!");
+                        else toast.error("Copy failed");
                       }}>
                       <Copy className="w-3 h-3" /> Copy
                     </Button>
@@ -870,10 +899,11 @@ export default function TempMail() {
                               <span className="font-mono font-extrabold text-sm text-primary tracking-widest">{otp}</span>
                               <button
                                 className="ml-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                   e.stopPropagation();
-                                  navigator.clipboard.writeText(otp);
-                                  toast.success(`OTP "${otp}" copied!`);
+                                  const ok = await copyToClipboard(otp);
+                                  if (ok) toast.success(`OTP "${otp}" copied!`);
+                                  else toast.error("Copy failed");
                                 }}
                               >
                                 Copy OTP
@@ -889,11 +919,12 @@ export default function TempMail() {
                           variant="outline"
                           size="sm"
                           className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold border-primary/20 text-primary hover:bg-primary/10 hover:text-primary px-2 sm:px-3"
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
                             const content = m.intro || m.subject || "";
-                            navigator.clipboard.writeText(content);
-                            toast.success("Email content copied!");
+                            const ok = await copyToClipboard(content);
+                            if (ok) toast.success("Email content copied!");
+                            else toast.error("Copy failed");
                           }}
                         >
                           <Copy className="w-3 h-3" /> Copy
