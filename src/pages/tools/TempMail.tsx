@@ -170,6 +170,7 @@ export default function TempMail() {
     setCreating(true);
     setMessages([]);
     setSelected(null);
+    prevMsgCountRef.current = 0;
     try {
       let domains = availableDomains;
       let providerBase = providerBaseCache;
