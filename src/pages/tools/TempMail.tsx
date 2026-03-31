@@ -124,6 +124,7 @@ export default function TempMail() {
   const [availableDomains, setAvailableDomains] = useState<{ domain: string }[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>("");
   const [providerBaseCache, setProviderBaseCache] = useState<string>("");
+  const [domainsLoaded, setDomainsLoaded] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const prevMsgCountRef = useRef(0);
