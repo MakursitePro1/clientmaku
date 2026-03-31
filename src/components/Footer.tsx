@@ -1,19 +1,22 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Sparkles, Globe, Heart, Facebook, Twitter, Instagram, Youtube, Github, Zap, Grid3X3, Shield } from "lucide-react";
+import { ArrowUpRight, Sparkles, Globe, Heart, Facebook, Twitter, Instagram, Youtube, Github, Linkedin, Zap, Grid3X3, Shield } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { useToolCatalog } from "@/contexts/ToolCatalogContext";
 
-const socialLinks = [
-  { name: "Facebook", icon: Facebook, url: "https://facebook.com", color: "hover:text-blue-500 hover:border-blue-500/30 hover:bg-blue-500/10" },
-  { name: "Twitter", icon: Twitter, url: "https://twitter.com", color: "hover:text-sky-400 hover:border-sky-400/30 hover:bg-sky-400/10" },
-  { name: "Instagram", icon: Instagram, url: "https://instagram.com", color: "hover:text-pink-500 hover:border-pink-500/30 hover:bg-pink-500/10" },
-  { name: "Youtube", icon: Youtube, url: "https://youtube.com", color: "hover:text-red-500 hover:border-red-500/30 hover:bg-red-500/10" },
-  { name: "GitHub", icon: Github, url: "https://github.com", color: "hover:text-foreground hover:border-foreground/30 hover:bg-foreground/10" },
+const socialConfig = [
+  { key: "social_facebook", name: "Facebook", icon: Facebook, color: "hover:text-blue-500 hover:border-blue-500/50 hover:bg-blue-500/10" },
+  { key: "social_twitter", name: "Twitter", icon: Twitter, color: "hover:text-sky-400 hover:border-sky-400/50 hover:bg-sky-400/10" },
+  { key: "social_instagram", name: "Instagram", icon: Instagram, color: "hover:text-pink-500 hover:border-pink-500/50 hover:bg-pink-500/10" },
+  { key: "social_youtube", name: "Youtube", icon: Youtube, color: "hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10" },
+  { key: "social_linkedin", name: "LinkedIn", icon: Linkedin, color: "hover:text-blue-600 hover:border-blue-600/50 hover:bg-blue-600/10" },
+  { key: "social_github", name: "GitHub", icon: Github, color: "hover:text-foreground hover:border-foreground/50 hover:bg-foreground/10" },
 ];
 
 export function Footer() {
   const { settings } = useSiteSettings();
   const { totalTools, totalCategories } = useToolCatalog();
+
+  const activeSocials = socialConfig.filter(s => settings[s.key]?.trim());
 
   return (
     <footer className="relative px-4 pb-6 pt-4">
@@ -65,17 +68,17 @@ export function Footer() {
               </nav>
 
               {/* Social */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                {socialLinks.map((s) => (
+              <div className="flex items-center gap-2 shrink-0">
+                {activeSocials.map((s) => (
                   <a
-                    key={s.name}
-                    href={s.url}
+                    key={s.key}
+                    href={settings[s.key]}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={s.name}
-                    className={`w-8 h-8 rounded-lg border border-border/30 bg-accent/20 flex items-center justify-center text-muted-foreground/50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${s.color}`}
+                    className={`w-9 h-9 rounded-xl border-2 border-border/60 bg-accent/30 flex items-center justify-center text-muted-foreground/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${s.color}`}
                   >
-                    <s.icon className="w-3.5 h-3.5" />
+                    <s.icon className="w-4 h-4" />
                   </a>
                 ))}
               </div>
