@@ -558,17 +558,12 @@ export default function InternetSpeedTester() {
   // Gauge animation loop — ultra-smooth with eased interpolation
   useEffect(() => {
     if (phase === "idle" || phase === "done") {
-      // Gentle fade to zero from any leftover value
-      let raf = 0;
-      const fadeOut = () => {
-        setDisplaySpeed((prev) => {
-          if (prev <= 0.05) return 0;
-          return +(prev * 0.88).toFixed(2);
-        });
-        raf = requestAnimationFrame(fadeOut);
-      };
-      raf = requestAnimationFrame(fadeOut);
-      return () => cancelAnimationFrame(raf);
+      // Immediately force meter to zero
+      smoothedRef.current = 0;
+      liveSpeedRef.current = 0;
+      lockedSpeedRef.current = null;
+      setDisplaySpeed(0);
+      return;
     }
 
     if (phase === "error") return;
@@ -618,7 +613,7 @@ export default function InternetSpeedTester() {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [phase, lockedSpeedRef.current]);
+  }, [phase]);
 
   const reset = useCallback(() => {
     setTesting(false);
