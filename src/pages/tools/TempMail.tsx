@@ -225,7 +225,7 @@ export default function TempMail() {
               className="shrink-0 h-9 w-9 hover:text-primary hover:bg-primary/10 rounded-xl">
               <Copy className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={createAccount} disabled={creating}
+            <Button variant="ghost" size="icon" onClick={() => createAccount()} disabled={creating}
               className="shrink-0 h-9 w-9 hover:text-primary hover:bg-primary/10 rounded-xl">
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             </Button>
