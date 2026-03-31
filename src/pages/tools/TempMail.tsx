@@ -371,6 +371,8 @@ export default function TempMail() {
       toast.error("Failed to clear messages");
     }
   };
+
+  const copyEmail = () => {
     if (!account) return;
     navigator.clipboard.writeText(account.address);
     toast.success("Email address copied!");
