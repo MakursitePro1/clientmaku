@@ -32,6 +32,8 @@ const BlogPostPage = lazy(() => import("./pages/BlogPostPage"));
 const PolicyPage = lazy(() => import("./pages/PolicyPage"));
 const CategoriesPage = lazy(() => import("./pages/CategoriesPage"));
 const CustomToolPage = lazy(() => import("./pages/tools/CustomToolPage"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+const FAQPage = lazy(() => import("./pages/FAQPage"));
 
 // Tools
 const InternetSpeedTester = lazy(() => import("./pages/tools/InternetSpeedTester"));
