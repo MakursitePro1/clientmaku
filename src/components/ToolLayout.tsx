@@ -40,9 +40,11 @@ const shareOptions = [
 
 export function ToolLayout({ title, description, children }: ToolLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [toolSeo, setToolSeo] = useState<any>(null);
+  const { isToolLocked } = useSubscription();
 
   const currentTool = useMemo(() => tools.find(t => t.path === location.pathname), [location.pathname]);
 
