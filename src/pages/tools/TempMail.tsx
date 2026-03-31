@@ -430,55 +430,77 @@ export default function TempMail() {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           <div className="tool-stat-card">
             <Inbox className="w-5 h-5 mx-auto text-primary mb-1" />
             <div className="stat-value text-lg">{messages.length}</div>
             <div className="stat-label">Messages</div>
           </div>
           <div className="tool-stat-card">
-            <Shield className="w-5 h-5 mx-auto text-green-500 mb-1" />
+            <Timer className="w-5 h-5 mx-auto mb-1" style={{ color: expiryText === "Expired" ? "hsl(var(--destructive))" : "hsl(var(--primary))" }} />
+            <div className={`stat-value text-lg font-mono ${expiryText === "Expired" ? "text-destructive" : ""}`}>{expiryText}</div>
+            <div className="stat-label">Expires In</div>
+          </div>
+          <div className="tool-stat-card">
+            <Shield className="w-5 h-5 mx-auto text-primary mb-1" />
             <div className="stat-value text-lg">{autoRefresh ? "Active" : "Paused"}</div>
             <div className="stat-label">Auto Refresh</div>
           </div>
           <div className="tool-stat-card">
-            <Clock className="w-5 h-5 mx-auto text-blue-500 mb-1" />
+            <Clock className="w-5 h-5 mx-auto text-primary mb-1" />
             <div className="stat-value text-lg">5s</div>
             <div className="stat-label">Refresh Rate</div>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Inbox className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium">{messages.length} messages</span>
-            {autoRefresh && refreshing && <Loader2 className="w-3 h-3 animate-spin text-primary" />}
-            {autoRefresh && !refreshing && (
-              <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
-                className="w-2 h-2 rounded-full bg-green-500" />
-            )}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Inbox className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium">{messages.length} messages</span>
+              {autoRefresh && refreshing && <Loader2 className="w-3 h-3 animate-spin text-primary" />}
+              {autoRefresh && !refreshing && (
+                <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
+                  className="w-2 h-2 rounded-full bg-primary" />
+              )}
+            </div>
+            <div className="flex gap-1.5 flex-wrap justify-end">
+              <Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}
+                className={`rounded-xl text-xs gap-1 ${soundEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+                {soundEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
+                {soundEnabled ? "Sound" : "Mute"}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => notifEnabled ? setNotifEnabled(false) : requestNotifPermission()}
+                className={`rounded-xl text-xs gap-1 ${notifEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+                {notifEnabled ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
+                {notifEnabled ? "Notif" : "Notif"}
+              </Button>
+              <Button variant="outline" size="sm" onClick={fetchMessages} disabled={!account || refreshing}
+                className="rounded-xl text-xs gap-1">
+                <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} /> Refresh
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}
+                className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-primary/30 text-primary" : "border-border"}`}>
+                {autoRefresh ? "⏸ Pause" : "▶ Resume"}
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-1.5 flex-wrap">
-            <Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`rounded-xl text-xs gap-1 ${soundEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
-              {soundEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
-              {soundEnabled ? "Sound On" : "Sound Off"}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => notifEnabled ? setNotifEnabled(false) : requestNotifPermission()}
-              className={`rounded-xl text-xs gap-1 ${notifEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
-              {notifEnabled ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
-              {notifEnabled ? "Notif On" : "Notif Off"}
-            </Button>
-            <Button variant="outline" size="sm" onClick={fetchMessages} disabled={!account || refreshing}
-              className="rounded-xl text-xs gap-1">
-              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} /> Refresh
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-primary/30 text-primary" : "border-border"}`}>
-              {autoRefresh ? "⏸ Pause" : "▶ Resume"}
-            </Button>
-          </div>
+          {/* Export buttons */}
+          {messages.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Download className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">Export:</span>
+              <Button variant="outline" size="sm" onClick={exportJSON}
+                className="rounded-xl text-xs gap-1 h-7">
+                <FileJson className="w-3 h-3" /> JSON
+              </Button>
+              <Button variant="outline" size="sm" onClick={exportCSV}
+                className="rounded-xl text-xs gap-1 h-7">
+                <FileSpreadsheet className="w-3 h-3" /> CSV
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Inbox / Email View */}
