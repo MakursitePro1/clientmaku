@@ -83,10 +83,15 @@ function parseMessages(html: string): SMSMessage[] {
 // ── Source 2: receivesms.co ──
 function parseCountryPages(html: string): CountryPage[] {
   const pages: CountryPage[] = [];
-  const regex = /<a class="card card-link" href="(https:\/\/www\.receivesms\.co\/[^"]+)">\s*<div class="row">\s*<img[^>]*alt="([^"]*)"[^>]*>\s*<strong>([^<]+)<\/strong>\s*<\/div>\s*<div class="muted">Active numbers:\s*(\d+)<\/div>/g;
+  // More flexible regex with [\s\S]*? for whitespace
+  const regex = /<a\s+class="card card-link"\s+href="([^"]+)"[\s\S]*?alt="([^"]*)"[\s\S]*?<strong>([^<]+)<\/strong>[\s\S]*?Active numbers:\s*(\d+)/g;
   let m;
   while ((m = regex.exec(html)) !== null) {
-    pages.push({ url: m[1], code: m[2], country: m[3].trim(), count: parseInt(m[4]) });
+    const url = m[1];
+    // Only country list pages (not individual number pages)
+    if (url.includes("-phone-numbers/")) {
+      pages.push({ url, code: m[2], country: m[3].trim(), count: parseInt(m[4]) });
+    }
   }
   return pages;
 }
