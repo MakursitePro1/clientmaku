@@ -443,23 +443,26 @@ export default function TempNumber() {
 
             {/* Check Numbers Button */}
             <Button
-              disabled={!countryFilter || loadingMore}
+              disabled={loadingMore}
               onClick={() => {
-                if (!countryFilter) return;
-                // First check if numbers already exist for this country
-                const existing = numbers.filter(n => n.country.toLowerCase() === countryFilter.toLowerCase());
-                if (existing.length > 0) {
-                  // Cycle to next number each click
-                  const currentIdx = existing.findIndex(n => n.slug === activeNumber?.slug);
-                  const nextIdx = (currentIdx + 1) % existing.length;
-                  selectNumber(existing[nextIdx]);
-                  toast.success(`${getFlag(countryFilter)} Showing ${countryFilter} number ${nextIdx + 1}/${existing.length}`);
+                const pool = countryFilter
+                  ? numbers.filter(n => n.country.toLowerCase() === countryFilter.toLowerCase())
+                  : numbers;
+                if (pool.length > 0) {
+                  const currentIdx = pool.findIndex(n => n.slug === activeNumber?.slug);
+                  const nextIdx = (currentIdx + 1) % pool.length;
+                  selectNumber(pool[nextIdx]);
+                  const label = countryFilter || "All";
+                  toast.success(`${countryFilter ? getFlag(countryFilter) + " " : ""}Showing number ${nextIdx + 1}/${pool.length}`);
                   return;
                 }
-                // Otherwise try to load from API
-                const cp = countryPages.find(p => p.country.toLowerCase() === countryFilter.toLowerCase());
-                if (cp) loadMoreNumbers(cp);
-                else toast.error(`No numbers available for ${countryFilter}`);
+                if (countryFilter) {
+                  const cp = countryPages.find(p => p.country.toLowerCase() === countryFilter.toLowerCase());
+                  if (cp) loadMoreNumbers(cp);
+                  else toast.error(`No numbers available for ${countryFilter}`);
+                } else {
+                  fetchNumbers();
+                }
               }}
               className="shrink-0 rounded-xl px-4 gap-1.5 text-white"
               size="default"
