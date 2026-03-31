@@ -237,7 +237,7 @@ export default function StudentIdCard() {
       ctx.fill();
       // Inner highlight
       ctx.fillStyle = "rgba(255,255,255,0.12)";
-      rr(rX + 1, vuY + 1, 128, 12, [14, 14, 0, 0]);
+      rr(rX + 1, vuY + 1, 128, 12, 6);
       ctx.fill();
 
       ctx.fillStyle = "#fff";
