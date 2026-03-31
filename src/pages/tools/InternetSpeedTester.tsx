@@ -478,11 +478,11 @@ export default function InternetSpeedTester() {
   const [rtt, setRtt] = useState("—");
   const [phaseNotice, setPhaseNotice] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
-  const [meterLocked, setMeterLocked] = useState(false);
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
   const smoothedRef = useRef(0);
+  const lockedSpeedRef = useRef<number | null>(null);
 
   const phaseDetails: Record<typeof phase, { title: string; subtitle: string; progress: number; step: string }> = {
     idle: {
@@ -557,11 +557,6 @@ export default function InternetSpeedTester() {
 
   // Gauge animation loop — ultra-smooth with eased interpolation
   useEffect(() => {
-    if (meterLocked) {
-      // When locked, force displaySpeed to whatever liveSpeedRef says (0 after done)
-      setDisplaySpeed(+liveSpeedRef.current.toFixed(2));
-      return;
-    }
     if (phase === "idle" || phase === "done") {
       // Gentle fade to zero from any leftover value
       let raf = 0;
@@ -577,6 +572,12 @@ export default function InternetSpeedTester() {
     }
 
     if (phase === "error") return;
+
+    // If speed is locked (after result confirmed), keep it frozen
+    if (lockedSpeedRef.current !== null) {
+      setDisplaySpeed(lockedSpeedRef.current);
+      return;
+    }
 
     let raf = 0;
     const phaseStart = performance.now();
@@ -617,16 +618,16 @@ export default function InternetSpeedTester() {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [meterLocked, phase]);
+  }, [phase, lockedSpeedRef.current]);
 
   const reset = useCallback(() => {
     setTesting(false);
     setPhase("idle");
     setPhaseNotice(null);
     setShowSummary(false);
-    setMeterLocked(false);
     setErrorMsg("");
     liveSpeedRef.current = 0;
+    lockedSpeedRef.current = null;
     setDisplaySpeed(0);
   }, []);
 
@@ -641,9 +642,9 @@ export default function InternetSpeedTester() {
     setJitter(null);
     setPhaseNotice(null);
     setShowSummary(false);
-    setMeterLocked(false);
     setErrorMsg("");
     liveSpeedRef.current = 0;
+    lockedSpeedRef.current = null;
     setDisplaySpeed(4);
     setPhaseNotice("Step 1: Measuring download speed...");
 
@@ -656,7 +657,7 @@ export default function InternetSpeedTester() {
       if (dlSpeed === 0) throw new Error("Download test failed");
 
       updateLive(dlSpeed);
-      setMeterLocked(true);
+      lockedSpeedRef.current = dlSpeed;
       setDisplaySpeed(dlSpeed);
       setDownload(dlSpeed);
       setPhaseNotice("Step 1 complete. Download result locked.");
@@ -675,13 +676,15 @@ export default function InternetSpeedTester() {
       setPhase("resetting");
       setPhaseNotice("Starting step 2: Upload test...");
       liveSpeedRef.current = 0;
+      lockedSpeedRef.current = null;
       setDisplaySpeed(0);
       await wait(700);
       if (cancelRef.current) return reset();
 
       // Start upload phase from zero with live animation enabled
-      setMeterLocked(false);
       if (cancelRef.current) return reset();
+      liveSpeedRef.current = 0;
+      lockedSpeedRef.current = null;
       setPhase("upload");
       setPhaseNotice("Step 2: Measuring upload speed...");
       liveSpeedRef.current = 0;
@@ -689,7 +692,7 @@ export default function InternetSpeedTester() {
       if (cancelRef.current) return reset();
 
       updateLive(ulSpeed);
-      setMeterLocked(true);
+      lockedSpeedRef.current = ulSpeed;
       setDisplaySpeed(ulSpeed);
       setUpload(ulSpeed);
       setPhaseNotice("Step 2 complete. Upload result locked.");
@@ -710,8 +713,8 @@ export default function InternetSpeedTester() {
 
       // Both phases complete: instantly reset meter to zero and keep it fixed
       liveSpeedRef.current = 0;
+      lockedSpeedRef.current = null;
       setDisplaySpeed(0);
-      setMeterLocked(false);
       setPhase("done");
       setTesting(false);
       setPhaseNotice("Test completed successfully.");
