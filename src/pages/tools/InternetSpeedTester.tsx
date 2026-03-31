@@ -799,11 +799,19 @@ export default function InternetSpeedTester() {
             </div>
 
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
-              <motion.div
-                className="h-full rounded-full bg-primary"
-                animate={{ width: `${phaseDetails[phase].progress}%` }}
-                transition={{ duration: 0.7, ease: "easeInOut" }}
-              />
+              <div className="flex h-full">
+                <motion.div
+                  className="h-full rounded-l-full bg-primary"
+                  animate={{ width: dlDone || phase === "download" || phase === "resetting" || phase === "upload" || phase === "done" ? "50%" : "0%" }}
+                  transition={{ duration: 0.7, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="h-full rounded-r-full"
+                  style={{ backgroundColor: "hsl(142 76% 40%)" }}
+                  animate={{ width: ulDone || phase === "upload" || phase === "done" ? "50%" : "0%" }}
+                  transition={{ duration: 0.7, ease: "easeInOut" }}
+                />
+              </div>
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
