@@ -248,7 +248,7 @@ export default function TempMail() {
     } finally {
       setRefreshing(false);
     }
-  }, [account?.token, account?.providerBase]);
+  }, [account?.token, account?.providerBase, soundEnabled, notifEnabled]);
 
   // Auto-refresh messages
   useEffect(() => {
