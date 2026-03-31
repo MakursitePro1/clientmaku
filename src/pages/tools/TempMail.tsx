@@ -55,30 +55,52 @@ export default function TempMail() {
   const [domainsLoaded, setDomainsLoaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const createAccount = useCallback(async () => {
+  // Fetch domains on mount
+  const fetchDomains = useCallback(async () => {
+    try {
+      const domainData = await callMailAPI("getDomains");
+      const domains = domainData?.domains || [];
+      const providerBase = domainData?.providerBase || "";
+      setAvailableDomains(domains);
+      setProviderBaseCache(providerBase);
+      if (domains.length > 0 && !selectedDomain) {
+        setSelectedDomain(domains[0].domain);
+      }
+      setDomainsLoaded(true);
+      return { domains, providerBase };
+    } catch {
+      toast.error("Failed to fetch domains");
+      setDomainsLoaded(true);
+      return null;
+    }
+  }, [selectedDomain]);
+
+  const createAccount = useCallback(async (domainOverride?: string) => {
     setCreating(true);
     setMessages([]);
     setSelected(null);
     try {
-      // Step 1: Get available domains + provider base
-      const domainData = await callMailAPI("getDomains");
-      const domains = domainData?.domains || [];
-      const providerBase = domainData?.providerBase || "";
-      
+      let domains = availableDomains;
+      let providerBase = providerBaseCache;
+
       if (!domains.length) {
-        toast.error("No domains available. Please try again later.");
-        setCreating(false);
-        return;
+        const result = await fetchDomains();
+        if (!result || !result.domains.length) {
+          toast.error("No domains available. Please try again later.");
+          setCreating(false);
+          return;
+        }
+        domains = result.domains;
+        providerBase = result.providerBase;
       }
-      const domain = domains[Math.floor(Math.random() * domains.length)].domain;
+
+      const domain = domainOverride || selectedDomain || domains[0].domain;
       const username = randomString(12);
       const address = `${username}@${domain}`;
       const password = randomString(16);
 
-      // Step 2: Create account
       const accResult = await callMailAPI("createAccount", { address, password, providerBase });
       if (accResult?.["@id"] || accResult?.id) {
-        // Step 3: Login to get token
         const loginResult = await callMailAPI("login", { address, password, providerBase });
         if (loginResult?.token) {
           const newAccount: MailAccount = {
@@ -103,11 +125,13 @@ export default function TempMail() {
     } finally {
       setCreating(false);
     }
-  }, []);
+  }, [availableDomains, providerBaseCache, selectedDomain, fetchDomains]);
 
   // Auto-create on mount
   useEffect(() => {
-    createAccount();
+    fetchDomains().then(() => {
+      createAccount();
+    });
   }, []);
 
   // Fetch messages
