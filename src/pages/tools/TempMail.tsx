@@ -787,6 +787,17 @@ export default function TempMail() {
                           <Eye className="w-3 h-3" /> Details
                         </Button>
                         <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold text-primary border-primary/20 hover:bg-primary/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            forwardEmail(m);
+                          }}
+                        >
+                          <Forward className="w-3 h-3" /> Forward
+                        </Button>
+                        <Button
                           variant="ghost"
                           size="sm"
                           className="h-7 rounded-lg text-[11px] gap-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 ml-auto"
