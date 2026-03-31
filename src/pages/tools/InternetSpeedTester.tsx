@@ -558,7 +558,6 @@ export default function InternetSpeedTester() {
   // Gauge animation loop — ultra-smooth with eased interpolation
   useEffect(() => {
     if (meterLocked) {
-      setDisplaySpeed(+liveSpeedRef.current.toFixed(2));
       return;
     }
 
@@ -720,7 +719,7 @@ export default function InternetSpeedTester() {
       setMeterLocked(true);
       setPhase("done");
       setTesting(false);
-      setPhaseNotice("Test completed successfully. Meter reset to zero.");
+      setPhaseNotice("Test completed successfully.");
       setShowSummary(true);
     } catch (err: unknown) {
       setPhaseNotice(null);
