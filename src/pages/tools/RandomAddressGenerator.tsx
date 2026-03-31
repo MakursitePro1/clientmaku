@@ -269,7 +269,7 @@ export default function RandomAddressGenerator() {
       });
     }
     setAddresses(result);
-    setExpandedIdx(null);
+    setExpandedIdx(0);
     setBookmarked(new Set());
     setSearchTerm("");
     toast.success(`${count} detailed addresses generated!`);
