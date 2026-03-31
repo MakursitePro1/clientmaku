@@ -506,23 +506,34 @@ export default function InternetSpeedTester() {
     try { setTestHistory(JSON.parse(localStorage.getItem("cv_speed_history") || "[]")); } catch { /* */ }
   }, []);
 
-  // Gauge animation loop
+  // Gauge animation loop — ultra-smooth with eased interpolation
   useEffect(() => {
     if (phase === "idle") {
-      setDisplaySpeed(0);
-      return;
+      // Gentle fade to zero from any leftover value
+      let raf = 0;
+      const fadeOut = () => {
+        setDisplaySpeed((prev) => {
+          if (prev <= 0.05) return 0;
+          return +(prev * 0.88).toFixed(2);
+        });
+        raf = requestAnimationFrame(fadeOut);
+      };
+      raf = requestAnimationFrame(fadeOut);
+      return () => cancelAnimationFrame(raf);
     }
 
     if (phase === "done") {
-      // After all tests complete, smoothly return to zero
+      // Graceful deceleration curve to zero
       let raf = 0;
       const tick = () => {
         setDisplaySpeed((prev) => {
-          if (prev <= 0.15) {
+          if (prev <= 0.08) {
             cancelAnimationFrame(raf);
             return 0;
           }
-          return +(prev * 0.92).toFixed(2);
+          // Slow cubic ease-out decay
+          const factor = 0.96 - Math.min(prev / 200, 0.03);
+          return +(prev * factor).toFixed(2);
         });
         raf = requestAnimationFrame(tick);
       };
@@ -530,12 +541,11 @@ export default function InternetSpeedTester() {
       return () => cancelAnimationFrame(raf);
     }
 
-    if (phase === "error") {
-      return;
-    }
+    if (phase === "error") return;
 
     let raf = 0;
     const phaseStart = performance.now();
+    let smoothed = 0;
 
     const tick = (now: number) => {
       const elapsed = now - phaseStart;
@@ -544,26 +554,34 @@ export default function InternetSpeedTester() {
         const target = liveSpeedRef.current;
 
         if (phase === "resetting") {
-          // Very smooth exponential decay to zero
-          if (prev <= 0.15) return 0;
-          const decay = prev * 0.94; // slow decay
-          return +Math.max(0, decay).toFixed(2);
+          // Ultra-smooth exponential decay with ease-out
+          if (prev <= 0.08) return 0;
+          const t = Math.min(elapsed / 3000, 1);
+          const easedFactor = 0.97 - t * 0.06; // accelerates decay over time
+          return +Math.max(0, prev * easedFactor).toFixed(2);
         }
 
         if (target > 0.35) {
-          // Slow, smooth interpolation — 0.06 factor for gentle movement
-          const smooth = prev + (target - prev) * 0.06;
-          // Gentle wobble at slower frequencies
-          const wobble = Math.sin(elapsed / 400) * Math.min(target * 0.03, 1.5)
-            + Math.cos(elapsed / 280) * Math.min(target * 0.012, 0.6);
-          return +Math.max(0.1, smooth + wobble).toFixed(2);
+          // Very gentle spring-like interpolation
+          const diff = target - prev;
+          const lerpFactor = 0.025 + Math.abs(diff) * 0.0003; // adaptive: faster when far, slower when close
+          smoothed = prev + diff * Math.min(lerpFactor, 0.08);
+
+          // Organic micro-oscillation (like a real needle)
+          const breathe = Math.sin(elapsed / 700) * Math.min(target * 0.015, 0.8);
+          const tremor = Math.sin(elapsed / 200) * Math.min(target * 0.005, 0.3);
+          return +Math.max(0.1, smoothed + breathe + tremor).toFixed(2);
         }
 
-        // Synthetic sweep while waiting for data — slower
-        const peak = phase === "download" ? 35 : 20;
-        const sweep = peak * Math.abs(Math.sin(elapsed / 600));
-        const pulse = peak * 0.05 * Math.abs(Math.cos(elapsed / 300));
-        return +Math.max(0.3, sweep + pulse).toFixed(2);
+        // Synthetic sweep while waiting for data — gentle sine wave
+        const peak = phase === "download" ? 30 : 18;
+        // Slow breathing sweep
+        const wave1 = peak * 0.5 * (1 + Math.sin((elapsed / 1200) - Math.PI / 2));
+        const wave2 = peak * 0.08 * Math.sin(elapsed / 450);
+        const combined = wave1 + wave2;
+        // Smooth transition from previous value
+        const eased = prev + (combined - prev) * 0.03;
+        return +Math.max(0.2, eased).toFixed(2);
       });
 
       raf = requestAnimationFrame(tick);
