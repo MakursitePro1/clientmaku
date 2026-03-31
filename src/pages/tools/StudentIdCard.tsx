@@ -11,39 +11,34 @@ import { Download, Eye, Upload, Palette, User, GraduationCap, RotateCcw, Sparkle
 import { motion } from "framer-motion";
 
 const themes = [
-  { id: "blue", name: "Royal Blue", primary: "#0d47a1", secondary: "#1565c0", accent: "#42a5f5", gold: "#c9a84c", text: "#ffffff" },
-  { id: "green", name: "Emerald", primary: "#1b5e20", secondary: "#2e7d32", accent: "#66bb6a", gold: "#c9a84c", text: "#ffffff" },
-  { id: "red", name: "Crimson", primary: "#7f1d1d", secondary: "#991b1b", accent: "#ef5350", gold: "#c9a84c", text: "#ffffff" },
-  { id: "purple", name: "Royal Purple", primary: "#4a148c", secondary: "#6a1b9a", accent: "#ab47bc", gold: "#c9a84c", text: "#ffffff" },
-  { id: "dark", name: "Dark Elegance", primary: "#1a1a2e", secondary: "#16213e", accent: "#5c6bc0", gold: "#d4a84b", text: "#e0e0e0" },
-  { id: "gold", name: "Gold Premium", primary: "#3e2723", secondary: "#4e342e", accent: "#8d6e63", gold: "#d4a84b", text: "#fff8e1" },
-  { id: "teal", name: "Teal Modern", primary: "#004d40", secondary: "#00695c", accent: "#26a69a", gold: "#c9a84c", text: "#ffffff" },
-  { id: "navy", name: "Navy Classic", primary: "#0a1628", secondary: "#1a2744", accent: "#5c7caa", gold: "#c9a84c", text: "#e8eaed" },
+  { id: "purple", name: "Royal Purple", primary: "#7c3aed", secondary: "#4c1d95", accent: "#a855f7", dark: "#2e1065", light: "#ede9fe", text: "#1e1b4b" },
+  { id: "blue", name: "Ocean Blue", primary: "#2563eb", secondary: "#1e3a8a", accent: "#60a5fa", dark: "#172554", light: "#dbeafe", text: "#172554" },
+  { id: "green", name: "Emerald", primary: "#059669", secondary: "#064e3b", accent: "#34d399", dark: "#022c22", light: "#d1fae5", text: "#064e3b" },
+  { id: "red", name: "Crimson", primary: "#dc2626", secondary: "#7f1d1d", accent: "#f87171", dark: "#450a0a", light: "#fee2e2", text: "#7f1d1d" },
+  { id: "teal", name: "Teal Modern", primary: "#0d9488", secondary: "#134e4a", accent: "#2dd4bf", dark: "#042f2e", light: "#ccfbf1", text: "#134e4a" },
+  { id: "navy", name: "Navy Classic", primary: "#1e3a5f", secondary: "#0c1e3a", accent: "#5b8db8", dark: "#0a1628", light: "#e0eaf5", text: "#0c1e3a" },
+  { id: "gold", name: "Gold Premium", primary: "#b45309", secondary: "#78350f", accent: "#f59e0b", dark: "#451a03", light: "#fef3c7", text: "#78350f" },
+  { id: "dark", name: "Dark Elegance", primary: "#6366f1", secondary: "#1e1b4b", accent: "#818cf8", dark: "#0f0e24", light: "#e0e7ff", text: "#1e1b4b" },
 ];
 
-function rr(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number | number[]) {
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
-}
-
 export default function StudentIdCard() {
-  const [name, setName] = useState("John Doe");
-  const [studentId, setStudentId] = useState("STU-2024-001");
-  const [department, setDepartment] = useState("Computer Science & Engineering");
-  const [institution, setInstitution] = useState("University of Technology");
-  const [session, setSession] = useState("2023-2024");
+  const [name, setName] = useState("Francois Mercer");
+  const [studentId, setStudentId] = useState("123-456-7890");
+  const [department, setDepartment] = useState("Sociology");
+  const [institution, setInstitution] = useState("Liceria University");
+  const [session, setSession] = useState("2025");
   const [blood, setBlood] = useState("A+");
   const [phone, setPhone] = useState("+880 1234-567890");
   const [email, setEmail] = useState("john@university.edu");
-  const [dob, setDob] = useState("2000-01-15");
-  const [fatherName, setFatherName] = useState("Robert Doe");
-  const [motherName, setMotherName] = useState("Jane Doe");
-  const [address, setAddress] = useState("123 University Road, Dhaka");
+  const [dob, setDob] = useState("2000-01-22");
+  const [fatherName, setFatherName] = useState("Robert Mercer");
+  const [motherName, setMotherName] = useState("Jane Mercer");
+  const [address, setAddress] = useState("123 Anywhere St., Any City");
   const [emergencyContact, setEmergencyContact] = useState("+880 9876-543210");
-  const [theme, setTheme] = useState("blue");
+  const [theme, setTheme] = useState("purple");
   const [photo, setPhoto] = useState<string>("");
   const [showBack, setShowBack] = useState(true);
-  const [validUntil, setValidUntil] = useState("2025-12-31");
+  const [validUntil, setValidUntil] = useState("2027-08-22");
   const [generated, setGenerated] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const photoRef = useRef<HTMLInputElement>(null);
@@ -56,18 +51,16 @@ export default function StudentIdCard() {
     reader.readAsDataURL(file);
   };
 
-  // ========== Barcode (Code128-like) ==========
   const drawBarcode = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, data: string, color = "#000") => {
     const clean = data.replace(/[^A-Za-z0-9]/g, "");
     if (!clean) return;
-    // Generate a dense barcode pattern
-    const bits: number[] = [1,1,0,1,0,0,1,1,0]; // start
+    const bits: number[] = [1,1,0,1,0,0,1,1,0];
     for (let i = 0; i < clean.length; i++) {
       const c = clean.charCodeAt(i);
       for (let b = 7; b >= 0; b--) bits.push((c >> b) & 1);
-      bits.push(0, 1); // separator
+      bits.push(0, 1);
     }
-    bits.push(1,1,0,0,1,1,0,1); // stop
+    bits.push(1,1,0,0,1,1,0,1);
     const barW = w / bits.length;
     ctx.fillStyle = color;
     bits.forEach((bit, i) => {
@@ -75,13 +68,11 @@ export default function StudentIdCard() {
     });
   };
 
-  // ========== QR Code ==========
   const drawQR = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
     const m = 21, cs = size / m;
     ctx.fillStyle = "#fff";
     ctx.fillRect(x, y, size, size);
     const seed = (studentId + name).split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-    // Finder patterns
     const finder = (fx: number, fy: number) => {
       ctx.fillStyle = "#000";
       ctx.fillRect(fx, fy, cs * 7, cs * 7);
@@ -90,10 +81,7 @@ export default function StudentIdCard() {
       ctx.fillStyle = "#000";
       ctx.fillRect(fx + cs * 2, fy + cs * 2, cs * 3, cs * 3);
     };
-    finder(x, y);
-    finder(x + (m - 7) * cs, y);
-    finder(x, y + (m - 7) * cs);
-    // Timing
+    finder(x, y); finder(x + (m - 7) * cs, y); finder(x, y + (m - 7) * cs);
     for (let i = 8; i < m - 8; i++) {
       if (i % 2 === 0) {
         ctx.fillStyle = "#000";
@@ -101,25 +89,14 @@ export default function StudentIdCard() {
         ctx.fillRect(x + 6 * cs, y + i * cs, cs, cs);
       }
     }
-    // Alignment pattern
-    const ac = 16;
-    ctx.fillStyle = "#000";
-    ctx.fillRect(x + (ac - 2) * cs, y + (ac - 2) * cs, cs * 5, cs * 5);
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(x + (ac - 1) * cs, y + (ac - 1) * cs, cs * 3, cs * 3);
-    ctx.fillStyle = "#000";
-    ctx.fillRect(x + ac * cs, y + ac * cs, cs, cs);
-    // Data fill
     for (let r = 0; r < m; r++) {
       for (let c = 0; c < m; c++) {
-        // Skip finder and timing areas
         if (r < 9 && c < 9) continue;
         if (r < 9 && c > m - 9) continue;
         if (r > m - 9 && c < 9) continue;
         if (r === 6 || c === 6) continue;
-        if (r >= ac - 2 && r <= ac + 2 && c >= ac - 2 && c <= ac + 2) continue;
-        const h = ((r * 37 + c * 19 + seed) * 2654435761) >>> 0;
-        if (h % 3 === 0) {
+        const h2 = ((r * 37 + c * 19 + seed) * 2654435761) >>> 0;
+        if (h2 % 3 === 0) {
           ctx.fillStyle = "#000";
           ctx.fillRect(x + c * cs, y + r * cs, cs, cs);
         }
@@ -127,301 +104,262 @@ export default function StudentIdCard() {
     }
   };
 
-  // ========== Main Generate ==========
+  const formatDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
+    } catch {
+      return dateStr;
+    }
+  };
+
   const generate = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const W = 860, CH = 540;
-    const totalH = showBack ? CH * 2 + 40 : CH;
+    const W = 900, CH = 560;
+    const totalH = showBack ? CH * 2 + 50 : CH;
     canvas.width = W * 2;
     canvas.height = totalH * 2;
     ctx.scale(2, 2);
     ctx.clearRect(0, 0, W, totalH);
     const t = themes.find(th => th.id === theme) || themes[0];
 
-    const drawCard = (oY: number, isFront: boolean) => {
-      // ===== Card base =====
+    // ===== DRAW FRONT =====
+    const drawFront = (oY: number) => {
+      // White card base with shadow
       ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.25)";
-      ctx.shadowBlur = 20;
-      ctx.shadowOffsetY = 6;
+      ctx.shadowColor = "rgba(0,0,0,0.15)";
+      ctx.shadowBlur = 25;
+      ctx.shadowOffsetY = 8;
       ctx.fillStyle = "#ffffff";
-      rr(ctx, 10, oY + 10, W - 20, CH - 20, 12);
+      ctx.beginPath();
+      ctx.roundRect(10, oY + 10, W - 20, CH - 20, 16);
       ctx.fill();
       ctx.restore();
 
-      // Outer border
-      ctx.strokeStyle = t.primary;
-      ctx.lineWidth = 2.5;
-      rr(ctx, 10, oY + 10, W - 20, CH - 20, 12);
-      ctx.stroke();
-
-      // Inner border (double line effect)
-      ctx.strokeStyle = t.primary + "40";
-      ctx.lineWidth = 0.8;
-      rr(ctx, 15, oY + 15, W - 30, CH - 30, 10);
-      ctx.stroke();
-
-      if (isFront) {
-        drawFront(ctx, oY, t);
-      } else {
-        drawBack(ctx, oY, t);
-      }
-    };
-
-    const drawFront = (ctx: CanvasRenderingContext2D, oY: number, t: typeof themes[0]) => {
-      // ===== Header Band =====
-      const hY = oY + 15, hH = 80;
-      const hGrad = ctx.createLinearGradient(15, hY, W - 15, hY);
-      hGrad.addColorStop(0, t.primary);
-      hGrad.addColorStop(0.3, t.secondary);
-      hGrad.addColorStop(0.7, t.secondary);
-      hGrad.addColorStop(1, t.primary);
-      ctx.fillStyle = hGrad;
+      // ===== Decorative wave shapes (top-right) =====
+      ctx.save();
       ctx.beginPath();
-      ctx.roundRect(15, hY, W - 30, hH, [10, 10, 0, 0]);
+      ctx.roundRect(10, oY + 10, W - 20, CH - 20, 16);
+      ctx.clip();
+
+      // Large wave 1
+      const wGrad1 = ctx.createLinearGradient(W * 0.5, oY, W, oY + CH * 0.7);
+      wGrad1.addColorStop(0, t.primary + "dd");
+      wGrad1.addColorStop(1, t.secondary + "ee");
+      ctx.fillStyle = wGrad1;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.55, oY + 10);
+      ctx.lineTo(W - 10, oY + 10);
+      ctx.lineTo(W - 10, oY + CH * 0.75);
+      ctx.quadraticCurveTo(W * 0.75, oY + CH * 0.65, W * 0.55, oY + CH * 0.55);
+      ctx.quadraticCurveTo(W * 0.45, oY + CH * 0.48, W * 0.5, oY + CH * 0.2);
+      ctx.quadraticCurveTo(W * 0.52, oY + 10, W * 0.55, oY + 10);
       ctx.fill();
 
-      // Gold accent line under header
-      ctx.fillStyle = t.gold;
-      ctx.fillRect(15, hY + hH, W - 30, 3);
+      // Wave 2 (overlay darker)
+      const wGrad2 = ctx.createLinearGradient(W * 0.6, oY, W, oY + CH);
+      wGrad2.addColorStop(0, t.secondary + "99");
+      wGrad2.addColorStop(1, t.primary + "cc");
+      ctx.fillStyle = wGrad2;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.65, oY + 10);
+      ctx.lineTo(W - 10, oY + 10);
+      ctx.lineTo(W - 10, oY + CH * 0.5);
+      ctx.quadraticCurveTo(W * 0.8, oY + CH * 0.55, W * 0.65, oY + CH * 0.35);
+      ctx.quadraticCurveTo(W * 0.58, oY + CH * 0.2, W * 0.65, oY + 10);
+      ctx.fill();
 
-      // Institution name
+      // Bottom wave
+      const wGrad3 = ctx.createLinearGradient(W * 0.4, oY + CH, W, oY + CH * 0.5);
+      wGrad3.addColorStop(0, t.accent + "55");
+      wGrad3.addColorStop(1, t.primary + "88");
+      ctx.fillStyle = wGrad3;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.5, oY + CH - 10);
+      ctx.lineTo(W - 10, oY + CH - 10);
+      ctx.lineTo(W - 10, oY + CH * 0.6);
+      ctx.quadraticCurveTo(W * 0.78, oY + CH * 0.75, W * 0.6, oY + CH * 0.8);
+      ctx.quadraticCurveTo(W * 0.45, oY + CH * 0.85, W * 0.5, oY + CH - 10);
+      ctx.fill();
+
+      ctx.restore();
+
+      // ===== Institution Name (top-left) =====
       ctx.fillStyle = t.text;
-      ctx.font = "bold 22px Georgia, 'Times New Roman', serif";
-      ctx.textAlign = "center";
-      ctx.fillText(institution.toUpperCase(), W / 2, hY + 32);
+      ctx.font = "bold 20px Georgia, 'Times New Roman', serif";
+      ctx.textAlign = "left";
+      ctx.fillText(institution, 45, oY + 55);
 
-      // Subtitle
-      ctx.font = "italic 11px Georgia, serif";
-      ctx.fillStyle = t.text + "bb";
-      ctx.fillText("Excellence in Education • Research • Innovation", W / 2, hY + 50);
+      // ===== "Student ID Card" title =====
+      ctx.fillStyle = t.primary;
+      ctx.font = "bold 36px Georgia, 'Times New Roman', serif";
+      ctx.textAlign = "left";
+      ctx.fillText("Student ID Card", 45, oY + 105);
 
-      // "STUDENT IDENTITY CARD" badge
-      const badgeW = 240, badgeH = 22;
-      const badgeX = W / 2 - badgeW / 2, badgeY2 = hY + hH + 3;
-      ctx.fillStyle = t.gold;
-      rr(ctx, badgeX, badgeY2, badgeW, badgeH, [0, 0, 6, 6]);
+      // ===== Detail Fields (left side) =====
+      const fields = [
+        { label: "Name", value: name },
+        { label: "ID Number", value: studentId },
+        { label: "Academic Year", value: session },
+        { label: "Major", value: department },
+        { label: "Birthday", value: formatDate(dob) },
+        { label: "Address", value: address },
+      ];
+
+      let dy = oY + 145;
+      const lineH = 42;
+      ctx.textAlign = "left";
+
+      fields.forEach(f => {
+        // Label (bold)
+        ctx.fillStyle = "#1a1a1a";
+        ctx.font = "bold 16px 'Segoe UI', Arial, sans-serif";
+        const labelText = f.label;
+        ctx.fillText(labelText, 45, dy);
+
+        // Colon
+        ctx.fillStyle = "#333";
+        ctx.font = "16px 'Segoe UI', Arial, sans-serif";
+        ctx.fillText(":", 185, dy);
+
+        // Value
+        ctx.fillStyle = "#444";
+        ctx.font = "16px 'Segoe UI', Arial, sans-serif";
+        let val = f.value;
+        const maxW = 280;
+        while (ctx.measureText(val).width > maxW && val.length > 5) {
+          val = val.slice(0, -1) + "…";
+        }
+        ctx.fillText(val, 200, dy);
+
+        dy += lineH;
+      });
+
+      // ===== Valid Until Badge =====
+      const vuY = dy + 15;
+      // Badge background
+      ctx.fillStyle = t.primary;
+      ctx.beginPath();
+      ctx.roundRect(45, vuY - 5, 130, 34, 8);
       ctx.fill();
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 10px 'Segoe UI', Arial, sans-serif";
-      ctx.letterSpacing = "4px";
-      ctx.fillText("STUDENT IDENTITY CARD", W / 2, badgeY2 + 15);
+      ctx.font = "bold 13px 'Segoe UI', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Valid Until", 110, vuY + 17);
 
-      // ===== Content Area =====
-      const contentTop = hY + hH + 35;
+      // Date value
+      ctx.fillStyle = t.text;
+      ctx.font = "bold 16px 'Segoe UI', sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(": " + formatDate(validUntil), 190, vuY + 17);
 
-      // --- Photo ---
-      const px = 40, py = contentTop, pw = 145, ph = 180;
+      // ===== Circular Photo (right side) =====
+      const photoR = 115;
+      const photoCX = W - 190;
+      const photoCY = oY + CH * 0.48;
 
-      // Photo outer frame (gold)
-      ctx.fillStyle = t.gold;
-      rr(ctx, px - 4, py - 4, pw + 8, ph + 8, 6);
+      // Outer ring
+      ctx.strokeStyle = t.primary;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(photoCX, photoCY, photoR + 8, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Inner white ring
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(photoCX, photoCY, photoR + 2, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Photo circle background
+      ctx.fillStyle = "#f3f4f6";
+      ctx.beginPath();
+      ctx.arc(photoCX, photoCY, photoR, 0, Math.PI * 2);
       ctx.fill();
-      // Photo inner frame (primary)
-      ctx.fillStyle = t.primary;
-      rr(ctx, px - 2, py - 2, pw + 4, ph + 4, 5);
-      ctx.fill();
 
-      // Photo area fill
-      ctx.fillStyle = "#f0f0f0";
-      rr(ctx, px, py, pw, ph, 4);
-      ctx.fill();
-
-      const drawAfterPhoto = () => {
-        // --- Student ID under photo ---
-        const idBadgeY = py + ph + 12;
-        ctx.fillStyle = t.primary;
-        rr(ctx, px - 4, idBadgeY, pw + 8, 28, 6);
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 13px 'Courier New', monospace";
-        ctx.textAlign = "center";
-        ctx.fillText(studentId, px + pw / 2, idBadgeY + 19);
-
-        // --- Blood group badge ---
-        const bBY = idBadgeY + 36;
-        ctx.fillStyle = "#b91c1c";
-        rr(ctx, px + pw / 2 - 32, bBY, 64, 24, 12);
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 12px 'Segoe UI', sans-serif";
-        ctx.fillText("Blood: " + blood, px + pw / 2, bBY + 16);
-
-        // ===== Right Side Details =====
-        const dx = 210, dw = W - dx - 35;
-        let dy = contentTop;
-        const rowH = 34;
-
-        const fields = [
-          { label: "Full Name", value: name, bold: true },
-          { label: "Father's Name", value: fatherName },
-          { label: "Department", value: department },
-          { label: "Session", value: session },
-          { label: "Date of Birth", value: dob },
-          { label: "Phone", value: phone },
-          { label: "Email", value: email },
-          { label: "Valid Until", value: validUntil },
-        ];
-
-        fields.forEach((f, i) => {
-          // Alternating row bg
-          if (i % 2 === 0) {
-            ctx.fillStyle = t.primary + "08";
-            rr(ctx, dx - 8, dy - 4, dw + 16, rowH, 4);
-            ctx.fill();
-          }
-
-          // Label
-          ctx.fillStyle = t.primary;
-          ctx.font = "bold 8px 'Segoe UI', sans-serif";
-          ctx.textAlign = "left";
-          ctx.fillText(f.label.toUpperCase(), dx, dy + 10);
-
-          // Colon dots
-          const labelW = ctx.measureText(f.label.toUpperCase()).width;
-          ctx.fillStyle = "#ccc";
-          const dotX = dx + labelW + 6;
-          const maxDots = Math.floor((140 - labelW) / 6);
-          for (let d = 0; d < Math.max(maxDots, 2); d++) {
-            ctx.fillRect(dotX + d * 6, dy + 8, 2, 2);
-          }
-
-          // Value
-          ctx.fillStyle = f.bold ? "#111" : "#333";
-          ctx.font = f.bold ? "bold 14px 'Segoe UI', sans-serif" : "13px 'Segoe UI', sans-serif";
-          let val = f.value;
-          while (ctx.measureText(val).width > dw - 150 && val.length > 5) {
-            val = val.slice(0, -1) + "…";
-          }
-          ctx.fillText(val, dx + 150, dy + 10);
-
-          // Separator
-          if (i < fields.length - 1) {
-            ctx.strokeStyle = "#e5e5e5";
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(dx, dy + rowH - 2);
-            ctx.lineTo(dx + dw, dy + rowH - 2);
-            ctx.stroke();
-          }
-
-          dy += rowH;
-        });
-
-        // ===== QR Code =====
-        const qrSize = 75;
-        const qrX = W - qrSize - 40;
-        const qrY = oY + CH - 20 - qrSize - 55;
-
-        // QR frame
-        ctx.fillStyle = "#f8f8f8";
-        ctx.strokeStyle = t.primary + "30";
-        ctx.lineWidth = 1;
-        rr(ctx, qrX - 6, qrY - 6, qrSize + 12, qrSize + 12, 6);
-        ctx.fill();
-        rr(ctx, qrX - 6, qrY - 6, qrSize + 12, qrSize + 12, 6);
-        ctx.stroke();
-
-        drawQR(ctx, qrX, qrY, qrSize);
-        ctx.fillStyle = "#888";
-        ctx.font = "7px 'Segoe UI', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("Scan to Verify", qrX + qrSize / 2, qrY + qrSize + 11);
-
-        // ===== Footer Band =====
-        const fH = 40;
-        const fY = oY + CH - 20 - fH;
-        const fGrad = ctx.createLinearGradient(15, fY, W - 15, fY);
-        fGrad.addColorStop(0, t.primary);
-        fGrad.addColorStop(1, t.secondary);
-        ctx.fillStyle = fGrad;
-        ctx.beginPath();
-        ctx.roundRect(15, fY, W - 30, fH + 5, [0, 0, 10, 10]);
-        ctx.fill();
-
-        // Gold line above footer
-        ctx.fillStyle = t.gold;
-        ctx.fillRect(15, fY - 2, W - 30, 2);
-
-        // Barcode in footer (white bars)
-        drawBarcode(ctx, 30, fY + 8, 180, 20, studentId, "#fff");
-        ctx.fillStyle = "rgba(255,255,255,0.6)";
-        ctx.font = "bold 7px 'Courier New', monospace";
-        ctx.textAlign = "center";
-        ctx.fillText(studentId, 120, fY + 35);
-
-        // Footer text
-        ctx.fillStyle = t.text + "bb";
-        ctx.font = "7.5px 'Segoe UI', sans-serif";
-        ctx.textAlign = "right";
-        ctx.fillText("This card is the property of " + institution, W - 30, fY + 16);
-        ctx.fillText("If found, please return to the administration office.", W - 30, fY + 28);
-      };
-
-      // ===== Draw Photo =====
       if (photo) {
         const img = new Image();
         img.onload = () => {
-          const aspect = img.width / img.height;
-          let sx = 0, sy = 0, sw = img.width, sh = img.height;
-          const tA = pw / ph;
-          if (aspect > tA) { sw = img.height * tA; sx = (img.width - sw) / 2; }
-          else { sh = img.width / tA; sy = (img.height - sh) / 2; }
           ctx.save();
-          rr(ctx, px, py, pw, ph, 4);
+          ctx.beginPath();
+          ctx.arc(photoCX, photoCY, photoR, 0, Math.PI * 2);
           ctx.clip();
-          ctx.drawImage(img, sx, sy, sw, sh, px, py, pw, ph);
+          const aspect = img.width / img.height;
+          let dx2 = photoCX - photoR, dy2 = photoCY - photoR, dw = photoR * 2, dh = photoR * 2;
+          if (aspect > 1) { dw = dh * aspect; dx2 = photoCX - dw / 2; }
+          else { dh = dw / aspect; dy2 = photoCY - dh / 2; }
+          ctx.drawImage(img, dx2, dy2, dw, dh);
           ctx.restore();
-          drawAfterPhoto();
-          if (showBack) drawCard(CH + 40, false);
+
+          if (showBack) drawBack(CH + 50);
           setGenerated(true);
         };
         img.src = photo;
       } else {
-        ctx.fillStyle = "#d4d4d4";
-        ctx.font = "56px sans-serif";
+        // Placeholder
+        ctx.fillStyle = "#d1d5db";
+        ctx.font = "72px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("👤", px + pw / 2, py + ph / 2 + 12);
-        ctx.fillStyle = "#aaa";
-        ctx.font = "10px 'Segoe UI', sans-serif";
-        ctx.fillText("Upload Photo", px + pw / 2, py + ph / 2 + 38);
-        drawAfterPhoto();
+        ctx.fillText("👤", photoCX, photoCY + 20);
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = "12px 'Segoe UI', sans-serif";
+        ctx.fillText("Upload Photo", photoCX, photoCY + 55);
       }
     };
 
-    const drawBack = (ctx: CanvasRenderingContext2D, oY: number, t: typeof themes[0]) => {
-      // ===== Back Header =====
-      const hY = oY + 15, hH = 55;
-      ctx.fillStyle = t.primary;
+    // ===== DRAW BACK =====
+    const drawBack = (oY: number) => {
+      // White card base
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.15)";
+      ctx.shadowBlur = 25;
+      ctx.shadowOffsetY = 8;
+      ctx.fillStyle = "#ffffff";
       ctx.beginPath();
-      ctx.roundRect(15, hY, W - 30, hH, [10, 10, 0, 0]);
+      ctx.roundRect(10, oY + 10, W - 20, CH - 20, 16);
       ctx.fill();
+      ctx.restore();
 
-      ctx.fillStyle = t.gold;
-      ctx.fillRect(15, hY + hH, W - 30, 2);
+      // Clip for wave decorations
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(10, oY + 10, W - 20, CH - 20, 16);
+      ctx.clip();
 
-      ctx.fillStyle = t.text;
-      ctx.font = "bold 16px Georgia, serif";
+      // Top header band
+      const hH = 65;
+      const hGrad = ctx.createLinearGradient(10, oY + 10, W - 10, oY + 10);
+      hGrad.addColorStop(0, t.primary);
+      hGrad.addColorStop(0.5, t.secondary);
+      hGrad.addColorStop(1, t.primary);
+      ctx.fillStyle = hGrad;
+      ctx.fillRect(10, oY + 10, W - 20, hH);
+
+      ctx.restore();
+
+      // Institution name on header
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 20px Georgia, serif";
       ctx.textAlign = "center";
-      ctx.fillText(institution.toUpperCase(), W / 2, hY + 25);
-      ctx.font = "10px 'Segoe UI', sans-serif";
-      ctx.fillStyle = t.text + "bb";
-      ctx.fillText("STUDENT IDENTITY CARD — BACK", W / 2, hY + 43);
+      ctx.fillText(institution.toUpperCase(), W / 2, oY + 40);
+      ctx.font = "11px 'Segoe UI', sans-serif";
+      ctx.fillStyle = "#ffffffbb";
+      ctx.fillText("STUDENT IDENTITY CARD — BACK", W / 2, oY + 58);
 
-      // ===== Two-Column Details =====
-      const cY = hY + hH + 22;
-      const colL = 35, colR = W / 2 + 20;
-      const colW2 = W / 2 - 55;
-      const rH = 38;
+      // ===== Two-column details =====
+      const cY = oY + 95;
+      const colL = 45, colR = W / 2 + 30, colW = W / 2 - 75;
+      const rH = 40;
 
       const leftData = [
         { label: "Father's Name", value: fatherName },
         { label: "Mother's Name", value: motherName },
-        { label: "Date of Birth", value: dob },
+        { label: "Date of Birth", value: formatDate(dob) },
         { label: "Blood Group", value: blood },
         { label: "Emergency Contact", value: emergencyContact },
       ];
@@ -430,133 +368,125 @@ export default function StudentIdCard() {
         { label: "Student ID", value: studentId },
         { label: "Session", value: session },
         { label: "Department", value: department },
-        { label: "Valid Until", value: validUntil },
+        { label: "Valid Until", value: formatDate(validUntil) },
       ];
 
-      const drawCol = (fields: { label: string; value: string }[], startX: number, startY: number, colWidth: number) => {
-        let y = startY;
+      const drawCol = (fields: { label: string; value: string }[], sx: number, sy: number, cw: number) => {
+        let y = sy;
         fields.forEach((f, i) => {
           if (i % 2 === 0) {
             ctx.fillStyle = t.primary + "08";
-            rr(ctx, startX - 5, y - 5, colWidth + 10, rH, 4);
+            ctx.beginPath();
+            ctx.roundRect(sx - 8, y - 6, cw + 16, rH, 4);
             ctx.fill();
           }
           ctx.fillStyle = t.primary;
-          ctx.font = "bold 8px 'Segoe UI', sans-serif";
+          ctx.font = "bold 9px 'Segoe UI', sans-serif";
           ctx.textAlign = "left";
-          ctx.fillText(f.label.toUpperCase(), startX, y + 9);
+          ctx.fillText(f.label.toUpperCase(), sx, y + 10);
           ctx.fillStyle = "#333";
-          ctx.font = "12px 'Segoe UI', sans-serif";
+          ctx.font = "13px 'Segoe UI', sans-serif";
           let val = f.value;
-          while (ctx.measureText(val).width > colWidth - 10 && val.length > 5) {
-            val = val.slice(0, -1) + "…";
-          }
-          ctx.fillText(val, startX, y + 24);
+          while (ctx.measureText(val).width > cw - 10 && val.length > 5) val = val.slice(0, -1) + "…";
+          ctx.fillText(val, sx, y + 26);
           if (i < fields.length - 1) {
             ctx.strokeStyle = "#e8e8e8";
             ctx.lineWidth = 0.5;
             ctx.beginPath();
-            ctx.moveTo(startX, y + rH - 3);
-            ctx.lineTo(startX + colWidth, y + rH - 3);
+            ctx.moveTo(sx, y + rH - 4);
+            ctx.lineTo(sx + cw, y + rH - 4);
             ctx.stroke();
           }
           y += rH;
         });
       };
 
-      drawCol(leftData, colL, cY, colW2);
-      drawCol(rightData, colR, cY, colW2);
+      drawCol(leftData, colL, cY, colW);
+      drawCol(rightData, colR, cY, colW);
 
       // Vertical divider
-      ctx.strokeStyle = t.primary + "25";
+      ctx.strokeStyle = t.primary + "20";
       ctx.lineWidth = 1;
-      ctx.setLineDash([4, 3]);
+      ctx.setLineDash([5, 4]);
       ctx.beginPath();
-      ctx.moveTo(W / 2 + 5, cY - 5);
-      ctx.lineTo(W / 2 + 5, cY + rH * 5);
+      ctx.moveTo(W / 2 + 10, cY - 5);
+      ctx.lineTo(W / 2 + 10, cY + rH * 5);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // ===== Terms & Conditions =====
+      // Terms & Conditions
       const tY = cY + rH * 5 + 15;
       ctx.fillStyle = "#fafafa";
-      ctx.strokeStyle = "#e0e0e0";
+      ctx.strokeStyle = "#e5e5e5";
       ctx.lineWidth = 0.8;
-      rr(ctx, 30, tY, W - 60, 75, 8);
+      ctx.beginPath();
+      ctx.roundRect(35, tY, W - 70, 72, 8);
       ctx.fill();
-      rr(ctx, 30, tY, W - 60, 75, 8);
+      ctx.beginPath();
+      ctx.roundRect(35, tY, W - 70, 72, 8);
       ctx.stroke();
 
       ctx.fillStyle = t.primary;
       ctx.font = "bold 9px 'Segoe UI', sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("TERMS & CONDITIONS", 45, tY + 15);
-
-      ctx.fillStyle = "#555";
+      ctx.fillText("TERMS & CONDITIONS", 50, tY + 14);
+      ctx.fillStyle = "#666";
       ctx.font = "8px 'Segoe UI', sans-serif";
-      [
-        "1. This card must be carried at all times within campus premises.",
-        "2. Loss of card must be reported immediately to the administration office.",
-        "3. This card is non-transferable and remains property of the institution.",
-        "4. Misuse of this card may result in disciplinary action.",
-      ].forEach((line, i) => {
-        ctx.fillText(line, 45, tY + 30 + i * 12);
-      });
+      ["1. This card must be carried at all times within campus.",
+       "2. Loss must be reported immediately to administration.",
+       "3. Non-transferable; property of the institution.",
+       "4. Misuse may result in disciplinary action.",
+      ].forEach((line, i) => ctx.fillText(line, 50, tY + 28 + i * 12));
 
-      // ===== Signature & Seal Area =====
-      const sigY = tY + 85;
-
-      // Left: Principal seal placeholder
+      // Signature & Seal
+      const sigY = tY + 82;
       ctx.strokeStyle = t.primary + "40";
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(120, sigY + 20, 25, 0, Math.PI * 2);
+      ctx.arc(120, sigY + 18, 22, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.fillStyle = t.primary + "15";
+      ctx.fillStyle = t.primary + "12";
       ctx.fill();
-      ctx.fillStyle = t.primary + "80";
+      ctx.fillStyle = t.primary + "88";
       ctx.font = "bold 7px 'Segoe UI', sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("SEAL", 120, sigY + 22);
+      ctx.fillText("SEAL", 120, sigY + 20);
 
-      // Right: Authorized signature
-      ctx.strokeStyle = "#888";
+      ctx.strokeStyle = "#aaa";
       ctx.lineWidth = 0.8;
       ctx.setLineDash([4, 2]);
       ctx.beginPath();
-      ctx.moveTo(W - 230, sigY + 30);
-      ctx.lineTo(W - 40, sigY + 30);
+      ctx.moveTo(W - 240, sigY + 28);
+      ctx.lineTo(W - 50, sigY + 28);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = "#666";
+      ctx.fillStyle = "#777";
       ctx.font = "8px 'Segoe UI', sans-serif";
-      ctx.fillText("Authorized Signature", W - 135, sigY + 45);
+      ctx.fillText("Authorized Signature", W - 145, sigY + 42);
 
-      // ===== Footer =====
-      const fY = oY + CH - 20 - 35;
-      ctx.fillStyle = t.primary;
+      // Footer
+      const fY = oY + CH - 55;
+      ctx.save();
       ctx.beginPath();
-      ctx.roundRect(15, fY, W - 30, 35 + 5, [0, 0, 10, 10]);
-      ctx.fill();
-      ctx.fillStyle = t.gold;
-      ctx.fillRect(15, fY - 2, W - 30, 2);
+      ctx.roundRect(10, oY + 10, W - 20, CH - 20, 16);
+      ctx.clip();
+      const fGrad = ctx.createLinearGradient(10, fY, W, fY);
+      fGrad.addColorStop(0, t.primary);
+      fGrad.addColorStop(1, t.secondary);
+      ctx.fillStyle = fGrad;
+      ctx.fillRect(10, fY, W - 20, 50);
+      ctx.restore();
 
-      // Barcode
-      drawBarcode(ctx, W / 2 - 120, fY + 5, 240, 18, studentId, "#fff");
+      drawBarcode(ctx, W / 2 - 130, fY + 5, 260, 20, studentId, "#fff");
       ctx.fillStyle = "rgba(255,255,255,0.6)";
-      ctx.font = "bold 7px 'Courier New', monospace";
+      ctx.font = "bold 8px 'Courier New', monospace";
       ctx.textAlign = "center";
-      ctx.fillText(studentId, W / 2, fY + 30);
+      ctx.fillText(studentId, W / 2, fY + 33);
     };
 
-    // Draw front card
-    drawCard(0, true);
-
-    // Draw back card (if no photo, draw immediately; with photo, it's drawn in img.onload)
-    if (!photo && showBack) {
-      drawCard(CH + 40, false);
-    }
-
+    // Draw
+    drawFront(0);
+    if (!photo && showBack) drawBack(CH + 50);
     if (!photo) setGenerated(true);
   }, [name, studentId, department, institution, session, blood, phone, email, dob, fatherName, motherName, address, emergencyContact, theme, photo, showBack, validUntil]);
 
@@ -574,11 +504,11 @@ export default function StudentIdCard() {
   };
 
   const resetAll = () => {
-    setName("John Doe"); setStudentId("STU-2024-001"); setDepartment("Computer Science & Engineering");
-    setInstitution("University of Technology"); setSession("2023-2024"); setBlood("A+");
-    setPhone("+880 1234-567890"); setEmail("john@university.edu"); setDob("2000-01-15");
-    setFatherName("Robert Doe"); setMotherName("Jane Doe"); setAddress("123 University Road, Dhaka");
-    setEmergencyContact("+880 9876-543210"); setTheme("blue"); setPhoto(""); setShowBack(true);
+    setName("Francois Mercer"); setStudentId("123-456-7890"); setDepartment("Sociology");
+    setInstitution("Liceria University"); setSession("2025"); setBlood("A+");
+    setPhone("+880 1234-567890"); setEmail("john@university.edu"); setDob("2000-01-22");
+    setFatherName("Robert Mercer"); setMotherName("Jane Mercer"); setAddress("123 Anywhere St., Any City");
+    setEmergencyContact("+880 9876-543210"); setTheme("purple"); setPhoto(""); setShowBack(true);
     setGenerated(false);
     toast.info("Form reset!");
   };
@@ -612,8 +542,8 @@ export default function StudentIdCard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="sm:col-span-2 space-y-1.5"><Label className="text-xs text-muted-foreground">Institution Name</Label><Input value={institution} onChange={e => setInstitution(e.target.value)} className="rounded-xl" /></div>
               <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Student ID</Label><Input value={studentId} onChange={e => setStudentId(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Department</Label><Input value={department} onChange={e => setDepartment(e.target.value)} className="rounded-xl" /></div>
-              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Session</Label><Input value={session} onChange={e => setSession(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Department / Major</Label><Input value={department} onChange={e => setDepartment(e.target.value)} className="rounded-xl" /></div>
+              <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Academic Year / Session</Label><Input value={session} onChange={e => setSession(e.target.value)} className="rounded-xl" /></div>
               <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">Valid Until</Label><Input type="date" value={validUntil} onChange={e => setValidUntil(e.target.value)} className="rounded-xl" /></div>
             </div>
           </TabsContent>
@@ -624,7 +554,7 @@ export default function StudentIdCard() {
                 <Label className="text-xs text-muted-foreground">Color Theme</Label>
                 <Select value={theme} onValueChange={setTheme}>
                   <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                  <SelectContent>{themes.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+                  <SelectContent>{themes.map(t2 => <SelectItem key={t2.id} value={t2.id}>{t2.name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-3">
@@ -636,10 +566,10 @@ export default function StudentIdCard() {
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
-              {themes.map(t => (
-                <button key={t.id} onClick={() => setTheme(t.id)}
-                  className={`w-8 h-8 rounded-full border-2 transition-all ${theme === t.id ? "ring-2 ring-primary scale-110" : "opacity-70 hover:opacity-100"}`}
-                  style={{ background: `linear-gradient(135deg, ${t.primary}, ${t.accent})` }} />
+              {themes.map(t2 => (
+                <button key={t2.id} onClick={() => setTheme(t2.id)}
+                  className={`w-8 h-8 rounded-full border-2 transition-all ${theme === t2.id ? "ring-2 ring-primary scale-110" : "opacity-70 hover:opacity-100"}`}
+                  style={{ background: `linear-gradient(135deg, ${t2.primary}, ${t2.accent})` }} />
               ))}
             </div>
             <div className="flex items-center gap-2">
