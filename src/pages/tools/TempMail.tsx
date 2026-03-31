@@ -49,6 +49,10 @@ export default function TempMail() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(false);
+  const [availableDomains, setAvailableDomains] = useState<{ domain: string }[]>([]);
+  const [selectedDomain, setSelectedDomain] = useState<string>("");
+  const [providerBaseCache, setProviderBaseCache] = useState<string>("");
+  const [domainsLoaded, setDomainsLoaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const createAccount = useCallback(async () => {
