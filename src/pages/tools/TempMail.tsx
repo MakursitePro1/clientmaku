@@ -441,6 +441,20 @@ export default function TempMail() {
                           {m.subject || "(No Subject)"}
                         </p>
                         <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">{m.intro}</p>
+                        {extractOTP(m.subject || "") || extractOTP(m.intro || "") ? (
+                          <div className="flex items-center gap-1 mt-1">
+                            <KeyRound className="w-3 h-3 text-primary" />
+                            <span className="text-[10px] font-bold text-primary">OTP: {extractOTP(m.subject || "") || extractOTP(m.intro || "")}</span>
+                            <button
+                              className="text-[10px] text-primary/70 hover:text-primary underline ml-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const otp = extractOTP(m.subject || "") || extractOTP(m.intro || "");
+                                if (otp) { navigator.clipboard.writeText(otp); toast.success(`OTP "${otp}" copied!`); }
+                              }}
+                            >Copy</button>
+                          </div>
+                        ) : null}
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                         <Eye className="w-3.5 h-3.5 text-muted-foreground" />
