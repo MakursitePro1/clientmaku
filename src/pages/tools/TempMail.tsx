@@ -225,13 +225,23 @@ export default function TempMail() {
     });
   }, []);
 
-  // Fetch messages
+  // Fetch messages with new-email detection
   const fetchMessages = useCallback(async () => {
     if (!account?.token) return;
     setRefreshing(true);
     try {
       const data = await callMailAPI("getMessages", { token: account.token, providerBase: account.providerBase });
       const msgs = data?.["hydra:member"] || data?.member || [];
+      
+      // Detect new emails
+      if (msgs.length > prevMsgCountRef.current && prevMsgCountRef.current > 0) {
+        const newMsg = msgs[0];
+        if (soundEnabled) playNotificationSound();
+        if (notifEnabled) sendBrowserNotification(newMsg?.subject || "", newMsg?.from?.name || newMsg?.from?.address || "Unknown");
+        toast.success("📧 New email received!", { description: newMsg?.subject || "(No Subject)" });
+      }
+      prevMsgCountRef.current = msgs.length;
+      
       setMessages(msgs);
     } catch (err) {
       // Silent fail for auto-refresh
