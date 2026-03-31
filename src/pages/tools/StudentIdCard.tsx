@@ -127,436 +127,386 @@ export default function StudentIdCard() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const W = 920, CH = 560;
-    const totalH = showBack ? CH * 2 + 50 : CH;
+    const W = 950, CH = 570;
+    const totalH = showBack ? CH * 2 + 60 : CH;
     canvas.width = W * 2;
     canvas.height = totalH * 2;
     ctx.scale(2, 2);
     ctx.clearRect(0, 0, W, totalH);
     const t = themes.find(th => th.id === theme) || themes[0];
 
-    const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
+    const rr = (x: number, y: number, w: number, h: number, r: number) => {
       ctx.beginPath();
       ctx.roundRect(x, y, w, h, r);
     };
 
+    const drawRightSideContent = (oY: number, panelW: number) => {
+      const rX = panelW + 40;
+      const rW = W - panelW - 70;
+
+      // Subtle top-right decorative circle
+      ctx.fillStyle = hexToRgba(t.primary, 0.04);
+      ctx.beginPath();
+      ctx.arc(W - 40, oY + 40, 80, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = hexToRgba(t.accent, 0.03);
+      ctx.beginPath();
+      ctx.arc(W - 70, oY + 70, 50, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Institution name
+      ctx.fillStyle = hexToRgba(t.primary, 0.55);
+      ctx.font = "600 11px 'Trebuchet MS', 'Lucida Sans', sans-serif";
+      ctx.textAlign = "left";
+      ctx.letterSpacing = "2px";
+      ctx.fillText(institution.toUpperCase(), rX, oY + 40);
+      ctx.letterSpacing = "0px";
+
+      // Gradient line
+      const lineGrad = ctx.createLinearGradient(rX, 0, rX + 200, 0);
+      lineGrad.addColorStop(0, t.primary);
+      lineGrad.addColorStop(0.6, t.accent);
+      lineGrad.addColorStop(1, hexToRgba(t.primary, 0));
+      ctx.fillStyle = lineGrad;
+      ctx.fillRect(rX, oY + 48, 220, 2);
+
+      // Title
+      ctx.fillStyle = t.text;
+      ctx.font = "bold 28px Georgia, 'Palatino Linotype', 'Book Antiqua', serif";
+      ctx.fillText("Student ID Card", rX, oY + 80);
+
+      // Small colored dot after title
+      ctx.fillStyle = t.primary;
+      ctx.beginPath();
+      ctx.arc(rX + ctx.measureText("Student ID Card").width + 8, oY + 74, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Detail rows with elegant styling
+      const fields = [
+        { label: "Full Name", value: name, icon: "●" },
+        { label: "Date of Birth", value: formatDate(dob), icon: "●" },
+        { label: "Father's Name", value: fatherName, icon: "●" },
+        { label: "Mother's Name", value: motherName, icon: "●" },
+        { label: "Blood Group", value: blood, icon: "●" },
+        { label: "Phone", value: phone, icon: "●" },
+        { label: "Email", value: email, icon: "●" },
+        { label: "Address", value: address, icon: "●" },
+      ];
+
+      let dy = oY + 106;
+      const rowH = 38;
+
+      fields.forEach((f, i) => {
+        // Alternating subtle bg
+        if (i % 2 === 0) {
+          ctx.fillStyle = hexToRgba(t.primary, 0.025);
+          rr(rX - 8, dy - 10, rW + 16, rowH, 8);
+          ctx.fill();
+        }
+
+        // Left color accent bar
+        ctx.fillStyle = i % 2 === 0 ? t.primary : t.accent;
+        rr(rX - 8, dy - 4, 2.5, 22, 2);
+        ctx.fill();
+
+        // Label
+        ctx.fillStyle = hexToRgba(t.primary, 0.6);
+        ctx.font = "600 9px 'Trebuchet MS', sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(f.label.toUpperCase(), rX + 4, dy + 5);
+
+        // Value
+        ctx.fillStyle = "#1a1a1a";
+        ctx.font = "500 13.5px Georgia, 'Palatino Linotype', serif";
+        let val = f.value;
+        const maxW = rW - 20;
+        while (ctx.measureText(val).width > maxW && val.length > 5) val = val.slice(0, -1) + "…";
+        ctx.fillText(val, rX + 4, dy + 21);
+
+        dy += rowH;
+      });
+
+      // Valid Until elegant badge
+      const vuY = dy + 8;
+      // Badge bg with gradient
+      const vuGrad = ctx.createLinearGradient(rX, vuY, rX + 130, vuY);
+      vuGrad.addColorStop(0, t.primary);
+      vuGrad.addColorStop(1, t.secondary);
+      ctx.fillStyle = vuGrad;
+      rr(rX, vuY, 130, 28, 14);
+      ctx.fill();
+      // Inner highlight
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      rr(rX + 1, vuY + 1, 128, 12, [14, 14, 0, 0]);
+      ctx.fill();
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 10px 'Trebuchet MS', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("VALID UNTIL", rX + 65, vuY + 18);
+
+      ctx.fillStyle = t.text;
+      ctx.font = "bold 13px Georgia, serif";
+      ctx.textAlign = "left";
+      ctx.fillText(formatDate(validUntil), rX + 142, vuY + 19);
+
+      // Session badge (bottom-right)
+      ctx.fillStyle = hexToRgba(t.primary, 0.06);
+      rr(W - 128, oY + CH - 74, 96, 44, 12);
+      ctx.fill();
+      ctx.strokeStyle = hexToRgba(t.primary, 0.1);
+      ctx.lineWidth = 1;
+      rr(W - 128, oY + CH - 74, 96, 44, 12);
+      ctx.stroke();
+      ctx.fillStyle = hexToRgba(t.primary, 0.4);
+      ctx.font = "600 8px 'Trebuchet MS', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("SESSION", W - 80, oY + CH - 54);
+      ctx.fillStyle = t.primary;
+      ctx.font = "bold 17px Georgia, serif";
+      ctx.fillText(session, W - 80, oY + CH - 36);
+    };
+
     // ===== FRONT CARD =====
     const drawFront = (oY: number) => {
-      // Card shadow
+      // Shadow
       ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.18)";
-      ctx.shadowBlur = 30;
-      ctx.shadowOffsetY = 10;
+      ctx.shadowColor = "rgba(0,0,0,0.2)";
+      ctx.shadowBlur = 35;
+      ctx.shadowOffsetY = 12;
       ctx.fillStyle = "#fff";
-      roundRect(12, oY + 12, W - 24, CH - 24, 18);
+      rr(14, oY + 14, W - 28, CH - 28, 20);
       ctx.fill();
       ctx.restore();
 
-      // Card border
-      ctx.strokeStyle = hexToRgba(t.primary, 0.12);
+      // Border
+      ctx.strokeStyle = hexToRgba(t.primary, 0.08);
       ctx.lineWidth = 1;
-      roundRect(12, oY + 12, W - 24, CH - 24, 18);
+      rr(14, oY + 14, W - 28, CH - 28, 20);
       ctx.stroke();
 
       // Clip
       ctx.save();
-      roundRect(12, oY + 12, W - 24, CH - 24, 18);
+      rr(14, oY + 14, W - 28, CH - 28, 20);
       ctx.clip();
 
-      // ===== LEFT COLORED PANEL =====
-      const panelW = 310;
-      const pGrad = ctx.createLinearGradient(12, oY, 12, oY + CH);
-      pGrad.addColorStop(0, t.primary);
-      pGrad.addColorStop(0.5, t.secondary);
-      pGrad.addColorStop(1, t.dark);
-      ctx.fillStyle = pGrad;
-      ctx.fillRect(12, oY + 12, panelW, CH - 24);
+      // ===== LEFT PANEL (Gradient) =====
+      const panelW = 290;
 
-      // Subtle pattern on panel
-      ctx.globalAlpha = 0.04;
-      for (let i = 0; i < 20; i++) {
-        ctx.fillStyle = "#fff";
-        ctx.beginPath();
-        ctx.arc(12 + Math.random() * panelW, oY + 12 + Math.random() * (CH - 24), 20 + Math.random() * 40, 0, Math.PI * 2);
-        ctx.fill();
+      // Main gradient
+      const pGrad = ctx.createLinearGradient(14, oY + 14, 14, oY + CH - 14);
+      pGrad.addColorStop(0, t.primary);
+      pGrad.addColorStop(0.35, t.secondary);
+      pGrad.addColorStop(0.7, t.dark);
+      pGrad.addColorStop(1, t.secondary);
+      ctx.fillStyle = pGrad;
+      ctx.fillRect(14, oY + 14, panelW, CH - 28);
+
+      // Overlay radial glow top
+      const rGrad = ctx.createRadialGradient(14 + panelW / 2, oY + 80, 10, 14 + panelW / 2, oY + 80, 180);
+      rGrad.addColorStop(0, hexToRgba(t.accent, 0.15));
+      rGrad.addColorStop(1, "transparent");
+      ctx.fillStyle = rGrad;
+      ctx.fillRect(14, oY + 14, panelW, CH - 28);
+
+      // Elegant geometric pattern — subtle circles
+      ctx.globalAlpha = 0.035;
+      ctx.fillStyle = "#fff";
+      for (let row = 0; row < 12; row++) {
+        for (let col = 0; col < 6; col++) {
+          ctx.beginPath();
+          ctx.arc(30 + col * 50, oY + 40 + row * 48, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
       ctx.globalAlpha = 1;
 
-      // Diagonal lines decoration
-      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      // Curved decorative line
+      ctx.strokeStyle = "rgba(255,255,255,0.08)";
       ctx.lineWidth = 1;
-      for (let i = -CH; i < panelW + CH; i += 30) {
-        ctx.beginPath();
-        ctx.moveTo(12 + i, oY + 12);
-        ctx.lineTo(12 + i - CH, oY + CH - 12);
-        ctx.stroke();
-      }
-
-      // ===== PHOTO on Left Panel =====
-      const photoR = 72;
-      const photoCX = 12 + panelW / 2;
-      const photoCY = oY + 130;
-
-      // Photo outer glow
-      ctx.shadowColor = "rgba(0,0,0,0.25)";
-      ctx.shadowBlur = 15;
-      ctx.fillStyle = "rgba(255,255,255,0.15)";
       ctx.beginPath();
-      ctx.arc(photoCX, photoCY, photoR + 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.shadowColor = "transparent";
-
-      // White ring
-      ctx.strokeStyle = "#fff";
-      ctx.lineWidth = 3.5;
+      ctx.moveTo(14, oY + CH * 0.6);
+      ctx.quadraticCurveTo(14 + panelW * 0.6, oY + CH * 0.5, 14 + panelW, oY + CH * 0.7);
+      ctx.stroke();
       ctx.beginPath();
-      ctx.arc(photoCX, photoCY, photoR + 2, 0, Math.PI * 2);
+      ctx.moveTo(14, oY + CH * 0.65);
+      ctx.quadraticCurveTo(14 + panelW * 0.4, oY + CH * 0.55, 14 + panelW, oY + CH * 0.75);
       ctx.stroke();
 
-      // Photo circle
-      ctx.fillStyle = hexToRgba(t.accent, 0.3);
+      // ===== PHOTO =====
+      const photoR = 68;
+      const photoCX = 14 + panelW / 2;
+      const photoCY = oY + 135;
+
+      // Double ring
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(photoCX, photoCY, photoR + 12, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(photoCX, photoCY, photoR + 4, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Photo bg
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
       ctx.beginPath();
       ctx.arc(photoCX, photoCY, photoR, 0, Math.PI * 2);
       ctx.fill();
 
-      const drawPhotoContent = () => {
-        if (photo) {
-          const img = new Image();
-          img.onload = () => {
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(photoCX, photoCY, photoR, 0, Math.PI * 2);
-            ctx.clip();
-            const aspect = img.width / img.height;
-            let dx = photoCX - photoR, dy = photoCY - photoR, dw = photoR * 2, dh = photoR * 2;
-            if (aspect > 1) { dw = dh * aspect; dx = photoCX - dw / 2; }
-            else { dh = dw / aspect; dy = photoCY - dh / 2; }
-            ctx.drawImage(img, dx, dy, dw, dh);
-            ctx.restore();
-            finishFrontAfterPhoto();
-          };
-          img.src = photo;
-          return false;
-        } else {
-          ctx.fillStyle = "rgba(255,255,255,0.3)";
-          ctx.font = "52px sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText("👤", photoCX, photoCY + 16);
-          return true;
-        }
-      };
-
-      const finishFrontAfterPhoto = () => {
-        // Name on panel
+      const drawLeftPanelText = () => {
+        // Name
         ctx.fillStyle = "#fff";
-        ctx.font = "bold 22px 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
+        ctx.font = "bold 21px Georgia, 'Palatino Linotype', serif";
         ctx.textAlign = "center";
-        const nameDisplay = name.length > 20 ? name.slice(0, 20) + "…" : name;
-        ctx.fillText(nameDisplay, photoCX, photoCY + photoR + 38);
+        const nameD = name.length > 22 ? name.slice(0, 22) + "…" : name;
+        ctx.fillText(nameD, photoCX, photoCY + photoR + 35);
 
-        // Department chip
-        ctx.fillStyle = "rgba(255,255,255,0.18)";
-        const deptText = department.length > 22 ? department.slice(0, 22) + "…" : department;
-        const deptW = Math.min(ctx.measureText(deptText).width + 30, panelW - 40);
-        roundRect(photoCX - deptW / 2, photoCY + photoR + 48, deptW, 26, 13);
+        // Thin line under name
+        ctx.strokeStyle = "rgba(255,255,255,0.2)";
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(photoCX - 60, photoCY + photoR + 42);
+        ctx.lineTo(photoCX + 60, photoCY + photoR + 42);
+        ctx.stroke();
+
+        // Department pill
+        ctx.fillStyle = "rgba(255,255,255,0.14)";
+        const deptText = department.length > 24 ? department.slice(0, 24) + "…" : department;
+        ctx.font = "600 10px 'Trebuchet MS', sans-serif";
+        const deptW = Math.min(ctx.measureText(deptText).width + 28, panelW - 40);
+        rr(photoCX - deptW / 2, photoCY + photoR + 50, deptW, 24, 12);
         ctx.fill();
         ctx.fillStyle = "#fff";
-        ctx.font = "600 11px 'Trebuchet MS', 'Lucida Sans', Arial, sans-serif";
-        ctx.fillText(deptText, photoCX, photoCY + photoR + 65);
+        ctx.fillText(deptText, photoCX, photoCY + photoR + 66);
 
-        // ID Badge on panel bottom
-        ctx.fillStyle = "rgba(0,0,0,0.2)";
-        roundRect(12 + 30, oY + CH - 100, panelW - 60, 50, 10);
+        // ID box at bottom
+        ctx.fillStyle = "rgba(0,0,0,0.15)";
+        rr(14 + 35, oY + CH - 95, panelW - 70, 48, 12);
         ctx.fill();
-        ctx.fillStyle = "rgba(255,255,255,0.08)";
-        roundRect(12 + 30, oY + CH - 100, panelW - 60, 50, 10);
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        rr(14 + 35, oY + CH - 95, panelW - 70, 24, [12, 12, 0, 0]);
         ctx.fill();
+
         ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.font = "600 9px 'Trebuchet MS', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("STUDENT ID", photoCX, oY + CH - 80);
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 16px 'Courier New', 'Lucida Console', monospace";
-        ctx.fillText(studentId, photoCX, oY + CH - 60);
-
-        // ===== RIGHT SIDE (Details) =====
-        const rX = 12 + panelW + 35;
-        const rW = W - panelW - 85;
-
-        // Institution header
-        ctx.fillStyle = t.text;
-        ctx.font = "bold 11px 'Trebuchet MS', 'Lucida Sans', Arial, sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillText(institution.toUpperCase(), rX, oY + 42);
-
-        // Accent line under institution
-        const iGrad = ctx.createLinearGradient(rX, oY + 48, rX + 180, oY + 48);
-        iGrad.addColorStop(0, t.primary);
-        iGrad.addColorStop(1, hexToRgba(t.primary, 0));
-        ctx.fillStyle = iGrad;
-        ctx.fillRect(rX, oY + 48, 180, 2.5);
-
-        // "STUDENT ID CARD" title
-        ctx.fillStyle = t.primary;
-        ctx.font = "bold 26px 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
-        ctx.fillText("Student ID Card", rX, oY + 82);
-
-        // Detail rows
-        const fields = [
-          { label: "Full Name", value: name },
-          { label: "Date of Birth", value: formatDate(dob) },
-          { label: "Father's Name", value: fatherName },
-          { label: "Mother's Name", value: motherName },
-          { label: "Blood Group", value: blood },
-          { label: "Phone", value: phone },
-          { label: "Email", value: email },
-          { label: "Address", value: address },
-        ];
-
-        let dy = oY + 115;
-        const rowH = 36;
-
-        fields.forEach((f, i) => {
-          // Alternating row background
-          if (i % 2 === 0) {
-            ctx.fillStyle = hexToRgba(t.primary, 0.03);
-            roundRect(rX - 10, dy - 12, rW + 20, rowH, 6);
-            ctx.fill();
-          }
-
-          // Label
-          ctx.fillStyle = hexToRgba(t.primary, 0.7);
-          ctx.font = "600 10px 'Trebuchet MS', 'Lucida Sans', sans-serif";
-          ctx.textAlign = "left";
-          ctx.fillText(f.label.toUpperCase(), rX, dy + 3);
-
-          // Value
-          ctx.fillStyle = "#1a1a1a";
-          ctx.font = "500 14px 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
-          let val = f.value;
-          const maxW = rW - 10;
-          while (ctx.measureText(val).width > maxW && val.length > 5) val = val.slice(0, -1) + "…";
-          ctx.fillText(val, rX, dy + 19);
-
-          dy += rowH;
-        });
-
-        // Valid Until badge
-        const vuY = dy + 10;
-        ctx.fillStyle = t.primary;
-        roundRect(rX, vuY, 110, 30, 8);
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 10px 'Trebuchet MS', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("VALID UNTIL", rX + 55, vuY + 19);
-
-        ctx.fillStyle = t.text;
-        ctx.font = "bold 14px 'Palatino Linotype', Georgia, serif";
-        ctx.textAlign = "left";
-        ctx.fillText(formatDate(validUntil), rX + 120, vuY + 20);
-
-        // Session / Year (bottom-right corner)
-        ctx.fillStyle = hexToRgba(t.primary, 0.06);
-        roundRect(W - 130, oY + CH - 72, 95, 42, 10);
-        ctx.fill();
-        ctx.fillStyle = hexToRgba(t.primary, 0.45);
         ctx.font = "600 8px 'Trebuchet MS', sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText("SESSION", W - 82, oY + CH - 52);
-        ctx.fillStyle = t.primary;
-        ctx.font = "bold 16px 'Palatino Linotype', serif";
-        ctx.fillText(session, W - 82, oY + CH - 35);
-
-        ctx.restore(); // End clip
-
-        if (showBack) drawBack(CH + 50);
-        setGenerated(true);
+        ctx.fillText("STUDENT ID NUMBER", photoCX, oY + CH - 78);
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 15px 'Courier New', monospace";
+        ctx.fillText(studentId, photoCX, oY + CH - 57);
       };
 
-      const noPhoto = drawPhotoContent();
-      if (noPhoto) {
-        // Name on panel
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 22px 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
+      if (photo) {
+        const img = new Image();
+        img.onload = () => {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(photoCX, photoCY, photoR, 0, Math.PI * 2);
+          ctx.clip();
+          const aspect = img.width / img.height;
+          let dx = photoCX - photoR, dy2 = photoCY - photoR, dw = photoR * 2, dh = photoR * 2;
+          if (aspect > 1) { dw = dh * aspect; dx = photoCX - dw / 2; }
+          else { dh = dw / aspect; dy2 = photoCY - dh / 2; }
+          ctx.drawImage(img, dx, dy2, dw, dh);
+          ctx.restore();
+          drawLeftPanelText();
+          drawRightSideContent(oY, 14 + panelW);
+          ctx.restore(); // end card clip
+          if (showBack) drawBack(CH + 60);
+          setGenerated(true);
+        };
+        img.src = photo;
+      } else {
+        // Placeholder icon
+        ctx.fillStyle = "rgba(255,255,255,0.25)";
+        ctx.font = "48px sans-serif";
         ctx.textAlign = "center";
-        const nameDisplay = name.length > 20 ? name.slice(0, 20) + "…" : name;
-        ctx.fillText(nameDisplay, photoCX, photoCY + photoR + 38);
-
-        ctx.fillStyle = "rgba(255,255,255,0.18)";
-        const deptText = department.length > 22 ? department.slice(0, 22) + "…" : department;
-        const deptW = Math.min(ctx.measureText(deptText).width + 30, panelW - 40);
-        roundRect(photoCX - deptW / 2, photoCY + photoR + 48, deptW, 26, 13);
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "600 11px 'Trebuchet MS', 'Lucida Sans', Arial, sans-serif";
-        ctx.fillText(deptText, photoCX, photoCY + photoR + 65);
-
-        // ID badge
-        ctx.fillStyle = "rgba(0,0,0,0.2)";
-        roundRect(12 + 30, oY + CH - 100, panelW - 60, 50, 10);
-        ctx.fill();
-        ctx.fillStyle = "rgba(255,255,255,0.08)";
-        roundRect(12 + 30, oY + CH - 100, panelW - 60, 50, 10);
-        ctx.fill();
-        ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.font = "600 9px 'Trebuchet MS', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("STUDENT ID", photoCX, oY + CH - 80);
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 16px 'Courier New', 'Lucida Console', monospace";
-        ctx.fillText(studentId, photoCX, oY + CH - 60);
-
-        // Right side details
-        const rX = 12 + panelW + 35;
-        const rW = W - panelW - 85;
-
-        ctx.fillStyle = t.text;
-        ctx.font = "bold 11px 'Trebuchet MS', 'Lucida Sans', Arial, sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillText(institution.toUpperCase(), rX, oY + 42);
-
-        const iGrad = ctx.createLinearGradient(rX, oY + 48, rX + 180, oY + 48);
-        iGrad.addColorStop(0, t.primary);
-        iGrad.addColorStop(1, hexToRgba(t.primary, 0));
-        ctx.fillStyle = iGrad;
-        ctx.fillRect(rX, oY + 48, 180, 2.5);
-
-        ctx.fillStyle = t.primary;
-        ctx.font = "bold 26px 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
-        ctx.fillText("Student ID Card", rX, oY + 82);
-
-        const fields = [
-          { label: "Full Name", value: name },
-          { label: "Date of Birth", value: formatDate(dob) },
-          { label: "Father's Name", value: fatherName },
-          { label: "Mother's Name", value: motherName },
-          { label: "Blood Group", value: blood },
-          { label: "Phone", value: phone },
-          { label: "Email", value: email },
-          { label: "Address", value: address },
-        ];
-
-        let dy = oY + 115;
-        const rowH = 36;
-
-        fields.forEach((f, i) => {
-          if (i % 2 === 0) {
-            ctx.fillStyle = hexToRgba(t.primary, 0.03);
-            roundRect(rX - 10, dy - 12, rW + 20, rowH, 6);
-            ctx.fill();
-          }
-          ctx.fillStyle = hexToRgba(t.primary, 0.7);
-          ctx.font = "600 10px 'Trebuchet MS', 'Lucida Sans', sans-serif";
-          ctx.textAlign = "left";
-          ctx.fillText(f.label.toUpperCase(), rX, dy + 3);
-          ctx.fillStyle = "#1a1a1a";
-          ctx.font = "500 14px 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
-          let val = f.value;
-          const maxW = rW - 10;
-          while (ctx.measureText(val).width > maxW && val.length > 5) val = val.slice(0, -1) + "…";
-          ctx.fillText(val, rX, dy + 19);
-          dy += rowH;
-        });
-
-        const vuY = dy + 10;
-        ctx.fillStyle = t.primary;
-        roundRect(rX, vuY, 110, 30, 8);
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 10px 'Trebuchet MS', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("VALID UNTIL", rX + 55, vuY + 19);
-        ctx.fillStyle = t.text;
-        ctx.font = "bold 14px 'Palatino Linotype', Georgia, serif";
-        ctx.textAlign = "left";
-        ctx.fillText(formatDate(validUntil), rX + 120, vuY + 20);
-
-        ctx.fillStyle = hexToRgba(t.primary, 0.06);
-        roundRect(W - 130, oY + CH - 72, 95, 42, 10);
-        ctx.fill();
-        ctx.fillStyle = hexToRgba(t.primary, 0.45);
-        ctx.font = "600 8px 'Trebuchet MS', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("SESSION", W - 82, oY + CH - 52);
-        ctx.fillStyle = t.primary;
-        ctx.font = "bold 16px 'Palatino Linotype', serif";
-        ctx.fillText(session, W - 82, oY + CH - 35);
-
+        ctx.fillText("👤", photoCX, photoCY + 14);
+        drawLeftPanelText();
+        drawRightSideContent(oY, 14 + panelW);
         ctx.restore();
-
-        if (showBack) drawBack(CH + 50);
+        if (showBack) drawBack(CH + 60);
         setGenerated(true);
       }
     };
 
     // ===== BACK CARD =====
     const drawBack = (oY: number) => {
-      // Card shadow
+      // Shadow
       ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.18)";
-      ctx.shadowBlur = 30;
-      ctx.shadowOffsetY = 10;
+      ctx.shadowColor = "rgba(0,0,0,0.2)";
+      ctx.shadowBlur = 35;
+      ctx.shadowOffsetY = 12;
       ctx.fillStyle = "#fff";
-      roundRect(12, oY + 12, W - 24, CH - 24, 18);
+      rr(14, oY + 14, W - 28, CH - 28, 20);
       ctx.fill();
       ctx.restore();
 
-      ctx.strokeStyle = hexToRgba(t.primary, 0.12);
+      ctx.strokeStyle = hexToRgba(t.primary, 0.08);
       ctx.lineWidth = 1;
-      roundRect(12, oY + 12, W - 24, CH - 24, 18);
+      rr(14, oY + 14, W - 28, CH - 28, 20);
       ctx.stroke();
 
       ctx.save();
-      roundRect(12, oY + 12, W - 24, CH - 24, 18);
+      rr(14, oY + 14, W - 28, CH - 28, 20);
       ctx.clip();
 
-      // Top colored header
-      const hH = 58;
-      const hGrad = ctx.createLinearGradient(12, oY + 12, W - 12, oY + 12);
+      // Top header band with gradient
+      const hH = 62;
+      const hGrad = ctx.createLinearGradient(14, oY + 14, W - 14, oY + 14);
       hGrad.addColorStop(0, t.primary);
-      hGrad.addColorStop(0.4, t.secondary);
-      hGrad.addColorStop(1, t.dark);
+      hGrad.addColorStop(0.35, t.secondary);
+      hGrad.addColorStop(0.7, t.dark);
+      hGrad.addColorStop(1, t.secondary);
       ctx.fillStyle = hGrad;
-      ctx.fillRect(12, oY + 12, W - 24, hH);
+      ctx.fillRect(14, oY + 14, W - 28, hH);
 
-      // Header pattern
-      ctx.strokeStyle = "rgba(255,255,255,0.05)";
-      ctx.lineWidth = 1;
-      for (let i = -100; i < W + 100; i += 25) {
+      // Dot pattern on header
+      ctx.globalAlpha = 0.06;
+      ctx.fillStyle = "#fff";
+      for (let i = 0; i < 40; i++) {
         ctx.beginPath();
-        ctx.moveTo(i, oY + 12);
-        ctx.lineTo(i - hH, oY + 12 + hH);
-        ctx.stroke();
+        ctx.arc(30 + i * 24, oY + 14 + hH / 2, 1.5, 0, Math.PI * 2);
+        ctx.fill();
       }
+      ctx.globalAlpha = 1;
 
       // Institution on header
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 18px 'Palatino Linotype', 'Book Antiqua', Georgia, serif";
+      ctx.font = "bold 17px Georgia, 'Palatino Linotype', serif";
       ctx.textAlign = "center";
-      ctx.fillText(institution.toUpperCase(), W / 2, oY + 42);
-      ctx.font = "500 9px 'Trebuchet MS', sans-serif";
-      ctx.fillStyle = "rgba(255,255,255,0.6)";
-      ctx.fillText("STUDENT IDENTITY CARD — REVERSE", W / 2, oY + 56);
+      ctx.fillText(institution.toUpperCase(), W / 2, oY + 44);
+      ctx.fillStyle = "rgba(255,255,255,0.5)";
+      ctx.font = "500 8px 'Trebuchet MS', sans-serif";
+      ctx.fillText("STUDENT IDENTITY CARD  •  REVERSE SIDE", W / 2, oY + 60);
 
-      // Two column details
-      const cY = oY + 90;
-      const colL = 45, colR = W / 2 + 25;
-      const colW = W / 2 - 70;
-      const rH = 44;
+      // Subtle bg decoration
+      ctx.fillStyle = hexToRgba(t.primary, 0.02);
+      ctx.beginPath();
+      ctx.arc(W - 60, oY + CH - 80, 120, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Two-column details
+      const cY = oY + 96;
+      const colL = 45, colR = W / 2 + 30;
+      const colW = W / 2 - 75;
+      const rowH = 42;
 
       const leftData = [
         { label: "Father's Name", value: fatherName },
         { label: "Mother's Name", value: motherName },
         { label: "Date of Birth", value: formatDate(dob) },
         { label: "Blood Group", value: blood },
-        { label: "Emergency", value: emergencyContact },
+        { label: "Emergency Contact", value: emergencyContact },
       ];
       const rightData = [
-        { label: "Address", value: address },
+        { label: "Permanent Address", value: address },
         { label: "Student ID", value: studentId },
-        { label: "Session", value: session },
+        { label: "Session / Year", value: session },
         { label: "Department", value: department },
         { label: "Valid Until", value: formatDate(validUntil) },
       ];
@@ -565,106 +515,128 @@ export default function StudentIdCard() {
         let y = sy;
         fields.forEach((f, i) => {
           if (i % 2 === 0) {
-            ctx.fillStyle = hexToRgba(t.primary, 0.03);
-            roundRect(sx - 10, y - 5, cw + 20, rH - 2, 6);
+            ctx.fillStyle = hexToRgba(t.primary, 0.025);
+            rr(sx - 10, y - 4, cw + 20, rowH - 2, 8);
             ctx.fill();
           }
-          // Colored left accent
-          ctx.fillStyle = t.primary;
-          roundRect(sx - 10, y - 2, 3, 20, 1.5);
+
+          // Color accent bar
+          const barGrad = ctx.createLinearGradient(sx - 10, y, sx - 10, y + 22);
+          barGrad.addColorStop(0, t.primary);
+          barGrad.addColorStop(1, t.accent);
+          ctx.fillStyle = barGrad;
+          rr(sx - 10, y, 2.5, 22, 1.5);
           ctx.fill();
 
-          ctx.fillStyle = hexToRgba(t.primary, 0.65);
-          ctx.font = "600 9px 'Trebuchet MS', sans-serif";
+          ctx.fillStyle = hexToRgba(t.primary, 0.55);
+          ctx.font = "600 8.5px 'Trebuchet MS', sans-serif";
           ctx.textAlign = "left";
-          ctx.fillText(f.label.toUpperCase(), sx, y + 10);
+          ctx.fillText(f.label.toUpperCase(), sx, y + 11);
           ctx.fillStyle = "#222";
-          ctx.font = "500 13px 'Palatino Linotype', Georgia, serif";
+          ctx.font = "500 12.5px Georgia, 'Palatino Linotype', serif";
           let val = f.value;
           while (ctx.measureText(val).width > cw - 10 && val.length > 5) val = val.slice(0, -1) + "…";
           ctx.fillText(val, sx, y + 28);
-          y += rH;
+          y += rowH;
         });
       };
 
       drawCol(leftData, colL, cY, colW);
       drawCol(rightData, colR, cY, colW);
 
-      // Vertical divider
-      ctx.strokeStyle = hexToRgba(t.primary, 0.12);
+      // Elegant vertical divider
+      const divGrad = ctx.createLinearGradient(0, cY, 0, cY + rowH * 5);
+      divGrad.addColorStop(0, hexToRgba(t.primary, 0));
+      divGrad.addColorStop(0.3, hexToRgba(t.primary, 0.15));
+      divGrad.addColorStop(0.7, hexToRgba(t.primary, 0.15));
+      divGrad.addColorStop(1, hexToRgba(t.primary, 0));
+      ctx.strokeStyle = divGrad;
       ctx.lineWidth = 1;
-      ctx.setLineDash([6, 4]);
       ctx.beginPath();
-      ctx.moveTo(W / 2 + 5, cY - 5);
-      ctx.lineTo(W / 2 + 5, cY + rH * 5);
+      ctx.moveTo(W / 2 + 8, cY);
+      ctx.lineTo(W / 2 + 8, cY + rowH * 5);
       ctx.stroke();
-      ctx.setLineDash([]);
+
+      // Small diamond on divider center
+      ctx.fillStyle = t.primary;
+      const diaY = cY + rowH * 2.5;
+      ctx.save();
+      ctx.translate(W / 2 + 8, diaY);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillRect(-3, -3, 6, 6);
+      ctx.restore();
 
       // Terms box
-      const tY = cY + rH * 5 + 10;
+      const tY = cY + rowH * 5 + 12;
       ctx.fillStyle = hexToRgba(t.primary, 0.02);
-      ctx.strokeStyle = hexToRgba(t.primary, 0.1);
-      ctx.lineWidth = 1;
-      roundRect(35, tY, W - 70, 65, 10);
+      rr(40, tY, W - 80, 62, 10);
       ctx.fill();
-      roundRect(35, tY, W - 70, 65, 10);
+      ctx.strokeStyle = hexToRgba(t.primary, 0.08);
+      ctx.lineWidth = 0.8;
+      rr(40, tY, W - 80, 62, 10);
       ctx.stroke();
 
       ctx.fillStyle = t.primary;
       ctx.font = "bold 8px 'Trebuchet MS', sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("TERMS & CONDITIONS", 50, tY + 13);
-      ctx.fillStyle = "#777";
-      ctx.font = "400 8px 'Palatino Linotype', Georgia, serif";
-      ["1. This card must be carried at all times within campus premises.",
-       "2. Loss of card must be reported immediately to administration.",
-       "3. This card is non-transferable and remains property of the institution.",
-       "4. Any misuse may lead to disciplinary action.",
-      ].forEach((line, i) => ctx.fillText(line, 50, tY + 26 + i * 11));
+      ctx.fillText("TERMS & CONDITIONS", 55, tY + 13);
+      ctx.fillStyle = "#888";
+      ctx.font = "400 7.5px Georgia, serif";
+      [
+        "1. This card must be carried at all times within campus premises.",
+        "2. Loss of this card must be reported immediately to administration.",
+        "3. This card is non-transferable and remains property of the institution.",
+        "4. Any misuse may lead to disciplinary action.",
+      ].forEach((line, i) => ctx.fillText(line, 55, tY + 25 + i * 10));
 
-      // Signature & Seal area
-      const sigY = tY + 72;
+      // Seal & Signature
+      const sigY = tY + 68;
 
-      // Seal
-      ctx.strokeStyle = hexToRgba(t.primary, 0.25);
+      // Seal circle
+      ctx.strokeStyle = hexToRgba(t.primary, 0.2);
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.arc(110, sigY + 16, 20, 0, Math.PI * 2);
+      ctx.arc(115, sigY + 14, 18, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.fillStyle = hexToRgba(t.primary, 0.04);
-      ctx.fill();
-      ctx.fillStyle = hexToRgba(t.primary, 0.35);
-      ctx.font = "bold 7px 'Trebuchet MS', sans-serif";
+      ctx.strokeStyle = hexToRgba(t.primary, 0.1);
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.arc(115, sigY + 14, 14, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = hexToRgba(t.primary, 0.3);
+      ctx.font = "bold 6px 'Trebuchet MS', sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("SEAL", 110, sigY + 18);
+      ctx.fillText("SEAL", 115, sigY + 16);
+
+      // QR code
+      drawQR(ctx, 175, sigY - 4, 38);
 
       // Signature line
-      ctx.strokeStyle = "#bbb";
+      ctx.strokeStyle = hexToRgba(t.primary, 0.2);
       ctx.lineWidth = 0.8;
-      ctx.setLineDash([4, 3]);
       ctx.beginPath();
-      ctx.moveTo(W - 250, sigY + 25);
-      ctx.lineTo(W - 50, sigY + 25);
+      ctx.moveTo(W - 240, sigY + 22);
+      ctx.lineTo(W - 50, sigY + 22);
       ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#888";
-      ctx.font = "500 8px 'Palatino Linotype', serif";
-      ctx.fillText("Authorized Signature", W - 150, sigY + 38);
+      ctx.fillStyle = "#999";
+      ctx.font = "500 7.5px Georgia, serif";
+      ctx.fillText("Authorized Signature", W - 145, sigY + 34);
 
-      // Bottom bar with barcode
+      // Bottom gradient bar with barcode
       const fY = oY + CH - 52;
-      const fGrad = ctx.createLinearGradient(12, fY, W - 12, fY);
+      const fGrad = ctx.createLinearGradient(14, fY, W - 14, fY);
       fGrad.addColorStop(0, t.primary);
-      fGrad.addColorStop(0.5, t.secondary);
-      fGrad.addColorStop(1, t.dark);
+      fGrad.addColorStop(0.35, t.secondary);
+      fGrad.addColorStop(0.7, t.dark);
+      fGrad.addColorStop(1, t.secondary);
       ctx.fillStyle = fGrad;
-      ctx.fillRect(12, fY, W - 24, 40);
+      ctx.fillRect(14, fY, W - 28, 38);
 
-      drawBarcode(ctx, W / 2 - 120, fY + 5, 240, 18, studentId, "#fff");
-      ctx.fillStyle = "rgba(255,255,255,0.5)";
-      ctx.font = "bold 8px 'Courier New', monospace";
+      drawBarcode(ctx, W / 2 - 110, fY + 4, 220, 16, studentId, "#fff");
+      ctx.fillStyle = "rgba(255,255,255,0.45)";
+      ctx.font = "bold 7px 'Courier New', monospace";
       ctx.textAlign = "center";
-      ctx.fillText(studentId + " | " + institution.toUpperCase(), W / 2, fY + 32);
+      ctx.fillText(studentId + "  •  " + institution.toUpperCase(), W / 2, fY + 30);
 
       ctx.restore();
     };
