@@ -3,7 +3,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe } from "lucide-react";
+import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -30,6 +30,50 @@ interface MailMessage {
 function randomString(len: number) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+}
+
+function extractOTP(text: string): string | null {
+  if (!text) return null;
+  // Match 4-8 digit codes commonly used as OTPs
+  const patterns = [
+    /\b(?:code|otp|pin|verification|verify|confirm|token)[:\s]+(\d{4,8})\b/i,
+    /\b(\d{4,8})\s*(?:is your|is the|as your|as the|verification|code|otp|pin)\b/i,
+    /(?:code is|code:)\s*(\d{4,8})\b/i,
+    /\b(\d{6})\b/, // Fallback: standalone 6-digit number (most common OTP length)
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match?.[1]) return match[1];
+  }
+  return null;
+}
+
+function OTPBanner({ text, subject }: { text: string; subject?: string }) {
+  const otp = extractOTP(subject || "") || extractOTP(text);
+  if (!otp) return null;
+  
+  const copyOTP = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(otp);
+    toast.success(`OTP "${otp}" copied!`);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/20"
+      onClick={copyOTP}
+    >
+      <KeyRound className="w-4 h-4 text-primary shrink-0" />
+      <span className="text-xs font-medium text-muted-foreground">OTP Detected:</span>
+      <span className="font-mono font-extrabold text-base text-primary tracking-widest">{otp}</span>
+      <Button variant="ghost" size="sm" className="ml-auto h-7 px-2 rounded-lg text-xs gap-1 hover:bg-primary/10"
+        onClick={copyOTP}>
+        <Copy className="w-3 h-3" /> Copy
+      </Button>
+    </motion.div>
+  );
 }
 
 async function callMailAPI(action: string, params: Record<string, string> = {}) {
@@ -330,6 +374,7 @@ export default function TempMail() {
                   </Button>
                 </div>
                 <h3 className="font-bold text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
+                <OTPBanner text={selected.text || selected.intro || ""} subject={selected.subject} />
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                   <span>From: <strong className="text-foreground">{selected.from?.name || selected.from?.address}</strong></span>
                   <span>•</span>
@@ -396,6 +441,20 @@ export default function TempMail() {
                           {m.subject || "(No Subject)"}
                         </p>
                         <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">{m.intro}</p>
+                        {extractOTP(m.subject || "") || extractOTP(m.intro || "") ? (
+                          <div className="flex items-center gap-1 mt-1">
+                            <KeyRound className="w-3 h-3 text-primary" />
+                            <span className="text-[10px] font-bold text-primary">OTP: {extractOTP(m.subject || "") || extractOTP(m.intro || "")}</span>
+                            <button
+                              className="text-[10px] text-primary/70 hover:text-primary underline ml-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const otp = extractOTP(m.subject || "") || extractOTP(m.intro || "");
+                                if (otp) { navigator.clipboard.writeText(otp); toast.success(`OTP "${otp}" copied!`); }
+                              }}
+                            >Copy</button>
+                          </div>
+                        ) : null}
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                         <Eye className="w-3.5 h-3.5 text-muted-foreground" />
