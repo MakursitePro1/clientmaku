@@ -239,6 +239,15 @@ export default function TempNumber() {
   // Initial load
   useEffect(() => { fetchNumbers(); fetchCountryPages(); }, []);
 
+  // Auto-load numbers when a country is selected that has no numbers yet
+  useEffect(() => {
+    if (!countryFilter) return;
+    const hasNumbers = numbers.some(n => n.country.toLowerCase() === countryFilter.toLowerCase());
+    if (hasNumbers || loadedCountries.has(countryFilter)) return;
+    const cp = countryPages.find(p => p.country.toLowerCase() === countryFilter.toLowerCase());
+    if (cp) loadMoreNumbers(cp);
+  }, [countryFilter, countryPages]);
+
   // Fetch messages when number changes
   useEffect(() => {
     if (!activeNumber) return;
