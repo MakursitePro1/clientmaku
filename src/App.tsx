@@ -203,6 +203,7 @@ const App = () => (
                 </Suspense>
               </BrowserRouter>
             </TooltipProvider>
+          </SubscriptionProvider>
           </ToolCatalogProvider>
         </SiteSettingsProvider>
       </FavoritesProvider>
