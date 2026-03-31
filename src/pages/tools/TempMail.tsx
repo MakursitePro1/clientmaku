@@ -145,14 +145,15 @@ export default function TempMail() {
 
   const EMAIL_LIFETIME_MS = 60 * 60 * 1000; // 1 hour
 
-  // Expiry timer
+  // Expiry timer with auto-renew
   useEffect(() => {
     if (!createdAt) return;
     const tick = () => {
       const elapsed = Date.now() - createdAt;
       const remaining = Math.max(0, EMAIL_LIFETIME_MS - elapsed);
       if (remaining <= 0) {
-        setExpiryText("Expired");
+        setExpiryText("Renewing...");
+        createAccount();
         return;
       }
       const m = Math.floor(remaining / 60000);
@@ -163,6 +164,15 @@ export default function TempMail() {
     expiryRef.current = setInterval(tick, 1000);
     return () => { if (expiryRef.current) clearInterval(expiryRef.current); };
   }, [createdAt]);
+
+  // Forward email via mailto
+  const forwardEmail = (msg: MailMessage) => {
+    const subject = encodeURIComponent(`Fwd: ${msg.subject || "(No Subject)"}`);
+    const body = encodeURIComponent(
+      `---------- Forwarded message ----------\nFrom: ${msg.from?.name || msg.from?.address || "Unknown"}\nDate: ${new Date(msg.createdAt).toLocaleString()}\nSubject: ${msg.subject || "(No Subject)"}\n\n${msg.text || msg.intro || "No content"}`
+    );
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
+  };
 
   // Export functions
   const exportJSON = () => {
