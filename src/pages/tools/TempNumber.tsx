@@ -3,7 +3,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, RefreshCw, Phone, MessageSquare, Trash2, Globe, Shield, Clock, Signal, Smartphone, Search, X, Check, KeyRound, ArrowLeft, Volume2, VolumeX, Bell, BellOff, Download, FileJson, FileSpreadsheet, Eye, Plus, Loader2 } from "lucide-react";
+import { Copy, RefreshCw, Phone, MessageSquare, Trash2, Globe, Shield, Clock, Signal, Smartphone, Search, X, Check, KeyRound, ArrowLeft, Volume2, VolumeX, Bell, BellOff, Download, FileJson, FileSpreadsheet, Eye, Plus, Loader2, Star, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ── Helpers ──
@@ -93,6 +93,27 @@ export default function TempNumber() {
   const [countryPages, setCountryPages] = useState<CountryPage[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadedCountries, setLoadedCountries] = useState<Set<string>>(new Set());
+  const [favoriteNumbers, setFavoriteNumbers] = useState<NumberInfo[]>(() => {
+    try { return JSON.parse(localStorage.getItem("temp-number-favorites") || "[]"); } catch { return []; }
+  });
+
+  // Persist favorites
+  useEffect(() => {
+    localStorage.setItem("temp-number-favorites", JSON.stringify(favoriteNumbers));
+  }, [favoriteNumbers]);
+
+  const isFavorite = (slug: string) => favoriteNumbers.some(f => f.slug === slug);
+
+  const toggleFavorite = (num: NumberInfo) => {
+    setFavoriteNumbers(prev => {
+      if (prev.some(f => f.slug === num.slug)) {
+        toast.success("Removed from favorites");
+        return prev.filter(f => f.slug !== num.slug);
+      }
+      toast.success("Added to favorites ⭐");
+      return [num, ...prev];
+    });
+  };
 
   // Copy effect
   const triggerCopy = useCallback((key: string) => {
@@ -314,21 +335,27 @@ export default function TempNumber() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto">
               {filteredNumbers.map(n => (
-                <button
-                  key={n.slug}
-                  onClick={() => selectNumber(n)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all ${n.slug === activeNumber?.slug ? "bg-primary/10 border border-primary/30 shadow-sm" : "bg-muted/30 border border-transparent hover:bg-muted/60 hover:border-border/50"}`}
-                >
-                  <span className="text-base">{getFlag(n.country)}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-mono text-xs sm:text-sm font-bold truncate">{n.number}</p>
-                    <p className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
-                      {n.country}
-                      {n.source === "receivesms-co" && <span className="text-[7px] px-1 py-0 rounded bg-primary/10 text-primary font-bold">NEW</span>}
-                    </p>
-                  </div>
-                  {n.slug === activeNumber?.slug && <Signal className="w-3 h-3 text-primary shrink-0" />}
-                </button>
+                 <button
+                   key={n.slug}
+                   onClick={() => selectNumber(n)}
+                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all ${n.slug === activeNumber?.slug ? "bg-primary/10 border border-primary/30 shadow-sm" : "bg-muted/30 border border-transparent hover:bg-muted/60 hover:border-border/50"}`}
+                 >
+                   <span className="text-base">{getFlag(n.country)}</span>
+                   <div className="flex-1 min-w-0">
+                     <p className="font-mono text-xs sm:text-sm font-bold truncate">{n.number}</p>
+                     <p className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
+                       {n.country}
+                       {n.source === "receivesms-co" && <span className="text-[7px] px-1 py-0 rounded bg-primary/10 text-primary font-bold">NEW</span>}
+                     </p>
+                   </div>
+                   <button
+                     onClick={e => { e.stopPropagation(); toggleFavorite(n); }}
+                     className={`shrink-0 p-1 rounded-lg transition-all ${isFavorite(n.slug) ? "text-yellow-500" : "text-muted-foreground/30 hover:text-yellow-400"}`}
+                   >
+                     <Star className={`w-3.5 h-3.5 ${isFavorite(n.slug) ? "fill-yellow-500" : ""}`} />
+                   </button>
+                   {n.slug === activeNumber?.slug && <Signal className="w-3 h-3 text-primary shrink-0" />}
+                 </button>
               ))}
             </div>
           )}
@@ -630,6 +657,40 @@ export default function TempNumber() {
             )}
           </AnimatePresence>
         </div>
+
+        {/* Favorite Numbers */}
+        {favoriteNumbers.length > 0 && (
+          <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/5 overflow-hidden">
+            <div className="p-3 bg-yellow-500/10 border-b border-yellow-500/20">
+              <span className="text-xs font-bold flex items-center gap-1.5">
+                <Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" /> Favorite Numbers ({favoriteNumbers.length})
+              </span>
+            </div>
+            <div className="divide-y divide-yellow-500/10 max-h-40 overflow-y-auto">
+              {favoriteNumbers.map(f => (
+                <div key={f.slug} className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-yellow-500/5 transition-colors">
+                  <span>{getFlag(f.country)}</span>
+                  <span className="font-mono font-semibold flex-1 truncate">{f.number}</span>
+                  <span className="text-[10px] text-muted-foreground shrink-0">{f.country}</span>
+                  <motion.div whileTap={{ scale: 0.9 }}>
+                    <button
+                      className={`transition-all ${copiedKey === `fav-${f.slug}` ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
+                      onClick={() => handleCopy(f.number, "Number copied!", `fav-${f.slug}`)}
+                    >
+                      {copiedKey === `fav-${f.slug}` ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                    </button>
+                  </motion.div>
+                  <button onClick={() => selectNumber(f)} className="text-[10px] text-primary hover:underline font-medium shrink-0">
+                    Use
+                  </button>
+                  <button onClick={() => toggleFavorite(f)} className="text-yellow-500 hover:text-yellow-600 shrink-0">
+                    <Star className="w-3 h-3 fill-yellow-500" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Number History */}
         {numberHistory.length > 1 && (
