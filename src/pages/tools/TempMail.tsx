@@ -645,8 +645,8 @@ export default function TempMail() {
 
                 {/* Attachments Section */}
                 {selected.attachments && selected.attachments.length > 0 && (
-                  <div className="px-5 pt-2 pb-4">
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2 flex items-center gap-1.5">
+                  <div className="px-3 sm:px-5 pt-2 pb-3 sm:pb-4">
+                    <p className="text-[9px] sm:text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2 flex items-center gap-1.5">
                       <Paperclip className="w-3 h-3" /> Attachments ({selected.attachments.length})
                     </p>
                     <div className="space-y-1.5">
