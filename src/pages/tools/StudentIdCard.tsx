@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Download, Eye, Upload, Palette, User, GraduationCap, RotateCcw, Sparkles } from "lucide-react";
+import { Download, Eye, Upload, Palette, User, GraduationCap, RotateCcw, Sparkles, FileImage, FileText } from "lucide-react";
+import { PDFDocument } from "pdf-lib";
 import { motion } from "framer-motion";
 
 const themes = [
@@ -671,16 +672,61 @@ export default function StudentIdCard() {
     drawFront(0);
   }, [name, studentId, department, institution, session, blood, phone, email, dob, fatherName, motherName, address, emergencyContact, theme, photo, showBack, validUntil]);
 
-  const downloadCard = () => {
+  const getCardCanvas = (side: "front" | "back" | "both"): HTMLCanvasElement | null => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const W = 920, CH = 560;
+    const scale = 2;
+
+    if (side === "both") return canvas;
+
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = W * scale;
+    tempCanvas.height = CH * scale;
+    const tCtx = tempCanvas.getContext("2d");
+    if (!tCtx) return null;
+
+    const srcY = side === "front" ? 0 : (CH + 50) * scale;
+    tCtx.drawImage(canvas, 0, srcY, W * scale, CH * scale, 0, 0, W * scale, CH * scale);
+    return tempCanvas;
+  };
+
+  const downloadAs = (side: "front" | "back" | "both", format: "png" | "jpg" | "pdf") => {
     generate();
-    setTimeout(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const a = document.createElement("a");
-      a.download = `student-id-${studentId}.png`;
-      a.href = canvas.toDataURL("image/png");
-      a.click();
-      toast.success("Student ID Card downloaded!");
+    setTimeout(async () => {
+      const src = getCardCanvas(side);
+      if (!src) return;
+
+      const filename = `student-id-${side}-${studentId}`;
+
+      if (format === "png") {
+        const a = document.createElement("a");
+        a.download = `${filename}.png`;
+        a.href = src.toDataURL("image/png");
+        a.click();
+      } else if (format === "jpg") {
+        const a = document.createElement("a");
+        a.download = `${filename}.jpg`;
+        a.href = src.toDataURL("image/jpeg", 0.95);
+        a.click();
+      } else if (format === "pdf") {
+        const imgData = src.toDataURL("image/png");
+        const imgBytes = await fetch(imgData).then(r => r.arrayBuffer());
+        const pdfDoc = await PDFDocument.create();
+        const pngImage = await pdfDoc.embedPng(imgBytes);
+        const { width, height } = pngImage.scale(0.5);
+        const page = pdfDoc.addPage([width, height]);
+        page.drawImage(pngImage, { x: 0, y: 0, width, height });
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+        const a = document.createElement("a");
+        a.download = `${filename}.pdf`;
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      toast.success(`${side === "both" ? "Full card" : side === "front" ? "Front side" : "Back side"} downloaded as ${format.toUpperCase()}!`);
     }, 500);
   };
 
@@ -787,13 +833,47 @@ export default function StudentIdCard() {
           <button onClick={generate} className="tool-btn-primary px-6 py-3 flex items-center gap-2 text-sm font-bold">
             <Eye className="w-4 h-4" /> Preview Card
           </button>
-          <button onClick={downloadCard} className="tool-btn-primary px-6 py-3 flex items-center gap-2 text-sm font-bold" style={{ background: "linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%))" }}>
-            <Download className="w-4 h-4" /> Download PNG
-          </button>
           <Button onClick={resetAll} variant="ghost" className="rounded-xl gap-1.5 text-muted-foreground hover:text-destructive">
             <RotateCcw className="w-4 h-4" /> Reset
           </Button>
         </div>
+
+        {generated && (
+          <div className="tool-section-card p-5 space-y-4">
+            <h3 className="text-sm font-bold flex items-center gap-2"><Download className="w-4 h-4 text-primary" /> Download Options</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Front Side */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Front Side</p>
+                <div className="flex flex-col gap-1.5">
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("front", "png")}><FileImage className="w-3.5 h-3.5 text-blue-500" /> PNG</Button>
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("front", "jpg")}><FileImage className="w-3.5 h-3.5 text-orange-500" /> JPG</Button>
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("front", "pdf")}><FileText className="w-3.5 h-3.5 text-red-500" /> PDF</Button>
+                </div>
+              </div>
+              {/* Back Side */}
+              {showBack && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Back Side</p>
+                  <div className="flex flex-col gap-1.5">
+                    <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("back", "png")}><FileImage className="w-3.5 h-3.5 text-blue-500" /> PNG</Button>
+                    <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("back", "jpg")}><FileImage className="w-3.5 h-3.5 text-orange-500" /> JPG</Button>
+                    <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("back", "pdf")}><FileText className="w-3.5 h-3.5 text-red-500" /> PDF</Button>
+                  </div>
+                </div>
+              )}
+              {/* Full Card */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Full Card</p>
+                <div className="flex flex-col gap-1.5">
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("both", "png")}><FileImage className="w-3.5 h-3.5 text-blue-500" /> PNG</Button>
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("both", "jpg")}><FileImage className="w-3.5 h-3.5 text-orange-500" /> JPG</Button>
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("both", "pdf")}><FileText className="w-3.5 h-3.5 text-red-500" /> PDF</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="tool-result-card relative overflow-hidden">
           <canvas ref={canvasRef} className="w-full rounded-2xl" style={{ maxWidth: "100%" }} />
