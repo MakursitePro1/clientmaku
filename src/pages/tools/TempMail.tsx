@@ -625,8 +625,8 @@ export default function TempMail() {
                 </div>
 
                 {/* Email Body */}
-                <div className="px-5 pt-3 pb-2">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Message Body</p>
+                <div className="px-3 sm:px-5 pt-2 sm:pt-3 pb-2">
+                  <p className="text-[9px] sm:text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Message Body</p>
                   {selected.html && selected.html.length > 0 ? (
                     <div className="rounded-xl border border-border/20 bg-background overflow-auto max-h-[400px]">
                       <iframe
