@@ -7,23 +7,31 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface MailAccount {
-  login: string;
-  domain: string;
+  id: string;
   address: string;
+  token: string;
+  password: string;
+  providerBase: string;
 }
 
 interface MailMessage {
-  id: number;
-  from: string;
+  id: string;
+  from: { address: string; name: string };
+  to: { address: string; name: string }[];
   subject: string;
-  date: string;
-  // full message fields
-  textBody?: string;
-  htmlBody?: string;
-  body?: string;
+  intro: string;
+  text?: string;
+  html?: string[];
+  createdAt: string;
+  seen: boolean;
 }
 
-async function callMailAPI(action: string, params: Record<string, any> = {}) {
+function randomString(len: number) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+}
+
+async function callMailAPI(action: string, params: Record<string, string> = {}) {
   const { data, error } = await supabase.functions.invoke("temp-mail", {
     body: { action, ...params },
   });
@@ -47,24 +55,44 @@ export default function TempMail() {
     setMessages([]);
     setSelected(null);
     try {
+      // Step 1: Get available domains + provider base
       const domainData = await callMailAPI("getDomains");
-      const domains: string[] = domainData?.domains || [];
+      const domains = domainData?.domains || [];
+      const providerBase = domainData?.providerBase || "";
+      
       if (!domains.length) {
         toast.error("No domains available. Please try again later.");
         setCreating(false);
         return;
       }
-      const domain = domains[Math.floor(Math.random() * domains.length)];
-      const emailData = await callMailAPI("generateEmail", { domain });
-      
-      const newAccount: MailAccount = {
-        login: emailData.login,
-        domain: emailData.domain,
-        address: emailData.address,
-      };
-      setAccount(newAccount);
-      setAutoRefresh(true);
-      toast.success("Temp email created successfully!");
+      const domain = domains[Math.floor(Math.random() * domains.length)].domain;
+      const username = randomString(12);
+      const address = `${username}@${domain}`;
+      const password = randomString(16);
+
+      // Step 2: Create account
+      const accResult = await callMailAPI("createAccount", { address, password, providerBase });
+      if (accResult?.["@id"] || accResult?.id) {
+        // Step 3: Login to get token
+        const loginResult = await callMailAPI("login", { address, password, providerBase });
+        if (loginResult?.token) {
+          const newAccount: MailAccount = {
+            id: accResult.id || accResult["@id"]?.replace("/accounts/", ""),
+            address,
+            token: loginResult.token,
+            password,
+            providerBase,
+          };
+          setAccount(newAccount);
+          setAutoRefresh(true);
+          toast.success("Temp email created successfully!");
+        } else {
+          toast.error("Failed to login. Please try again.");
+        }
+      } else {
+        const errMsg = accResult?.detail || accResult?.message || "Failed to create account";
+        toast.error(errMsg);
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to create temp email");
     } finally {
@@ -72,43 +100,59 @@ export default function TempMail() {
     }
   }, []);
 
+  // Auto-create on mount
   useEffect(() => {
     createAccount();
   }, []);
 
+  // Fetch messages
   const fetchMessages = useCallback(async () => {
-    if (!account) return;
+    if (!account?.token) return;
     setRefreshing(true);
     try {
-      const data = await callMailAPI("getMessages", { login: account.login, domain: account.domain });
-      const msgs = data?.messages || [];
+      const data = await callMailAPI("getMessages", { token: account.token, providerBase: account.providerBase });
+      const msgs = data?.["hydra:member"] || data?.member || [];
       setMessages(msgs);
     } catch (err) {
       // Silent fail for auto-refresh
     } finally {
       setRefreshing(false);
     }
-  }, [account?.login, account?.domain]);
+  }, [account?.token, account?.providerBase]);
 
+  // Auto-refresh messages
   useEffect(() => {
-    if (!account || !autoRefresh) return;
+    if (!account?.token || !autoRefresh) return;
     fetchMessages();
     intervalRef.current = setInterval(fetchMessages, 5000);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [account, autoRefresh, fetchMessages]);
+  }, [account?.token, autoRefresh, fetchMessages]);
 
+  // View full message
   const viewMessage = async (msg: MailMessage) => {
-    if (!account) return;
+    if (!account?.token) return;
     setLoadingMessage(true);
     try {
-      const fullMsg = await callMailAPI("getMessage", { login: account.login, domain: account.domain, id: msg.id });
-      setSelected({ ...msg, ...fullMsg });
+      const fullMsg = await callMailAPI("getMessage", { token: account.token, messageId: msg.id, providerBase: account.providerBase });
+      setSelected(fullMsg);
     } catch (err) {
       toast.error("Failed to load message");
     } finally {
       setLoadingMessage(false);
+    }
+  };
+
+  const deleteMessage = async (msgId: string) => {
+    if (!account?.token) return;
+    try {
+      await callMailAPI("deleteMessage", { token: account.token, messageId: msgId, providerBase: account.providerBase });
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+      if (selected?.id === msgId) setSelected(null);
+      toast.success("Message deleted");
+    } catch {
+      toast.error("Failed to delete message");
     }
   };
 
@@ -215,17 +259,21 @@ export default function TempMail() {
                 className="p-5 space-y-4">
                 <div className="flex items-center justify-between">
                   <button onClick={() => setSelected(null)} className="text-xs text-primary hover:underline font-bold">← Back to Inbox</button>
+                  <Button variant="ghost" size="sm" className="text-xs text-destructive hover:bg-destructive/10 rounded-lg gap-1"
+                    onClick={() => deleteMessage(selected.id)}>
+                    <Trash2 className="w-3 h-3" /> Delete
+                  </Button>
                 </div>
                 <h3 className="font-bold text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span>From: <strong className="text-foreground">{selected.from}</strong></span>
+                  <span>From: <strong className="text-foreground">{selected.from?.name || selected.from?.address}</strong></span>
                   <span>•</span>
-                  <span>{new Date(selected.date).toLocaleString()}</span>
+                  <span>{new Date(selected.createdAt).toLocaleString()}</span>
                 </div>
-                {selected.htmlBody ? (
+                {selected.html && selected.html.length > 0 ? (
                   <div className="rounded-xl border border-border/30 bg-white dark:bg-zinc-900 overflow-auto max-h-[400px]">
                     <iframe
-                      srcDoc={selected.htmlBody}
+                      srcDoc={selected.html.join("")}
                       className="w-full min-h-[300px] border-0"
                       sandbox="allow-same-origin"
                       title="Email content"
@@ -233,7 +281,7 @@ export default function TempMail() {
                   </div>
                 ) : (
                   <div className="p-4 rounded-xl bg-accent/30 border border-border/30 text-sm leading-relaxed whitespace-pre-wrap">
-                    {selected.textBody || selected.body || "No content"}
+                    {selected.text || selected.intro || "No content"}
                   </div>
                 )}
               </motion.div>
@@ -271,17 +319,18 @@ export default function TempMail() {
                     className="w-full text-left p-3.5 hover:bg-primary/5 transition-all group"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 bg-primary" />
+                      <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${m.seen ? "bg-muted-foreground/30" : "bg-primary"}`} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <span className="text-sm truncate font-bold">
-                            {m.from || "Unknown"}
+                          <span className={`text-sm truncate ${m.seen ? "font-medium" : "font-bold"}`}>
+                            {m.from?.name || m.from?.address || "Unknown"}
                           </span>
-                          <span className="text-[10px] text-muted-foreground/60 shrink-0">{timeDiff(m.date)}</span>
+                          <span className="text-[10px] text-muted-foreground/60 shrink-0">{timeDiff(m.createdAt)}</span>
                         </div>
-                        <p className="text-xs truncate text-foreground">
+                        <p className={`text-xs truncate ${m.seen ? "text-muted-foreground" : "text-foreground"}`}>
                           {m.subject || "(No Subject)"}
                         </p>
+                        <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">{m.intro}</p>
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                         <Eye className="w-3.5 h-3.5 text-muted-foreground" />
@@ -299,7 +348,7 @@ export default function TempMail() {
           <AlertTriangle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
           <div className="text-xs text-muted-foreground space-y-1">
             <p className="font-semibold text-foreground">How it works</p>
-            <p>This generates a real temporary email that works on most websites. Copy the email, use it anywhere, and receive real OTPs & verification codes here. Emails auto-refresh every 5 seconds.</p>
+            <p>This generates a real temporary email. Copy the email, use it anywhere, and receive real OTPs & verification codes here. Emails auto-refresh every 5 seconds.</p>
           </div>
         </div>
       </div>
