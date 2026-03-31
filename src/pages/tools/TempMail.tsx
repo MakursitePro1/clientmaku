@@ -421,10 +421,11 @@ export default function TempMail() {
     }
   };
 
-  const copyEmail = () => {
+  const copyEmail = async () => {
     if (!account) return;
-    copyToClipboard(account.address);
-    toast.success("Email address copied!");
+    const ok = await copyToClipboard(account.address);
+    if (ok) toast.success("Email address copied!");
+    else toast.error("Copy failed");
   };
 
   const timeDiff = (dateStr: string) => {
