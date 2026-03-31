@@ -105,7 +105,7 @@ export default function AgeCalculator() {
           </div>
         </div>
         <div className="flex gap-3">
-          <button onClick={calculate} className="tool-btn-primary flex-1 py-3.5 px-6 flex items-center justify-center gap-2 text-base text-white">
+          <button onClick={calculate} className="tool-btn-primary flex-1 py-3.5 px-6 flex items-center justify-center gap-2 text-base">
             <Zap className="w-5 h-5" /> Calculate Age
           </button>
           {result && (
