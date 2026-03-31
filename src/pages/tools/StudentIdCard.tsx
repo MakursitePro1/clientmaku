@@ -156,7 +156,7 @@ export default function StudentIdCard() {
 
       // Institution name
       ctx.fillStyle = hexToRgba(t.primary, 0.55);
-      ctx.font = "600 11px 'Trebuchet MS', 'Lucida Sans', sans-serif";
+      ctx.font = "600 12px 'Trebuchet MS', 'Lucida Sans', sans-serif";
       ctx.textAlign = "left";
       ctx.letterSpacing = "2px";
       ctx.fillText(institution.toUpperCase(), rX, oY + 40);
@@ -172,7 +172,7 @@ export default function StudentIdCard() {
 
       // Title
       ctx.fillStyle = t.text;
-      ctx.font = "bold 28px Georgia, 'Palatino Linotype', 'Book Antiqua', serif";
+      ctx.font = "bold 32px Georgia, 'Palatino Linotype', 'Book Antiqua', serif";
       ctx.fillText("Student ID Card", rX, oY + 80);
 
       // Small colored dot after title
@@ -211,13 +211,13 @@ export default function StudentIdCard() {
 
         // Label
         ctx.fillStyle = hexToRgba(t.primary, 0.6);
-        ctx.font = "600 9px 'Trebuchet MS', sans-serif";
+        ctx.font = "600 11px 'Trebuchet MS', sans-serif";
         ctx.textAlign = "left";
         ctx.fillText(f.label.toUpperCase(), rX + 4, dy + 5);
 
         // Value
         ctx.fillStyle = "#1a1a1a";
-        ctx.font = "500 13.5px Georgia, 'Palatino Linotype', serif";
+        ctx.font = "500 15px Georgia, 'Palatino Linotype', serif";
         let val = f.value;
         const maxW = rW - 20;
         while (ctx.measureText(val).width > maxW && val.length > 5) val = val.slice(0, -1) + "…";
@@ -241,12 +241,12 @@ export default function StudentIdCard() {
       ctx.fill();
 
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 10px 'Trebuchet MS', sans-serif";
+      ctx.font = "bold 11px 'Trebuchet MS', sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("VALID UNTIL", rX + 65, vuY + 18);
 
       ctx.fillStyle = t.text;
-      ctx.font = "bold 13px Georgia, serif";
+      ctx.font = "bold 14px Georgia, serif";
       ctx.textAlign = "left";
       ctx.fillText(formatDate(validUntil), rX + 142, vuY + 19);
 
@@ -259,11 +259,11 @@ export default function StudentIdCard() {
       rr(W - 128, oY + CH - 74, 96, 44, 12);
       ctx.stroke();
       ctx.fillStyle = hexToRgba(t.primary, 0.4);
-      ctx.font = "600 8px 'Trebuchet MS', sans-serif";
+      ctx.font = "600 9px 'Trebuchet MS', sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("SESSION", W - 80, oY + CH - 54);
       ctx.fillStyle = t.primary;
-      ctx.font = "bold 17px Georgia, serif";
+      ctx.font = "bold 18px Georgia, serif";
       ctx.fillText(session, W - 80, oY + CH - 36);
     };
 
@@ -333,6 +333,51 @@ export default function StudentIdCard() {
       ctx.quadraticCurveTo(14 + panelW * 0.4, oY + CH * 0.55, 14 + panelW, oY + CH * 0.75);
       ctx.stroke();
 
+      // Premium hologram plate
+      const holoX = W - 180;
+      const holoY = oY + 98;
+      const holoGrad = ctx.createLinearGradient(holoX, holoY, holoX + 120, holoY + 60);
+      holoGrad.addColorStop(0, hexToRgba(t.primary, 0.16));
+      holoGrad.addColorStop(0.5, hexToRgba(t.accent, 0.2));
+      holoGrad.addColorStop(1, hexToRgba(t.secondary, 0.12));
+      ctx.fillStyle = holoGrad;
+      rr(holoX, holoY, 120, 60, 12);
+      ctx.fill();
+      ctx.strokeStyle = hexToRgba(t.primary, 0.22);
+      ctx.lineWidth = 1;
+      rr(holoX, holoY, 120, 60, 12);
+      ctx.stroke();
+      ctx.strokeStyle = hexToRgba(t.primary, 0.25);
+      ctx.lineWidth = 0.9;
+      ctx.beginPath();
+      ctx.arc(holoX + 30, holoY + 30, 14, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(holoX + 30, holoY + 30, 6, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(holoX + 54, holoY + 22);
+      ctx.lineTo(holoX + 98, holoY + 22);
+      ctx.moveTo(holoX + 54, holoY + 31);
+      ctx.lineTo(holoX + 104, holoY + 31);
+      ctx.moveTo(holoX + 54, holoY + 40);
+      ctx.lineTo(holoX + 90, holoY + 40);
+      ctx.stroke();
+
+      // Lower-right wave graphics
+      const waveGrad = ctx.createLinearGradient(W - 320, oY + CH - 150, W, oY + CH);
+      waveGrad.addColorStop(0, hexToRgba(t.primary, 0.08));
+      waveGrad.addColorStop(1, hexToRgba(t.accent, 0.04));
+      ctx.fillStyle = waveGrad;
+      ctx.beginPath();
+      ctx.moveTo(W - 330, oY + CH - 110);
+      ctx.quadraticCurveTo(W - 220, oY + CH - 165, W - 80, oY + CH - 120);
+      ctx.quadraticCurveTo(W - 36, oY + CH - 103, W - 22, oY + CH - 72);
+      ctx.lineTo(W - 22, oY + CH - 25);
+      ctx.lineTo(W - 330, oY + CH - 25);
+      ctx.closePath();
+      ctx.fill();
+
       // ===== PHOTO =====
       const photoR = 68;
       const photoCX = 14 + panelW / 2;
@@ -360,7 +405,7 @@ export default function StudentIdCard() {
       const drawLeftPanelText = () => {
         // Name
         ctx.fillStyle = "#fff";
-        ctx.font = "bold 21px Georgia, 'Palatino Linotype', serif";
+        ctx.font = "bold 24px Georgia, 'Palatino Linotype', serif";
         ctx.textAlign = "center";
         const nameD = name.length > 22 ? name.slice(0, 22) + "…" : name;
         ctx.fillText(nameD, photoCX, photoCY + photoR + 35);
@@ -376,7 +421,7 @@ export default function StudentIdCard() {
         // Department pill
         ctx.fillStyle = "rgba(255,255,255,0.14)";
         const deptText = department.length > 24 ? department.slice(0, 24) + "…" : department;
-        ctx.font = "600 10px 'Trebuchet MS', sans-serif";
+        ctx.font = "600 11px 'Trebuchet MS', sans-serif";
         const deptW = Math.min(ctx.measureText(deptText).width + 28, panelW - 40);
         rr(photoCX - deptW / 2, photoCY + photoR + 50, deptW, 24, 12);
         ctx.fill();
@@ -392,11 +437,11 @@ export default function StudentIdCard() {
         ctx.fill();
 
         ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.font = "600 8px 'Trebuchet MS', sans-serif";
+        ctx.font = "600 9px 'Trebuchet MS', sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("STUDENT ID NUMBER", photoCX, oY + CH - 78);
         ctx.fillStyle = "#fff";
-        ctx.font = "bold 15px 'Courier New', monospace";
+        ctx.font = "bold 16px 'Courier New', monospace";
         ctx.fillText(studentId, photoCX, oY + CH - 57);
       };
 
@@ -423,7 +468,7 @@ export default function StudentIdCard() {
       } else {
         // Placeholder icon
         ctx.fillStyle = "rgba(255,255,255,0.25)";
-        ctx.font = "48px sans-serif";
+        ctx.font = "54px sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("👤", photoCX, photoCY + 14);
         drawLeftPanelText();
@@ -477,12 +522,34 @@ export default function StudentIdCard() {
 
       // Institution on header
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 17px Georgia, 'Palatino Linotype', serif";
+      ctx.font = "bold 19px Georgia, 'Palatino Linotype', serif";
       ctx.textAlign = "center";
       ctx.fillText(institution.toUpperCase(), W / 2, oY + 44);
       ctx.fillStyle = "rgba(255,255,255,0.5)";
-      ctx.font = "500 8px 'Trebuchet MS', sans-serif";
+      ctx.font = "500 9px 'Trebuchet MS', sans-serif";
       ctx.fillText("STUDENT IDENTITY CARD  •  REVERSE SIDE", W / 2, oY + 60);
+
+      // Watermark ribbon graphics
+      const wmGrad = ctx.createLinearGradient(40, oY + 120, W - 40, oY + CH - 80);
+      wmGrad.addColorStop(0, hexToRgba(t.primary, 0.035));
+      wmGrad.addColorStop(0.5, hexToRgba(t.accent, 0.05));
+      wmGrad.addColorStop(1, hexToRgba(t.secondary, 0.03));
+      ctx.fillStyle = wmGrad;
+      ctx.beginPath();
+      ctx.moveTo(20, oY + 170);
+      ctx.quadraticCurveTo(W * 0.45, oY + 130, W - 20, oY + 190);
+      ctx.lineTo(W - 20, oY + 235);
+      ctx.quadraticCurveTo(W * 0.45, oY + 175, 20, oY + 225);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = hexToRgba(t.primary, 0.06);
+      ctx.save();
+      ctx.translate(W - 110, oY + 110);
+      ctx.rotate(-Math.PI / 9);
+      ctx.font = "bold 24px Georgia, serif";
+      ctx.fillText("ID", 0, 0);
+      ctx.restore();
 
       // Subtle bg decoration
       ctx.fillStyle = hexToRgba(t.primary, 0.02);
@@ -529,11 +596,11 @@ export default function StudentIdCard() {
           ctx.fill();
 
           ctx.fillStyle = hexToRgba(t.primary, 0.55);
-          ctx.font = "600 8.5px 'Trebuchet MS', sans-serif";
+          ctx.font = "600 9.5px 'Trebuchet MS', sans-serif";
           ctx.textAlign = "left";
           ctx.fillText(f.label.toUpperCase(), sx, y + 11);
           ctx.fillStyle = "#222";
-          ctx.font = "500 12.5px Georgia, 'Palatino Linotype', serif";
+          ctx.font = "500 14px Georgia, 'Palatino Linotype', serif";
           let val = f.value;
           while (ctx.measureText(val).width > cw - 10 && val.length > 5) val = val.slice(0, -1) + "…";
           ctx.fillText(val, sx, y + 28);
@@ -577,11 +644,11 @@ export default function StudentIdCard() {
       ctx.stroke();
 
       ctx.fillStyle = t.primary;
-      ctx.font = "bold 8px 'Trebuchet MS', sans-serif";
+      ctx.font = "bold 9px 'Trebuchet MS', sans-serif";
       ctx.textAlign = "left";
       ctx.fillText("TERMS & CONDITIONS", 55, tY + 13);
       ctx.fillStyle = "#888";
-      ctx.font = "400 7.5px Georgia, serif";
+      ctx.font = "400 8.2px Georgia, serif";
       [
         "1. This card must be carried at all times within campus premises.",
         "2. Loss of this card must be reported immediately to administration.",
@@ -604,7 +671,7 @@ export default function StudentIdCard() {
       ctx.arc(115, sigY + 14, 14, 0, Math.PI * 2);
       ctx.stroke();
       ctx.fillStyle = hexToRgba(t.primary, 0.3);
-      ctx.font = "bold 6px 'Trebuchet MS', sans-serif";
+      ctx.font = "bold 7px 'Trebuchet MS', sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("SEAL", 115, sigY + 16);
 
@@ -619,7 +686,7 @@ export default function StudentIdCard() {
       ctx.lineTo(W - 50, sigY + 22);
       ctx.stroke();
       ctx.fillStyle = "#999";
-      ctx.font = "500 7.5px Georgia, serif";
+      ctx.font = "500 8.5px Georgia, serif";
       ctx.fillText("Authorized Signature", W - 145, sigY + 34);
 
       // Bottom gradient bar with barcode
@@ -634,7 +701,7 @@ export default function StudentIdCard() {
 
       drawBarcode(ctx, W / 2 - 110, fY + 4, 220, 16, studentId, "#fff");
       ctx.fillStyle = "rgba(255,255,255,0.45)";
-      ctx.font = "bold 7px 'Courier New', monospace";
+      ctx.font = "bold 8px 'Courier New', monospace";
       ctx.textAlign = "center";
       ctx.fillText(studentId + "  •  " + institution.toUpperCase(), W / 2, fY + 30);
 
