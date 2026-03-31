@@ -572,6 +572,10 @@ export default function TempMail() {
                       }}>
                       <Copy className="w-3 h-3" /> Copy
                     </Button>
+                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-primary hover:bg-primary/10"
+                      onClick={() => forwardEmail(selected)}>
+                      <Forward className="w-3 h-3" /> Forward
+                    </Button>
                     <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-destructive hover:bg-destructive/10"
                       onClick={() => deleteMessage(selected.id)}>
                       <Trash2 className="w-3 h-3" /> Delete
