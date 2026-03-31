@@ -834,6 +834,137 @@ export default function InternetSpeedTester() {
           </div>
         </div>
 
+        {/* ===== Summary Card — visible after test completes ===== */}
+        <AnimatePresence>
+          {phase === "done" && download !== null && upload !== null && ping !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ type: "spring", stiffness: 160, damping: 18, delay: 0.3 }}
+              className="rounded-2xl border-2 border-primary/20 bg-card overflow-hidden"
+            >
+              {/* Gradient header */}
+              <div className="relative px-6 py-4 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent" />
+                <h3 className="relative flex items-center gap-2 text-sm font-bold text-foreground">
+                  <Zap className="h-4 w-4 text-primary" />
+                  Speed Test Summary
+                </h3>
+                <p className="relative mt-0.5 text-[11px] text-muted-foreground">
+                  {new Date().toLocaleString()}
+                </p>
+              </div>
+
+              <div className="p-5 space-y-5">
+                {/* Visual speed bars */}
+                <div className="space-y-4">
+                  {/* Download bar */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <Download className="h-4 w-4 text-primary" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Download</span>
+                      </div>
+                      <span className="text-lg font-semibold text-foreground">{download.toFixed(2)} <span className="text-xs text-muted-foreground font-normal">Mbps</span></span>
+                    </div>
+                    <div className="h-3 w-full rounded-full bg-foreground/5 overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: "linear-gradient(90deg, hsl(263 70% 50%), hsl(280 80% 60%))" }}
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${Math.min((download / 100) * 100, 100)}%` }}
+                        transition={{ duration: 1.2, delay: 0.6, ease: "easeOut" }}
+                      />
+                    </div>
+                  </motion.div>
+
+                  {/* Upload bar */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <Upload className="h-4 w-4" style={{ color: "hsl(142 76% 40%)" }} />
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Upload</span>
+                      </div>
+                      <span className="text-lg font-semibold text-foreground">{upload.toFixed(2)} <span className="text-xs text-muted-foreground font-normal">Mbps</span></span>
+                    </div>
+                    <div className="h-3 w-full rounded-full bg-foreground/5 overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ background: "linear-gradient(90deg, hsl(142 76% 36%), hsl(160 70% 45%))" }}
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${Math.min((upload / 100) * 100, 100)}%` }}
+                        transition={{ duration: 1.2, delay: 0.8, ease: "easeOut" }}
+                      />
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Metrics grid */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1 }}
+                  className="grid grid-cols-4 gap-2"
+                >
+                  {[
+                    { label: "Ping", value: `${ping}`, unit: "ms", icon: Activity, color: "hsl(45 93% 55%)" },
+                    { label: "Jitter", value: `${jitter ?? 0}`, unit: "ms", icon: TrendingUp, color: "hsl(25 95% 55%)" },
+                    { label: "Server", value: "CDN", unit: "", icon: Server, color: "hsl(200 80% 55%)" },
+                    { label: "Protocol", value: location.protocol === "https:" ? "TLS" : "HTTP", unit: "", icon: Shield, color: "hsl(160 70% 45%)" },
+                  ].map((item, i) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 1.1 + i * 0.1, type: "spring", stiffness: 200 }}
+                      className="flex flex-col items-center gap-1 rounded-xl border border-foreground/8 bg-muted/30 p-3"
+                    >
+                      <item.icon className="h-3.5 w-3.5" style={{ color: item.color }} />
+                      <span className="text-base font-bold text-foreground">{item.value}{item.unit && <span className="text-[10px] text-muted-foreground ml-0.5">{item.unit}</span>}</span>
+                      <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{item.label}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* Speed rating */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.5 }}
+                  className="flex items-center justify-center gap-3 rounded-xl border border-foreground/8 bg-muted/20 p-3"
+                >
+                  <div className="text-2xl">
+                    {download >= 50 ? "🚀" : download >= 20 ? "⚡" : download >= 5 ? "👍" : "🐢"}
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-foreground">
+                      {download >= 50 ? "Excellent Speed!" : download >= 20 ? "Very Good Speed" : download >= 5 ? "Decent Speed" : "Slow Connection"}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {download >= 50
+                        ? "Great for 4K streaming, gaming & large downloads"
+                        : download >= 20
+                          ? "Good for HD streaming & video calls"
+                          : download >= 5
+                            ? "Suitable for browsing & SD streaming"
+                            : "May struggle with video streaming"}
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Network Information */}
         <div className="rounded-2xl border-2 border-foreground/10 bg-card p-5">
           <h3 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
