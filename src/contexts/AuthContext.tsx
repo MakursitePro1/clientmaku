@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, displayName: string, username: string) => Promise<{ error: Error | null; needsVerification?: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -20,13 +20,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    // Safety timeout - ensure loading resolves even if auth hangs
     const timeout = setTimeout(() => {
       setLoading(false);
       setInitialized(true);
     }, 10000);
 
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -35,7 +33,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    // Then get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -56,13 +53,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signUp = async (email: string, password: string, displayName: string) => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, displayName: string, username: string) => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName } },
+      options: {
+        data: { display_name: displayName, username },
+        emailRedirectTo: window.location.origin,
+      },
     });
-    return { error: error as Error | null };
+    if (error) return { error: error as Error | null };
+
+    // If user exists but email not confirmed, it means verification is needed
+    const needsVerification = !!data.user && !data.session;
+
+    // Update username in profiles if user was created
+    if (data.user && username) {
+      await supabase
+        .from("profiles")
+        .update({ username })
+        .eq("user_id", data.user.id);
+    }
+
+    return { error: null, needsVerification };
   };
 
   const signIn = async (email: string, password: string) => {
