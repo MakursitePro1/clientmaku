@@ -10,12 +10,10 @@ import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { ToolsBanner } from "@/components/ToolsBanner";
-import { SideDecorations } from "@/components/SideDecorations";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background relative">
-      <SideDecorations />
+    <div className="min-h-screen bg-background">
       <SEOHead title="Cyber Venom" description="210+ free online web tools — image editors, code testers, converters, calculators, and more. No signup required." path="/" />
       <Navbar />
       <HeroSection />
