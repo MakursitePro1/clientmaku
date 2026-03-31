@@ -62,6 +62,7 @@ export default function AuthPage() {
       return;
     }
 
+    if (isSignUp) {
       if (!displayName.trim()) { setError("Full name is required"); setLoading(false); return; }
       if (!username.trim()) { setError("Username is required"); setLoading(false); return; }
       if (username.length < 3) { setError("Username must be at least 3 characters"); setLoading(false); return; }
