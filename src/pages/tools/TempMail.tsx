@@ -356,7 +356,21 @@ export default function TempMail() {
     }
   };
 
-  const copyEmail = () => {
+  const clearAllMessages = async () => {
+    if (!account?.token || !messages.length) return;
+    const count = messages.length;
+    try {
+      await Promise.allSettled(messages.map(m => 
+        callMailAPI("deleteMessage", { token: account.token, messageId: m.id, providerBase: account.providerBase })
+      ));
+      setMessages([]);
+      setSelected(null);
+      prevMsgCountRef.current = 0;
+      toast.success(`${count} messages cleared!`);
+    } catch {
+      toast.error("Failed to clear messages");
+    }
+  };
     if (!account) return;
     navigator.clipboard.writeText(account.address);
     toast.success("Email address copied!");
