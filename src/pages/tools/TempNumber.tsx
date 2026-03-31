@@ -3,7 +3,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, RefreshCw, Phone, MessageSquare, Trash2, Globe, Shield, Clock, Signal, Smartphone, Search, X, Check, KeyRound, ArrowLeft, Volume2, VolumeX, Bell, BellOff, Download, FileJson, FileSpreadsheet, Eye, Plus, Loader2 } from "lucide-react";
+import { Copy, RefreshCw, Phone, MessageSquare, Trash2, Globe, Shield, Clock, Signal, Smartphone, Search, X, Check, KeyRound, ArrowLeft, Volume2, VolumeX, Bell, BellOff, Download, FileJson, FileSpreadsheet, Eye, Plus, Loader2, Star, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ── Helpers ──
