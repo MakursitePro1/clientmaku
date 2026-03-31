@@ -335,21 +335,27 @@ export default function TempNumber() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto">
               {filteredNumbers.map(n => (
-                <button
-                  key={n.slug}
-                  onClick={() => selectNumber(n)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all ${n.slug === activeNumber?.slug ? "bg-primary/10 border border-primary/30 shadow-sm" : "bg-muted/30 border border-transparent hover:bg-muted/60 hover:border-border/50"}`}
-                >
-                  <span className="text-base">{getFlag(n.country)}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-mono text-xs sm:text-sm font-bold truncate">{n.number}</p>
-                    <p className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
-                      {n.country}
-                      {n.source === "receivesms-co" && <span className="text-[7px] px-1 py-0 rounded bg-primary/10 text-primary font-bold">NEW</span>}
-                    </p>
-                  </div>
-                  {n.slug === activeNumber?.slug && <Signal className="w-3 h-3 text-primary shrink-0" />}
-                </button>
+                 <button
+                   key={n.slug}
+                   onClick={() => selectNumber(n)}
+                   className={`flex items-center gap-2 px-3 py-2 rounded-xl text-left transition-all ${n.slug === activeNumber?.slug ? "bg-primary/10 border border-primary/30 shadow-sm" : "bg-muted/30 border border-transparent hover:bg-muted/60 hover:border-border/50"}`}
+                 >
+                   <span className="text-base">{getFlag(n.country)}</span>
+                   <div className="flex-1 min-w-0">
+                     <p className="font-mono text-xs sm:text-sm font-bold truncate">{n.number}</p>
+                     <p className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
+                       {n.country}
+                       {n.source === "receivesms-co" && <span className="text-[7px] px-1 py-0 rounded bg-primary/10 text-primary font-bold">NEW</span>}
+                     </p>
+                   </div>
+                   <button
+                     onClick={e => { e.stopPropagation(); toggleFavorite(n); }}
+                     className={`shrink-0 p-1 rounded-lg transition-all ${isFavorite(n.slug) ? "text-yellow-500" : "text-muted-foreground/30 hover:text-yellow-400"}`}
+                   >
+                     <Star className={`w-3.5 h-3.5 ${isFavorite(n.slug) ? "fill-yellow-500" : ""}`} />
+                   </button>
+                   {n.slug === activeNumber?.slug && <Signal className="w-3 h-3 text-primary shrink-0" />}
+                 </button>
               ))}
             </div>
           )}
