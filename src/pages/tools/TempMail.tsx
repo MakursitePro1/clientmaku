@@ -3,7 +3,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX, Download, FileJson, FileSpreadsheet, Timer } from "lucide-react";
+import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX, Download, FileJson, FileSpreadsheet, Timer, ArrowLeft, Paperclip, File, Calendar, User, TrashIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -43,6 +43,14 @@ interface MailAccount {
   providerBase: string;
 }
 
+interface MailAttachment {
+  id: string;
+  filename: string;
+  contentType: string;
+  size: number;
+  downloadUrl?: string;
+}
+
 interface MailMessage {
   id: string;
   from: { address: string; name: string };
@@ -53,6 +61,8 @@ interface MailMessage {
   html?: string[];
   createdAt: string;
   seen: boolean;
+  hasAttachments?: boolean;
+  attachments?: MailAttachment[];
 }
 
 function randomString(len: number) {
@@ -346,6 +356,22 @@ export default function TempMail() {
     }
   };
 
+  const clearAllMessages = async () => {
+    if (!account?.token || !messages.length) return;
+    const count = messages.length;
+    try {
+      await Promise.allSettled(messages.map(m => 
+        callMailAPI("deleteMessage", { token: account.token, messageId: m.id, providerBase: account.providerBase })
+      ));
+      setMessages([]);
+      setSelected(null);
+      prevMsgCountRef.current = 0;
+      toast.success(`${count} messages cleared!`);
+    } catch {
+      toast.error("Failed to clear messages");
+    }
+  };
+
   const copyEmail = () => {
     if (!account) return;
     navigator.clipboard.writeText(account.address);
@@ -486,18 +512,24 @@ export default function TempMail() {
               </Button>
             </div>
           </div>
-          {/* Export buttons */}
+          {/* Export & Clear buttons */}
           {messages.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Download className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground font-medium">Export:</span>
-              <Button variant="outline" size="sm" onClick={exportJSON}
-                className="rounded-xl text-xs gap-1 h-7">
-                <FileJson className="w-3 h-3" /> JSON
-              </Button>
-              <Button variant="outline" size="sm" onClick={exportCSV}
-                className="rounded-xl text-xs gap-1 h-7">
-                <FileSpreadsheet className="w-3 h-3" /> CSV
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Download className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">Export:</span>
+                <Button variant="outline" size="sm" onClick={exportJSON}
+                  className="rounded-xl text-xs gap-1 h-7">
+                  <FileJson className="w-3 h-3" /> JSON
+                </Button>
+                <Button variant="outline" size="sm" onClick={exportCSV}
+                  className="rounded-xl text-xs gap-1 h-7">
+                  <FileSpreadsheet className="w-3 h-3" /> CSV
+                </Button>
+              </div>
+              <Button variant="outline" size="sm" onClick={clearAllMessages}
+                className="rounded-xl text-xs gap-1 h-7 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
+                <Trash2 className="w-3 h-3" /> Clear All ({messages.length})
               </Button>
             </div>
           )}
@@ -514,33 +546,120 @@ export default function TempMail() {
               </motion.div>
             ) : selected ? (
               <motion.div key="detail" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
-                className="p-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <button onClick={() => setSelected(null)} className="text-xs text-primary hover:underline font-bold">← Back to Inbox</button>
-                  <Button variant="ghost" size="sm" className="text-xs text-destructive hover:bg-destructive/10 rounded-lg gap-1"
-                    onClick={() => deleteMessage(selected.id)}>
-                    <Trash2 className="w-3 h-3" /> Delete
-                  </Button>
-                </div>
-                <h3 className="font-bold text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
-                <OTPBanner text={selected.text || selected.intro || ""} subject={selected.subject} />
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span>From: <strong className="text-foreground">{selected.from?.name || selected.from?.address}</strong></span>
-                  <span>•</span>
-                  <span>{new Date(selected.createdAt).toLocaleString()}</span>
-                </div>
-                {selected.html && selected.html.length > 0 ? (
-                  <div className="rounded-xl border border-border/30 bg-white dark:bg-zinc-900 overflow-auto max-h-[400px]">
-                    <iframe
-                      srcDoc={selected.html.join("")}
-                      className="w-full min-h-[300px] border-0"
-                      sandbox="allow-same-origin"
-                      title="Email content"
-                    />
+                className="flex flex-col">
+                
+                {/* Detail Header */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-border/20 bg-accent/20">
+                  <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-xs text-primary hover:underline font-bold">
+                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Inbox
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1"
+                      onClick={() => {
+                        const content = selected.text || selected.intro || selected.subject || "";
+                        navigator.clipboard.writeText(content);
+                        toast.success("Content copied!");
+                      }}>
+                      <Copy className="w-3 h-3" /> Copy
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-destructive hover:bg-destructive/10"
+                      onClick={() => deleteMessage(selected.id)}>
+                      <Trash2 className="w-3 h-3" /> Delete
+                    </Button>
                   </div>
-                ) : (
-                  <div className="p-4 rounded-xl bg-accent/30 border border-border/30 text-sm leading-relaxed whitespace-pre-wrap">
-                    {selected.text || selected.intro || "No content"}
+                </div>
+
+                {/* Subject */}
+                <div className="px-5 pt-4 pb-3">
+                  <h3 className="font-bold text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
+                </div>
+
+                {/* OTP Banner */}
+                <div className="px-5">
+                  <OTPBanner text={selected.text || selected.intro || ""} subject={selected.subject} />
+                </div>
+
+                {/* Sender Info Card */}
+                <div className="mx-5 mt-3 p-3 rounded-xl bg-accent/30 border border-border/20">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                      {(selected.from?.name || selected.from?.address || "?")[0].toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <User className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-sm font-semibold text-foreground truncate">{selected.from?.name || "Unknown"}</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground truncate">{selected.from?.address}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
+                      <Calendar className="w-3 h-3" />
+                      {new Date(selected.createdAt).toLocaleString()}
+                    </div>
+                  </div>
+                  {selected.to && selected.to.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-border/20 text-[11px] text-muted-foreground">
+                      <span className="font-medium">To:</span> {selected.to.map(t => t.address).join(", ")}
+                    </div>
+                  )}
+                </div>
+
+                {/* Email Body */}
+                <div className="px-5 pt-3 pb-2">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Message Body</p>
+                  {selected.html && selected.html.length > 0 ? (
+                    <div className="rounded-xl border border-border/20 bg-background overflow-auto max-h-[400px]">
+                      <iframe
+                        srcDoc={selected.html.join("")}
+                        className="w-full min-h-[300px] border-0"
+                        sandbox="allow-same-origin"
+                        title="Email content"
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-xl bg-accent/20 border border-border/20 text-sm leading-relaxed whitespace-pre-wrap">
+                      {selected.text || selected.intro || "No content"}
+                    </div>
+                  )}
+                </div>
+
+                {/* Attachments Section */}
+                {selected.attachments && selected.attachments.length > 0 && (
+                  <div className="px-5 pt-2 pb-4">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2 flex items-center gap-1.5">
+                      <Paperclip className="w-3 h-3" /> Attachments ({selected.attachments.length})
+                    </p>
+                    <div className="space-y-1.5">
+                      {selected.attachments.map((att) => (
+                        <div key={att.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-accent/30 border border-border/20 hover:bg-accent/50 transition-colors">
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                            <File className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium truncate">{att.filename}</p>
+                            <p className="text-[10px] text-muted-foreground">{att.contentType} • {(att.size / 1024).toFixed(1)} KB</p>
+                          </div>
+                          {att.downloadUrl && (
+                            <a href={att.downloadUrl} target="_blank" rel="noopener noreferrer"
+                              className="shrink-0">
+                              <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1">
+                                <Download className="w-3 h-3" /> Save
+                              </Button>
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No attachments info */}
+                {(!selected.attachments || selected.attachments.length === 0) && (
+                  <div className="px-5 pb-4 pt-1">
+                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/50">
+                      <Paperclip className="w-3 h-3" />
+                      <span>No attachments</span>
+                    </div>
                   </div>
                 )}
               </motion.div>
