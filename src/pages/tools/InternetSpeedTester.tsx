@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect, type MutableRefObject } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
-import { Download, Upload, Activity, Globe, Server, Clock, Shield, RotateCcw, AlertTriangle, Gauge, Wifi, Monitor, MapPin, Zap, BarChart3, TrendingUp } from "lucide-react";
+import { Download, Upload, Activity, Globe, Server, Clock, Shield, RotateCcw, AlertTriangle, Gauge, Wifi, Monitor, MapPin, Zap, BarChart3, TrendingUp, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TEST_SERVER_URL = "https://speed.cloudflare.com";
@@ -482,6 +482,45 @@ export default function InternetSpeedTester() {
   const liveSpeedRef = useRef(0);
   const smoothedRef = useRef(0);
 
+  const phaseDetails: Record<typeof phase, { title: string; subtitle: string; progress: number; step: string }> = {
+    idle: {
+      title: "Ready to test",
+      subtitle: "Press Run Speed Test to begin a 2-step measurement.",
+      progress: 0,
+      step: "0/2",
+    },
+    download: {
+      title: "Step 1: Measuring Download",
+      subtitle: "We are measuring your download bandwidth in real time.",
+      progress: 42,
+      step: "1/2",
+    },
+    resetting: {
+      title: "Transitioning to Step 2",
+      subtitle: "Stabilizing the meter before upload measurement.",
+      progress: 58,
+      step: "1/2",
+    },
+    upload: {
+      title: "Step 2: Measuring Upload",
+      subtitle: "Now testing your upload speed.",
+      progress: 86,
+      step: "2/2",
+    },
+    done: {
+      title: "Test completed",
+      subtitle: "Download, Upload and latency results are ready.",
+      progress: 100,
+      step: "2/2",
+    },
+    error: {
+      title: "Test failed",
+      subtitle: "Please retry to run the speed test again.",
+      progress: 100,
+      step: "—",
+    },
+  };
+
   const updateLive = useCallback((speed: number) => {
     liveSpeedRef.current = Math.max(0, speed);
   }, []);
@@ -601,6 +640,7 @@ export default function InternetSpeedTester() {
     setErrorMsg("");
     liveSpeedRef.current = 0;
     setDisplaySpeed(4);
+    setPhaseNotice("Step 1: Measuring download speed...");
 
     try {
       // Phase 1: download measurement and final hold
@@ -621,6 +661,7 @@ export default function InternetSpeedTester() {
       }
 
       // Hold exact download value briefly before transition
+      setPhaseNotice("Download measured. Finalizing step 1...");
       await wait(1100);
       if (cancelRef.current) return reset();
 
@@ -637,19 +678,21 @@ export default function InternetSpeedTester() {
       if (cancelRef.current) return reset();
 
       // Clear transition notice before upload phase begins
-      setPhaseNotice("✅ Download সম্পন্ন — এখন Upload Speed টেস্ট শুরু হচ্ছে...");
+      setPhaseNotice("Step 1 complete. Preparing step 2: Upload test...");
       await wait(1800);
       if (cancelRef.current) return reset();
       setPhaseNotice(null);
 
       // Phase 2: upload starts fresh in green
       setPhase("upload");
+      setPhaseNotice("Step 2: Measuring upload speed...");
       liveSpeedRef.current = 0;
       const ulSpeed = await measureUpload(TEST_SERVER_URL, updateLive, cancelRef);
       if (cancelRef.current) return reset();
 
       setUpload(ulSpeed);
       updateLive(ulSpeed);
+      setPhaseNotice("Upload measured. Finalizing complete result...");
 
       const entry = {
         dl: +dlSpeed.toFixed(2),
@@ -663,6 +706,7 @@ export default function InternetSpeedTester() {
 
       setPhase("done");
       setTesting(false);
+      setPhaseNotice("Test completed successfully.");
     } catch (err: unknown) {
       setPhaseNotice(null);
       setPhase("error");
@@ -709,6 +753,65 @@ export default function InternetSpeedTester() {
         <div className="rounded-2xl border-2 border-foreground/10 bg-card p-4 sm:p-8">
           {/* Gauge */}
           <SpeedGauge value={displaySpeed} phase={phase} testing={testing} />
+
+          {/* Smooth step-by-step process */}
+          <div className="mt-4 rounded-2xl border border-foreground/10 bg-muted/20 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-foreground">{phaseDetails[phase].title}</p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {phaseNotice || phaseDetails[phase].subtitle}
+                </p>
+              </div>
+              <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold text-primary">
+                {phaseDetails[phase].step}
+              </span>
+            </div>
+
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
+              <motion.div
+                className="h-full rounded-full bg-primary"
+                animate={{ width: `${phaseDetails[phase].progress}%` }}
+                transition={{ duration: 0.7, ease: "easeInOut" }}
+              />
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <div
+                className={`rounded-xl border px-3 py-2 transition-all duration-300 ${
+                  phase === "download" || phase === "resetting" || phase === "upload" || phase === "done"
+                    ? "border-primary/30 bg-primary/10"
+                    : "border-foreground/10 bg-background"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  {download !== null ? (
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  ) : (
+                    <Download className="h-4 w-4 text-primary" />
+                  )}
+                  <span className="text-[11px] font-semibold text-foreground">Download Phase</span>
+                </div>
+              </div>
+
+              <div
+                className={`rounded-xl border px-3 py-2 transition-all duration-300 ${
+                  phase === "upload" || phase === "done"
+                    ? "border-primary/30 bg-primary/10"
+                    : "border-foreground/10 bg-background"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  {upload !== null ? (
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                  ) : (
+                    <Upload className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span className="text-[11px] font-semibold text-foreground">Upload Phase</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Two-phase result cards */}
           <AnimatePresence>
