@@ -195,24 +195,42 @@ export default function RandomAddressGenerator() {
             <h3 className="text-xs sm:text-sm font-bold">Configuration</h3>
           </div>
 
+          {/* Country Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder={`Search ${Object.keys(countriesData).length}+ countries...`}
+              value={countrySearch}
+              onChange={e => setCountrySearch(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 rounded-xl tool-input-colorful text-xs sm:text-sm bg-background"
+            />
+          </div>
+
           {/* Country Grid */}
-          <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 sm:gap-2">
-            {(Object.keys(countriesData) as CountryKey[]).map(c => (
+          <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-1 sm:gap-1.5 max-h-[280px] overflow-y-auto rounded-xl p-1">
+            {(Object.keys(countriesData) as CountryKey[])
+              .filter(c => !countrySearch || c.toLowerCase().includes(countrySearch.toLowerCase()))
+              .map(c => (
               <button
                 key={c}
-                onClick={() => setCountry(c)}
-                className={`flex flex-col items-center p-1.5 sm:p-2 rounded-xl transition-all duration-200 border-2
+                onClick={() => { setCountry(c); setCountrySearch(""); }}
+                className={`flex flex-col items-center p-1 sm:p-1.5 rounded-lg transition-all duration-200 border
                   ${country === c 
-                    ? "border-primary bg-primary/10 shadow-md shadow-primary/10" 
+                    ? "border-primary bg-primary/10 shadow-sm shadow-primary/10" 
                     : "border-transparent hover:border-primary/30 hover:bg-muted/50"
                   }`}
               >
-                <span className="text-lg sm:text-2xl">{countriesData[c].flag}</span>
-                <span className="text-[8px] sm:text-[10px] text-muted-foreground font-medium mt-0.5 leading-tight text-center truncate w-full">
-                  {c.length > 8 ? c.split(" ")[0] : c}
+                <span className="text-base sm:text-lg">{countriesData[c].flag}</span>
+                <span className="text-[7px] sm:text-[9px] text-muted-foreground font-medium mt-0.5 leading-tight text-center truncate w-full">
+                  {c.length > 10 ? c.split(" ")[0] : c}
                 </span>
               </button>
             ))}
+          </div>
+          
+          <div className="text-[10px] sm:text-xs text-muted-foreground text-center">
+            Selected: <span className="font-semibold text-foreground">{countriesData[country].flag} {country}</span>
           </div>
 
           {/* Count + Generate */}
