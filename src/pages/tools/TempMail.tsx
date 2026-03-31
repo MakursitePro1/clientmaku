@@ -32,6 +32,50 @@ function randomString(len: number) {
   return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 }
 
+function extractOTP(text: string): string | null {
+  if (!text) return null;
+  // Match 4-8 digit codes commonly used as OTPs
+  const patterns = [
+    /\b(?:code|otp|pin|verification|verify|confirm|token)[:\s]+(\d{4,8})\b/i,
+    /\b(\d{4,8})\s*(?:is your|is the|as your|as the|verification|code|otp|pin)\b/i,
+    /(?:code is|code:)\s*(\d{4,8})\b/i,
+    /\b(\d{6})\b/, // Fallback: standalone 6-digit number (most common OTP length)
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match?.[1]) return match[1];
+  }
+  return null;
+}
+
+function OTPBanner({ text, subject }: { text: string; subject?: string }) {
+  const otp = extractOTP(subject || "") || extractOTP(text);
+  if (!otp) return null;
+  
+  const copyOTP = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(otp);
+    toast.success(`OTP "${otp}" copied!`);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/10 border border-primary/20"
+      onClick={copyOTP}
+    >
+      <KeyRound className="w-4 h-4 text-primary shrink-0" />
+      <span className="text-xs font-medium text-muted-foreground">OTP Detected:</span>
+      <span className="font-mono font-extrabold text-base text-primary tracking-widest">{otp}</span>
+      <Button variant="ghost" size="sm" className="ml-auto h-7 px-2 rounded-lg text-xs gap-1 hover:bg-primary/10"
+        onClick={copyOTP}>
+        <Copy className="w-3 h-3" /> Copy
+      </Button>
+    </motion.div>
+  );
+}
+
 async function callMailAPI(action: string, params: Record<string, string> = {}) {
   const { data, error } = await supabase.functions.invoke("temp-mail", {
     body: { action, ...params },
