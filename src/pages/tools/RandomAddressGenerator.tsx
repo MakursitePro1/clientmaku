@@ -7,7 +7,7 @@ import {
   Copy, RefreshCw, Download, MapPin, Globe, Map, Building, Navigation,
   User, Phone, Mail, Hash, Clock, Compass, Check, ChevronDown, ChevronUp,
   Search, Bookmark, BookmarkCheck, Trash2, Heart, Calendar, Ruler, Droplet,
-  CreditCard, Car, Briefcase, GraduationCap, Wifi, Shield
+  CreditCard, Car, Briefcase, GraduationCap, Wifi, Shield, FileText
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { countriesData, continentCountries, continentEmojis, type CityData, type CountryData, type ContinentKey } from "@/data/countriesData";
