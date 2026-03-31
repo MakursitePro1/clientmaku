@@ -14,8 +14,8 @@ const navLinks = [
   { name: "Home", path: "/", hash: "hero" },
   { name: "Tools", path: "/tools", hash: "", highlight: true },
   { name: "Blog", path: "/blog", hash: "" },
-  { name: "About", path: "/", hash: "about" },
-  { name: "FAQ", path: "/", hash: "faq" },
+  { name: "About", path: "/about", hash: "" },
+  { name: "FAQ", path: "/faq", hash: "" },
   { name: "Contact", path: "/", hash: "contact" },
 ];
 

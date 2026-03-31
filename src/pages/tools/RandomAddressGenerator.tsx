@@ -523,6 +523,9 @@ export default function RandomAddressGenerator() {
                   <Button onClick={downloadJson} variant="outline" size="sm" className="rounded-xl gap-1 text-[10px] sm:text-xs flex-1 sm:flex-none border-primary/20 hover:border-primary/40">
                     <Download className="w-3.5 h-3.5" /> <span>JSON</span>
                   </Button>
+                  <Button onClick={downloadPdf} variant="outline" size="sm" className="rounded-xl gap-1 text-[10px] sm:text-xs flex-1 sm:flex-none border-primary/20 hover:border-primary/40">
+                    <FileText className="w-3.5 h-3.5" /> <span>PDF</span>
+                  </Button>
                 </div>
               </div>
 

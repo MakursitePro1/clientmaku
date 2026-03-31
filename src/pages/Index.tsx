@@ -5,8 +5,6 @@ import { PopularToolsSection } from "@/components/PopularToolsSection";
 import { ImportantToolsSection } from "@/components/ImportantToolsSection";
 import { ToolsGrid } from "@/components/ToolsGrid";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
-import { AboutSection } from "@/components/AboutSection";
-import { FAQSection } from "@/components/FAQSection";
 import { ContactSection } from "@/components/ContactSection";
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
@@ -24,8 +22,6 @@ const Index = () => {
       <ImportantToolsSection />
       <ToolsGrid />
       <TestimonialsSection />
-      <AboutSection />
-      <FAQSection />
       <ContactSection />
       <ToolsBanner />
       <Footer />
