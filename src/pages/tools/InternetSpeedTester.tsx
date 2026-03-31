@@ -446,15 +446,10 @@ function PhaseResult({
       )}
 
       {done && value !== null && (
-        <motion.div
-          initial={{ scale: 0.3, opacity: 0, y: 10 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 200, damping: 15, duration: 0.6 }}
-          className="flex items-baseline gap-1"
-        >
-          <CountUpValue target={value} duration={1.2} />
+        <div className="flex items-baseline gap-1">
+          <span className="text-3xl font-light text-foreground">{value.toFixed(2)}</span>
           <span className="text-xs text-muted-foreground">Mbps</span>
-        </motion.div>
+        </div>
       )}
 
       {!active && !done && (
@@ -462,29 +457,6 @@ function PhaseResult({
       )}
     </motion.div>
   );
-}
-
-// Animated count-up for result values
-function CountUpValue({ target, duration = 1 }: { target: number; duration?: number }) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const steps = Math.round(duration * 60);
-    const increment = target / steps;
-    let frame = 0;
-    const tick = () => {
-      start += increment;
-      if (start >= target) {
-        setCount(target);
-        return;
-      }
-      setCount(+start.toFixed(2));
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [target, duration]);
-  return <span className="text-3xl font-light text-foreground">{count.toFixed(2)}</span>;
 }
 
 // --- Main Component ---
@@ -504,6 +476,7 @@ export default function InternetSpeedTester() {
   const [location_, setLocation_] = useState("—");
   const [downlink, setDownlink] = useState("—");
   const [rtt, setRtt] = useState("—");
+  const [phaseNotice, setPhaseNotice] = useState<string | null>(null);
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
@@ -558,22 +531,9 @@ export default function InternetSpeedTester() {
     }
 
     if (phase === "done") {
-      // Graceful deceleration curve to zero
-      let raf = 0;
-      const tick = () => {
-        setDisplaySpeed((prev) => {
-          if (prev <= 0.08) {
-            cancelAnimationFrame(raf);
-            return 0;
-          }
-          // Slow cubic ease-out decay
-          const factor = 0.96 - Math.min(prev / 200, 0.03);
-          return +(prev * factor).toFixed(2);
-        });
-        raf = requestAnimationFrame(tick);
-      };
-      raf = requestAnimationFrame(tick);
-      return () => cancelAnimationFrame(raf);
+      // Keep final measured value fixed (no animation in result state)
+      setDisplaySpeed(+liveSpeedRef.current.toFixed(2));
+      return;
     }
 
     if (phase === "error") return;
@@ -595,15 +555,12 @@ export default function InternetSpeedTester() {
         }
 
         if (target > 0.35) {
-          // Ultra-gentle lerp with adaptive factor — key to smooth needle
+          // Smooth adaptive lerp that settles exactly on measured value
           const diff = target - smoothedRef.current;
-          const lerpFactor = 0.018 + Math.abs(diff) * 0.00015;
-          smoothedRef.current += diff * Math.min(lerpFactor, 0.06);
-
-          // Organic micro-oscillation
-          const breathe = Math.sin(elapsed / 800) * Math.min(target * 0.012, 0.6);
-          const tremor = Math.sin(elapsed / 250) * Math.min(target * 0.004, 0.2);
-          return +Math.max(0.1, smoothedRef.current + breathe + tremor).toFixed(2);
+          const lerpFactor = Math.min(0.03 + Math.abs(diff) * 0.0012, 0.12);
+          smoothedRef.current += diff * lerpFactor;
+          const settled = Math.abs(target - smoothedRef.current) < 0.06 ? target : smoothedRef.current;
+          return +Math.max(0.1, settled).toFixed(2);
         }
 
         // Synthetic sweep — very slow breathing wave
@@ -620,11 +577,12 @@ export default function InternetSpeedTester() {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [phase, upload]);
+  }, [phase]);
 
   const reset = useCallback(() => {
     setTesting(false);
     setPhase("idle");
+    setPhaseNotice(null);
     setErrorMsg("");
     liveSpeedRef.current = 0;
     setDisplaySpeed(0);
@@ -639,6 +597,7 @@ export default function InternetSpeedTester() {
     setUpload(null);
     setPing(null);
     setJitter(null);
+    setPhaseNotice(null);
     setErrorMsg("");
     liveSpeedRef.current = 0;
     setDisplaySpeed(4);
@@ -653,12 +612,17 @@ export default function InternetSpeedTester() {
 
       setDownload(dlSpeed);
       updateLive(dlSpeed);
+      setDisplaySpeed(dlSpeed);
 
       const pingResult = await pingPromise;
       if (!cancelRef.current) {
         setPing(pingResult.avgPing);
         setJitter(pingResult.avgJitter);
       }
+
+      // Hold exact download value briefly before transition
+      await wait(1100);
+      if (cancelRef.current) return reset();
 
       // Immediately after download completes: smooth reset to zero
       setPhase("resetting");
@@ -671,6 +635,12 @@ export default function InternetSpeedTester() {
       // Keep gauge at true zero for 2 seconds before upload starts
       await wait(2000);
       if (cancelRef.current) return reset();
+
+      // Clear transition notice before upload phase begins
+      setPhaseNotice("✅ Download সম্পন্ন — এখন Upload Speed টেস্ট শুরু হচ্ছে...");
+      await wait(1800);
+      if (cancelRef.current) return reset();
+      setPhaseNotice(null);
 
       // Phase 2: upload starts fresh in green
       setPhase("upload");
@@ -694,6 +664,7 @@ export default function InternetSpeedTester() {
       setPhase("done");
       setTesting(false);
     } catch (err: unknown) {
+      setPhaseNotice(null);
       setPhase("error");
       setErrorMsg(err instanceof Error ? err.message : "Speed test failed.");
       setTesting(false);
@@ -740,6 +711,20 @@ export default function InternetSpeedTester() {
           <SpeedGauge value={displaySpeed} phase={phase} testing={testing} />
 
           {/* Two-phase result cards */}
+          <AnimatePresence>
+            {phaseNotice && (
+              <motion.div
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                transition={{ duration: 0.35 }}
+                className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-center"
+              >
+                <p className="text-xs font-semibold tracking-wide text-foreground">{phaseNotice}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="mt-4 grid grid-cols-2 gap-3">
             <PhaseResult
               label="Download"
