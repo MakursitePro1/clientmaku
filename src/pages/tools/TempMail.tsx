@@ -284,6 +284,15 @@ export default function TempMail() {
             providerBase,
           };
           setAccount(newAccount);
+          setInboxes(prev => {
+            const exists = prev.some(a => a.address === newAccount.address);
+            if (!exists) {
+              const updated = [...prev, newAccount];
+              setActiveInboxIdx(updated.length - 1);
+              return updated;
+            }
+            return prev;
+          });
           setAutoRefresh(true);
           setCreatedAt(Date.now());
           toast.success("Temp email created successfully!");
