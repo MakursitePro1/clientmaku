@@ -1,161 +1,352 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Mail, Inbox, Trash2 } from "lucide-react";
+import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
 
-const domains = ["tempbox.test", "quickmail.test", "dropmail.test", "fastinbox.test", "nomail.test"];
+interface MailAccount {
+  id: string;
+  address: string;
+  token: string;
+  password: string;
+}
+
+interface MailMessage {
+  id: string;
+  from: { address: string; name: string };
+  to: { address: string; name: string }[];
+  subject: string;
+  intro: string;
+  text?: string;
+  html?: string[];
+  createdAt: string;
+  seen: boolean;
+}
 
 function randomString(len: number) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 }
 
-interface FakeEmail {
-  id: string;
-  from: string;
-  subject: string;
-  body: string;
-  time: Date;
+async function callMailAPI(action: string, params: Record<string, string> = {}) {
+  const { data, error } = await supabase.functions.invoke("temp-mail", {
+    body: { action, ...params },
+  });
+  if (error) throw new Error(error.message || "API call failed");
+  return data;
 }
 
-const sampleEmails: { from: string; subject: string; body: string }[] = [
-  { from: "noreply@service.com", subject: "Welcome to Our Platform!", body: "Thank you for signing up. Your account has been successfully created. Please verify your email to continue." },
-  { from: "support@example.com", subject: "Your Verification Code: 847293", body: "Your one-time verification code is 847293. This code expires in 10 minutes. Do not share this code with anyone." },
-  { from: "newsletter@updates.com", subject: "Weekly Digest - Top Stories", body: "Here are your top stories this week. Check out the latest trends and updates in technology, science, and more." },
-  { from: "security@account.com", subject: "Login Alert - New Device Detected", body: "A new login was detected from Chrome on Windows. If this wasn't you, please change your password immediately." },
-  { from: "promo@deals.com", subject: "🎉 50% Off - Limited Time!", body: "Don't miss our biggest sale of the year! Use code SAVE50 at checkout. Offer valid until midnight." },
-];
-
 export default function TempMail() {
-  const [email, setEmail] = useState("");
-  const [inbox, setInbox] = useState<FakeEmail[]>([]);
-  const [selected, setSelected] = useState<FakeEmail | null>(null);
+  const [account, setAccount] = useState<MailAccount | null>(null);
+  const [messages, setMessages] = useState<MailMessage[]>([]);
+  const [selected, setSelected] = useState<MailMessage | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const generateEmail = useCallback(() => {
-    const domain = domains[Math.floor(Math.random() * domains.length)];
-    setEmail(`${randomString(10)}@${domain}`);
-    setInbox([]);
+  const createAccount = useCallback(async () => {
+    setCreating(true);
+    setMessages([]);
     setSelected(null);
+    try {
+      // Step 1: Get available domains
+      const domainData = await callMailAPI("getDomains");
+      const domains = domainData?.["hydra:member"] || domainData?.member || [];
+      if (!domains.length) {
+        toast.error("No domains available. Please try again later.");
+        setCreating(false);
+        return;
+      }
+      const domain = domains[Math.floor(Math.random() * domains.length)].domain;
+      const username = randomString(12);
+      const address = `${username}@${domain}`;
+      const password = randomString(16);
+
+      // Step 2: Create account
+      const accResult = await callMailAPI("createAccount", { address, password });
+      if (accResult?.["@id"] || accResult?.id) {
+        // Step 3: Login to get token
+        const loginResult = await callMailAPI("login", { address, password });
+        if (loginResult?.token) {
+          const newAccount: MailAccount = {
+            id: accResult.id || accResult["@id"]?.replace("/accounts/", ""),
+            address,
+            token: loginResult.token,
+            password,
+          };
+          setAccount(newAccount);
+          setAutoRefresh(true);
+          toast.success("Temp email created successfully!");
+        } else {
+          toast.error("Failed to login. Please try again.");
+        }
+      } else {
+        const errMsg = accResult?.detail || accResult?.message || "Failed to create account";
+        toast.error(errMsg);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create temp email");
+    } finally {
+      setCreating(false);
+    }
   }, []);
 
-  useEffect(() => { generateEmail(); }, [generateEmail]);
-
-  // Simulate incoming emails
+  // Auto-create on mount
   useEffect(() => {
-    if (!autoRefresh || !email) return;
-    const interval = setInterval(() => {
-      if (Math.random() > 0.4) {
-        const sample = sampleEmails[Math.floor(Math.random() * sampleEmails.length)];
-        const newEmail: FakeEmail = {
-          id: randomString(8),
-          ...sample,
-          time: new Date(),
-        };
-        setInbox(prev => [newEmail, ...prev].slice(0, 20));
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [email, autoRefresh]);
+    createAccount();
+  }, []);
+
+  // Fetch messages
+  const fetchMessages = useCallback(async () => {
+    if (!account?.token) return;
+    setRefreshing(true);
+    try {
+      const data = await callMailAPI("getMessages", { token: account.token });
+      const msgs = data?.["hydra:member"] || data?.member || [];
+      setMessages(msgs);
+    } catch (err) {
+      // Silent fail for auto-refresh
+    } finally {
+      setRefreshing(false);
+    }
+  }, [account?.token]);
+
+  // Auto-refresh messages
+  useEffect(() => {
+    if (!account?.token || !autoRefresh) return;
+    fetchMessages();
+    intervalRef.current = setInterval(fetchMessages, 5000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [account?.token, autoRefresh, fetchMessages]);
+
+  // View full message
+  const viewMessage = async (msg: MailMessage) => {
+    if (!account?.token) return;
+    setLoadingMessage(true);
+    try {
+      const fullMsg = await callMailAPI("getMessage", { token: account.token, messageId: msg.id });
+      setSelected(fullMsg);
+    } catch (err) {
+      toast.error("Failed to load message");
+    } finally {
+      setLoadingMessage(false);
+    }
+  };
+
+  const deleteMessage = async (msgId: string) => {
+    if (!account?.token) return;
+    try {
+      await callMailAPI("deleteMessage", { token: account.token, messageId: msgId });
+      setMessages(prev => prev.filter(m => m.id !== msgId));
+      if (selected?.id === msgId) setSelected(null);
+      toast.success("Message deleted");
+    } catch {
+      toast.error("Failed to delete message");
+    }
+  };
 
   const copyEmail = () => {
-    navigator.clipboard.writeText(email);
+    if (!account) return;
+    navigator.clipboard.writeText(account.address);
     toast.success("Email address copied!");
   };
 
-  const clearInbox = () => {
-    setInbox([]);
-    setSelected(null);
-    toast.success("Inbox cleared!");
-  };
-
-  const timeDiff = (d: Date) => {
-    const s = Math.floor((Date.now() - d.getTime()) / 1000);
+  const timeDiff = (dateStr: string) => {
+    const s = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
     if (s < 60) return "Just now";
     if (s < 3600) return `${Math.floor(s / 60)}m ago`;
-    return `${Math.floor(s / 3600)}h ago`;
+    if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+    return `${Math.floor(s / 86400)}d ago`;
   };
 
   return (
-    <ToolLayout title="Temp Mail" description="Get a temporary disposable email address instantly">
+    <ToolLayout title="Temp Mail" description="Get a real temporary disposable email address instantly — receive OTPs, verification codes & more">
       <div className="space-y-4 max-w-2xl mx-auto">
         {/* Email Address */}
-        <div className="tool-result-card flex items-center gap-2">
-          <Mail className="w-5 h-5 text-primary shrink-0" />
-          <span className="font-mono text-sm sm:text-base font-bold flex-1 truncate gradient-text">{email}</span>
-          <Button variant="ghost" size="icon" onClick={copyEmail} className="shrink-0 h-8 w-8 hover:text-primary">
-            <Copy className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={generateEmail} className="shrink-0 h-8 w-8 hover:text-primary">
-            <RefreshCw className="w-4 h-4" />
-          </Button>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="tool-result-card"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.05))" }}>
+              <Mail className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-0.5">Your Temporary Email</p>
+              {account ? (
+                <p className="font-mono text-sm sm:text-base font-extrabold gradient-text truncate">{account.address}</p>
+              ) : (
+                <p className="text-sm text-muted-foreground animate-pulse">Creating email...</p>
+              )}
+            </div>
+            <Button variant="ghost" size="icon" onClick={copyEmail} disabled={!account}
+              className="shrink-0 h-9 w-9 hover:text-primary hover:bg-primary/10 rounded-xl">
+              <Copy className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={createAccount} disabled={creating}
+              className="shrink-0 h-9 w-9 hover:text-primary hover:bg-primary/10 rounded-xl">
+              {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            </Button>
+          </div>
+        </motion.div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="tool-stat-card">
+            <Inbox className="w-5 h-5 mx-auto text-primary mb-1" />
+            <div className="stat-value text-lg">{messages.length}</div>
+            <div className="stat-label">Messages</div>
+          </div>
+          <div className="tool-stat-card">
+            <Shield className="w-5 h-5 mx-auto text-green-500 mb-1" />
+            <div className="stat-value text-lg">{autoRefresh ? "Active" : "Paused"}</div>
+            <div className="stat-label">Auto Refresh</div>
+          </div>
+          <div className="tool-stat-card">
+            <Clock className="w-5 h-5 mx-auto text-blue-500 mb-1" />
+            <div className="stat-value text-lg">5s</div>
+            <div className="stat-label">Refresh Rate</div>
+          </div>
         </div>
 
         {/* Controls */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Inbox className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium">{inbox.length} messages</span>
-            {autoRefresh && <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />}
+            <span className="text-sm font-medium">{messages.length} messages</span>
+            {autoRefresh && refreshing && <Loader2 className="w-3 h-3 animate-spin text-primary" />}
+            {autoRefresh && !refreshing && (
+              <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
+                className="w-2 h-2 rounded-full bg-green-500" />
+            )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)} className="rounded-lg text-xs">
-              {autoRefresh ? "Pause" : "Resume"}
+            <Button variant="outline" size="sm" onClick={fetchMessages} disabled={!account || refreshing}
+              className="rounded-xl text-xs gap-1">
+              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} /> Refresh
             </Button>
-            {inbox.length > 0 && (
-              <Button variant="outline" size="sm" onClick={clearInbox} className="rounded-lg text-xs gap-1">
-                <Trash2 className="w-3 h-3" /> Clear
-              </Button>
-            )}
+            <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}
+              className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-green-500/30 text-green-600" : "border-border"}`}>
+              {autoRefresh ? "⏸ Pause" : "▶ Resume"}
+            </Button>
           </div>
         </div>
 
         {/* Inbox / Email View */}
-        <div className="min-h-[300px] tool-section-card overflow-hidden">
-          {selected ? (
-            <div className="p-4 space-y-3">
-              <button onClick={() => setSelected(null)} className="text-xs text-primary hover:underline">← Back to Inbox</button>
-              <h3 className="font-bold text-lg">{selected.subject}</h3>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span>From: <strong>{selected.from}</strong></span>
-                <span>•</span>
-                <span>{selected.time.toLocaleTimeString()}</span>
-              </div>
-              <div className="p-4 rounded-lg bg-accent/30 border border-border/30 text-sm leading-relaxed">
-                {selected.body}
-              </div>
-            </div>
-          ) : inbox.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground/50">
-              <Inbox className="w-12 h-12 mb-3" />
-              <p className="font-medium">Waiting for emails...</p>
-              <p className="text-xs mt-1">Emails will appear here automatically</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-border/30">
-              {inbox.map(e => (
-                <button
-                  key={e.id}
-                  onClick={() => setSelected(e)}
-                  className="w-full text-left p-3 hover:bg-accent/30 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm truncate">{e.subject}</p>
-                      <p className="text-xs text-muted-foreground truncate">{e.from}</p>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground/60 shrink-0">{timeDiff(e.time)}</span>
+        <div className="min-h-[350px] tool-section-card overflow-hidden">
+          <AnimatePresence mode="wait">
+            {loadingMessage ? (
+              <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center h-[350px] text-muted-foreground">
+                <Loader2 className="w-10 h-10 animate-spin text-primary mb-3" />
+                <p className="text-sm font-medium">Loading message...</p>
+              </motion.div>
+            ) : selected ? (
+              <motion.div key="detail" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
+                className="p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <button onClick={() => setSelected(null)} className="text-xs text-primary hover:underline font-bold">← Back to Inbox</button>
+                  <Button variant="ghost" size="sm" className="text-xs text-destructive hover:bg-destructive/10 rounded-lg gap-1"
+                    onClick={() => deleteMessage(selected.id)}>
+                    <Trash2 className="w-3 h-3" /> Delete
+                  </Button>
+                </div>
+                <h3 className="font-bold text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                  <span>From: <strong className="text-foreground">{selected.from?.name || selected.from?.address}</strong></span>
+                  <span>•</span>
+                  <span>{new Date(selected.createdAt).toLocaleString()}</span>
+                </div>
+                {selected.html && selected.html.length > 0 ? (
+                  <div className="rounded-xl border border-border/30 bg-white dark:bg-zinc-900 overflow-auto max-h-[400px]">
+                    <iframe
+                      srcDoc={selected.html.join("")}
+                      className="w-full min-h-[300px] border-0"
+                      sandbox="allow-same-origin"
+                      title="Email content"
+                    />
                   </div>
-                </button>
-              ))}
-            </div>
-          )}
+                ) : (
+                  <div className="p-4 rounded-xl bg-accent/30 border border-border/30 text-sm leading-relaxed whitespace-pre-wrap">
+                    {selected.text || selected.intro || "No content"}
+                  </div>
+                )}
+              </motion.div>
+            ) : creating ? (
+              <motion.div key="creating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center h-[350px] text-muted-foreground">
+                <Loader2 className="w-12 h-12 animate-spin text-primary mb-3" />
+                <p className="font-bold text-sm">Creating your temp email...</p>
+                <p className="text-xs mt-1">This may take a few seconds</p>
+              </motion.div>
+            ) : messages.length === 0 ? (
+              <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center h-[350px] text-muted-foreground/50">
+                <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+                  <Inbox className="w-14 h-14 mb-3 text-primary/20" />
+                </motion.div>
+                <p className="font-bold text-sm">Inbox is empty</p>
+                <p className="text-xs mt-1">Emails will appear here automatically when received</p>
+                <div className="flex items-center gap-1.5 mt-3">
+                  <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-2 h-2 rounded-full bg-primary" />
+                  <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }} className="w-2 h-2 rounded-full bg-primary" />
+                  <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }} className="w-2 h-2 rounded-full bg-primary" />
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="divide-y divide-border/30">
+                {messages.map((m, i) => (
+                  <motion.button
+                    key={m.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    onClick={() => viewMessage(m)}
+                    className="w-full text-left p-3.5 hover:bg-primary/5 transition-all group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${m.seen ? "bg-muted-foreground/30" : "bg-primary"}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-0.5">
+                          <span className={`text-sm truncate ${m.seen ? "font-medium" : "font-bold"}`}>
+                            {m.from?.name || m.from?.address || "Unknown"}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground/60 shrink-0">{timeDiff(m.createdAt)}</span>
+                        </div>
+                        <p className={`text-xs truncate ${m.seen ? "text-muted-foreground" : "text-foreground"}`}>
+                          {m.subject || "(No Subject)"}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">{m.intro}</p>
+                      </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                        <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <p className="text-xs text-muted-foreground text-center">
-          ⚠️ This is a demo temp mail. Emails are simulated locally and not real. For actual temporary email, use dedicated services.
-        </p>
+        {/* Info */}
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p className="font-semibold text-foreground">How it works</p>
+            <p>This generates a real temporary email using Mail.tm. Copy the email, use it anywhere, and receive real OTPs & verification codes here. Emails auto-refresh every 5 seconds.</p>
+          </div>
+        </div>
       </div>
     </ToolLayout>
   );
