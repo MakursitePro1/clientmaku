@@ -711,7 +711,6 @@ export default function InternetSpeedTester() {
       // Both phases complete: instantly reset meter to zero and keep it fixed
       liveSpeedRef.current = 0;
       setDisplaySpeed(0);
-      setMeterLocked(true);
       setPhase("done");
       setTesting(false);
       setPhaseNotice("Test completed successfully.");
