@@ -760,7 +760,7 @@ export default function InternetSpeedTester() {
         {/* Main card */}
         <div className="rounded-2xl border-2 border-foreground/10 bg-card p-4 sm:p-8">
           {/* Gauge */}
-          <SpeedGauge value={displaySpeed} phase={phase} testing={testing} />
+          <SpeedGauge value={phase === "done" || phase === "idle" ? 0 : displaySpeed} phase={phase} testing={testing} />
 
           {/* Smooth step-by-step process */}
           <div className="mt-4 rounded-2xl border border-foreground/10 bg-muted/20 p-4">
