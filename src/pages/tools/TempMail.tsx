@@ -591,30 +591,34 @@ export default function TempMail() {
                 </div>
 
                 {/* OTP Banner */}
-                <div className="px-5">
+                <div className="px-3 sm:px-5">
                   <OTPBanner text={selected.text || selected.intro || ""} subject={selected.subject} />
                 </div>
 
                 {/* Sender Info Card */}
-                <div className="mx-5 mt-3 p-3 rounded-xl bg-accent/30 border border-border/20">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                <div className="mx-3 sm:mx-5 mt-2 sm:mt-3 p-2.5 sm:p-3 rounded-xl bg-accent/30 border border-border/20">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3">
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold text-xs sm:text-sm shrink-0">
                       {(selected.from?.name || selected.from?.address || "?")[0].toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <User className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-sm font-semibold text-foreground truncate">{selected.from?.name || "Unknown"}</span>
+                        <User className="w-3 h-3 text-muted-foreground hidden sm:block" />
+                        <span className="text-xs sm:text-sm font-semibold text-foreground truncate">{selected.from?.name || "Unknown"}</span>
                       </div>
-                      <p className="text-[11px] text-muted-foreground truncate">{selected.from?.address}</p>
+                      <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">{selected.from?.address}</p>
+                      <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 sm:hidden">
+                        <Calendar className="w-2.5 h-2.5" />
+                        {new Date(selected.createdAt).toLocaleString()}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
+                    <div className="hidden sm:flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
                       <Calendar className="w-3 h-3" />
                       {new Date(selected.createdAt).toLocaleString()}
                     </div>
                   </div>
                   {selected.to && selected.to.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-border/20 text-[11px] text-muted-foreground">
+                    <div className="mt-2 pt-2 border-t border-border/20 text-[10px] sm:text-[11px] text-muted-foreground">
                       <span className="font-medium">To:</span> {selected.to.map(t => t.address).join(", ")}
                     </div>
                   )}
