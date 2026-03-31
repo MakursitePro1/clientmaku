@@ -702,10 +702,11 @@ export default function TempMail() {
                   </button>
                   <div className="flex items-center gap-1">
                     <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2"
-                      onClick={() => {
+                      onClick={async () => {
                         const content = selected.text || selected.intro || selected.subject || "";
-                        copyToClipboard(content);
-                        toast.success("Content copied!");
+                        const ok = await copyToClipboard(content);
+                        if (ok) toast.success("Content copied!");
+                        else toast.error("Copy failed");
                       }}>
                       <Copy className="w-3 h-3" /> Copy
                     </Button>
