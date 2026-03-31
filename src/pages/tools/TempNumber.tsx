@@ -446,9 +446,20 @@ export default function TempNumber() {
               disabled={!countryFilter || loadingMore}
               onClick={() => {
                 if (!countryFilter) return;
+                // First check if numbers already exist for this country
+                const existing = numbers.filter(n => n.country.toLowerCase() === countryFilter.toLowerCase());
+                if (existing.length > 0) {
+                  // Cycle to next number each click
+                  const currentIdx = existing.findIndex(n => n.slug === activeNumber?.slug);
+                  const nextIdx = (currentIdx + 1) % existing.length;
+                  selectNumber(existing[nextIdx]);
+                  toast.success(`${getFlag(countryFilter)} Showing ${countryFilter} number ${nextIdx + 1}/${existing.length}`);
+                  return;
+                }
+                // Otherwise try to load from API
                 const cp = countryPages.find(p => p.country.toLowerCase() === countryFilter.toLowerCase());
                 if (cp) loadMoreNumbers(cp);
-                else toast.error("No source available for this country");
+                else toast.error(`No numbers available for ${countryFilter}`);
               }}
               className="shrink-0 rounded-xl px-4 gap-1.5 text-white"
               size="default"
@@ -457,6 +468,33 @@ export default function TempNumber() {
               <span className="hidden sm:inline">Check</span>
             </Button>
           </div>
+
+          {/* Country availability status */}
+          {countryFilter && !loading && !loadingMore && (
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium ${
+              filteredNumbers.length > 0
+                ? "bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400"
+                : "bg-destructive/10 border border-destructive/20 text-destructive"
+            }`}>
+              {filteredNumbers.length > 0 ? (
+                <>
+                  <Check className="w-3.5 h-3.5" />
+                  <span>{filteredNumbers.length} numbers available for {getFlag(countryFilter)} {countryFilter}</span>
+                </>
+              ) : (
+                <>
+                  <X className="w-3.5 h-3.5" />
+                  <span>No numbers available for {getFlag(countryFilter)} {countryFilter}</span>
+                </>
+              )}
+            </div>
+          )}
+          {loadingMore && countryFilter && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-primary/5 border border-primary/10 text-xs text-primary font-medium">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Loading numbers for {getFlag(countryFilter)} {countryFilter}...</span>
+            </div>
+          )}
 
           {/* Number list */}
           {loading ? (
