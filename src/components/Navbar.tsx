@@ -196,7 +196,16 @@ export function Navbar() {
           </div>
 
           {/* Desktop Right Side */}
-          <div className={cn("relative z-10 ml-auto items-center gap-3 hidden lg:flex", isCompactNav ? "!hidden" : "")}>
+          <div className={cn("relative z-10 ml-auto items-center gap-2 hidden lg:flex", isCompactNav ? "!hidden" : "")}>
+            <motion.button
+              onClick={() => navigate("/pricing")}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all"
+            >
+              <Crown className="w-4 h-4" />
+              Premium
+            </motion.button>
             <motion.button
               onClick={() => navigate("/favorites")}
               whileHover={{ scale: 1.05 }}
