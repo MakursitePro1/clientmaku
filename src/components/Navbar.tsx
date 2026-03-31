@@ -14,8 +14,8 @@ const navLinks = [
   { name: "Home", path: "/", hash: "hero" },
   { name: "Tools", path: "/tools", hash: "", highlight: true },
   { name: "Blog", path: "/blog", hash: "" },
-  { name: "About", path: "/", hash: "about" },
-  { name: "FAQ", path: "/", hash: "faq" },
+  { name: "About", path: "/about", hash: "" },
+  { name: "FAQ", path: "/faq", hash: "" },
   { name: "Contact", path: "/", hash: "contact" },
 ];
 
@@ -110,6 +110,8 @@ export function Navbar() {
   const isActive = (link: typeof navLinks[0]) => {
     if (link.path === "/tools") return location.pathname === "/tools" || location.pathname.startsWith("/tools/");
     if (link.path === "/blog") return location.pathname === "/blog" || location.pathname.startsWith("/blog/");
+    if (link.path === "/about") return location.pathname === "/about";
+    if (link.path === "/faq") return location.pathname === "/faq";
     if (location.pathname !== "/") return false;
     return link.hash === activeHash;
   };

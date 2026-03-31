@@ -7,7 +7,7 @@ import {
   Copy, RefreshCw, Download, MapPin, Globe, Map, Building, Navigation,
   User, Phone, Mail, Hash, Clock, Compass, Check, ChevronDown, ChevronUp,
   Search, Bookmark, BookmarkCheck, Trash2, Heart, Calendar, Ruler, Droplet,
-  CreditCard, Car, Briefcase, GraduationCap, Wifi, Shield
+  CreditCard, Car, Briefcase, GraduationCap, Wifi, Shield, FileText
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { countriesData, continentCountries, continentEmojis, type CityData, type CountryData, type ContinentKey } from "@/data/countriesData";
@@ -255,6 +255,98 @@ export default function RandomAddressGenerator() {
     toast.success("JSON downloaded!");
   };
 
+  const downloadPdf = async () => {
+    const { PDFDocument, rgb, StandardFonts } = await import("pdf-lib");
+    const pdfDoc = await PDFDocument.create();
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+    for (const a of addresses) {
+      const page = pdfDoc.addPage([595, 842]); // A4
+      const { height } = page.getSize();
+      let y = height - 50;
+      const lineH = 16;
+      const sectionGap = 10;
+
+      const drawTitle = (text: string) => {
+        y -= sectionGap;
+        page.drawText(text, { x: 50, y, size: 12, font: fontBold, color: rgb(0.4, 0.2, 0.8) });
+        y -= lineH + 2;
+      };
+      const drawField = (label: string, value: string) => {
+        if (y < 50) return;
+        page.drawText(`${label}:`, { x: 55, y, size: 9, font: fontBold, color: rgb(0.3, 0.3, 0.3) });
+        page.drawText(value, { x: 160, y, size: 9, font, color: rgb(0.1, 0.1, 0.1) });
+        y -= lineH;
+      };
+
+      // Header
+      page.drawText("Random Identity Report", { x: 50, y, size: 18, font: fontBold, color: rgb(0.3, 0.1, 0.7) });
+      y -= 10;
+      page.drawRectangle({ x: 50, y, width: 495, height: 1.5, color: rgb(0.4, 0.2, 0.8) });
+      y -= 20;
+
+      drawTitle("PERSONAL INFORMATION");
+      drawField("Full Name", a.fullName);
+      drawField("Email", a.email);
+      drawField("Phone", a.phone);
+      drawField("Username", a.username);
+      drawField("Password", a.password);
+      drawField("National ID", a.nationalId);
+      drawField("Date of Birth", `${a.dob} (Age: ${a.age})`);
+      drawField("Zodiac", a.zodiac);
+      drawField("Mother Maiden", a.motherMaiden);
+
+      drawTitle("PHYSICAL ATTRIBUTES");
+      drawField("Blood Type", a.bloodType);
+      drawField("Height", a.height);
+      drawField("Weight", a.weight);
+      drawField("Eye Color", a.eyeColor);
+      drawField("Hair Color", a.hairColor);
+
+      drawTitle("ADDRESS DETAILS");
+      drawField("Street", a.fullStreet);
+      drawField("City", a.city);
+      if (a.state) drawField("State", a.state);
+      drawField("ZIP/Postal", a.zip);
+      drawField("Country", a.country);
+
+      drawTitle("GEOGRAPHIC & META");
+      drawField("Latitude", a.lat);
+      drawField("Longitude", a.lng);
+      drawField("Timezone", a.timezone);
+      drawField("Currency", a.currency);
+      drawField("Dial Code", a.countryCode);
+
+      drawTitle("EMPLOYMENT");
+      drawField("Company", a.company);
+      drawField("Occupation", a.occupation);
+      drawField("Education", a.education);
+      drawField("Website", a.website);
+
+      drawTitle("VEHICLE");
+      drawField("Vehicle", a.vehicle);
+      drawField("License Plate", a.licensePlate);
+
+      drawTitle("FINANCIAL");
+      drawField("Card Number", a.creditCard);
+      drawField("CVV", a.cvv);
+      drawField("Expiry", a.cardExpiry);
+
+      drawTitle("DIGITAL & NETWORK");
+      drawField("IP Address", a.ipAddress);
+      drawField("MAC Address", a.macAddress);
+    }
+
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "random-identities.pdf";
+    link.click();
+    toast.success("PDF downloaded!");
+  };
+
   const toggleBookmark = (idx: number) => {
     setBookmarked(prev => {
       const next = new Set(prev);
@@ -430,6 +522,9 @@ export default function RandomAddressGenerator() {
                   </Button>
                   <Button onClick={downloadJson} variant="outline" size="sm" className="rounded-xl gap-1 text-[10px] sm:text-xs flex-1 sm:flex-none border-primary/20 hover:border-primary/40">
                     <Download className="w-3.5 h-3.5" /> <span>JSON</span>
+                  </Button>
+                  <Button onClick={downloadPdf} variant="outline" size="sm" className="rounded-xl gap-1 text-[10px] sm:text-xs flex-1 sm:flex-none border-primary/20 hover:border-primary/40">
+                    <FileText className="w-3.5 h-3.5" /> <span>PDF</span>
                   </Button>
                 </div>
               </div>
