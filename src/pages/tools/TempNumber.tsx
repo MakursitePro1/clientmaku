@@ -362,19 +362,69 @@ export default function TempNumber() {
             <span className="text-[10px] text-muted-foreground ml-auto">{filteredNumbers.length} numbers</span>
           </div>
 
-          {/* Country chips */}
-          <div className="flex flex-wrap gap-1.5">
+          {/* Country Search Dropdown */}
+          <div className="relative" ref={countryDropdownRef}>
             <button
-              onClick={() => setCountryFilter("")}
-              className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-medium transition-all ${!countryFilter ? "bg-primary/15 text-primary border border-primary/30" : "bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted"}`}
-            >All</button>
-            {availableCountries.map(c => (
-              <button
-                key={c}
-                onClick={() => setCountryFilter(c === countryFilter ? "" : c)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-medium transition-all whitespace-nowrap ${c === countryFilter ? "bg-primary/15 text-primary border border-primary/30" : "bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted"}`}
-              >{getFlag(c)} {c}</button>
-            ))}
+              onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border border-border/60 bg-muted/30 hover:bg-muted/50 transition-all text-sm"
+            >
+              <Search className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className={countryFilter ? "font-medium" : "text-muted-foreground"}>
+                {countryFilter ? `${getFlag(countryFilter)} ${countryFilter}` : "All Countries"}
+              </span>
+              <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground ml-auto transition-transform ${countryDropdownOpen ? "rotate-180" : ""}`} />
+              {countryFilter && (
+                <button
+                  onClick={e => { e.stopPropagation(); setCountryFilter(""); setCountrySearch(""); }}
+                  className="p-0.5 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </button>
+
+            {countryDropdownOpen && (
+              <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border/60 bg-card shadow-xl overflow-hidden">
+                <div className="p-2 border-b border-border/40">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Search 200+ countries..."
+                      value={countrySearch}
+                      onChange={e => setCountrySearch(e.target.value)}
+                      autoFocus
+                      className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-muted/50 border border-border/40 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
+                    />
+                  </div>
+                </div>
+                <div className="max-h-48 overflow-y-auto">
+                  <button
+                    onClick={() => { setCountryFilter(""); setCountryDropdownOpen(false); setCountrySearch(""); }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${!countryFilter ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted/50"}`}
+                  >
+                    <Globe className="w-3.5 h-3.5" /> All Countries
+                  </button>
+                  {filteredCountryList.map(c => {
+                    const hasNumbers = availableCountries.some(ac => ac.toLowerCase() === c.toLowerCase());
+                    return (
+                      <button
+                        key={c}
+                        onClick={() => { setCountryFilter(c); setCountryDropdownOpen(false); setCountrySearch(""); }}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${c === countryFilter ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted/50"}`}
+                      >
+                        <span>{getFlag(c)}</span>
+                        <span className="flex-1">{c}</span>
+                        {hasNumbers && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">{numbers.filter(n => n.country.toLowerCase() === c.toLowerCase()).length}</span>}
+                      </button>
+                    );
+                  })}
+                  {filteredCountryList.length === 0 && (
+                    <p className="text-center text-xs text-muted-foreground py-4">No country found</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Number list */}
