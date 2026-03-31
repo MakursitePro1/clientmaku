@@ -69,7 +69,7 @@ export const tools: Tool[] = [
   { id: "barcode-generator", name: "Barcode Generator", description: "Generate barcodes from text", icon: BarChart3, category: "generator", path: "/tools/barcode-generator", color: "hsl(220, 90%, 56%)" },
   { id: "barcode-scanner", name: "Barcode Scanner", description: "Scan barcodes from uploaded images", icon: ScanBarcode, category: "generator", path: "/tools/barcode-scanner", color: "hsl(30, 80%, 50%)" },
   { id: "random-name-generator", name: "Random Name Generator", description: "Generate realistic random names", icon: User, category: "generator", path: "/tools/random-name-generator", color: "hsl(180, 60%, 45%)" },
-  { id: "random-address-generator", name: "Random Address Generator", description: "Generate random addresses instantly", icon: MapPinned, category: "generator", path: "/tools/random-address-generator", color: "hsl(45, 80%, 50%)" },
+  { id: "random-address-generator", name: "Fake Address Generator", description: "Generate random addresses instantly", icon: MapPinned, category: "generator", path: "/tools/random-address-generator", color: "hsl(45, 80%, 50%)" },
   { id: "uuid-generator", name: "UUID Generator", description: "Generate random UUID v4 strings", icon: Key, category: "generator", path: "/tools/uuid-generator", color: "hsl(300, 70%, 50%)" },
   { id: "gradient-generator", name: "CSS Gradient Generator", description: "Create beautiful CSS gradients with code", icon: Paintbrush, category: "generator", path: "/tools/gradient-generator", color: "hsl(330, 80%, 55%)" },
   { id: "meta-tag-generator", name: "Meta Tag Generator", description: "Generate SEO-friendly meta tags", icon: Globe, category: "generator", path: "/tools/meta-tag-generator", color: "hsl(200, 75%, 50%)" },
