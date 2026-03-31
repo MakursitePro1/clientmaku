@@ -507,6 +507,7 @@ export default function InternetSpeedTester() {
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
+  const smoothedRef = useRef(0);
 
   const updateLive = useCallback((speed: number) => {
     liveSpeedRef.current = Math.max(0, speed);
