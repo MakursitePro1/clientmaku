@@ -25,6 +25,8 @@ function getToolStats(toolId: string) {
 
 export function ToolsGrid() {
   const { tools, categories, totalTools, getCategoryCount } = useToolCatalog();
+  const { isToolLocked, premiumToolIds } = useSubscription();
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<ToolCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
