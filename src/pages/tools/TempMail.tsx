@@ -43,6 +43,14 @@ interface MailAccount {
   providerBase: string;
 }
 
+interface MailAttachment {
+  id: string;
+  filename: string;
+  contentType: string;
+  size: number;
+  downloadUrl?: string;
+}
+
 interface MailMessage {
   id: string;
   from: { address: string; name: string };
@@ -53,6 +61,8 @@ interface MailMessage {
   html?: string[];
   createdAt: string;
   seen: boolean;
+  hasAttachments?: boolean;
+  attachments?: MailAttachment[];
 }
 
 function randomString(len: number) {
