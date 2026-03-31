@@ -9,6 +9,7 @@ import {
   Search, Bookmark, BookmarkCheck, Trash2
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { countriesData, type CityData, type CountryData } from "@/data/countriesData";
 
 function rand<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
 function randNum(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -28,185 +29,17 @@ const lastNames = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller
 const companySuffixes = ["Inc.", "LLC", "Corp.", "Ltd.", "Group", "Solutions", "Technologies", "Industries", "Enterprises", "Co."];
 const companyWords = ["Global", "Pacific", "Summit", "Atlas", "Apex", "Nova", "Prime", "Pinnacle", "Sterling", "Vertex", "Horizon", "Alpha", "Omega", "Titan", "Phoenix"];
 
-const countriesData: Record<string, CountryData> = {
-  "United States": {
-    flag: "🇺🇸", code: "+1", phoneFormat: "(###) ###-####", timezone: "EST/CST/PST",
-    currency: "USD ($)",
-    streets: ["Main St","Oak Ave","Elm St","Maple Dr","Pine Rd","Cedar Ln","Broadway","5th Avenue","Park Ave","Washington Blvd","Sunset Dr","Lake View Rd","Highland Ave","Forest Ln","Valley Dr","River Rd","Mountain View Dr","Spring St","Ocean Blvd","Heritage Way"],
-    cities: [
-      { city: "New York", state: "NY", lat: 40.7128, lng: -74.0060 },
-      { city: "Los Angeles", state: "CA", lat: 34.0522, lng: -118.2437 },
-      { city: "Chicago", state: "IL", lat: 41.8781, lng: -87.6298 },
-      { city: "Houston", state: "TX", lat: 29.7604, lng: -95.3698 },
-      { city: "Miami", state: "FL", lat: 25.7617, lng: -80.1918 },
-      { city: "Seattle", state: "WA", lat: 47.6062, lng: -122.3321 },
-      { city: "San Francisco", state: "CA", lat: 37.7749, lng: -122.4194 },
-      { city: "Denver", state: "CO", lat: 39.7392, lng: -104.9903 },
-      { city: "Portland", state: "OR", lat: 45.5152, lng: -122.6784 },
-      { city: "Austin", state: "TX", lat: 30.2672, lng: -97.7431 },
-      { city: "Boston", state: "MA", lat: 42.3601, lng: -71.0589 },
-      { city: "Nashville", state: "TN", lat: 36.1627, lng: -86.7816 },
-    ],
-    format: (a: any) => `${a.num} ${a.street}\n${a.city}, ${a.state} ${a.zip}\nUnited States`,
-    zip: () => String(randNum(10000, 99999)),
-  },
-  "United Kingdom": {
-    flag: "🇬🇧", code: "+44", phoneFormat: "07### ######", timezone: "GMT/BST",
-    currency: "GBP (£)",
-    streets: ["High Street","Church Lane","Mill Road","Station Road","Park Avenue","King Street","Queen Street","Victoria Road","London Road","Bridge Street","Manor Way","Castle Drive","Abbey Road","Oxford Street","Baker Street"],
-    cities: [
-      { city: "London", state: "", lat: 51.5074, lng: -0.1278 },
-      { city: "Manchester", state: "", lat: 53.4808, lng: -2.2426 },
-      { city: "Birmingham", state: "", lat: 52.4862, lng: -1.8904 },
-      { city: "Edinburgh", state: "", lat: 55.9533, lng: -3.1883 },
-      { city: "Liverpool", state: "", lat: 53.4084, lng: -2.9916 },
-      { city: "Bristol", state: "", lat: 51.4545, lng: -2.5879 },
-    ],
-    format: (a: any) => `${a.num} ${a.street}\n${a.city}\n${a.zip}\nUnited Kingdom`,
-    zip: () => `${String.fromCharCode(65+randNum(0,25))}${String.fromCharCode(65+randNum(0,25))}${randNum(1,9)} ${randNum(1,9)}${String.fromCharCode(65+randNum(0,25))}${String.fromCharCode(65+randNum(0,25))}`,
-  },
-  "Canada": {
-    flag: "🇨🇦", code: "+1", phoneFormat: "(###) ###-####", timezone: "EST/CST/PST",
-    currency: "CAD ($)",
-    streets: ["Maple Street","Bay Street","Yonge Street","King Street","Queen Street","Bloor Street","Granville Street","Jasper Avenue","Portage Avenue","Robson Street","Wellington St","Rideau Street"],
-    cities: [
-      { city: "Toronto", state: "ON", lat: 43.6532, lng: -79.3832 },
-      { city: "Vancouver", state: "BC", lat: 49.2827, lng: -123.1207 },
-      { city: "Montreal", state: "QC", lat: 45.5017, lng: -73.5673 },
-      { city: "Calgary", state: "AB", lat: 51.0447, lng: -114.0719 },
-      { city: "Ottawa", state: "ON", lat: 45.4215, lng: -75.6972 },
-      { city: "Edmonton", state: "AB", lat: 53.5461, lng: -113.4938 },
-    ],
-    format: (a: any) => `${a.num} ${a.street}\n${a.city}, ${a.state} ${a.zip}\nCanada`,
-    zip: () => `${String.fromCharCode(65+randNum(0,25))}${randNum(1,9)}${String.fromCharCode(65+randNum(0,25))} ${randNum(1,9)}${String.fromCharCode(65+randNum(0,25))}${randNum(1,9)}`,
-  },
-  "Australia": {
-    flag: "🇦🇺", code: "+61", phoneFormat: "04## ### ###", timezone: "AEST/ACST/AWST",
-    currency: "AUD ($)",
-    streets: ["George Street","King Street","Collins Street","Pitt Street","Elizabeth Street","Flinders Street","Queen Street","Bourke Street","Swanston Street"],
-    cities: [
-      { city: "Sydney", state: "NSW", lat: -33.8688, lng: 151.2093 },
-      { city: "Melbourne", state: "VIC", lat: -37.8136, lng: 144.9631 },
-      { city: "Brisbane", state: "QLD", lat: -27.4698, lng: 153.0251 },
-      { city: "Perth", state: "WA", lat: -31.9505, lng: 115.8605 },
-      { city: "Adelaide", state: "SA", lat: -34.9285, lng: 138.6007 },
-    ],
-    format: (a: any) => `${a.num} ${a.street}\n${a.city}, ${a.state} ${a.zip}\nAustralia`,
-    zip: () => String(randNum(2000, 6999)),
-  },
-  "Germany": {
-    flag: "🇩🇪", code: "+49", phoneFormat: "01## #######", timezone: "CET/CEST",
-    currency: "EUR (€)",
-    streets: ["Hauptstraße","Berliner Straße","Schillerstraße","Goethestraße","Bahnhofstraße","Kirchstraße","Gartenstraße","Friedrichstraße","Lindenstraße"],
-    cities: [
-      { city: "Berlin", state: "", lat: 52.5200, lng: 13.4050 },
-      { city: "Munich", state: "", lat: 48.1351, lng: 11.5820 },
-      { city: "Hamburg", state: "", lat: 53.5511, lng: 9.9937 },
-      { city: "Frankfurt", state: "", lat: 50.1109, lng: 8.6821 },
-      { city: "Cologne", state: "", lat: 50.9375, lng: 6.9603 },
-    ],
-    format: (a: any) => `${a.street} ${a.num}\n${a.zip} ${a.city}\nGermany`,
-    zip: () => String(randNum(10000, 99999)),
-  },
-  "France": {
-    flag: "🇫🇷", code: "+33", phoneFormat: "06 ## ## ## ##", timezone: "CET/CEST",
-    currency: "EUR (€)",
-    streets: ["Rue de la Paix","Avenue des Champs","Boulevard Saint-Germain","Rue de Rivoli","Rue du Faubourg","Place de la République","Rue Lafayette","Avenue Victor Hugo"],
-    cities: [
-      { city: "Paris", state: "", lat: 48.8566, lng: 2.3522 },
-      { city: "Lyon", state: "", lat: 45.7640, lng: 4.8357 },
-      { city: "Marseille", state: "", lat: 43.2965, lng: 5.3698 },
-      { city: "Toulouse", state: "", lat: 43.6047, lng: 1.4442 },
-      { city: "Nice", state: "", lat: 43.7102, lng: 7.2620 },
-    ],
-    format: (a: any) => `${a.num} ${a.street}\n${a.zip} ${a.city}\nFrance`,
-    zip: () => String(randNum(10000, 99999)),
-  },
-  "Japan": {
-    flag: "🇯🇵", code: "+81", phoneFormat: "090-####-####", timezone: "JST",
-    currency: "JPY (¥)",
-    streets: ["Shibuya","Shinjuku","Ginza","Akihabara","Roppongi","Harajuku","Ikebukuro","Asakusa","Ueno","Odaiba"],
-    cities: [
-      { city: "Tokyo", state: "", lat: 35.6762, lng: 139.6503 },
-      { city: "Osaka", state: "", lat: 34.6937, lng: 135.5023 },
-      { city: "Kyoto", state: "", lat: 35.0116, lng: 135.7681 },
-      { city: "Yokohama", state: "", lat: 35.4437, lng: 139.6380 },
-      { city: "Fukuoka", state: "", lat: 33.5904, lng: 130.4017 },
-    ],
-    format: (a: any) => `${a.zip}\n${a.city}, ${a.street} ${a.num}\nJapan`,
-    zip: () => `${randNum(100,999)}-${randNum(1000,9999)}`,
-  },
-  "Bangladesh": {
-    flag: "🇧🇩", code: "+880", phoneFormat: "01#########", timezone: "BST",
-    currency: "BDT (৳)",
-    streets: ["Dhanmondi Rd","Gulshan Ave","Mirpur Rd","Banani Road","Uttara Sector","Mohammadpur Rd","Old Dhaka Lane","Chittagong Rd","Motijheel C/A","Farmgate Road"],
-    cities: [
-      { city: "Dhaka", state: "", lat: 23.8103, lng: 90.4125 },
-      { city: "Chittagong", state: "", lat: 22.3569, lng: 91.7832 },
-      { city: "Sylhet", state: "", lat: 24.8949, lng: 91.8687 },
-      { city: "Rajshahi", state: "", lat: 24.3745, lng: 88.6042 },
-      { city: "Khulna", state: "", lat: 22.8456, lng: 89.5403 },
-      { city: "Comilla", state: "", lat: 23.4607, lng: 91.1809 },
-    ],
-    format: (a: any) => `${a.num} ${a.street}\n${a.city} ${a.zip}\nBangladesh`,
-    zip: () => String(randNum(1000, 9999)),
-  },
-  "India": {
-    flag: "🇮🇳", code: "+91", phoneFormat: "9#########", timezone: "IST",
-    currency: "INR (₹)",
-    streets: ["MG Road","Brigade Road","Park Street","Connaught Place","Marine Drive","Juhu Road","Linking Road","Anna Salai","Mount Road","Residency Road","FC Road","Law Garden Road"],
-    cities: [
-      { city: "Mumbai", state: "MH", lat: 19.0760, lng: 72.8777 },
-      { city: "Delhi", state: "DL", lat: 28.7041, lng: 77.1025 },
-      { city: "Bangalore", state: "KA", lat: 12.9716, lng: 77.5946 },
-      { city: "Chennai", state: "TN", lat: 13.0827, lng: 80.2707 },
-      { city: "Kolkata", state: "WB", lat: 22.5726, lng: 88.3639 },
-      { city: "Hyderabad", state: "TS", lat: 17.3850, lng: 78.4867 },
-    ],
-    format: (a: any) => `${a.num}, ${a.street}\n${a.city}, ${a.state} ${a.zip}\nIndia`,
-    zip: () => String(randNum(100000, 999999)),
-  },
-  "Brazil": {
-    flag: "🇧🇷", code: "+55", phoneFormat: "(##) 9####-####", timezone: "BRT",
-    currency: "BRL (R$)",
-    streets: ["Rua Augusta","Avenida Paulista","Rua Oscar Freire","Rua da Consolação","Avenida Brasil","Rua das Flores","Avenida Atlântica","Rua XV de Novembro"],
-    cities: [
-      { city: "São Paulo", state: "SP", lat: -23.5505, lng: -46.6333 },
-      { city: "Rio de Janeiro", state: "RJ", lat: -22.9068, lng: -43.1729 },
-      { city: "Brasília", state: "DF", lat: -15.7975, lng: -47.8919 },
-      { city: "Salvador", state: "BA", lat: -12.9714, lng: -38.5124 },
-      { city: "Curitiba", state: "PR", lat: -25.4284, lng: -49.2733 },
-    ],
-    format: (a: any) => `${a.street}, ${a.num}\n${a.city} - ${a.state}\n${a.zip}\nBrazil`,
-    zip: () => `${randNum(10000,99999)}-${randNum(100,999)}`,
-  },
-};
-
-interface CityData { city: string; state: string; lat: number; lng: number; }
-interface CountryData {
-  flag: string; code: string; phoneFormat: string; timezone: string; currency: string;
-  streets: string[]; cities: CityData[];
-  format: (a: any) => string;
-  zip: () => string;
-}
-
 type CountryKey = keyof typeof countriesData;
 
 interface FullAddress {
-  // Person
   firstName: string; lastName: string; fullName: string;
   email: string; phone: string; username: string;
-  // Address
   streetNum: number; street: string; fullStreet: string;
   city: string; state: string; zip: string; country: string;
   formatted: string;
-  // Geo
   lat: string; lng: string;
-  // Meta
   timezone: string; currency: string; countryCode: string;
-  // Company
   company: string;
-  // SSN-like ID
   nationalId: string;
 }
 
