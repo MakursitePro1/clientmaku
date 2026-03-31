@@ -158,7 +158,7 @@ function SpeedGauge({
           fill="none"
           stroke="hsl(var(--foreground) / 0.12)"
           strokeWidth="18"
-          strokeLinecap="round"
+          strokeLinecap="butt"
         />
 
         {/* Tick marks */}
@@ -494,8 +494,20 @@ export default function InternetSpeedTester() {
     }
 
     if (phase === "done") {
-      setDisplaySpeed(upload ?? 0);
-      return;
+      // After all tests complete, smoothly return to zero
+      let raf = 0;
+      const tick = () => {
+        setDisplaySpeed((prev) => {
+          if (prev <= 0.15) {
+            cancelAnimationFrame(raf);
+            return 0;
+          }
+          return +(prev * 0.92).toFixed(2);
+        });
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
     }
 
     if (phase === "error") {
