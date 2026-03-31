@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Star, Users, Eye, Share2, Zap, TrendingUp } from "lucide-react";
+import { ArrowRight, Search, Sparkles, ExternalLink, ChevronLeft, ChevronRight, Star, Users, Eye, Share2, Zap, TrendingUp, Crown, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { type ToolCategory, type Tool } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useToolCatalog } from "@/contexts/ToolCatalogContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
