@@ -675,7 +675,7 @@ export default function TempMail() {
 
                 {/* No attachments info */}
                 {(!selected.attachments || selected.attachments.length === 0) && (
-                  <div className="px-5 pb-4 pt-1">
+                  <div className="px-3 sm:px-5 pb-3 sm:pb-4 pt-1">
                     <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/50">
                       <Paperclip className="w-3 h-3" />
                       <span>No attachments</span>
