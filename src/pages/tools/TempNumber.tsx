@@ -322,7 +322,10 @@ export default function TempNumber() {
                   <span className="text-base">{getFlag(n.country)}</span>
                   <div className="flex-1 min-w-0">
                     <p className="font-mono text-xs sm:text-sm font-bold truncate">{n.number}</p>
-                    <p className="text-[9px] sm:text-[10px] text-muted-foreground">{n.country}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
+                      {n.country}
+                      {n.source === "receivesms-co" && <span className="text-[7px] px-1 py-0 rounded bg-primary/10 text-primary font-bold">NEW</span>}
+                    </p>
                   </div>
                   {n.slug === activeNumber?.slug && <Signal className="w-3 h-3 text-primary shrink-0" />}
                 </button>
