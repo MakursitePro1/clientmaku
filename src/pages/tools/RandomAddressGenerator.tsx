@@ -383,8 +383,8 @@ export default function RandomAddressGenerator() {
                 ))}
               </SelectContent>
             </Select>
-            <button onClick={generate} className="tool-btn-primary flex-1 py-2.5 sm:py-3 flex items-center justify-center gap-2 text-sm sm:text-base">
-              <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" /> Generate Addresses
+            <button onClick={generate} className="tool-btn-primary flex-1 py-2.5 sm:py-3 flex items-center justify-center gap-2 text-sm sm:text-base text-primary-foreground">
+              <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5" /> Generate Identities
             </button>
           </div>
         </div>
