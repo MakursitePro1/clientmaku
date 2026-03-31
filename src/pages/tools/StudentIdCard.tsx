@@ -649,22 +649,27 @@ export default function StudentIdCard() {
           </TabsContent>
         </Tabs>
 
-        <div className="grid grid-cols-3 gap-3">
-          <div className="tool-stat-card">
-            <GraduationCap className="w-5 h-5 mx-auto text-blue-500 mb-1" />
-            <div className="stat-value text-sm">{department.length > 20 ? department.slice(0, 20) + "…" : department}</div>
-            <div className="stat-label">Department</div>
-          </div>
-          <div className="tool-stat-card">
-            <User className="w-5 h-5 mx-auto text-primary mb-1" />
-            <div className="stat-value text-sm">{studentId}</div>
-            <div className="stat-label">Student ID</div>
-          </div>
-          <div className="tool-stat-card">
-            <Palette className="w-5 h-5 mx-auto text-purple-500 mb-1" />
-            <div className="stat-value text-sm capitalize">{theme}</div>
-            <div className="stat-label">Theme</div>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            { icon: GraduationCap, value: department.length > 18 ? department.slice(0, 18) + "…" : department, label: "Department", color: "from-blue-500/20 to-indigo-500/10", iconColor: "text-blue-500", border: "border-blue-500/20" },
+            { icon: User, value: studentId, label: "Student ID", color: "from-primary/20 to-primary/5", iconColor: "text-primary", border: "border-primary/20" },
+            { icon: Palette, value: themes.find(t2 => t2.id === theme)?.name || theme, label: "Theme", color: "from-purple-500/20 to-fuchsia-500/10", iconColor: "text-purple-500", border: "border-purple-500/20" },
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1, duration: 0.3 }}
+              className={`group relative overflow-hidden rounded-2xl border ${stat.border} bg-gradient-to-br ${stat.color} backdrop-blur-sm p-4 text-center transition-all duration-300 hover:scale-[1.03] hover:shadow-lg cursor-default`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className={`w-9 h-9 mx-auto mb-2 rounded-xl bg-background/80 flex items-center justify-center shadow-sm ${stat.iconColor}`}>
+                <stat.icon className="w-4.5 h-4.5" />
+              </div>
+              <div className="text-sm font-bold truncate">{stat.value}</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider font-medium">{stat.label}</div>
+            </motion.div>
+          ))}
         </div>
 
         <div className="flex flex-wrap gap-3">
