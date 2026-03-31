@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle } from "lucide-react";
+import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -48,32 +49,58 @@ export default function TempMail() {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(false);
+  const [availableDomains, setAvailableDomains] = useState<{ domain: string }[]>([]);
+  const [selectedDomain, setSelectedDomain] = useState<string>("");
+  const [providerBaseCache, setProviderBaseCache] = useState<string>("");
+  const [domainsLoaded, setDomainsLoaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const createAccount = useCallback(async () => {
+  // Fetch domains on mount
+  const fetchDomains = useCallback(async () => {
+    try {
+      const domainData = await callMailAPI("getDomains");
+      const domains = domainData?.domains || [];
+      const providerBase = domainData?.providerBase || "";
+      setAvailableDomains(domains);
+      setProviderBaseCache(providerBase);
+      if (domains.length > 0 && !selectedDomain) {
+        setSelectedDomain(domains[0].domain);
+      }
+      setDomainsLoaded(true);
+      return { domains, providerBase };
+    } catch {
+      toast.error("Failed to fetch domains");
+      setDomainsLoaded(true);
+      return null;
+    }
+  }, [selectedDomain]);
+
+  const createAccount = useCallback(async (domainOverride?: string) => {
     setCreating(true);
     setMessages([]);
     setSelected(null);
     try {
-      // Step 1: Get available domains + provider base
-      const domainData = await callMailAPI("getDomains");
-      const domains = domainData?.domains || [];
-      const providerBase = domainData?.providerBase || "";
-      
+      let domains = availableDomains;
+      let providerBase = providerBaseCache;
+
       if (!domains.length) {
-        toast.error("No domains available. Please try again later.");
-        setCreating(false);
-        return;
+        const result = await fetchDomains();
+        if (!result || !result.domains.length) {
+          toast.error("No domains available. Please try again later.");
+          setCreating(false);
+          return;
+        }
+        domains = result.domains;
+        providerBase = result.providerBase;
       }
-      const domain = domains[Math.floor(Math.random() * domains.length)].domain;
+
+      const domain = domainOverride || selectedDomain || domains[0].domain;
       const username = randomString(12);
       const address = `${username}@${domain}`;
       const password = randomString(16);
 
-      // Step 2: Create account
       const accResult = await callMailAPI("createAccount", { address, password, providerBase });
       if (accResult?.["@id"] || accResult?.id) {
-        // Step 3: Login to get token
         const loginResult = await callMailAPI("login", { address, password, providerBase });
         if (loginResult?.token) {
           const newAccount: MailAccount = {
@@ -98,11 +125,13 @@ export default function TempMail() {
     } finally {
       setCreating(false);
     }
-  }, []);
+  }, [availableDomains, providerBaseCache, selectedDomain, fetchDomains]);
 
   // Auto-create on mount
   useEffect(() => {
-    createAccount();
+    fetchDomains().then(() => {
+      createAccount();
+    });
   }, []);
 
   // Fetch messages
@@ -196,12 +225,48 @@ export default function TempMail() {
               className="shrink-0 h-9 w-9 hover:text-primary hover:bg-primary/10 rounded-xl">
               <Copy className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={createAccount} disabled={creating}
+            <Button variant="ghost" size="icon" onClick={() => createAccount()} disabled={creating}
               className="shrink-0 h-9 w-9 hover:text-primary hover:bg-primary/10 rounded-xl">
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             </Button>
           </div>
         </motion.div>
+
+        {/* Domain Selector */}
+        {domainsLoaded && availableDomains.length > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="tool-result-card"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.05))" }}>
+                <Globe className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Select Domain</p>
+                <Select value={selectedDomain} onValueChange={setSelectedDomain}>
+                  <SelectTrigger className="h-9 rounded-xl text-sm font-mono">
+                    <SelectValue placeholder="Choose domain..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableDomains.map((d) => (
+                      <SelectItem key={d.domain} value={d.domain}>
+                        @{d.domain}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => createAccount(selectedDomain)} disabled={creating || !selectedDomain}
+                className="rounded-xl text-xs gap-1 shrink-0">
+                {creating ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                Generate
+              </Button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
