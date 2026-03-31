@@ -262,6 +262,7 @@ export default function TempMail() {
           };
           setAccount(newAccount);
           setAutoRefresh(true);
+          setCreatedAt(Date.now());
           toast.success("Temp email created successfully!");
         } else {
           toast.error("Failed to login. Please try again.");
