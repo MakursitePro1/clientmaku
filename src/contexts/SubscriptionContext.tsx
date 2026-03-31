@@ -10,6 +10,10 @@ interface Plan {
   price_semi_annual: number;
   price_annual: number;
   price_lifetime: number;
+  price_monthly_bdt: number;
+  price_semi_annual_bdt: number;
+  price_annual_bdt: number;
+  price_lifetime_bdt: number;
   features: string[];
   is_popular: boolean;
   is_enabled: boolean;
