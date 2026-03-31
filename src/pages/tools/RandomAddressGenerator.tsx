@@ -615,8 +615,6 @@ export default function RandomAddressGenerator() {
                                 <DetailRow icon={User} label="Full Name" value={a.fullName} />
                                 <DetailRow icon={Mail} label="Email" value={a.email} iconColor="text-blue-500" />
                                 <DetailRow icon={Phone} label="Phone" value={a.phone} iconColor="text-green-500" />
-                                <DetailRow icon={Hash} label="Username" value={a.username} iconColor="text-purple-500" />
-                                <DetailRow icon={Shield} label="Password" value={a.password} iconColor="text-red-500" />
                                 <DetailRow icon={Hash} label="National ID" value={a.nationalId} iconColor="text-orange-500" />
                                 <DetailRow icon={Calendar} label="Date of Birth" value={`${a.dob} (Age: ${a.age})`} iconColor="text-pink-500" />
                               </div>
