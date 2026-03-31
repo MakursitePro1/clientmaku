@@ -158,7 +158,7 @@ function SpeedGauge({
           fill="none"
           stroke="hsl(var(--foreground) / 0.12)"
           strokeWidth="18"
-          strokeLinecap="round"
+          strokeLinecap="butt"
         />
 
         {/* Tick marks */}
