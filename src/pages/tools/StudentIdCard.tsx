@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Download, Eye, Upload, Palette, User, GraduationCap, RotateCcw, Sparkles, FileImage, FileText, Image } from "lucide-react";
+import { Download, Eye, Upload, Palette, User, GraduationCap, RotateCcw, Sparkles, FileImage, FileText } from "lucide-react";
 import { PDFDocument } from "pdf-lib";
 import { motion } from "framer-motion";
 
