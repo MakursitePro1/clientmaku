@@ -61,6 +61,7 @@ export default function RandomAddressGenerator() {
   const [searchTerm, setSearchTerm] = useState("");
   const [bookmarked, setBookmarked] = useState<Set<number>>(new Set());
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [countrySearch, setCountrySearch] = useState("");
 
   const copyText = useCallback((text: string, label: string) => {
     navigator.clipboard.writeText(text).then(() => {
