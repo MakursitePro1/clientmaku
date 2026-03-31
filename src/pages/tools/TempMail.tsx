@@ -116,10 +116,11 @@ function OTPBanner({ text, subject }: { text: string; subject?: string }) {
   const otp = extractOTP(subject || "") || extractOTP(text);
   if (!otp) return null;
   
-  const copyOTP = (e: React.MouseEvent) => {
+  const copyOTP = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    copyToClipboard(otp);
-    toast.success(`OTP "${otp}" copied!`);
+    const ok = await copyToClipboard(otp);
+    if (ok) toast.success(`OTP "${otp}" copied!`);
+    else toast.error("Copy failed. Please select and copy manually.");
   };
 
   return (
