@@ -561,12 +561,12 @@ export default function TempMail() {
                 className="flex flex-col">
                 
                 {/* Detail Header */}
-                <div className="flex items-center justify-between px-5 py-3 border-b border-border/20 bg-accent/20">
-                  <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-xs text-primary hover:underline font-bold">
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Inbox
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3 border-b border-border/20 bg-accent/20 gap-2">
+                  <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-[11px] sm:text-xs text-primary hover:underline font-bold">
+                    <ArrowLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Back to Inbox
                   </button>
-                  <div className="flex items-center gap-1.5">
-                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1"
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2"
                       onClick={() => {
                         const content = selected.text || selected.intro || selected.subject || "";
                         navigator.clipboard.writeText(content);
@@ -574,20 +574,20 @@ export default function TempMail() {
                       }}>
                       <Copy className="w-3 h-3" /> Copy
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-primary hover:bg-primary/10"
+                    <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2 text-primary hover:bg-primary/10"
                       onClick={() => forwardEmail(selected)}>
-                      <Forward className="w-3 h-3" /> Forward
+                      <Forward className="w-3 h-3" /> Fwd
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-destructive hover:bg-destructive/10"
+                    <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2 text-destructive hover:bg-destructive/10"
                       onClick={() => deleteMessage(selected.id)}>
-                      <Trash2 className="w-3 h-3" /> Delete
+                      <Trash2 className="w-3 h-3" />
                     </Button>
                   </div>
                 </div>
 
                 {/* Subject */}
-                <div className="px-5 pt-4 pb-3">
-                  <h3 className="font-bold text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
+                <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-2 sm:pb-3">
+                  <h3 className="font-bold text-sm sm:text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
                 </div>
 
                 {/* OTP Banner */}
