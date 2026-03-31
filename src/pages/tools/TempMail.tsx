@@ -514,6 +514,64 @@ export default function TempMail() {
           </motion.div>
         )}
 
+        {/* Multiple Inboxes */}
+        {inboxes.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {inboxes.map((inbox, idx) => (
+              <button
+                key={inbox.address}
+                onClick={() => switchInbox(idx)}
+                className={`relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
+                  idx === activeInboxIdx
+                    ? "bg-primary/15 text-primary border border-primary/30 font-bold"
+                    : "bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted"
+                }`}
+              >
+                <Mail className="w-3 h-3" />
+                <span className="font-mono">{inbox.address.split("@")[0].slice(0, 6)}@{inbox.address.split("@")[1]}</span>
+                {inboxes.length > 1 && (
+                  <span
+                    onClick={(e) => { e.stopPropagation(); removeInbox(idx); }}
+                    className="ml-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-destructive/20 hover:text-destructive transition-colors"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </span>
+                )}
+              </button>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => createAccount()}
+              disabled={creating || inboxes.length >= 5}
+              className="rounded-xl text-[10px] sm:text-xs gap-1 h-7 sm:h-8 px-2 sm:px-3 shrink-0"
+            >
+              {creating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+              <span className="hidden sm:inline">Add Inbox</span>
+            </Button>
+          </div>
+        )}
+
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by subject, sender, or content..."
+            className="w-full h-9 sm:h-10 pl-9 pr-8 rounded-xl text-xs sm:text-sm bg-muted/50 border border-border/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 outline-none transition-all placeholder:text-muted-foreground/50"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-muted-foreground/20 flex items-center justify-center hover:bg-muted-foreground/30 transition-colors"
+            >
+              <X className="w-2.5 h-2.5 text-muted-foreground" />
+            </button>
+          )}
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           <div className="tool-stat-card p-3 sm:p-4">
