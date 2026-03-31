@@ -139,6 +139,9 @@ export default function TempMail() {
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [createdAt, setCreatedAt] = useState<number | null>(null);
   const [expiryText, setExpiryText] = useState("--:--");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [inboxes, setInboxes] = useState<MailAccount[]>([]);
+  const [activeInboxIdx, setActiveInboxIdx] = useState(0);
   const prevMsgCountRef = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const expiryRef = useRef<NodeJS.Timeout | null>(null);
