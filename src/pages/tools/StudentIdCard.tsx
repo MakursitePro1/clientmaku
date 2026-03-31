@@ -833,13 +833,47 @@ export default function StudentIdCard() {
           <button onClick={generate} className="tool-btn-primary px-6 py-3 flex items-center gap-2 text-sm font-bold">
             <Eye className="w-4 h-4" /> Preview Card
           </button>
-          <button onClick={downloadCard} className="tool-btn-primary px-6 py-3 flex items-center gap-2 text-sm font-bold" style={{ background: "linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%))" }}>
-            <Download className="w-4 h-4" /> Download PNG
-          </button>
           <Button onClick={resetAll} variant="ghost" className="rounded-xl gap-1.5 text-muted-foreground hover:text-destructive">
             <RotateCcw className="w-4 h-4" /> Reset
           </Button>
         </div>
+
+        {generated && (
+          <div className="tool-section-card p-5 space-y-4">
+            <h3 className="text-sm font-bold flex items-center gap-2"><Download className="w-4 h-4 text-primary" /> Download Options</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Front Side */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Front Side</p>
+                <div className="flex flex-col gap-1.5">
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("front", "png")}><FileImage className="w-3.5 h-3.5 text-blue-500" /> PNG</Button>
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("front", "jpg")}><FileImage className="w-3.5 h-3.5 text-orange-500" /> JPG</Button>
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("front", "pdf")}><FileText className="w-3.5 h-3.5 text-red-500" /> PDF</Button>
+                </div>
+              </div>
+              {/* Back Side */}
+              {showBack && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Back Side</p>
+                  <div className="flex flex-col gap-1.5">
+                    <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("back", "png")}><FileImage className="w-3.5 h-3.5 text-blue-500" /> PNG</Button>
+                    <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("back", "jpg")}><FileImage className="w-3.5 h-3.5 text-orange-500" /> JPG</Button>
+                    <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("back", "pdf")}><FileText className="w-3.5 h-3.5 text-red-500" /> PDF</Button>
+                  </div>
+                </div>
+              )}
+              {/* Full Card */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Full Card</p>
+                <div className="flex flex-col gap-1.5">
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("both", "png")}><FileImage className="w-3.5 h-3.5 text-blue-500" /> PNG</Button>
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("both", "jpg")}><FileImage className="w-3.5 h-3.5 text-orange-500" /> JPG</Button>
+                  <Button variant="outline" size="sm" className="justify-start gap-2 rounded-xl text-xs" onClick={() => downloadAs("both", "pdf")}><FileText className="w-3.5 h-3.5 text-red-500" /> PDF</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="tool-result-card relative overflow-hidden">
           <canvas ref={canvasRef} className="w-full rounded-2xl" style={{ maxWidth: "100%" }} />
