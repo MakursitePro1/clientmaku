@@ -3,9 +3,37 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound } from "lucide-react";
+import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+
+function playNotificationSound() {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch {}
+}
+
+function sendBrowserNotification(subject: string, from: string) {
+  if (Notification.permission === "granted") {
+    new Notification("📧 New Email Received!", {
+      body: `From: ${from}\n${subject || "(No Subject)"}`,
+      icon: "/logo.jpg",
+      tag: "temp-mail-new",
+    });
+  }
+}
 
 interface MailAccount {
   id: string;
@@ -97,7 +125,26 @@ export default function TempMail() {
   const [selectedDomain, setSelectedDomain] = useState<string>("");
   const [providerBaseCache, setProviderBaseCache] = useState<string>("");
   const [domainsLoaded, setDomainsLoaded] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const prevMsgCountRef = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Request notification permission
+  const requestNotifPermission = useCallback(async () => {
+    if (!("Notification" in window)) {
+      toast.error("This browser doesn't support notifications");
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    if (perm === "granted") {
+      setNotifEnabled(true);
+      toast.success("Notifications enabled!");
+    } else {
+      setNotifEnabled(false);
+      toast.error("Notification permission denied");
+    }
+  }, []);
 
   // Fetch domains on mount
   const fetchDomains = useCallback(async () => {
@@ -123,6 +170,7 @@ export default function TempMail() {
     setCreating(true);
     setMessages([]);
     setSelected(null);
+    prevMsgCountRef.current = 0;
     try {
       let domains = availableDomains;
       let providerBase = providerBaseCache;
@@ -178,20 +226,30 @@ export default function TempMail() {
     });
   }, []);
 
-  // Fetch messages
+  // Fetch messages with new-email detection
   const fetchMessages = useCallback(async () => {
     if (!account?.token) return;
     setRefreshing(true);
     try {
       const data = await callMailAPI("getMessages", { token: account.token, providerBase: account.providerBase });
       const msgs = data?.["hydra:member"] || data?.member || [];
+      
+      // Detect new emails
+      if (msgs.length > prevMsgCountRef.current && prevMsgCountRef.current > 0) {
+        const newMsg = msgs[0];
+        if (soundEnabled) playNotificationSound();
+        if (notifEnabled) sendBrowserNotification(newMsg?.subject || "", newMsg?.from?.name || newMsg?.from?.address || "Unknown");
+        toast.success("📧 New email received!", { description: newMsg?.subject || "(No Subject)" });
+      }
+      prevMsgCountRef.current = msgs.length;
+      
       setMessages(msgs);
     } catch (err) {
       // Silent fail for auto-refresh
     } finally {
       setRefreshing(false);
     }
-  }, [account?.token, account?.providerBase]);
+  }, [account?.token, account?.providerBase, soundEnabled, notifEnabled]);
 
   // Auto-refresh messages
   useEffect(() => {
@@ -342,13 +400,23 @@ export default function TempMail() {
                 className="w-2 h-2 rounded-full bg-green-500" />
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 flex-wrap">
+            <Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`rounded-xl text-xs gap-1 ${soundEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+              {soundEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
+              {soundEnabled ? "Sound On" : "Sound Off"}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => notifEnabled ? setNotifEnabled(false) : requestNotifPermission()}
+              className={`rounded-xl text-xs gap-1 ${notifEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+              {notifEnabled ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
+              {notifEnabled ? "Notif On" : "Notif Off"}
+            </Button>
             <Button variant="outline" size="sm" onClick={fetchMessages} disabled={!account || refreshing}
               className="rounded-xl text-xs gap-1">
               <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} /> Refresh
             </Button>
             <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-green-500/30 text-green-600" : "border-border"}`}>
+              className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-primary/30 text-primary" : "border-border"}`}>
               {autoRefresh ? "⏸ Pause" : "▶ Resume"}
             </Button>
           </div>
