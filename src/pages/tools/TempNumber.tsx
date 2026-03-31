@@ -360,45 +360,6 @@ export default function TempNumber() {
             </div>
           )}
 
-          {/* Load More from Country */}
-          {countryPages.length > 0 && (
-            <div className="mt-2">
-              <p className="text-[10px] text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
-                <Plus className="w-3 h-3" /> Load more numbers by country:
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {countryPages
-                  .filter(cp => cp.count > 0)
-                  .sort((a, b) => b.count - a.count)
-                  .slice(0, 20)
-                  .map(cp => {
-                    const alreadyLoaded = loadedCountries.has(cp.country);
-                    return (
-                      <button
-                        key={cp.url}
-                        disabled={loadingMore || alreadyLoaded}
-                        onClick={() => loadMoreNumbers(cp)}
-                        className={`px-2 py-1 rounded-lg text-[10px] sm:text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1 ${
-                          alreadyLoaded
-                            ? "bg-primary/10 text-primary/50 border border-primary/20 cursor-default"
-                            : "bg-accent/50 text-muted-foreground border border-transparent hover:bg-primary/10 hover:text-primary hover:border-primary/20"
-                        }`}
-                      >
-                        {getFlag(cp.country)} {cp.country}
-                        <span className="text-[8px] opacity-60">({cp.count})</span>
-                        {alreadyLoaded && <Check className="w-2.5 h-2.5" />}
-                      </button>
-                    );
-                  })}
-              </div>
-              {loadingMore && (
-                <div className="flex items-center gap-2 mt-2 text-xs text-primary">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span className="font-medium">Loading numbers...</span>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Stats */}
