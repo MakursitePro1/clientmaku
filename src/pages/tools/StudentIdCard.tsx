@@ -647,7 +647,7 @@ export default function StudentIdCard() {
   const getCardCanvas = (side: "front" | "back" | "both"): HTMLCanvasElement | null => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
-    const W = 920, CH = 560;
+    const W = 950, CH = 570;
     const scale = 2;
 
     if (side === "both") return canvas;
