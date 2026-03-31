@@ -308,6 +308,12 @@ export default function TempNumber() {
   // Country list from available numbers
   const availableCountries = [...new Set(numbers.map(n => n.country))].sort();
 
+  // All known countries (200+) for dropdown
+  const allCountryNames = Object.keys(countryFlags).map(c => c.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")).sort();
+  const filteredCountryList = countrySearch.trim()
+    ? allCountryNames.filter(c => c.toLowerCase().includes(countrySearch.toLowerCase()))
+    : allCountryNames;
+
   // Filtered numbers by country
   const filteredNumbers = countryFilter
     ? numbers.filter(n => n.country.toLowerCase() === countryFilter.toLowerCase())
