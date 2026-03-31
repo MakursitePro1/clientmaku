@@ -41,7 +41,7 @@ export function Footer() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Upper section - 4 columns */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 py-10 sm:py-14">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10 py-6 sm:py-8">
             {/* Brand column */}
             <div className="sm:col-span-2 lg:col-span-1 space-y-4">
               <Link to="/" className="flex items-center gap-3 group w-fit">
@@ -161,7 +161,7 @@ export function Footer() {
           <div className="h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
 
           {/* Bottom bar */}
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between py-5">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between py-3">
             <p className="text-[10px] sm:text-[11px] text-muted-foreground/35 flex items-center gap-1.5 flex-wrap justify-center">
               {settings.footer_copyright || "© 2024"}{" "}
               <span className="font-semibold gradient-text">{settings.site_name}</span>
