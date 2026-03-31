@@ -408,16 +408,21 @@ function PhaseResult({
   return (
     <motion.div
       layout
-      className={`flex flex-col items-center gap-1 rounded-xl border-2 p-4 transition-all duration-300 ${
+      className={`flex flex-col items-center gap-1.5 rounded-2xl border-2 p-5 transition-all duration-500 ${
         active
-          ? "border-primary/40 bg-primary/5 shadow-lg shadow-primary/10"
+          ? "border-primary/40 bg-primary/5 shadow-xl shadow-primary/10"
           : done
             ? "border-foreground/15 bg-card"
             : "border-foreground/8 bg-muted/40 opacity-50"
       }`}
     >
       <div className="flex items-center gap-2">
-        <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-muted-foreground"}`} style={done ? { color } : {}} />
+        <motion.div
+          animate={active ? { rotate: [0, 10, -10, 0], scale: [1, 1.15, 1] } : {}}
+          transition={{ duration: 1.5, repeat: active ? Infinity : 0, ease: "easeInOut" }}
+        >
+          <Icon className={`h-5 w-5 ${active ? "text-primary" : "text-muted-foreground"}`} style={done ? { color } : {}} />
+        </motion.div>
         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
           {label}
         </span>
@@ -425,23 +430,29 @@ function PhaseResult({
 
       {active && !done && (
         <motion.div
-          className="mt-1 flex items-center gap-1"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
+          className="mt-1 flex items-center gap-1.5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
         >
-          <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-          <div className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-          <div className="h-1.5 w-1.5 rounded-full bg-primary/30" />
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="h-1.5 w-1.5 rounded-full bg-primary"
+              animate={{ scale: [0.6, 1.2, 0.6], opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+            />
+          ))}
         </motion.div>
       )}
 
       {done && value !== null && (
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          initial={{ scale: 0.3, opacity: 0, y: 10 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15, duration: 0.6 }}
           className="flex items-baseline gap-1"
         >
-          <span className="text-3xl font-light text-foreground">{value.toFixed(2)}</span>
+          <CountUpValue target={value} duration={1.2} />
           <span className="text-xs text-muted-foreground">Mbps</span>
         </motion.div>
       )}
@@ -451,6 +462,29 @@ function PhaseResult({
       )}
     </motion.div>
   );
+}
+
+// Animated count-up for result values
+function CountUpValue({ target, duration = 1 }: { target: number; duration?: number }) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const steps = Math.round(duration * 60);
+    const increment = target / steps;
+    let frame = 0;
+    const tick = () => {
+      start += increment;
+      if (start >= target) {
+        setCount(target);
+        return;
+      }
+      setCount(+start.toFixed(2));
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target, duration]);
+  return <span className="text-3xl font-light text-foreground">{count.toFixed(2)}</span>;
 }
 
 // --- Main Component ---
