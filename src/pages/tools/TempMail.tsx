@@ -466,26 +466,26 @@ export default function TempMail() {
         )}
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-3">
-          <div className="tool-stat-card">
-            <Inbox className="w-5 h-5 mx-auto text-primary mb-1" />
-            <div className="stat-value text-lg">{messages.length}</div>
-            <div className="stat-label">Messages</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          <div className="tool-stat-card p-3 sm:p-4">
+            <Inbox className="w-4 h-4 sm:w-5 sm:h-5 mx-auto text-primary mb-1" />
+            <div className="stat-value text-base sm:text-lg">{messages.length}</div>
+            <div className="stat-label text-[9px] sm:text-xs">Messages</div>
           </div>
-          <div className="tool-stat-card">
-            <Timer className="w-5 h-5 mx-auto mb-1" style={{ color: expiryText === "Expired" ? "hsl(var(--destructive))" : "hsl(var(--primary))" }} />
-            <div className={`stat-value text-lg font-mono ${expiryText === "Expired" ? "text-destructive" : ""}`}>{expiryText}</div>
-            <div className="stat-label">Expires In</div>
+          <div className="tool-stat-card p-3 sm:p-4">
+            <Timer className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1" style={{ color: expiryText === "Expired" ? "hsl(var(--destructive))" : "hsl(var(--primary))" }} />
+            <div className={`stat-value text-base sm:text-lg font-mono ${expiryText === "Expired" ? "text-destructive" : ""}`}>{expiryText}</div>
+            <div className="stat-label text-[9px] sm:text-xs">Expires In</div>
           </div>
-          <div className="tool-stat-card">
-            <Shield className="w-5 h-5 mx-auto text-primary mb-1" />
-            <div className="stat-value text-lg">{autoRefresh ? "Active" : "Paused"}</div>
-            <div className="stat-label">Auto Refresh</div>
+          <div className="tool-stat-card p-3 sm:p-4">
+            <Shield className="w-4 h-4 sm:w-5 sm:h-5 mx-auto text-primary mb-1" />
+            <div className="stat-value text-base sm:text-lg">{autoRefresh ? "Active" : "Paused"}</div>
+            <div className="stat-label text-[9px] sm:text-xs">Auto Refresh</div>
           </div>
-          <div className="tool-stat-card">
-            <Clock className="w-5 h-5 mx-auto text-primary mb-1" />
-            <div className="stat-value text-lg">5s</div>
-            <div className="stat-label">Refresh Rate</div>
+          <div className="tool-stat-card p-3 sm:p-4">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5 mx-auto text-primary mb-1" />
+            <div className="stat-value text-base sm:text-lg">5s</div>
+            <div className="stat-label text-[9px] sm:text-xs">Refresh Rate</div>
           </div>
         </div>
 
