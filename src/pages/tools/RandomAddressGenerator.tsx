@@ -186,7 +186,7 @@ export default function RandomAddressGenerator() {
   const currentCountry = countriesData[country];
 
   return (
-    <ToolLayout title="Random Address Generator" description="Generate ultra-detailed random identities with addresses for 10 countries">
+    <ToolLayout title="Random Address Generator" description={`Generate ultra-detailed random identities with addresses for ${Object.keys(countriesData).length}+ countries`}>
       <div className="space-y-4 sm:space-y-5 max-w-3xl mx-auto">
         {/* Config */}
         <div className="tool-section-card p-3 sm:p-5 space-y-3 sm:space-y-4">
