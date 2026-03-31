@@ -919,11 +919,12 @@ export default function TempMail() {
                           variant="outline"
                           size="sm"
                           className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold border-primary/20 text-primary hover:bg-primary/10 hover:text-primary px-2 sm:px-3"
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
                             const content = m.intro || m.subject || "";
-                            copyToClipboard(content);
-                            toast.success("Email content copied!");
+                            const ok = await copyToClipboard(content);
+                            if (ok) toast.success("Email content copied!");
+                            else toast.error("Copy failed");
                           }}
                         >
                           <Copy className="w-3 h-3" /> Copy
