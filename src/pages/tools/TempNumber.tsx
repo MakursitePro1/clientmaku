@@ -62,8 +62,9 @@ const countryFlags: Record<string, string> = {
 };
 function getFlag(country: string) { return countryFlags[country.toLowerCase()] || "🌍"; }
 
-interface NumberInfo { number: string; country: string; slug: string; }
+interface NumberInfo { number: string; country: string; slug: string; source?: string; pageUrl?: string; }
 interface SMSMessage { id: string; message: string; sender: string; time: string; }
+interface CountryPage { country: string; url: string; count: number; code: string; }
 
 async function callAPI(action: string, params: Record<string, string> = {}) {
   const { data, error } = await supabase.functions.invoke("temp-number", { body: { action, ...params } });
