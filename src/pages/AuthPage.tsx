@@ -56,7 +56,12 @@ export default function AuthPage() {
     setError("");
     setLoading(true);
 
-    if (isSignUp) {
+    if (!email.toLowerCase().endsWith("@gmail.com")) {
+      setError("Only Gmail (@gmail.com) is allowed.");
+      setLoading(false);
+      return;
+    }
+
       if (!displayName.trim()) { setError("Full name is required"); setLoading(false); return; }
       if (!username.trim()) { setError("Username is required"); setLoading(false); return; }
       if (username.length < 3) { setError("Username must be at least 3 characters"); setLoading(false); return; }
