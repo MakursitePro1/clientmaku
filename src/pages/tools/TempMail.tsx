@@ -766,12 +766,12 @@ export default function TempMail() {
                         </div>
                       </div>
 
-                      {/* Action buttons - always visible on mobile, hover on desktop */}
-                      <div className="flex items-center gap-1.5 mt-2.5 ml-[52px]">
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-1 sm:gap-1.5 mt-2 sm:mt-2.5 ml-[42px] sm:ml-[52px]">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold border-primary/20 text-primary hover:bg-primary/10 hover:text-primary"
+                          className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold border-primary/20 text-primary hover:bg-primary/10 hover:text-primary px-2 sm:px-3"
                           onClick={(e) => {
                             e.stopPropagation();
                             const content = m.intro || m.subject || "";
