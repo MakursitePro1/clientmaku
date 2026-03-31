@@ -258,6 +258,17 @@ export default function TempNumber() {
   // Cleanup
   useEffect(() => () => { if (copyResetRef.current) clearTimeout(copyResetRef.current); }, []);
 
+  // Close country dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(e.target as Node)) {
+        setCountryDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const selectNumber = (num: NumberInfo) => {
     setActiveNumber(num);
     setNumberHistory(prev => {
