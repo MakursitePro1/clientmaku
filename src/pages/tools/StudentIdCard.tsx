@@ -388,7 +388,7 @@ export default function StudentIdCard() {
         rr(14 + 35, oY + CH - 95, panelW - 70, 48, 12);
         ctx.fill();
         ctx.fillStyle = "rgba(255,255,255,0.06)";
-        rr(14 + 35, oY + CH - 95, panelW - 70, 24, [12, 12, 0, 0]);
+        rr(14 + 35, oY + CH - 95, panelW - 70, 24, 8);
         ctx.fill();
 
         ctx.fillStyle = "rgba(255,255,255,0.5)";
