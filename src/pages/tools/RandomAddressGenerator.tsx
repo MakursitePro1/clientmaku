@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -6,10 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Copy, RefreshCw, Download, MapPin, Globe, Map, Building, Navigation,
   User, Phone, Mail, Hash, Clock, Compass, Check, ChevronDown, ChevronUp,
-  Search, Bookmark, BookmarkCheck, Trash2
+  Search, Bookmark, BookmarkCheck, Trash2, Heart, Calendar, Ruler, Droplet,
+  CreditCard, Car, Briefcase, GraduationCap, Wifi, Shield
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { countriesData, type CityData, type CountryData } from "@/data/countriesData";
+import { countriesData, continentCountries, continentEmojis, type CityData, type CountryData, type ContinentKey } from "@/data/countriesData";
 
 function rand<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
 function randNum(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -29,6 +30,62 @@ const lastNames = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller
 const companySuffixes = ["Inc.", "LLC", "Corp.", "Ltd.", "Group", "Solutions", "Technologies", "Industries", "Enterprises", "Co."];
 const companyWords = ["Global", "Pacific", "Summit", "Atlas", "Apex", "Nova", "Prime", "Pinnacle", "Sterling", "Vertex", "Horizon", "Alpha", "Omega", "Titan", "Phoenix"];
 
+const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const eyeColors = ["Brown", "Blue", "Green", "Hazel", "Gray", "Amber"];
+const hairColors = ["Black", "Brown", "Blonde", "Red", "Gray", "Auburn", "White"];
+const occupations = ["Software Engineer", "Teacher", "Doctor", "Accountant", "Designer", "Nurse", "Manager", "Lawyer", "Architect", "Analyst", "Consultant", "Marketing Specialist", "Writer", "Electrician", "Chef", "Photographer", "Pharmacist", "Scientist", "Mechanic", "Sales Executive"];
+const universities = ["MIT", "Harvard", "Stanford", "Oxford", "Cambridge", "Yale", "Princeton", "Columbia", "UCLA", "NYU", "University of Tokyo", "ETH Zurich", "Sorbonne", "NUS", "Tsinghua"];
+const carBrands = ["Toyota", "Honda", "BMW", "Mercedes", "Audi", "Tesla", "Ford", "Volkswagen", "Hyundai", "Kia", "Nissan", "Chevrolet", "Lexus", "Porsche", "Mazda"];
+const carModels: Record<string, string[]> = {
+  Toyota: ["Camry", "Corolla", "RAV4", "Highlander"], Honda: ["Civic", "Accord", "CR-V"], BMW: ["3 Series", "5 Series", "X5"],
+  Mercedes: ["C-Class", "E-Class", "GLC"], Audi: ["A4", "A6", "Q5"], Tesla: ["Model 3", "Model Y", "Model S"],
+  Ford: ["F-150", "Mustang", "Explorer"], Volkswagen: ["Golf", "Passat", "Tiguan"], Hyundai: ["Elantra", "Tucson", "Sonata"],
+  Kia: ["Sportage", "Seltos", "K5"], Nissan: ["Altima", "Rogue", "Sentra"], Chevrolet: ["Malibu", "Equinox", "Silverado"],
+  Lexus: ["IS", "RX", "ES"], Porsche: ["911", "Cayenne", "Macan"], Mazda: ["CX-5", "Mazda3", "CX-30"],
+};
+const zodiacSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+
+function generateMAC(): string {
+  return Array.from({ length: 6 }, () => randNum(0, 255).toString(16).padStart(2, "0").toUpperCase()).join(":");
+}
+function generateIP(): string {
+  return `${randNum(1, 254)}.${randNum(0, 255)}.${randNum(0, 255)}.${randNum(1, 254)}`;
+}
+function generateCreditCard(): string {
+  const prefix = rand(["4", "5", "37", "6011"]);
+  let num = prefix;
+  while (num.length < 15) num += randNum(0, 9);
+  // Luhn checksum
+  let sum = 0;
+  for (let i = 0; i < num.length; i++) {
+    let d = parseInt(num[num.length - 1 - i]);
+    if (i % 2 === 0) { d *= 2; if (d > 9) d -= 9; }
+    sum += d;
+  }
+  num += ((10 - (sum % 10)) % 10).toString();
+  return num.replace(/(.{4})/g, "$1 ").trim();
+}
+function generateDOB(): { dob: string; age: number; zodiac: string } {
+  const year = randNum(1960, 2005);
+  const month = randNum(1, 12);
+  const day = randNum(1, 28);
+  const age = new Date().getFullYear() - year;
+  const monthDay = month * 100 + day;
+  let zodiac = "Capricorn";
+  if (monthDay >= 120 && monthDay <= 218) zodiac = "Aquarius";
+  else if (monthDay >= 219 && monthDay <= 320) zodiac = "Pisces";
+  else if (monthDay >= 321 && monthDay <= 419) zodiac = "Aries";
+  else if (monthDay >= 420 && monthDay <= 520) zodiac = "Taurus";
+  else if (monthDay >= 521 && monthDay <= 620) zodiac = "Gemini";
+  else if (monthDay >= 621 && monthDay <= 722) zodiac = "Cancer";
+  else if (monthDay >= 723 && monthDay <= 822) zodiac = "Leo";
+  else if (monthDay >= 823 && monthDay <= 922) zodiac = "Virgo";
+  else if (monthDay >= 923 && monthDay <= 1022) zodiac = "Libra";
+  else if (monthDay >= 1023 && monthDay <= 1121) zodiac = "Scorpio";
+  else if (monthDay >= 1122 && monthDay <= 1221) zodiac = "Sagittarius";
+  return { dob: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`, age, zodiac };
+}
+
 type CountryKey = keyof typeof countriesData;
 
 interface FullAddress {
@@ -41,6 +98,17 @@ interface FullAddress {
   timezone: string; currency: string; countryCode: string;
   company: string;
   nationalId: string;
+  // Extended details
+  dob: string; age: number; zodiac: string;
+  bloodType: string; height: string; weight: string;
+  eyeColor: string; hairColor: string;
+  occupation: string; education: string;
+  vehicle: string; licensePlate: string;
+  creditCard: string; cvv: string; cardExpiry: string;
+  ipAddress: string; macAddress: string; userAgent: string;
+  password: string; website: string;
+  motherMaiden: string;
+  ssn: string;
 }
 
 function generateNationalId(country: string): string {
@@ -52,6 +120,19 @@ function generateNationalId(country: string): string {
     default: return `${randNum(100000000,999999999)}`;
   }
 }
+
+function randPassword(): string {
+  const chars = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%";
+  return Array.from({ length: randNum(12, 16) }, () => chars[randNum(0, chars.length - 1)]).join("");
+}
+
+const userAgents = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) Safari/17.0",
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0) Mobile/15E148",
+  "Mozilla/5.0 (Linux; Android 14) Chrome/120.0.6099.43",
+  "Mozilla/5.0 (X11; Linux x86_64) Firefox/121.0",
+];
 
 export default function RandomAddressGenerator() {
   const [country, setCountry] = useState<CountryKey>("United States");
