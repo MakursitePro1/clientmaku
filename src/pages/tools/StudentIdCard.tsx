@@ -11,26 +11,22 @@ import { Download, Eye, Upload, Palette, User, GraduationCap, RotateCcw, Sparkle
 import { motion } from "framer-motion";
 
 const themes = [
-  { id: "blue", name: "Royal Blue", primary: "#1a237e", secondary: "#283593", accent: "#3f51b5", text: "#ffffff" },
-  { id: "green", name: "Emerald", primary: "#1b5e20", secondary: "#2e7d32", accent: "#43a047", text: "#ffffff" },
-  { id: "red", name: "Crimson", primary: "#b71c1c", secondary: "#c62828", accent: "#e53935", text: "#ffffff" },
-  { id: "purple", name: "Royal Purple", primary: "#4a148c", secondary: "#6a1b9a", accent: "#8e24aa", text: "#ffffff" },
-  { id: "dark", name: "Dark Mode", primary: "#1a1a2e", secondary: "#16213e", accent: "#0f3460", text: "#e0e0e0" },
-  { id: "gold", name: "Gold Premium", primary: "#5d4037", secondary: "#795548", accent: "#d4a574", text: "#fff8e1" },
-  { id: "teal", name: "Teal Modern", primary: "#004d40", secondary: "#00695c", accent: "#26a69a", text: "#ffffff" },
-  { id: "navy", name: "Navy Classic", primary: "#0d1b2a", secondary: "#1b2838", accent: "#415a77", text: "#e0e1dd" },
-];
-
-const layouts = [
-  { id: "classic", name: "Classic Vertical" },
-  { id: "modern", name: "Modern Horizontal" },
-  { id: "minimal", name: "Minimal Clean" },
+  { id: "blue", name: "Royal Blue", primary: "#0d47a1", secondary: "#1565c0", accent: "#1976d2", headerBg: "#0d47a1", text: "#ffffff", cardBg: "#ffffff" },
+  { id: "green", name: "Emerald", primary: "#1b5e20", secondary: "#2e7d32", accent: "#388e3c", headerBg: "#1b5e20", text: "#ffffff", cardBg: "#ffffff" },
+  { id: "red", name: "Crimson", primary: "#b71c1c", secondary: "#c62828", accent: "#d32f2f", headerBg: "#b71c1c", text: "#ffffff", cardBg: "#ffffff" },
+  { id: "purple", name: "Royal Purple", primary: "#4a148c", secondary: "#6a1b9a", accent: "#7b1fa2", headerBg: "#4a148c", text: "#ffffff", cardBg: "#ffffff" },
+  { id: "dark", name: "Dark Mode", primary: "#1a1a2e", secondary: "#16213e", accent: "#0f3460", headerBg: "#1a1a2e", text: "#e0e0e0", cardBg: "#f8f9fa" },
+  { id: "gold", name: "Gold Premium", primary: "#5d4037", secondary: "#6d4c41", accent: "#8d6e63", headerBg: "#5d4037", text: "#fff8e1", cardBg: "#ffffff" },
+  { id: "teal", name: "Teal Modern", primary: "#004d40", secondary: "#00695c", accent: "#00897b", headerBg: "#004d40", text: "#ffffff", cardBg: "#ffffff" },
+  { id: "navy", name: "Navy Classic", primary: "#0d1b2a", secondary: "#1b2838", accent: "#415a77", headerBg: "#0d1b2a", text: "#e0e1dd", cardBg: "#ffffff" },
 ];
 
 function drawRoundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, r);
 }
+
+function rand(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
 export default function StudentIdCard() {
   const [name, setName] = useState("John Doe");
@@ -47,12 +43,10 @@ export default function StudentIdCard() {
   const [address, setAddress] = useState("123 University Road, Dhaka");
   const [emergencyContact, setEmergencyContact] = useState("+880 9876-543210");
   const [theme, setTheme] = useState("blue");
-  const [layout, setLayout] = useState("classic");
   const [photo, setPhoto] = useState<string>("");
   const [showBack, setShowBack] = useState(false);
-  const [showBarcode, setShowBarcode] = useState(true);
-  const [showQr, setShowQr] = useState(true);
   const [validUntil, setValidUntil] = useState("2025-12-31");
+  const [generated, setGenerated] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const photoRef = useRef<HTMLInputElement>(null);
 
@@ -64,49 +58,88 @@ export default function StudentIdCard() {
     reader.readAsDataURL(file);
   };
 
-  const drawBarcode = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, text: string) => {
-    const bars = text.split("").map(c => c.charCodeAt(0));
-    const barW = w / (bars.length * 11);
-    bars.forEach((b, i) => {
-      const pattern = b.toString(2).padStart(8, "0");
-      pattern.split("").forEach((bit, j) => {
-        if (bit === "1") {
-          ctx.fillStyle = "#000";
-          ctx.fillRect(x + (i * 11 + j) * barW, y, barW, h);
+  const drawBarcode = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, data: string) => {
+    const cleanData = data.replace(/[^A-Za-z0-9]/g, "");
+    const totalBars = cleanData.length * 11 + 20;
+    const barW = w / totalBars;
+    
+    // Start guard
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(x, y, barW * 2, h);
+    ctx.fillRect(x + barW * 3, y, barW, h);
+    
+    let offset = barW * 5;
+    for (let i = 0; i < cleanData.length; i++) {
+      const charCode = cleanData.charCodeAt(i);
+      const binary = charCode.toString(2).padStart(8, "0");
+      for (let j = 0; j < 8; j++) {
+        if (binary[j] === "1") {
+          ctx.fillStyle = "#000000";
+          ctx.fillRect(x + offset, y, barW, h);
         }
-      });
-    });
-    ctx.fillStyle = "#333";
-    ctx.font = "8px monospace";
+        offset += barW;
+      }
+      offset += barW * 3;
+    }
+    
+    // End guard
+    ctx.fillRect(x + w - barW * 4, y, barW, h);
+    ctx.fillRect(x + w - barW * 2, y, barW * 2, h);
+
+    ctx.fillStyle = "#333333";
+    ctx.font = "bold 9px 'Courier New', monospace";
     ctx.textAlign = "center";
-    ctx.fillText(text, x + w / 2, y + h + 10);
+    ctx.fillText(cleanData, x + w / 2, y + h + 12);
   };
 
-  const drawQrPlaceholder = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
-    ctx.fillStyle = "#fff";
+  const drawQrCode = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => {
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(x, y, size, size);
-    const cellSize = size / 21;
-    const pattern = [
-      [1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
-      [1,0,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,0,0,1],
-      [1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,0,1],
-      [1,0,1,1,1,0,1,0,0,1,0,1,0,0,1,0,1,1,1,0,1],
-      [1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,0,1],
-      [1,0,0,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0,0,0,1],
-      [1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
-    ];
-    pattern.forEach((row, r) => {
-      row.forEach((cell, c) => {
-        if (cell) {
+    
+    const modules = 25;
+    const cellSize = size / modules;
+    
+    // Generate a deterministic QR-like pattern from studentId
+    const seed = studentId.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    
+    // Draw finder patterns (3 corners)
+    const drawFinder = (fx: number, fy: number) => {
+      ctx.fillStyle = "#000";
+      ctx.fillRect(fx, fy, cellSize * 7, cellSize * 7);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(fx + cellSize, fy + cellSize, cellSize * 5, cellSize * 5);
+      ctx.fillStyle = "#000";
+      ctx.fillRect(fx + cellSize * 2, fy + cellSize * 2, cellSize * 3, cellSize * 3);
+    };
+    
+    drawFinder(x, y);
+    drawFinder(x + (modules - 7) * cellSize, y);
+    drawFinder(x, y + (modules - 7) * cellSize);
+    
+    // Timing patterns
+    for (let i = 8; i < modules - 8; i++) {
+      if (i % 2 === 0) {
+        ctx.fillStyle = "#000";
+        ctx.fillRect(x + i * cellSize, y + 6 * cellSize, cellSize, cellSize);
+        ctx.fillRect(x + 6 * cellSize, y + i * cellSize, cellSize, cellSize);
+      }
+    }
+    
+    // Data area with pseudo-random pattern
+    for (let r = 9; r < modules - 1; r++) {
+      for (let c = 9; c < modules - 1; c++) {
+        const hash = ((r * 31 + c * 17 + seed) * 2654435761) >>> 0;
+        if (hash % 3 !== 0) {
           ctx.fillStyle = "#000";
           ctx.fillRect(x + c * cellSize, y + r * cellSize, cellSize, cellSize);
         }
-      });
-    });
-    // Fill remaining area with random-ish pattern
-    for (let r = 7; r < 21; r++) {
-      for (let c = 0; c < 21; c++) {
-        if ((r + c) % 3 === 0 || (r * c) % 5 === 0) {
+      }
+    }
+    // Fill some data in bottom-right quadrant
+    for (let r = 9; r < modules - 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const hash = ((r * 13 + c * 7 + seed * 3) * 2654435761) >>> 0;
+        if (hash % 4 !== 0) {
           ctx.fillStyle = "#000";
           ctx.fillRect(x + c * cellSize, y + r * cellSize, cellSize, cellSize);
         }
@@ -120,242 +153,336 @@ export default function StudentIdCard() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const w = 650, h = showBack ? 820 : 420;
-    canvas.width = w;
-    canvas.height = h;
+    const CARD_W = 680;
+    const CARD_H = 430;
+    const w = CARD_W;
+    const h = showBack ? CARD_H * 2 + 30 : CARD_H;
+    canvas.width = w * 2;
+    canvas.height = h * 2;
+    ctx.scale(2, 2);
     const t = themes.find(th => th.id === theme) || themes[0];
 
     ctx.clearRect(0, 0, w, h);
 
-    // === FRONT SIDE ===
-    const cardH = 400;
-
+    // ============ FRONT SIDE ============
     // Card shadow
-    ctx.shadowColor = "rgba(0,0,0,0.15)";
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetY = 8;
-
-    // Background
-    const grad = ctx.createLinearGradient(0, 0, w, cardH);
-    grad.addColorStop(0, t.primary);
-    grad.addColorStop(0.5, t.secondary);
-    grad.addColorStop(1, t.primary);
-    ctx.fillStyle = grad;
-    drawRoundRect(ctx, 0, 0, w, cardH, 16);
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 15;
+    ctx.shadowOffsetY = 5;
+    ctx.shadowOffsetX = 2;
+    ctx.fillStyle = t.cardBg;
+    drawRoundRect(ctx, 0, 0, w, CARD_H, 14);
     ctx.fill();
-
     ctx.shadowColor = "transparent";
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
+    ctx.shadowOffsetX = 0;
 
-    // Inner card
-    ctx.fillStyle = "#ffffff";
-    drawRoundRect(ctx, 6, 6, w - 12, cardH - 12, 12);
+    // Card border
+    ctx.strokeStyle = t.primary + "40";
+    ctx.lineWidth = 1.5;
+    drawRoundRect(ctx, 0, 0, w, CARD_H, 14);
+    ctx.stroke();
+
+    // Top header band
+    const headerH = 75;
+    const hGrad = ctx.createLinearGradient(0, 0, w, 0);
+    hGrad.addColorStop(0, t.primary);
+    hGrad.addColorStop(0.5, t.secondary);
+    hGrad.addColorStop(1, t.primary);
+    ctx.fillStyle = hGrad;
+    ctx.beginPath();
+    ctx.roundRect(1, 1, w - 2, headerH, [14, 14, 0, 0]);
     ctx.fill();
 
-    // Decorative top pattern
+    // Subtle pattern on header
     ctx.save();
-    ctx.globalAlpha = 0.05;
-    for (let i = 0; i < 20; i++) {
+    ctx.globalAlpha = 0.06;
+    for (let i = 0; i < w; i += 20) {
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 0.5;
       ctx.beginPath();
-      ctx.arc(Math.random() * w, Math.random() * 80, Math.random() * 30 + 5, 0, Math.PI * 2);
-      ctx.fillStyle = t.primary;
-      ctx.fill();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + 30, headerH);
+      ctx.stroke();
     }
     ctx.restore();
 
-    // Header bar
-    const hGrad = ctx.createLinearGradient(6, 6, w - 6, 70);
-    hGrad.addColorStop(0, t.primary);
-    hGrad.addColorStop(1, t.accent);
-    ctx.fillStyle = hGrad;
-    ctx.beginPath();
-    ctx.roundRect(6, 6, w - 12, 62, [12, 12, 0, 0]);
-    ctx.fill();
-
     // Institution name
     ctx.fillStyle = t.text;
-    ctx.font = "bold 17px 'Segoe UI', Arial, sans-serif";
+    ctx.font = "bold 19px 'Georgia', 'Times New Roman', serif";
     ctx.textAlign = "center";
-    ctx.fillText(institution.toUpperCase(), w / 2, 32);
+    ctx.fillText(institution.toUpperCase(), w / 2, 30);
 
-    // Tagline
-    ctx.font = "11px 'Segoe UI', sans-serif";
-    ctx.fillStyle = "rgba(255,255,255,0.8)";
-    ctx.fillText("Excellence in Education & Research", w / 2, 52);
+    // Subtitle
+    ctx.font = "12px 'Segoe UI', Arial, sans-serif";
+    ctx.fillStyle = t.text + "cc";
+    ctx.fillText("Excellence in Education & Research", w / 2, 48);
 
-    // Sub-header
-    ctx.fillStyle = t.accent;
-    ctx.fillRect(6, 68, w - 12, 26);
-    ctx.fillStyle = "#fff";
+    // Student Identity Card label
+    ctx.fillStyle = t.text;
     ctx.font = "bold 11px 'Segoe UI', sans-serif";
-    ctx.fillText("— STUDENT IDENTITY CARD —", w / 2, 85);
+    ctx.letterSpacing = "3px";
+    ctx.fillText("━━  STUDENT IDENTITY CARD  ━━", w / 2, 67);
+
+    // Thin accent line
+    ctx.fillStyle = t.accent + "80";
+    ctx.fillRect(1, headerH, w - 2, 3);
+
+    // ---- Content Area ----
+    const contentY = headerH + 14;
 
     // Photo area
-    const px = 30, py = 108, pw = 120, ph = 150;
-    // Photo border with gradient
-    const photoGrad = ctx.createLinearGradient(px - 3, py - 3, px + pw + 3, py + ph + 3);
-    photoGrad.addColorStop(0, t.primary);
-    photoGrad.addColorStop(1, t.accent);
-    ctx.fillStyle = photoGrad;
-    drawRoundRect(ctx, px - 3, py - 3, pw + 6, ph + 6, 8);
+    const px = 28, py = contentY, pw = 125, ph = 155;
+    
+    // Photo frame with gradient border
+    const framePad = 3;
+    const frameGrad = ctx.createLinearGradient(px - framePad, py - framePad, px + pw + framePad, py + ph + framePad);
+    frameGrad.addColorStop(0, t.primary);
+    frameGrad.addColorStop(0.5, t.accent);
+    frameGrad.addColorStop(1, t.primary);
+    ctx.fillStyle = frameGrad;
+    drawRoundRect(ctx, px - framePad, py - framePad, pw + framePad * 2, ph + framePad * 2, 8);
     ctx.fill();
 
-    ctx.fillStyle = "#f5f5f5";
+    ctx.fillStyle = "#f0f0f0";
     drawRoundRect(ctx, px, py, pw, ph, 6);
     ctx.fill();
 
-    const drawAfterPhoto = () => {
+    const drawContent = () => {
       if (!ctx) return;
 
-      // Name plate under photo
+      // Name badge below photo
+      const badgeY = py + ph + 10;
       ctx.fillStyle = t.primary;
-      drawRoundRect(ctx, px - 3, py + ph + 8, pw + 6, 24, 4);
+      drawRoundRect(ctx, px - framePad, badgeY, pw + framePad * 2, 26, 5);
       ctx.fill();
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 10px sans-serif";
+      ctx.font = "bold 10px 'Segoe UI', sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("ID: " + studentId, px + pw / 2, py + ph + 24);
+      ctx.fillText(studentId, px + pw / 2, badgeY + 17);
 
-      // Details section
+      // Blood group badge
+      const bloodBadgeY = badgeY + 32;
+      ctx.fillStyle = "#dc2626";
+      drawRoundRect(ctx, px + pw / 2 - 30, bloodBadgeY, 60, 22, 11);
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 11px 'Segoe UI', sans-serif";
+      ctx.fillText("🩸 " + blood, px + pw / 2, bloodBadgeY + 15);
+
+      // --- Right side details ---
       ctx.textAlign = "left";
-      const sx = 170, gap = 26;
-      let y = 112;
+      const detailX = 175;
+      const detailW = w - detailX - 20;
+      let dy = contentY + 2;
+      const lineH = 28;
+
       const fields = [
-        { label: "Full Name", value: name },
-        { label: "Student ID", value: studentId },
-        { label: "Department", value: department },
-        { label: "Session", value: session },
-        { label: "Blood Group", value: blood },
-        { label: "Date of Birth", value: dob },
-        { label: "Father's Name", value: fatherName },
-        { label: "Phone", value: phone },
-        { label: "Email", value: email },
+        { label: "FULL NAME", value: name },
+        { label: "FATHER'S NAME", value: fatherName },
+        { label: "DEPARTMENT", value: department },
+        { label: "SESSION", value: session },
+        { label: "DATE OF BIRTH", value: dob },
+        { label: "PHONE", value: phone },
+        { label: "EMAIL", value: email },
+        { label: "VALID UNTIL", value: validUntil },
       ];
 
-      fields.forEach(f => {
-        ctx.fillStyle = t.accent;
-        ctx.font = "bold 8px 'Segoe UI', sans-serif";
-        ctx.fillText(f.label.toUpperCase(), sx, y);
-        ctx.fillStyle = "#222";
-        ctx.font = "12px 'Segoe UI', sans-serif";
-        ctx.fillText(f.value, sx, y + 13);
-        // Subtle underline
-        ctx.strokeStyle = "#eee";
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(sx, y + 17);
-        ctx.lineTo(w - 30, y + 17);
-        ctx.stroke();
-        y += gap;
+      fields.forEach((f, i) => {
+        // Label
+        ctx.fillStyle = t.primary;
+        ctx.font = "bold 7.5px 'Segoe UI', sans-serif";
+        ctx.fillText(f.label, detailX, dy + 9);
+
+        // Value
+        ctx.fillStyle = "#1a1a1a";
+        ctx.font = "600 12px 'Segoe UI', Arial, sans-serif";
+        
+        // Truncate if too long
+        let displayVal = f.value;
+        while (ctx.measureText(displayVal).width > detailW - 10 && displayVal.length > 5) {
+          displayVal = displayVal.slice(0, -1);
+        }
+        ctx.fillText(displayVal, detailX, dy + 22);
+
+        // Separator line
+        if (i < fields.length - 1) {
+          ctx.strokeStyle = "#e8e8e8";
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(detailX, dy + lineH - 1);
+          ctx.lineTo(detailX + detailW, dy + lineH - 1);
+          ctx.stroke();
+        }
+
+        dy += lineH;
       });
 
-      // QR Code
-      if (showQr) {
-        drawQrPlaceholder(ctx, w - 95, 108, 65);
-        ctx.fillStyle = "#999";
-        ctx.font = "7px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("Scan to Verify", w - 62, 182);
-      }
-
-      // Valid until badge
-      ctx.fillStyle = t.accent + "20";
-      drawRoundRect(ctx, w - 110, 190, 85, 22, 4);
+      // QR code in bottom-right
+      const qrSize = 70;
+      const qrX = w - qrSize - 22;
+      const qrY = CARD_H - qrSize - 55;
+      
+      // QR frame
+      ctx.fillStyle = "#f8f8f8";
+      drawRoundRect(ctx, qrX - 5, qrY - 5, qrSize + 10, qrSize + 10, 6);
       ctx.fill();
-      ctx.fillStyle = t.accent;
-      ctx.font = "bold 8px sans-serif";
+      ctx.strokeStyle = t.primary + "30";
+      ctx.lineWidth = 1;
+      drawRoundRect(ctx, qrX - 5, qrY - 5, qrSize + 10, qrSize + 10, 6);
+      ctx.stroke();
+      
+      drawQrCode(ctx, qrX, qrY, qrSize);
+      ctx.fillStyle = "#888";
+      ctx.font = "7px 'Segoe UI', sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(`Valid: ${validUntil}`, w - 67, 205);
+      ctx.fillText("Scan to Verify", qrX + qrSize / 2, qrY + qrSize + 12);
 
-      // Footer
-      const fGrad = ctx.createLinearGradient(6, cardH - 48, w - 6, cardH - 6);
+      // Bottom bar
+      const footerH = 38;
+      const footerY = CARD_H - footerH;
+      const fGrad = ctx.createLinearGradient(0, footerY, w, footerY);
       fGrad.addColorStop(0, t.primary);
-      fGrad.addColorStop(1, t.accent);
+      fGrad.addColorStop(1, t.secondary);
       ctx.fillStyle = fGrad;
       ctx.beginPath();
-      ctx.roundRect(6, cardH - 48, w - 12, 42, [0, 0, 12, 12]);
+      ctx.roundRect(1, footerY, w - 2, footerH - 1, [0, 0, 14, 14]);
       ctx.fill();
 
       // Barcode in footer
-      if (showBarcode) {
-        drawBarcode(ctx, 20, cardH - 42, 140, 20, studentId.replace(/[^A-Z0-9]/gi, ""));
-      }
+      drawBarcode(ctx, 15, footerY + 5, 160, 18, studentId);
 
-      ctx.fillStyle = "rgba(255,255,255,0.85)";
-      ctx.font = "8px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("This card is the property of " + institution + ". If found, please return.", w / 2 + 40, cardH - 28);
-      ctx.fillText("Generated by Cyber Venom Tools", w / 2 + 40, cardH - 16);
+      // Footer text
+      ctx.fillStyle = t.text + "cc";
+      ctx.font = "7px 'Segoe UI', sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText("This card is property of " + institution, w - 15, footerY + 14);
+      ctx.fillText("If found, please return to the administration office", w - 15, footerY + 26);
 
-      // === BACK SIDE ===
+      // ============ BACK SIDE ============
       if (showBack) {
-        const by = cardH + 20;
+        const BY = CARD_H + 30;
 
-        ctx.shadowColor = "rgba(0,0,0,0.15)";
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetY = 8;
-
-        const bGrad = ctx.createLinearGradient(0, by, w, by + cardH);
-        bGrad.addColorStop(0, t.secondary);
-        bGrad.addColorStop(1, t.primary);
-        ctx.fillStyle = bGrad;
-        drawRoundRect(ctx, 0, by, w, cardH, 16);
+        ctx.shadowColor = "rgba(0,0,0,0.2)";
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetY = 5;
+        ctx.fillStyle = t.cardBg;
+        drawRoundRect(ctx, 0, BY, w, CARD_H, 14);
         ctx.fill();
-
         ctx.shadowColor = "transparent";
         ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
 
-        ctx.fillStyle = "#ffffff";
-        drawRoundRect(ctx, 6, by + 6, w - 12, cardH - 12, 12);
-        ctx.fill();
+        ctx.strokeStyle = t.primary + "40";
+        ctx.lineWidth = 1.5;
+        drawRoundRect(ctx, 0, BY, w, CARD_H, 14);
+        ctx.stroke();
 
         // Back header
+        const bHeaderH = 50;
         ctx.fillStyle = t.primary;
         ctx.beginPath();
-        ctx.roundRect(6, by + 6, w - 12, 40, [12, 12, 0, 0]);
+        ctx.roundRect(1, BY + 1, w - 2, bHeaderH, [14, 14, 0, 0]);
         ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 14px 'Segoe UI', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("BACK SIDE — ADDITIONAL INFORMATION", w / 2, by + 32);
 
-        // Back details
-        ctx.textAlign = "left";
-        let bY = by + 70;
-        const backFields = [
-          { label: "Father's Name", value: fatherName },
-          { label: "Mother's Name", value: motherName },
-          { label: "Permanent Address", value: address },
-          { label: "Emergency Contact", value: emergencyContact },
-          { label: "Blood Group", value: blood },
-          { label: "Valid Until", value: validUntil },
+        ctx.fillStyle = t.text;
+        ctx.font = "bold 15px 'Georgia', serif";
+        ctx.textAlign = "center";
+        ctx.fillText(institution.toUpperCase(), w / 2, BY + 22);
+        ctx.font = "10px 'Segoe UI', sans-serif";
+        ctx.fillStyle = t.text + "cc";
+        ctx.fillText("ADDITIONAL INFORMATION", w / 2, BY + 40);
+
+        ctx.fillStyle = t.accent + "80";
+        ctx.fillRect(1, BY + bHeaderH, w - 2, 2);
+
+        // Back content - two columns
+        const bContentY = BY + bHeaderH + 18;
+        const colW = (w - 60) / 2;
+        
+        const leftFields = [
+          { label: "FATHER'S NAME", value: fatherName },
+          { label: "MOTHER'S NAME", value: motherName },
+          { label: "BLOOD GROUP", value: blood },
+          { label: "EMERGENCY CONTACT", value: emergencyContact },
         ];
 
-        backFields.forEach(f => {
-          ctx.fillStyle = t.accent;
-          ctx.font = "bold 9px sans-serif";
-          ctx.fillText(f.label.toUpperCase(), 30, bY);
+        const rightFields = [
+          { label: "PERMANENT ADDRESS", value: address },
+          { label: "STUDENT ID", value: studentId },
+          { label: "VALID UNTIL", value: validUntil },
+          { label: "SESSION", value: session },
+        ];
+
+        ctx.textAlign = "left";
+        let lY = bContentY;
+        leftFields.forEach((f, i) => {
+          ctx.fillStyle = t.primary;
+          ctx.font = "bold 7.5px 'Segoe UI', sans-serif";
+          ctx.fillText(f.label, 25, lY);
           ctx.fillStyle = "#222";
-          ctx.font = "13px 'Segoe UI', sans-serif";
-          ctx.fillText(f.value, 30, bY + 16);
-          ctx.strokeStyle = "#eee";
-          ctx.lineWidth = 0.5;
-          ctx.beginPath();
-          ctx.moveTo(30, bY + 22);
-          ctx.lineTo(w - 30, bY + 22);
-          ctx.stroke();
-          bY += 35;
+          ctx.font = "12px 'Segoe UI', sans-serif";
+          ctx.fillText(f.value, 25, lY + 15);
+          if (i < leftFields.length - 1) {
+            ctx.strokeStyle = "#e8e8e8";
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(25, lY + 22);
+            ctx.lineTo(25 + colW, lY + 22);
+            ctx.stroke();
+          }
+          lY += 32;
         });
 
-        // Terms & conditions
+        let rY = bContentY;
+        rightFields.forEach((f, i) => {
+          ctx.fillStyle = t.primary;
+          ctx.font = "bold 7.5px 'Segoe UI', sans-serif";
+          ctx.fillText(f.label, w / 2 + 10, rY);
+          ctx.fillStyle = "#222";
+          ctx.font = "12px 'Segoe UI', sans-serif";
+          let val = f.value;
+          while (ctx.measureText(val).width > colW - 10 && val.length > 5) {
+            val = val.slice(0, -1);
+          }
+          ctx.fillText(val, w / 2 + 10, rY + 15);
+          if (i < rightFields.length - 1) {
+            ctx.strokeStyle = "#e8e8e8";
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(w / 2 + 10, rY + 22);
+            ctx.lineTo(w - 25, rY + 22);
+            ctx.stroke();
+          }
+          rY += 32;
+        });
+
+        // Divider line between columns
+        ctx.strokeStyle = t.primary + "20";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(w / 2, bContentY - 8);
+        ctx.lineTo(w / 2, bContentY + 120);
+        ctx.stroke();
+
+        // Terms & Conditions box
+        const termsY = bContentY + 140;
         ctx.fillStyle = "#f5f5f5";
-        drawRoundRect(ctx, 20, bY + 10, w - 40, 80, 8);
+        drawRoundRect(ctx, 20, termsY, w - 40, 80, 8);
         ctx.fill();
-        ctx.fillStyle = "#666";
-        ctx.font = "bold 9px sans-serif";
-        ctx.fillText("TERMS & CONDITIONS:", 35, bY + 30);
-        ctx.font = "8px sans-serif";
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.lineWidth = 0.5;
+        drawRoundRect(ctx, 20, termsY, w - 40, 80, 8);
+        ctx.stroke();
+
+        ctx.fillStyle = t.primary;
+        ctx.font = "bold 9px 'Segoe UI', sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("TERMS & CONDITIONS", 35, termsY + 16);
+        
+        ctx.fillStyle = "#555";
+        ctx.font = "8px 'Segoe UI', sans-serif";
         const terms = [
           "1. This card must be carried at all times within campus premises.",
           "2. Loss of card must be reported immediately to the administration.",
@@ -363,20 +490,38 @@ export default function StudentIdCard() {
           "4. Misuse of this card will result in disciplinary action.",
         ];
         terms.forEach((term, i) => {
-          ctx.fillText(term, 35, bY + 45 + i * 13);
+          ctx.fillText(term, 35, termsY + 32 + i * 13);
         });
 
-        // Large barcode on back
-        if (showBarcode) {
-          drawBarcode(ctx, w / 2 - 100, by + cardH - 60, 200, 30, studentId.replace(/[^A-Z0-9]/gi, ""));
-        }
+        // Signature area
+        const sigY = termsY + 90;
+        ctx.strokeStyle = "#999";
+        ctx.lineWidth = 0.8;
+        ctx.setLineDash([3, 2]);
+        ctx.beginPath();
+        ctx.moveTo(w - 200, sigY + 20);
+        ctx.lineTo(w - 30, sigY + 20);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#666";
+        ctx.font = "8px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Authorized Signature & Seal", w - 115, sigY + 34);
+
+        // Bottom barcode on back
+        const bFooterY = BY + CARD_H - 40;
+        ctx.fillStyle = t.primary;
+        ctx.beginPath();
+        ctx.roundRect(1, bFooterY, w - 2, 39, [0, 0, 14, 14]);
+        ctx.fill();
+        drawBarcode(ctx, w / 2 - 110, bFooterY + 5, 220, 18, studentId);
       }
     };
 
+    // Draw photo
     if (photo) {
       const img = new Image();
       img.onload = () => {
-        // Crop to fit
         const aspect = img.width / img.height;
         let sx = 0, sy = 0, sw = img.width, sh = img.height;
         const targetAspect = pw / ph;
@@ -392,30 +537,35 @@ export default function StudentIdCard() {
         ctx.clip();
         ctx.drawImage(img, sx, sy, sw, sh, px, py, pw, ph);
         ctx.restore();
-        drawAfterPhoto();
+        drawContent();
       };
       img.src = photo;
     } else {
-      ctx.fillStyle = "#ddd";
-      ctx.font = "40px sans-serif";
+      // Default placeholder
+      ctx.fillStyle = "#e0e0e0";
+      ctx.font = "48px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText("👤", px + pw / 2, py + ph / 2 + 10);
+      ctx.fillText("👤", px + pw / 2, py + ph / 2 + 8);
       ctx.fillStyle = "#bbb";
-      ctx.font = "10px sans-serif";
-      ctx.fillText("Upload Photo", px + pw / 2, py + ph / 2 + 35);
-      drawAfterPhoto();
+      ctx.font = "9px 'Segoe UI', sans-serif";
+      ctx.fillText("Upload Photo", px + pw / 2, py + ph / 2 + 32);
+      drawContent();
     }
-  }, [name, studentId, department, institution, session, blood, phone, email, dob, fatherName, motherName, address, emergencyContact, theme, photo, showBack, showBarcode, showQr, validUntil, layout]);
+
+    setGenerated(true);
+  }, [name, studentId, department, institution, session, blood, phone, email, dob, fatherName, motherName, address, emergencyContact, theme, photo, showBack, validUntil]);
 
   const downloadCard = () => {
     generate();
     setTimeout(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
       const a = document.createElement("a");
       a.download = `student-id-${studentId}.png`;
-      a.href = canvasRef.current?.toDataURL("image/png") || "";
+      a.href = canvas.toDataURL("image/png");
       a.click();
       toast.success("Student ID Card downloaded!");
-    }, 300);
+    }, 400);
   };
 
   const resetAll = () => {
@@ -424,6 +574,7 @@ export default function StudentIdCard() {
     setPhone("+880 1234-567890"); setEmail("john@university.edu"); setDob("2000-01-15");
     setFatherName("Robert Doe"); setMotherName("Jane Doe"); setAddress("123 University Road, Dhaka");
     setEmergencyContact("+880 9876-543210"); setTheme("blue"); setPhoto(""); setShowBack(false);
+    setGenerated(false);
     toast.info("Form reset!");
   };
 
@@ -487,10 +638,9 @@ export default function StudentIdCard() {
                   style={{ background: `linear-gradient(135deg, ${t.primary}, ${t.accent})` }} />
               ))}
             </div>
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2"><Switch checked={showBack} onCheckedChange={setShowBack} /><Label className="text-xs">Show Back Side</Label></div>
-              <div className="flex items-center gap-2"><Switch checked={showBarcode} onCheckedChange={setShowBarcode} /><Label className="text-xs">Barcode</Label></div>
-              <div className="flex items-center gap-2"><Switch checked={showQr} onCheckedChange={setShowQr} /><Label className="text-xs">QR Code</Label></div>
+            <div className="flex items-center gap-2">
+              <Switch checked={showBack} onCheckedChange={setShowBack} />
+              <Label className="text-xs">Show Back Side</Label>
             </div>
           </TabsContent>
         </Tabs>
@@ -529,8 +679,8 @@ export default function StudentIdCard() {
 
         {/* Canvas */}
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="tool-result-card relative overflow-hidden">
-          <canvas ref={canvasRef} className="w-full rounded-2xl" />
-          {!canvasRef.current?.width && (
+          <canvas ref={canvasRef} className="w-full rounded-2xl" style={{ maxWidth: "100%" }} />
+          {!generated && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground gap-2 py-20">
               <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
                 <Sparkles className="w-10 h-10 text-primary/30" />
