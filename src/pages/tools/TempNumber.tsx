@@ -90,6 +90,9 @@ export default function TempNumber() {
   const prevMsgCountRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const copyResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [countryPages, setCountryPages] = useState<CountryPage[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadedCountries, setLoadedCountries] = useState<Set<string>>(new Set());
 
   // Copy effect
   const triggerCopy = useCallback((key: string) => {
