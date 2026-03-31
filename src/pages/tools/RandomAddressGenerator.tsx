@@ -15,6 +15,7 @@ import { countriesData, continentCountries, continentEmojis, type CityData, type
 function rand<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)]; }
 function randNum(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function randFloat(min: number, max: number) { return (Math.random() * (max - min) + min).toFixed(6); }
+function randChar() { return String.fromCharCode(65 + randNum(0, 25)); }
 function randPhone(format: string) {
   return format.replace(/#/g, () => String(randNum(0, 9)));
 }
