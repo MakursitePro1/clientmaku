@@ -113,6 +113,9 @@ export default function TempNumber() {
   const [refreshing, setRefreshing] = useState(false);
   const [countryFilter, setCountryFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [countrySearch, setCountrySearch] = useState("");
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [notifEnabled, setNotifEnabled] = useState(false);
