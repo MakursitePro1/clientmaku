@@ -183,7 +183,7 @@ export default function TempNumber() {
   }, []);
 
   // Initial load
-  useEffect(() => { fetchNumbers(); }, []);
+  useEffect(() => { fetchNumbers(); fetchCountryPages(); }, []);
 
   // Fetch messages when number changes
   useEffect(() => {
