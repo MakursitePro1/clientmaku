@@ -399,13 +399,23 @@ export default function TempMail() {
                 className="w-2 h-2 rounded-full bg-green-500" />
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 flex-wrap">
+            <Button variant="outline" size="sm" onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`rounded-xl text-xs gap-1 ${soundEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+              {soundEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
+              {soundEnabled ? "Sound On" : "Sound Off"}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => notifEnabled ? setNotifEnabled(false) : requestNotifPermission()}
+              className={`rounded-xl text-xs gap-1 ${notifEnabled ? "border-primary/30 text-primary" : "border-border"}`}>
+              {notifEnabled ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
+              {notifEnabled ? "Notif On" : "Notif Off"}
+            </Button>
             <Button variant="outline" size="sm" onClick={fetchMessages} disabled={!account || refreshing}
               className="rounded-xl text-xs gap-1">
               <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} /> Refresh
             </Button>
             <Button variant="outline" size="sm" onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-green-500/30 text-green-600" : "border-border"}`}>
+              className={`rounded-xl text-xs border-2 ${autoRefresh ? "border-primary/30 text-primary" : "border-border"}`}>
               {autoRefresh ? "⏸ Pause" : "▶ Resume"}
             </Button>
           </div>
