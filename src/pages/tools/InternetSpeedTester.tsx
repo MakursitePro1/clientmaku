@@ -477,6 +477,7 @@ export default function InternetSpeedTester() {
   const [downlink, setDownlink] = useState("—");
   const [rtt, setRtt] = useState("—");
   const [phaseNotice, setPhaseNotice] = useState<string | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
@@ -622,6 +623,7 @@ export default function InternetSpeedTester() {
     setTesting(false);
     setPhase("idle");
     setPhaseNotice(null);
+    setShowSummary(false);
     setErrorMsg("");
     liveSpeedRef.current = 0;
     setDisplaySpeed(0);
@@ -637,6 +639,7 @@ export default function InternetSpeedTester() {
     setPing(null);
     setJitter(null);
     setPhaseNotice(null);
+    setShowSummary(false);
     setErrorMsg("");
     liveSpeedRef.current = 0;
     setDisplaySpeed(4);
@@ -650,9 +653,14 @@ export default function InternetSpeedTester() {
       if (cancelRef.current) return reset();
       if (dlSpeed === 0) throw new Error("Download test failed");
 
-      setDownload(dlSpeed);
       updateLive(dlSpeed);
       setDisplaySpeed(dlSpeed);
+      setPhaseNotice("Step 1 complete. Locking download result...");
+
+      // Lock meter on measured download value first, then reveal result
+      await wait(900);
+      if (cancelRef.current) return reset();
+      setDownload(dlSpeed);
 
       const pingResult = await pingPromise;
       if (!cancelRef.current) {
@@ -660,13 +668,9 @@ export default function InternetSpeedTester() {
         setJitter(pingResult.avgJitter);
       }
 
-      // Hold exact download value briefly before transition
-      setPhaseNotice("Download measured. Finalizing step 1...");
-      await wait(1100);
-      if (cancelRef.current) return reset();
-
       // Immediately after download completes: smooth reset to zero
       setPhase("resetting");
+      setPhaseNotice("Moving to step 2...");
       liveSpeedRef.current = 0;
       // Let the needle glide down naturally
       await wait(2400);
@@ -679,7 +683,7 @@ export default function InternetSpeedTester() {
 
       // Clear transition notice before upload phase begins
       setPhaseNotice("Step 1 complete. Preparing step 2: Upload test...");
-      await wait(1800);
+      await wait(1200);
       if (cancelRef.current) return reset();
       setPhaseNotice(null);
 
@@ -690,9 +694,14 @@ export default function InternetSpeedTester() {
       const ulSpeed = await measureUpload(TEST_SERVER_URL, updateLive, cancelRef);
       if (cancelRef.current) return reset();
 
-      setUpload(ulSpeed);
       updateLive(ulSpeed);
-      setPhaseNotice("Upload measured. Finalizing complete result...");
+      setDisplaySpeed(ulSpeed);
+      setPhaseNotice("Step 2 complete. Locking upload result...");
+
+      // Lock meter on measured upload value first, then reveal result
+      await wait(900);
+      if (cancelRef.current) return reset();
+      setUpload(ulSpeed);
 
       const entry = {
         dl: +dlSpeed.toFixed(2),
@@ -704,11 +713,17 @@ export default function InternetSpeedTester() {
       setTestHistory(next);
       localStorage.setItem("cv_speed_history", JSON.stringify(next));
 
+      setPhaseNotice("Preparing final report...");
+      await wait(500);
+      if (cancelRef.current) return reset();
+
       setPhase("done");
       setTesting(false);
       setPhaseNotice("Test completed successfully.");
+      setShowSummary(true);
     } catch (err: unknown) {
       setPhaseNotice(null);
+      setShowSummary(false);
       setPhase("error");
       setErrorMsg(err instanceof Error ? err.message : "Speed test failed.");
       setTesting(false);
@@ -759,9 +774,23 @@ export default function InternetSpeedTester() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-foreground">{phaseDetails[phase].title}</p>
-                <p className="mt-1 text-[11px] text-muted-foreground">
-                  {phaseNotice || phaseDetails[phase].subtitle}
-                </p>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={phaseNotice || phase}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.25 }}
+                    className="mt-2 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-background px-3 py-1"
+                  >
+                    <motion.span
+                      className="h-1.5 w-1.5 rounded-full bg-primary"
+                      animate={testing ? { opacity: [0.35, 1, 0.35], scale: [0.9, 1.15, 0.9] } : { opacity: 1, scale: 1 }}
+                      transition={{ duration: 1.1, repeat: testing ? Infinity : 0 }}
+                    />
+                    <p className="text-[11px] font-medium text-foreground/90">{phaseNotice || phaseDetails[phase].subtitle}</p>
+                  </motion.div>
+                </AnimatePresence>
               </div>
               <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold text-primary">
                 {phaseDetails[phase].step}
@@ -921,7 +950,7 @@ export default function InternetSpeedTester() {
 
         {/* ===== Summary Card — visible after test completes ===== */}
         <AnimatePresence>
-          {phase === "done" && download !== null && upload !== null && ping !== null && (
+          {showSummary && phase === "done" && download !== null && upload !== null && ping !== null && (
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
