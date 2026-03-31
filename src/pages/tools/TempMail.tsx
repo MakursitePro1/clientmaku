@@ -797,7 +797,7 @@ export default function TempMail() {
                 <p className="font-bold text-sm">Creating your temp email...</p>
                 <p className="text-xs mt-1">This may take a few seconds</p>
               </motion.div>
-            ) : messages.length === 0 ? (
+            ) : filteredMessages.length === 0 && messages.length === 0 ? (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="flex flex-col items-center justify-center h-[350px] text-muted-foreground/50">
                 <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 2, repeat: Infinity }}>
@@ -811,10 +811,20 @@ export default function TempMail() {
                   <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }} className="w-2 h-2 rounded-full bg-primary" />
                 </div>
               </motion.div>
+            ) : filteredMessages.length === 0 && searchQuery ? (
+              <motion.div key="no-results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center h-[350px] text-muted-foreground/50">
+                <Search className="w-10 h-10 mb-3 text-muted-foreground/20" />
+                <p className="font-bold text-sm">No results found</p>
+                <p className="text-xs mt-1">Try a different search term</p>
+                <Button variant="outline" size="sm" className="mt-3 rounded-xl text-xs" onClick={() => setSearchQuery("")}>
+                  Clear Search
+                </Button>
+              </motion.div>
             ) : (
               <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="divide-y divide-border/20">
-                {messages.map((m, i) => {
+                {filteredMessages.map((m, i) => {
                   const otp = extractOTP(m.subject || "") || extractOTP(m.intro || "");
                   const isUnread = !m.seen;
                   return (
