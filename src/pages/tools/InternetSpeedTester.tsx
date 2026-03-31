@@ -478,6 +478,7 @@ export default function InternetSpeedTester() {
   const [rtt, setRtt] = useState("—");
   const [phaseNotice, setPhaseNotice] = useState<string | null>(null);
   const [showSummary, setShowSummary] = useState(false);
+  const [meterLocked, setMeterLocked] = useState(false);
 
   const cancelRef = useRef(false);
   const liveSpeedRef = useRef(0);
@@ -556,6 +557,11 @@ export default function InternetSpeedTester() {
 
   // Gauge animation loop — ultra-smooth with eased interpolation
   useEffect(() => {
+    if (meterLocked) {
+      setDisplaySpeed(+liveSpeedRef.current.toFixed(2));
+      return;
+    }
+
     if (phase === "idle") {
       // Gentle fade to zero from any leftover value
       let raf = 0;
@@ -617,13 +623,14 @@ export default function InternetSpeedTester() {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [phase]);
+  }, [meterLocked, phase]);
 
   const reset = useCallback(() => {
     setTesting(false);
     setPhase("idle");
     setPhaseNotice(null);
     setShowSummary(false);
+    setMeterLocked(false);
     setErrorMsg("");
     liveSpeedRef.current = 0;
     setDisplaySpeed(0);
@@ -640,6 +647,7 @@ export default function InternetSpeedTester() {
     setJitter(null);
     setPhaseNotice(null);
     setShowSummary(false);
+    setMeterLocked(false);
     setErrorMsg("");
     liveSpeedRef.current = 0;
     setDisplaySpeed(4);
@@ -654,13 +662,14 @@ export default function InternetSpeedTester() {
       if (dlSpeed === 0) throw new Error("Download test failed");
 
       updateLive(dlSpeed);
+      setMeterLocked(true);
       setDisplaySpeed(dlSpeed);
-      setPhaseNotice("Step 1 complete. Locking download result...");
-
-      // Lock meter on measured download value first, then reveal result
-      await wait(900);
-      if (cancelRef.current) return reset();
       setDownload(dlSpeed);
+      setPhaseNotice("Step 1 complete. Download result locked.");
+
+      // Keep step-1 result visible briefly, while meter stays fully static
+      await wait(1000);
+      if (cancelRef.current) return reset();
 
       const pingResult = await pingPromise;
       if (!cancelRef.current) {
@@ -668,26 +677,17 @@ export default function InternetSpeedTester() {
         setJitter(pingResult.avgJitter);
       }
 
-      // Immediately after download completes: smooth reset to zero
+      // Transition: instant reset to zero, no gauge movement
       setPhase("resetting");
-      setPhaseNotice("Moving to step 2...");
+      setPhaseNotice("Starting step 2: Upload test...");
       liveSpeedRef.current = 0;
-      // Let the needle glide down naturally
-      await wait(2400);
-      if (cancelRef.current) return reset();
       setDisplaySpeed(0);
-
-      // Keep gauge at true zero for 2 seconds before upload starts
-      await wait(2000);
+      await wait(700);
       if (cancelRef.current) return reset();
 
-      // Clear transition notice before upload phase begins
-      setPhaseNotice("Step 1 complete. Preparing step 2: Upload test...");
-      await wait(1200);
+      // Start upload phase from zero with live animation enabled
+      setMeterLocked(false);
       if (cancelRef.current) return reset();
-      setPhaseNotice(null);
-
-      // Phase 2: upload starts fresh in green
       setPhase("upload");
       setPhaseNotice("Step 2: Measuring upload speed...");
       liveSpeedRef.current = 0;
@@ -695,13 +695,14 @@ export default function InternetSpeedTester() {
       if (cancelRef.current) return reset();
 
       updateLive(ulSpeed);
+      setMeterLocked(true);
       setDisplaySpeed(ulSpeed);
-      setPhaseNotice("Step 2 complete. Locking upload result...");
-
-      // Lock meter on measured upload value first, then reveal result
-      await wait(900);
-      if (cancelRef.current) return reset();
       setUpload(ulSpeed);
+      setPhaseNotice("Step 2 complete. Upload result locked.");
+
+      // Keep step-2 result visible briefly, while meter stays fully static
+      await wait(1000);
+      if (cancelRef.current) return reset();
 
       const entry = {
         dl: +dlSpeed.toFixed(2),
@@ -713,13 +714,13 @@ export default function InternetSpeedTester() {
       setTestHistory(next);
       localStorage.setItem("cv_speed_history", JSON.stringify(next));
 
-      setPhaseNotice("Preparing final report...");
-      await wait(500);
-      if (cancelRef.current) return reset();
-
+      // Both phases complete: instantly reset meter to zero and keep it fixed
+      liveSpeedRef.current = 0;
+      setDisplaySpeed(0);
+      setMeterLocked(true);
       setPhase("done");
       setTesting(false);
-      setPhaseNotice("Test completed successfully.");
+      setPhaseNotice("Test completed successfully. Meter reset to zero.");
       setShowSummary(true);
     } catch (err: unknown) {
       setPhaseNotice(null);
