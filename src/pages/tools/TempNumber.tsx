@@ -362,16 +362,25 @@ export default function TempNumber() {
                 disabled={numbers.length < 2}
                 className="shrink-0 h-9 w-9 rounded-xl hover:text-primary hover:bg-primary/10 transition-all"
                 onClick={() => {
-                  const pool = countryFilter
-                    ? numbers.filter(n => n.country.toLowerCase() === countryFilter.toLowerCase())
-                    : numbers;
-                  if (pool.length < 2) return;
-                  const currentIdx = pool.findIndex(n => n.slug === activeNumber?.slug);
-                  const nextIdx = (currentIdx + 1) % pool.length;
-                  selectNumber(pool[nextIdx]);
-                  toast.success(`Switched to number ${nextIdx + 1}/${pool.length}`);
+                  const preferredCountry = countryFilter || "United States";
+                  const countryPool = numbers.filter(n => n.country.toLowerCase() === preferredCountry.toLowerCase());
+                  const pool = countryPool.length > 0 ? countryPool : numbers;
+                  if (pool.length === 0) {
+                    toast.error("No available numbers");
+                    return;
+                  }
+
+                  const candidates = pool.filter(n => n.slug !== activeNumber?.slug);
+                  if (candidates.length === 0) {
+                    toast.error("No new number available right now");
+                    return;
+                  }
+
+                  const next = candidates[Math.floor(Math.random() * candidates.length)];
+                  selectNumber(next);
+                  toast.success(`${getFlag(next.country)} New number loaded`);
                 }}
-                title="Next number"
+                title="Refresh number"
               >
                 <RefreshCw className="w-4 h-4" />
               </Button>
@@ -464,24 +473,22 @@ export default function TempNumber() {
             <Button
               disabled={loadingMore}
               onClick={() => {
-                const pool = countryFilter
-                  ? numbers.filter(n => n.country.toLowerCase() === countryFilter.toLowerCase())
-                  : numbers;
+                const preferredCountry = countryFilter || "United States";
+                const pool = numbers.filter(n => n.country.toLowerCase() === preferredCountry.toLowerCase());
+
                 if (pool.length > 0) {
-                  const currentIdx = pool.findIndex(n => n.slug === activeNumber?.slug);
-                  const nextIdx = (currentIdx + 1) % pool.length;
-                  selectNumber(pool[nextIdx]);
-                  const label = countryFilter || "All";
-                  toast.success(`${countryFilter ? getFlag(countryFilter) + " " : ""}Showing number ${nextIdx + 1}/${pool.length}`);
+                  const candidates = pool.filter(n => n.slug !== activeNumber?.slug);
+                  const next = candidates.length > 0
+                    ? candidates[Math.floor(Math.random() * candidates.length)]
+                    : pool[0];
+                  selectNumber(next);
+                  toast.success(`${getFlag(preferredCountry)} ${preferredCountry} number updated`);
                   return;
                 }
-                if (countryFilter) {
-                  const cp = countryPages.find(p => p.country.toLowerCase() === countryFilter.toLowerCase());
-                  if (cp) loadMoreNumbers(cp);
-                  else toast.error(`No numbers available for ${countryFilter}`);
-                } else {
-                  fetchNumbers();
-                }
+
+                const cp = countryPages.find(p => p.country.toLowerCase() === preferredCountry.toLowerCase());
+                if (cp) loadMoreNumbers(cp);
+                else toast.error(`No numbers available for ${preferredCountry}`);
               }}
               className="shrink-0 rounded-xl px-4 gap-1.5 text-white"
               size="default"
