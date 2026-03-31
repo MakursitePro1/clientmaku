@@ -486,50 +486,107 @@ export default function TempMail() {
               </motion.div>
             ) : (
               <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="divide-y divide-border/30">
-                {messages.map((m, i) => (
-                  <motion.button
-                    key={m.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.03 }}
-                    onClick={() => viewMessage(m)}
-                    className="w-full text-left p-3.5 hover:bg-primary/5 transition-all group"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${m.seen ? "bg-muted-foreground/30" : "bg-primary"}`} />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <span className={`text-sm truncate ${m.seen ? "font-medium" : "font-bold"}`}>
-                            {m.from?.name || m.from?.address || "Unknown"}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground/60 shrink-0">{timeDiff(m.createdAt)}</span>
+                className="divide-y divide-border/20">
+                {messages.map((m, i) => {
+                  const otp = extractOTP(m.subject || "") || extractOTP(m.intro || "");
+                  const isUnread = !m.seen;
+                  return (
+                    <motion.div
+                      key={m.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.04, duration: 0.3 }}
+                      className={`relative p-4 transition-all group ${isUnread ? "bg-primary/[0.03]" : ""} hover:bg-accent/50`}
+                    >
+                      {/* Unread indicator bar */}
+                      {isUnread && (
+                        <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full bg-primary" />
+                      )}
+
+                      <div className="flex items-start gap-3">
+                        {/* Avatar */}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm font-bold ${isUnread ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                          {(m.from?.name || m.from?.address || "?")[0].toUpperCase()}
                         </div>
-                        <p className={`text-xs truncate ${m.seen ? "text-muted-foreground" : "text-foreground"}`}>
-                          {m.subject || "(No Subject)"}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground/60 truncate mt-0.5">{m.intro}</p>
-                        {extractOTP(m.subject || "") || extractOTP(m.intro || "") ? (
-                          <div className="flex items-center gap-1 mt-1">
-                            <KeyRound className="w-3 h-3 text-primary" />
-                            <span className="text-[10px] font-bold text-primary">OTP: {extractOTP(m.subject || "") || extractOTP(m.intro || "")}</span>
-                            <button
-                              className="text-[10px] text-primary/70 hover:text-primary underline ml-1"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const otp = extractOTP(m.subject || "") || extractOTP(m.intro || "");
-                                if (otp) { navigator.clipboard.writeText(otp); toast.success(`OTP "${otp}" copied!`); }
-                              }}
-                            >Copy</button>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 mb-0.5">
+                            <span className={`text-sm truncate ${isUnread ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>
+                              {m.from?.name || m.from?.address || "Unknown"}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground/50 shrink-0 tabular-nums">{timeDiff(m.createdAt)}</span>
                           </div>
-                        ) : null}
+                          <p className={`text-xs truncate mb-0.5 ${isUnread ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
+                            {m.subject || "(No Subject)"}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground/50 truncate leading-relaxed">{m.intro}</p>
+
+                          {/* OTP Banner inline */}
+                          {otp && (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              className="flex items-center gap-2 mt-2 px-2.5 py-1.5 rounded-lg bg-primary/10 border border-primary/20 w-fit"
+                            >
+                              <KeyRound className="w-3.5 h-3.5 text-primary" />
+                              <span className="font-mono font-extrabold text-sm text-primary tracking-widest">{otp}</span>
+                              <button
+                                className="ml-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigator.clipboard.writeText(otp);
+                                  toast.success(`OTP "${otp}" copied!`);
+                                }}
+                              >
+                                Copy OTP
+                              </button>
+                            </motion.div>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                        <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+
+                      {/* Action buttons - always visible on mobile, hover on desktop */}
+                      <div className="flex items-center gap-1.5 mt-2.5 ml-[52px]">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold border-primary/20 text-primary hover:bg-primary/10 hover:text-primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const content = m.intro || m.subject || "";
+                            navigator.clipboard.writeText(content);
+                            toast.success("Email content copied!");
+                          }}
+                        >
+                          <Copy className="w-3 h-3" /> Copy
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            viewMessage(m);
+                          }}
+                        >
+                          <Eye className="w-3 h-3" /> Details
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 rounded-lg text-[11px] gap-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 ml-auto"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteMessage(m.id);
+                          }}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
                       </div>
-                    </div>
-                  </motion.button>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </motion.div>
             )}
           </AnimatePresence>
