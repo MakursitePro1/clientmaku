@@ -3,7 +3,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, RefreshCw, Phone, MessageSquare, Trash2, Globe, Shield, Clock, Signal, Smartphone, Search, X, Check, KeyRound, ArrowLeft, Volume2, VolumeX, Bell, BellOff, Download, FileJson, FileSpreadsheet, Eye, Plus, Loader2, Star, Heart } from "lucide-react";
+import { Copy, RefreshCw, Phone, MessageSquare, Trash2, Globe, Shield, Clock, Signal, Smartphone, Search, X, Check, KeyRound, ArrowLeft, Volume2, VolumeX, Bell, BellOff, Download, FileJson, FileSpreadsheet, Eye, Plus, Loader2, Star, Heart, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ── Helpers ──
@@ -47,18 +47,48 @@ function extractOTP(text: string): string | null {
 }
 
 const countryFlags: Record<string, string> = {
-  "united states": "🇺🇸", "canada": "🇨🇦", "united kingdom": "🇬🇧", "germany": "🇩🇪",
-  "france": "🇫🇷", "netherlands": "🇳🇱", "sweden": "🇸🇪", "denmark": "🇩🇰",
-  "finland": "🇫🇮", "poland": "🇵🇱", "spain": "🇪🇸", "italy": "🇮🇹",
-  "australia": "🇦🇺", "india": "🇮🇳", "russia": "🇷🇺", "brazil": "🇧🇷",
-  "mexico": "🇲🇽", "japan": "🇯🇵", "china": "🇨🇳", "south korea": "🇰🇷",
-  "indonesia": "🇮🇩", "philippines": "🇵🇭", "thailand": "🇹🇭", "vietnam": "🇻🇳",
-  "malaysia": "🇲🇾", "singapore": "🇸🇬", "hong kong": "🇭🇰", "taiwan": "🇹🇼",
-  "nigeria": "🇳🇬", "south africa": "🇿🇦", "egypt": "🇪🇬", "kenya": "🇰🇪",
-  "ukraine": "🇺🇦", "romania": "🇷🇴", "portugal": "🇵🇹", "czech republic": "🇨🇿",
-  "austria": "🇦🇹", "belgium": "🇧🇪", "switzerland": "🇨🇭", "israel": "🇮🇱",
-  "turkey": "🇹🇷", "pakistan": "🇵🇰", "bangladesh": "🇧🇩", "myanmar": "🇲🇲",
-  "colombia": "🇨🇴", "argentina": "🇦🇷", "chile": "🇨🇱", "peru": "🇵🇪",
+  "afghanistan":"🇦🇫","albania":"🇦🇱","algeria":"🇩🇿","andorra":"🇦🇩","angola":"🇦🇴",
+  "antigua and barbuda":"🇦🇬","argentina":"🇦🇷","armenia":"🇦🇲","australia":"🇦🇺","austria":"🇦🇹",
+  "azerbaijan":"🇦🇿","bahamas":"🇧🇸","bahrain":"🇧🇭","bangladesh":"🇧🇩","barbados":"🇧🇧",
+  "belarus":"🇧🇾","belgium":"🇧🇪","belize":"🇧🇿","benin":"🇧🇯","bhutan":"🇧🇹",
+  "bolivia":"🇧🇴","bosnia and herzegovina":"🇧🇦","botswana":"🇧🇼","brazil":"🇧🇷","brunei":"🇧🇳",
+  "bulgaria":"🇧🇬","burkina faso":"🇧🇫","burundi":"🇧🇮","cambodia":"🇰🇭","cameroon":"🇨🇲",
+  "canada":"🇨🇦","cape verde":"🇨🇻","central african republic":"🇨🇫","chad":"🇹🇩","chile":"🇨🇱",
+  "china":"🇨🇳","colombia":"🇨🇴","comoros":"🇰🇲","congo":"🇨🇬","costa rica":"🇨🇷",
+  "croatia":"🇭🇷","cuba":"🇨🇺","cyprus":"🇨🇾","czech republic":"🇨🇿","czechia":"🇨🇿",
+  "denmark":"🇩🇰","djibouti":"🇩🇯","dominica":"🇩🇲","dominican republic":"🇩🇴","east timor":"🇹🇱",
+  "ecuador":"🇪🇨","egypt":"🇪🇬","el salvador":"🇸🇻","equatorial guinea":"🇬🇶","eritrea":"🇪🇷",
+  "estonia":"🇪🇪","eswatini":"🇸🇿","ethiopia":"🇪🇹","fiji":"🇫🇯","finland":"🇫🇮",
+  "france":"🇫🇷","gabon":"🇬🇦","gambia":"🇬🇲","georgia":"🇬🇪","germany":"🇩🇪",
+  "ghana":"🇬🇭","greece":"🇬🇷","grenada":"🇬🇩","guatemala":"🇬🇹","guinea":"🇬🇳",
+  "guinea-bissau":"🇬🇼","guyana":"🇬🇾","haiti":"🇭🇹","honduras":"🇭🇳","hong kong":"🇭🇰",
+  "hungary":"🇭🇺","iceland":"🇮🇸","india":"🇮🇳","indonesia":"🇮🇩","iran":"🇮🇷",
+  "iraq":"🇮🇶","ireland":"🇮🇪","israel":"🇮🇱","italy":"🇮🇹","ivory coast":"🇨🇮",
+  "jamaica":"🇯🇲","japan":"🇯🇵","jordan":"🇯🇴","kazakhstan":"🇰🇿","kenya":"🇰🇪",
+  "kiribati":"🇰🇮","kosovo":"🇽🇰","kuwait":"🇰🇼","kyrgyzstan":"🇰🇬","laos":"🇱🇦",
+  "latvia":"🇱🇻","lebanon":"🇱🇧","lesotho":"🇱🇸","liberia":"🇱🇷","libya":"🇱🇾",
+  "liechtenstein":"🇱🇮","lithuania":"🇱🇹","luxembourg":"🇱🇺","macau":"🇲🇴","madagascar":"🇲🇬",
+  "malawi":"🇲🇼","malaysia":"🇲🇾","maldives":"🇲🇻","mali":"🇲🇱","malta":"🇲🇹",
+  "marshall islands":"🇲🇭","mauritania":"🇲🇷","mauritius":"🇲🇺","mexico":"🇲🇽","micronesia":"🇫🇲",
+  "moldova":"🇲🇩","monaco":"🇲🇨","mongolia":"🇲🇳","montenegro":"🇲🇪","morocco":"🇲🇦",
+  "mozambique":"🇲🇿","myanmar":"🇲🇲","namibia":"🇳🇦","nauru":"🇳🇷","nepal":"🇳🇵",
+  "netherlands":"🇳🇱","new zealand":"🇳🇿","nicaragua":"🇳🇮","niger":"🇳🇪","nigeria":"🇳🇬",
+  "north korea":"🇰🇵","north macedonia":"🇲🇰","norway":"🇳🇴","oman":"🇴🇲","pakistan":"🇵🇰",
+  "palau":"🇵🇼","palestine":"🇵🇸","panama":"🇵🇦","papua new guinea":"🇵🇬","paraguay":"🇵🇾",
+  "peru":"🇵🇪","philippines":"🇵🇭","poland":"🇵🇱","portugal":"🇵🇹","puerto rico":"🇵🇷",
+  "qatar":"🇶🇦","romania":"🇷🇴","russia":"🇷🇺","rwanda":"🇷🇼","saint kitts and nevis":"🇰🇳",
+  "saint lucia":"🇱🇨","saint vincent":"🇻🇨","samoa":"🇼🇸","san marino":"🇸🇲",
+  "sao tome and principe":"🇸🇹","saudi arabia":"🇸🇦","senegal":"🇸🇳","serbia":"🇷🇸",
+  "seychelles":"🇸🇨","sierra leone":"🇸🇱","singapore":"🇸🇬","slovakia":"🇸🇰","slovenia":"🇸🇮",
+  "solomon islands":"🇸🇧","somalia":"🇸🇴","south africa":"🇿🇦","south korea":"🇰🇷",
+  "south sudan":"🇸🇸","spain":"🇪🇸","sri lanka":"🇱🇰","sudan":"🇸🇩","suriname":"🇸🇷",
+  "sweden":"🇸🇪","switzerland":"🇨🇭","syria":"🇸🇾","taiwan":"🇹🇼","tajikistan":"🇹🇯",
+  "tanzania":"🇹🇿","thailand":"🇹🇭","togo":"🇹🇬","tonga":"🇹🇴","trinidad and tobago":"🇹🇹",
+  "tunisia":"🇹🇳","turkey":"🇹🇷","turkmenistan":"🇹🇲","tuvalu":"🇹🇻","uganda":"🇺🇬",
+  "ukraine":"🇺🇦","united arab emirates":"🇦🇪","uae":"🇦🇪","united kingdom":"🇬🇧",
+  "united states":"🇺🇸","uruguay":"🇺🇾","uzbekistan":"🇺🇿","vanuatu":"🇻🇺",
+  "vatican city":"🇻🇦","venezuela":"🇻🇪","vietnam":"🇻🇳","yemen":"🇾🇪",
+  "zambia":"🇿🇲","zimbabwe":"🇿🇼",
 };
 function getFlag(country: string) { return countryFlags[country.toLowerCase()] || "🌍"; }
 
@@ -83,6 +113,9 @@ export default function TempNumber() {
   const [refreshing, setRefreshing] = useState(false);
   const [countryFilter, setCountryFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [countrySearch, setCountrySearch] = useState("");
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [notifEnabled, setNotifEnabled] = useState(false);
@@ -225,6 +258,17 @@ export default function TempNumber() {
   // Cleanup
   useEffect(() => () => { if (copyResetRef.current) clearTimeout(copyResetRef.current); }, []);
 
+  // Close country dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(e.target as Node)) {
+        setCountryDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const selectNumber = (num: NumberInfo) => {
     setActiveNumber(num);
     setNumberHistory(prev => {
@@ -263,6 +307,12 @@ export default function TempNumber() {
 
   // Country list from available numbers
   const availableCountries = [...new Set(numbers.map(n => n.country))].sort();
+
+  // All known countries (200+) for dropdown
+  const allCountryNames = Object.keys(countryFlags).map(c => c.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")).sort();
+  const filteredCountryList = countrySearch.trim()
+    ? allCountryNames.filter(c => c.toLowerCase().includes(countrySearch.toLowerCase()))
+    : allCountryNames;
 
   // Filtered numbers by country
   const filteredNumbers = countryFilter
@@ -312,19 +362,69 @@ export default function TempNumber() {
             <span className="text-[10px] text-muted-foreground ml-auto">{filteredNumbers.length} numbers</span>
           </div>
 
-          {/* Country chips */}
-          <div className="flex flex-wrap gap-1.5">
+          {/* Country Search Dropdown */}
+          <div className="relative" ref={countryDropdownRef}>
             <button
-              onClick={() => setCountryFilter("")}
-              className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-medium transition-all ${!countryFilter ? "bg-primary/15 text-primary border border-primary/30" : "bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted"}`}
-            >All</button>
-            {availableCountries.map(c => (
-              <button
-                key={c}
-                onClick={() => setCountryFilter(c === countryFilter ? "" : c)}
-                className={`px-2.5 py-1 rounded-lg text-[10px] sm:text-xs font-medium transition-all whitespace-nowrap ${c === countryFilter ? "bg-primary/15 text-primary border border-primary/30" : "bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted"}`}
-              >{getFlag(c)} {c}</button>
-            ))}
+              onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border border-border/60 bg-muted/30 hover:bg-muted/50 transition-all text-sm"
+            >
+              <Search className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className={countryFilter ? "font-medium" : "text-muted-foreground"}>
+                {countryFilter ? `${getFlag(countryFilter)} ${countryFilter}` : "All Countries"}
+              </span>
+              <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground ml-auto transition-transform ${countryDropdownOpen ? "rotate-180" : ""}`} />
+              {countryFilter && (
+                <button
+                  onClick={e => { e.stopPropagation(); setCountryFilter(""); setCountrySearch(""); }}
+                  className="p-0.5 rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </button>
+
+            {countryDropdownOpen && (
+              <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border/60 bg-card shadow-xl overflow-hidden">
+                <div className="p-2 border-b border-border/40">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <input
+                      type="text"
+                      placeholder="Search 200+ countries..."
+                      value={countrySearch}
+                      onChange={e => setCountrySearch(e.target.value)}
+                      autoFocus
+                      className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-muted/50 border border-border/40 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20"
+                    />
+                  </div>
+                </div>
+                <div className="max-h-48 overflow-y-auto">
+                  <button
+                    onClick={() => { setCountryFilter(""); setCountryDropdownOpen(false); setCountrySearch(""); }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${!countryFilter ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted/50"}`}
+                  >
+                    <Globe className="w-3.5 h-3.5" /> All Countries
+                  </button>
+                  {filteredCountryList.map(c => {
+                    const hasNumbers = availableCountries.some(ac => ac.toLowerCase() === c.toLowerCase());
+                    return (
+                      <button
+                        key={c}
+                        onClick={() => { setCountryFilter(c); setCountryDropdownOpen(false); setCountrySearch(""); }}
+                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${c === countryFilter ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted/50"}`}
+                      >
+                        <span>{getFlag(c)}</span>
+                        <span className="flex-1">{c}</span>
+                        {hasNumbers && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">{numbers.filter(n => n.country.toLowerCase() === c.toLowerCase()).length}</span>}
+                      </button>
+                    );
+                  })}
+                  {filteredCountryList.length === 0 && (
+                    <p className="text-center text-xs text-muted-foreground py-4">No country found</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Number list */}
