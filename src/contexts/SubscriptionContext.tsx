@@ -74,6 +74,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
           price_semi_annual: Number(p.price_semi_annual),
           price_annual: Number(p.price_annual),
           price_lifetime: Number(p.price_lifetime),
+          price_monthly_bdt: Number(p.price_monthly_bdt || 0),
+          price_semi_annual_bdt: Number(p.price_semi_annual_bdt || 0),
+          price_annual_bdt: Number(p.price_annual_bdt || 0),
+          price_lifetime_bdt: Number(p.price_lifetime_bdt || 0),
           features: Array.isArray(p.features) ? p.features : [],
         })));
       }
