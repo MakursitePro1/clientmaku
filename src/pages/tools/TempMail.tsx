@@ -127,8 +127,66 @@ export default function TempMail() {
   const [domainsLoaded, setDomainsLoaded] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [createdAt, setCreatedAt] = useState<number | null>(null);
+  const [expiryText, setExpiryText] = useState("--:--");
   const prevMsgCountRef = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const expiryRef = useRef<NodeJS.Timeout | null>(null);
+
+  const EMAIL_LIFETIME_MS = 60 * 60 * 1000; // 1 hour
+
+  // Expiry timer
+  useEffect(() => {
+    if (!createdAt) return;
+    const tick = () => {
+      const elapsed = Date.now() - createdAt;
+      const remaining = Math.max(0, EMAIL_LIFETIME_MS - elapsed);
+      if (remaining <= 0) {
+        setExpiryText("Expired");
+        return;
+      }
+      const m = Math.floor(remaining / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      setExpiryText(`${m}:${s.toString().padStart(2, "0")}`);
+    };
+    tick();
+    expiryRef.current = setInterval(tick, 1000);
+    return () => { if (expiryRef.current) clearInterval(expiryRef.current); };
+  }, [createdAt]);
+
+  // Export functions
+  const exportJSON = () => {
+    if (!messages.length) { toast.error("No messages to export"); return; }
+    const data = messages.map(m => ({
+      from: m.from?.address || "",
+      fromName: m.from?.name || "",
+      subject: m.subject || "",
+      preview: m.intro || "",
+      date: m.createdAt,
+      read: m.seen,
+    }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `tempmail_${account?.address || "export"}.json`; a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Exported as JSON!");
+  };
+
+  const exportCSV = () => {
+    if (!messages.length) { toast.error("No messages to export"); return; }
+    const header = "From,From Name,Subject,Preview,Date,Read\n";
+    const rows = messages.map(m => {
+      const esc = (s: string) => `"${(s || "").replace(/"/g, '""')}"`;
+      return [esc(m.from?.address || ""), esc(m.from?.name || ""), esc(m.subject || ""), esc(m.intro || ""), esc(m.createdAt), m.seen ? "Yes" : "No"].join(",");
+    }).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `tempmail_${account?.address || "export"}.csv`; a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Exported as CSV!");
+  };
 
   // Request notification permission
   const requestNotifPermission = useCallback(async () => {
