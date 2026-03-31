@@ -93,6 +93,27 @@ export default function TempNumber() {
   const [countryPages, setCountryPages] = useState<CountryPage[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadedCountries, setLoadedCountries] = useState<Set<string>>(new Set());
+  const [favoriteNumbers, setFavoriteNumbers] = useState<NumberInfo[]>(() => {
+    try { return JSON.parse(localStorage.getItem("temp-number-favorites") || "[]"); } catch { return []; }
+  });
+
+  // Persist favorites
+  useEffect(() => {
+    localStorage.setItem("temp-number-favorites", JSON.stringify(favoriteNumbers));
+  }, [favoriteNumbers]);
+
+  const isFavorite = (slug: string) => favoriteNumbers.some(f => f.slug === slug);
+
+  const toggleFavorite = (num: NumberInfo) => {
+    setFavoriteNumbers(prev => {
+      if (prev.some(f => f.slug === num.slug)) {
+        toast.success("Removed from favorites");
+        return prev.filter(f => f.slug !== num.slug);
+      }
+      toast.success("Added to favorites ⭐");
+      return [num, ...prev];
+    });
+  };
 
   // Copy effect
   const triggerCopy = useCallback((key: string) => {
