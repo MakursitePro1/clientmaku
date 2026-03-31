@@ -71,12 +71,14 @@ function SpeedGauge({
   };
 
   const displayVal = value;
-  const angle = speedToAngle(displayVal);
+  const isZeroState = phase === "done" || phase === "idle" || phase === "error" || phase === "resetting";
+  const effectiveVal = isZeroState ? 0 : displayVal;
+  const angle = speedToAngle(effectiveVal);
   const needleEnd = polar(angle, r - 8);
   const needleBase1 = polar(angle + 90, 4);
   const needleBase2 = polar(angle - 90, 4);
-  const intPart = Math.floor(displayVal);
-  const decPart = (displayVal % 1).toFixed(2).slice(1);
+  const intPart = Math.floor(effectiveVal);
+  const decPart = (effectiveVal % 1).toFixed(2).slice(1);
 
   const isDownload = phase === "download";
   const isUpload = phase === "upload";
@@ -173,7 +175,7 @@ function SpeedGauge({
         {ticks}
 
         {/* Active arc */}
-        {displayVal > 0.1 && (
+        {effectiveVal > 0.1 && (
           <>
             <path
               d={arcPath(START_ANGLE, angle, r)}
@@ -256,9 +258,9 @@ function SpeedGauge({
         {/* Speed number */}
         <text x={cx} y={cy + 10} textAnchor="middle" dominantBaseline="middle">
           <tspan className="fill-foreground" style={{ fontSize: "52px", fontWeight: 200 }}>
-            {displayVal > 0.1 ? intPart : "—"}
+            {effectiveVal > 0.1 ? intPart : "—"}
           </tspan>
-          {displayVal > 0.1 && (
+          {effectiveVal > 0.1 && (
             <tspan fill="hsl(var(--foreground) / 0.5)" style={{ fontSize: "28px", fontWeight: 200 }}>
               {decPart}
             </tspan>
