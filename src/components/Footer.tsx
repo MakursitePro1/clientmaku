@@ -1,61 +1,108 @@
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowUpRight, Sparkles, Globe, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowUpRight, Sparkles, Globe, Heart, Facebook, Twitter, Instagram, Youtube, Github, Zap, Grid3X3, Shield } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
+import { useToolCatalog } from "@/contexts/ToolCatalogContext";
+
+const socialLinks = [
+  { name: "Facebook", icon: Facebook, url: "https://facebook.com", color: "hover:text-blue-500 hover:border-blue-500/30 hover:bg-blue-500/10" },
+  { name: "Twitter", icon: Twitter, url: "https://twitter.com", color: "hover:text-sky-400 hover:border-sky-400/30 hover:bg-sky-400/10" },
+  { name: "Instagram", icon: Instagram, url: "https://instagram.com", color: "hover:text-pink-500 hover:border-pink-500/30 hover:bg-pink-500/10" },
+  { name: "Youtube", icon: Youtube, url: "https://youtube.com", color: "hover:text-red-500 hover:border-red-500/30 hover:bg-red-500/10" },
+  { name: "GitHub", icon: Github, url: "https://github.com", color: "hover:text-foreground hover:border-foreground/30 hover:bg-foreground/10" },
+];
 
 export function Footer() {
-  const navigate = useNavigate();
   const { settings } = useSiteSettings();
+  const { totalTools, totalCategories } = useToolCatalog();
 
   return (
     <footer className="relative px-4 pb-6 pt-4">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] max-w-md h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] max-w-4xl h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-      <div className="max-w-3xl mx-auto">
-        <div className="relative rounded-2xl border border-primary/10 bg-card/60 backdrop-blur-xl overflow-hidden shadow-lg shadow-primary/5">
+      <div className="max-w-7xl mx-auto">
+        <div className="relative rounded-3xl border border-primary/10 bg-card/60 backdrop-blur-xl overflow-hidden shadow-xl shadow-primary/5">
+          <div className="absolute top-0 left-0 w-[250px] h-[150px] bg-primary/[0.03] rounded-full blur-[80px] pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-[200px] h-[150px] bg-pink-500/[0.03] rounded-full blur-[80px] pointer-events-none" />
           <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
-          <div className="relative z-10 px-5 sm:px-8 py-5 sm:py-6">
-            {/* Top row: logo + nav links */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-              <Link to="/" className="flex items-center gap-2 group">
+          <div className="relative z-10 px-5 sm:px-8 lg:px-12 py-6 sm:py-8">
+            {/* Top: Brand + Nav + Social */}
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-5">
+              {/* Brand */}
+              <Link to="/" className="flex items-center gap-2.5 group shrink-0">
                 <img
                   src={settings.site_logo_url || "/logo.png"}
                   alt={settings.site_name}
-                  className="w-8 h-8 rounded-xl object-cover shadow-md shadow-primary/15 ring-1 ring-primary/10"
+                  className="w-9 h-9 rounded-xl object-cover shadow-md shadow-primary/15 ring-1 ring-primary/10"
                 />
-                <span className="text-sm font-extrabold tracking-tight">
-                  <span className="gradient-text">{settings.navbar_brand_text}</span>
-                  <span className="text-foreground"> {settings.navbar_brand_accent}</span>
-                </span>
+                <div>
+                  <span className="text-base font-extrabold tracking-tight block leading-tight">
+                    <span className="gradient-text">{settings.navbar_brand_text}</span>
+                    <span className="text-foreground"> {settings.navbar_brand_accent}</span>
+                  </span>
+                  <span className="text-[9px] text-muted-foreground/40 font-medium tracking-wider uppercase">{settings.site_tagline}</span>
+                </div>
               </Link>
 
-              <nav className="flex items-center gap-1 flex-wrap justify-center">
+              {/* Nav Links */}
+              <nav className="flex items-center gap-0.5 sm:gap-1 flex-wrap justify-center">
                 {[
                   { name: "Tools", path: "/tools" },
+                  { name: "Categories", path: "/categories" },
                   { name: "Blog", path: "/blog" },
                   { name: "About", path: "/about" },
+                  { name: "FAQ", path: "/faq" },
                   { name: "Policy", path: "/policy" },
                 ].map(link => (
                   <Link
                     key={link.name}
                     to={link.path}
-                    className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
                   >
                     {link.name}
                   </Link>
                 ))}
               </nav>
+
+              {/* Social */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                {socialLinks.map((s) => (
+                  <a
+                    key={s.name}
+                    href={s.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={s.name}
+                    className={`w-8 h-8 rounded-lg border border-border/30 bg-accent/20 flex items-center justify-center text-muted-foreground/50 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${s.color}`}
+                  >
+                    <s.icon className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Stats badges */}
+            <div className="flex items-center justify-center gap-2 mt-5 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-[11px] font-semibold text-primary">
+                <Zap className="w-3 h-3" /> {totalTools}+ Tools
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 text-[11px] font-semibold text-primary">
+                <Grid3X3 className="w-3 h-3" /> {totalCategories} Categories
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/40 border border-border/30 text-[11px] font-semibold text-foreground/70">
+                <Shield className="w-3 h-3" /> 100% Free
+              </span>
             </div>
 
             {/* Divider */}
-            <div className="my-4 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
+            <div className="my-5 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
 
             {/* Bottom: copyright + credit */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-[11px] text-muted-foreground/50 flex items-center gap-1">
+              <p className="text-[11px] text-muted-foreground/45 flex items-center gap-1.5">
                 {settings.footer_copyright || "© 2024"} <span className="font-semibold gradient-text">{settings.site_name}</span>
-                <span className="mx-1">·</span>
-                Made with <Heart className="w-2.5 h-2.5 text-red-400/60 fill-red-400/60" />
+                <span className="text-muted-foreground/25">·</span>
+                Made with <Heart className="w-2.5 h-2.5 text-red-400/60 fill-red-400/60" /> for the community
               </p>
 
               <a
