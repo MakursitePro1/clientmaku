@@ -3,7 +3,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX, Download, FileJson, FileSpreadsheet, Timer, ArrowLeft, Paperclip, File, Calendar, User, TrashIcon } from "lucide-react";
+import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX, Download, FileJson, FileSpreadsheet, Timer, ArrowLeft, Paperclip, File, Calendar, User, Forward } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -145,14 +145,15 @@ export default function TempMail() {
 
   const EMAIL_LIFETIME_MS = 60 * 60 * 1000; // 1 hour
 
-  // Expiry timer
+  // Expiry timer with auto-renew
   useEffect(() => {
     if (!createdAt) return;
     const tick = () => {
       const elapsed = Date.now() - createdAt;
       const remaining = Math.max(0, EMAIL_LIFETIME_MS - elapsed);
       if (remaining <= 0) {
-        setExpiryText("Expired");
+        setExpiryText("Renewing...");
+        createAccount();
         return;
       }
       const m = Math.floor(remaining / 60000);
@@ -163,6 +164,15 @@ export default function TempMail() {
     expiryRef.current = setInterval(tick, 1000);
     return () => { if (expiryRef.current) clearInterval(expiryRef.current); };
   }, [createdAt]);
+
+  // Forward email via mailto
+  const forwardEmail = (msg: MailMessage) => {
+    const subject = encodeURIComponent(`Fwd: ${msg.subject || "(No Subject)"}`);
+    const body = encodeURIComponent(
+      `---------- Forwarded message ----------\nFrom: ${msg.from?.name || msg.from?.address || "Unknown"}\nDate: ${new Date(msg.createdAt).toLocaleString()}\nSubject: ${msg.subject || "(No Subject)"}\n\n${msg.text || msg.intro || "No content"}`
+    );
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_self");
+  };
 
   // Export functions
   const exportJSON = () => {
@@ -562,6 +572,10 @@ export default function TempMail() {
                       }}>
                       <Copy className="w-3 h-3" /> Copy
                     </Button>
+                    <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-primary hover:bg-primary/10"
+                      onClick={() => forwardEmail(selected)}>
+                      <Forward className="w-3 h-3" /> Forward
+                    </Button>
                     <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] gap-1 text-destructive hover:bg-destructive/10"
                       onClick={() => deleteMessage(selected.id)}>
                       <Trash2 className="w-3 h-3" /> Delete
@@ -771,6 +785,17 @@ export default function TempMail() {
                           }}
                         >
                           <Eye className="w-3 h-3" /> Details
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold text-primary border-primary/20 hover:bg-primary/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            forwardEmail(m);
+                          }}
+                        >
+                          <Forward className="w-3 h-3" /> Forward
                         </Button>
                         <Button
                           variant="ghost"
