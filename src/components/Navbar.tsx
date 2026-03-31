@@ -390,6 +390,13 @@ export function Navbar() {
             ))}
 
             <button
+              onClick={() => { setIsOpen(false); navigate("/pricing"); }}
+              className="w-full text-left px-4 py-3 rounded-lg text-amber-600 hover:bg-amber-500/10 transition-all flex items-center gap-2 font-semibold"
+            >
+              <Crown className="w-4 h-4" /> Premium
+            </button>
+
+            <button
               onClick={() => { setIsOpen(false); navigate("/favorites"); }}
               className={cn(
                 "w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-2",
