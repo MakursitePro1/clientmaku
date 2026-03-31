@@ -68,7 +68,7 @@ interface MailMessage {
 async function copyToClipboard(text: string): Promise<boolean> {
   try {
     if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text);
+      await copyToClipboard(text);
       return true;
     }
   } catch {}
@@ -118,7 +118,7 @@ function OTPBanner({ text, subject }: { text: string; subject?: string }) {
   
   const copyOTP = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(otp);
+    copyToClipboard(otp);
     toast.success(`OTP "${otp}" copied!`);
   };
 
@@ -422,7 +422,7 @@ export default function TempMail() {
 
   const copyEmail = () => {
     if (!account) return;
-    navigator.clipboard.writeText(account.address);
+    copyToClipboard(account.address);
     toast.success("Email address copied!");
   };
 
@@ -702,7 +702,7 @@ export default function TempMail() {
                     <Button variant="ghost" size="sm" className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 px-2"
                       onClick={() => {
                         const content = selected.text || selected.intro || selected.subject || "";
-                        navigator.clipboard.writeText(content);
+                        copyToClipboard(content);
                         toast.success("Content copied!");
                       }}>
                       <Copy className="w-3 h-3" /> Copy
@@ -898,7 +898,7 @@ export default function TempMail() {
                                 className="ml-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  navigator.clipboard.writeText(otp);
+                                  copyToClipboard(otp);
                                   toast.success(`OTP "${otp}" copied!`);
                                 }}
                               >
@@ -918,7 +918,7 @@ export default function TempMail() {
                           onClick={(e) => {
                             e.stopPropagation();
                             const content = m.intro || m.subject || "";
-                            navigator.clipboard.writeText(content);
+                            copyToClipboard(content);
                             toast.success("Email content copied!");
                           }}
                         >
