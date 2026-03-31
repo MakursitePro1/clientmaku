@@ -16,6 +16,8 @@ export function Footer() {
   const { settings } = useSiteSettings();
   const { totalTools, totalCategories } = useToolCatalog();
 
+  const activeSocials = socialConfig.filter(s => settings[s.key]?.trim());
+
   return (
     <footer className="relative px-4 pb-6 pt-4">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] max-w-4xl h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
