@@ -143,6 +143,17 @@ export default function RandomAddressGenerator() {
   const [bookmarked, setBookmarked] = useState<Set<number>>(new Set());
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [countrySearch, setCountrySearch] = useState("");
+  const [activeContinent, setActiveContinent] = useState<ContinentKey | "All">("All");
+
+  const filteredCountries = useMemo(() => {
+    let countries = activeContinent === "All" 
+      ? Object.keys(countriesData) as CountryKey[]
+      : (continentCountries[activeContinent] || []).filter(c => c in countriesData) as CountryKey[];
+    if (countrySearch) {
+      countries = countries.filter(c => c.toLowerCase().includes(countrySearch.toLowerCase()));
+    }
+    return countries;
+  }, [activeContinent, countrySearch]);
 
   const copyText = useCallback((text: string, label: string) => {
     navigator.clipboard.writeText(text).then(() => {
