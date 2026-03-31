@@ -512,18 +512,24 @@ export default function TempMail() {
               </Button>
             </div>
           </div>
-          {/* Export buttons */}
+          {/* Export & Clear buttons */}
           {messages.length > 0 && (
-            <div className="flex items-center gap-2">
-              <Download className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground font-medium">Export:</span>
-              <Button variant="outline" size="sm" onClick={exportJSON}
-                className="rounded-xl text-xs gap-1 h-7">
-                <FileJson className="w-3 h-3" /> JSON
-              </Button>
-              <Button variant="outline" size="sm" onClick={exportCSV}
-                className="rounded-xl text-xs gap-1 h-7">
-                <FileSpreadsheet className="w-3 h-3" /> CSV
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Download className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">Export:</span>
+                <Button variant="outline" size="sm" onClick={exportJSON}
+                  className="rounded-xl text-xs gap-1 h-7">
+                  <FileJson className="w-3 h-3" /> JSON
+                </Button>
+                <Button variant="outline" size="sm" onClick={exportCSV}
+                  className="rounded-xl text-xs gap-1 h-7">
+                  <FileSpreadsheet className="w-3 h-3" /> CSV
+                </Button>
+              </div>
+              <Button variant="outline" size="sm" onClick={clearAllMessages}
+                className="rounded-xl text-xs gap-1 h-7 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive">
+                <Trash2 className="w-3 h-3" /> Clear All ({messages.length})
               </Button>
             </div>
           )}
