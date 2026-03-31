@@ -718,7 +718,7 @@ export default function StudentIdCard() {
         const page = pdfDoc.addPage([width, height]);
         page.drawImage(pngImage, { x: 0, y: 0, width, height });
         const pdfBytes = await pdfDoc.save();
-        const blob = new Blob([pdfBytes], { type: "application/pdf" });
+        const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
         const a = document.createElement("a");
         a.download = `${filename}.pdf`;
         a.href = URL.createObjectURL(blob);
