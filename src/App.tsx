@@ -109,6 +109,7 @@ const App = () => (
       <FavoritesProvider>
         <SiteSettingsProvider>
           <ToolCatalogProvider>
+          <SubscriptionProvider>
             <TooltipProvider>
               <Toaster />
               <Sonner />
