@@ -658,7 +658,7 @@ export default function StudentIdCard() {
     const tCtx = tempCanvas.getContext("2d");
     if (!tCtx) return null;
 
-    const srcY = side === "front" ? 0 : (CH + 50) * scale;
+    const srcY = side === "front" ? 0 : (CH + 60) * scale;
     tCtx.drawImage(canvas, 0, srcY, W * scale, CH * scale, 0, 0, W * scale, CH * scale);
     return tempCanvas;
   };
