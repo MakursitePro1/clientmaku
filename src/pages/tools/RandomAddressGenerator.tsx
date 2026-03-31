@@ -521,7 +521,23 @@ export default function RandomAddressGenerator() {
                                 <DetailRow icon={Mail} label="Email" value={a.email} iconColor="text-blue-500" />
                                 <DetailRow icon={Phone} label="Phone" value={a.phone} iconColor="text-green-500" />
                                 <DetailRow icon={Hash} label="Username" value={a.username} iconColor="text-purple-500" />
+                                <DetailRow icon={Shield} label="Password" value={a.password} iconColor="text-red-500" />
                                 <DetailRow icon={Hash} label="National ID" value={a.nationalId} iconColor="text-orange-500" />
+                                <DetailRow icon={Calendar} label="Date of Birth" value={`${a.dob} (Age: ${a.age})`} iconColor="text-pink-500" />
+                                <DetailRow icon={Heart} label="Zodiac" value={a.zodiac} iconColor="text-rose-400" />
+                                <DetailRow icon={User} label="Mother's Maiden" value={a.motherMaiden} iconColor="text-fuchsia-500" />
+                              </div>
+
+                              {/* Physical */}
+                              <div className="mb-2 sm:mb-3">
+                                <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                                  🧬 Physical Attributes
+                                </h5>
+                                <DetailRow icon={Droplet} label="Blood Type" value={a.bloodType} iconColor="text-red-500" />
+                                <DetailRow icon={Ruler} label="Height" value={a.height} iconColor="text-teal-500" />
+                                <DetailRow icon={Ruler} label="Weight" value={a.weight} iconColor="text-cyan-500" />
+                                <DetailRow icon={User} label="Eye Color" value={a.eyeColor} iconColor="text-blue-400" />
+                                <DetailRow icon={User} label="Hair Color" value={a.hairColor} iconColor="text-amber-600" />
                               </div>
 
                               {/* Address Section */}
@@ -543,17 +559,50 @@ export default function RandomAddressGenerator() {
                                 </h5>
                                 <DetailRow icon={Compass} label="Latitude" value={a.lat} iconColor="text-emerald-500" />
                                 <DetailRow icon={Compass} label="Longitude" value={a.lng} iconColor="text-emerald-500" />
+                                <DetailRow icon={Navigation} label="Google Maps" value={`https://maps.google.com/?q=${a.lat},${a.lng}`} iconColor="text-blue-500" />
                                 <DetailRow icon={Clock} label="Timezone" value={a.timezone} iconColor="text-amber-500" />
                                 <DetailRow icon={Hash} label="Currency" value={a.currency} iconColor="text-yellow-500" />
                                 <DetailRow icon={Phone} label="Dial Code" value={a.countryCode} iconColor="text-sky-500" />
                               </div>
 
-                              {/* Company */}
-                              <div>
+                              {/* Employment & Education */}
+                              <div className="mb-2 sm:mb-3">
                                 <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
-                                  🏢 Company
+                                  💼 Employment & Education
                                 </h5>
                                 <DetailRow icon={Building} label="Company" value={a.company} iconColor="text-violet-500" />
+                                <DetailRow icon={Briefcase} label="Occupation" value={a.occupation} iconColor="text-indigo-500" />
+                                <DetailRow icon={GraduationCap} label="Education" value={a.education} iconColor="text-blue-600" />
+                                <DetailRow icon={Globe} label="Website" value={a.website} iconColor="text-cyan-600" />
+                              </div>
+
+                              {/* Vehicle */}
+                              <div className="mb-2 sm:mb-3">
+                                <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                                  🚗 Vehicle
+                                </h5>
+                                <DetailRow icon={Car} label="Vehicle" value={a.vehicle} iconColor="text-slate-500" />
+                                <DetailRow icon={Hash} label="License Plate" value={a.licensePlate} iconColor="text-gray-500" />
+                              </div>
+
+                              {/* Financial */}
+                              <div className="mb-2 sm:mb-3">
+                                <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                                  💳 Financial
+                                </h5>
+                                <DetailRow icon={CreditCard} label="Card Number" value={a.creditCard} iconColor="text-emerald-600" />
+                                <DetailRow icon={Hash} label="CVV" value={a.cvv} iconColor="text-orange-600" />
+                                <DetailRow icon={Calendar} label="Expiry" value={a.cardExpiry} iconColor="text-amber-600" />
+                              </div>
+
+                              {/* Digital */}
+                              <div className="mb-2 sm:mb-3">
+                                <h5 className="text-[10px] sm:text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                                  💻 Digital & Network
+                                </h5>
+                                <DetailRow icon={Wifi} label="IP Address" value={a.ipAddress} iconColor="text-green-600" />
+                                <DetailRow icon={Hash} label="MAC Address" value={a.macAddress} iconColor="text-purple-600" />
+                                <DetailRow icon={Globe} label="User Agent" value={a.userAgent} iconColor="text-slate-600" />
                               </div>
 
                               {/* Copy All Details */}
@@ -561,7 +610,7 @@ export default function RandomAddressGenerator() {
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    const text = `Name: ${a.fullName}\nEmail: ${a.email}\nPhone: ${a.phone}\nUsername: ${a.username}\nNational ID: ${a.nationalId}\n\nStreet: ${a.fullStreet}\nCity: ${a.city}\nState: ${a.state}\nZIP: ${a.zip}\nCountry: ${a.country}\n\nLatitude: ${a.lat}\nLongitude: ${a.lng}\nTimezone: ${a.timezone}\nCurrency: ${a.currency}\nDial Code: ${a.countryCode}\n\nCompany: ${a.company}`;
+                                    const text = `═══ PERSONAL ═══\nName: ${a.fullName}\nEmail: ${a.email}\nPhone: ${a.phone}\nUsername: ${a.username}\nPassword: ${a.password}\nNational ID: ${a.nationalId}\nDOB: ${a.dob} (Age: ${a.age})\nZodiac: ${a.zodiac}\nMother's Maiden: ${a.motherMaiden}\n\n═══ PHYSICAL ═══\nBlood Type: ${a.bloodType}\nHeight: ${a.height}\nWeight: ${a.weight}\nEye Color: ${a.eyeColor}\nHair Color: ${a.hairColor}\n\n═══ ADDRESS ═══\nStreet: ${a.fullStreet}\nCity: ${a.city}\nState: ${a.state}\nZIP: ${a.zip}\nCountry: ${a.country}\n\n═══ GEO ═══\nLatitude: ${a.lat}\nLongitude: ${a.lng}\nTimezone: ${a.timezone}\nCurrency: ${a.currency}\nDial Code: ${a.countryCode}\n\n═══ EMPLOYMENT ═══\nCompany: ${a.company}\nOccupation: ${a.occupation}\nEducation: ${a.education}\nWebsite: ${a.website}\n\n═══ VEHICLE ═══\nVehicle: ${a.vehicle}\nLicense: ${a.licensePlate}\n\n═══ FINANCIAL ═══\nCard: ${a.creditCard}\nCVV: ${a.cvv}\nExpiry: ${a.cardExpiry}\n\n═══ DIGITAL ═══\nIP: ${a.ipAddress}\nMAC: ${a.macAddress}\nUser Agent: ${a.userAgent}`;
                                     copyText(text, `all-details-${realIdx}`);
                                   }}
                                   className="w-full py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all"
