@@ -3,7 +3,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX, Download, FileJson, FileSpreadsheet, Timer, ArrowLeft, Paperclip, File, Calendar, User, Forward } from "lucide-react";
+import { Copy, RefreshCw, Mail, Inbox, Trash2, Eye, Loader2, Shield, Clock, AlertTriangle, Globe, KeyRound, Bell, BellOff, Volume2, VolumeX, Download, FileJson, FileSpreadsheet, Timer, ArrowLeft, Paperclip, File, Calendar, User, Forward, Search, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -139,6 +139,9 @@ export default function TempMail() {
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [createdAt, setCreatedAt] = useState<number | null>(null);
   const [expiryText, setExpiryText] = useState("--:--");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [inboxes, setInboxes] = useState<MailAccount[]>([]);
+  const [activeInboxIdx, setActiveInboxIdx] = useState(0);
   const prevMsgCountRef = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const expiryRef = useRef<NodeJS.Timeout | null>(null);
@@ -281,6 +284,15 @@ export default function TempMail() {
             providerBase,
           };
           setAccount(newAccount);
+          setInboxes(prev => {
+            const exists = prev.some(a => a.address === newAccount.address);
+            if (!exists) {
+              const updated = [...prev, newAccount];
+              setActiveInboxIdx(updated.length - 1);
+              return updated;
+            }
+            return prev;
+          });
           setAutoRefresh(true);
           setCreatedAt(Date.now());
           toast.success("Temp email created successfully!");
@@ -396,6 +408,43 @@ export default function TempMail() {
     return `${Math.floor(s / 86400)}d ago`;
   };
 
+  // Switch inbox
+  const switchInbox = (idx: number) => {
+    if (idx === activeInboxIdx) return;
+    setActiveInboxIdx(idx);
+    const target = inboxes[idx];
+    if (target) {
+      setAccount(target);
+      setMessages([]);
+      setSelected(null);
+      prevMsgCountRef.current = 0;
+      setCreatedAt(Date.now());
+    }
+  };
+
+  const removeInbox = (idx: number) => {
+    if (inboxes.length <= 1) { toast.error("At least one inbox required"); return; }
+    const updated = inboxes.filter((_, i) => i !== idx);
+    setInboxes(updated);
+    const newIdx = idx >= updated.length ? updated.length - 1 : idx;
+    setActiveInboxIdx(newIdx);
+    setAccount(updated[newIdx]);
+    setMessages([]);
+    setSelected(null);
+    prevMsgCountRef.current = 0;
+  };
+
+  // Filtered messages
+  const filteredMessages = searchQuery.trim()
+    ? messages.filter(m => {
+        const q = searchQuery.toLowerCase();
+        return (m.subject || "").toLowerCase().includes(q) ||
+               (m.from?.address || "").toLowerCase().includes(q) ||
+               (m.from?.name || "").toLowerCase().includes(q) ||
+               (m.intro || "").toLowerCase().includes(q);
+      })
+    : messages;
+
   return (
     <ToolLayout title="Temp Mail" description="Get a real temporary disposable email address instantly — receive OTPs, verification codes & more">
       <div className="space-y-4 max-w-2xl mx-auto">
@@ -464,6 +513,64 @@ export default function TempMail() {
             </div>
           </motion.div>
         )}
+
+        {/* Multiple Inboxes */}
+        {inboxes.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {inboxes.map((inbox, idx) => (
+              <button
+                key={inbox.address}
+                onClick={() => switchInbox(idx)}
+                className={`relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
+                  idx === activeInboxIdx
+                    ? "bg-primary/15 text-primary border border-primary/30 font-bold"
+                    : "bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted"
+                }`}
+              >
+                <Mail className="w-3 h-3" />
+                <span className="font-mono">{inbox.address.split("@")[0].slice(0, 6)}@{inbox.address.split("@")[1]}</span>
+                {inboxes.length > 1 && (
+                  <span
+                    onClick={(e) => { e.stopPropagation(); removeInbox(idx); }}
+                    className="ml-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-destructive/20 hover:text-destructive transition-colors"
+                  >
+                    <X className="w-2.5 h-2.5" />
+                  </span>
+                )}
+              </button>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => createAccount()}
+              disabled={creating || inboxes.length >= 5}
+              className="rounded-xl text-[10px] sm:text-xs gap-1 h-7 sm:h-8 px-2 sm:px-3 shrink-0"
+            >
+              {creating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+              <span className="hidden sm:inline">Add Inbox</span>
+            </Button>
+          </div>
+        )}
+
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by subject, sender, or content..."
+            className="w-full h-9 sm:h-10 pl-9 pr-8 rounded-xl text-xs sm:text-sm bg-muted/50 border border-border/50 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 outline-none transition-all placeholder:text-muted-foreground/50"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-muted-foreground/20 flex items-center justify-center hover:bg-muted-foreground/30 transition-colors"
+            >
+              <X className="w-2.5 h-2.5 text-muted-foreground" />
+            </button>
+          )}
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
@@ -690,7 +797,7 @@ export default function TempMail() {
                 <p className="font-bold text-sm">Creating your temp email...</p>
                 <p className="text-xs mt-1">This may take a few seconds</p>
               </motion.div>
-            ) : messages.length === 0 ? (
+            ) : filteredMessages.length === 0 && messages.length === 0 ? (
               <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="flex flex-col items-center justify-center h-[350px] text-muted-foreground/50">
                 <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 2, repeat: Infinity }}>
@@ -704,10 +811,20 @@ export default function TempMail() {
                   <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }} className="w-2 h-2 rounded-full bg-primary" />
                 </div>
               </motion.div>
+            ) : filteredMessages.length === 0 && searchQuery ? (
+              <motion.div key="no-results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center h-[350px] text-muted-foreground/50">
+                <Search className="w-10 h-10 mb-3 text-muted-foreground/20" />
+                <p className="font-bold text-sm">No results found</p>
+                <p className="text-xs mt-1">Try a different search term</p>
+                <Button variant="outline" size="sm" className="mt-3 rounded-xl text-xs" onClick={() => setSearchQuery("")}>
+                  Clear Search
+                </Button>
+              </motion.div>
             ) : (
               <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="divide-y divide-border/20">
-                {messages.map((m, i) => {
+                {filteredMessages.map((m, i) => {
                   const otp = extractOTP(m.subject || "") || extractOTP(m.intro || "");
                   const isUnread = !m.seen;
                   return (
