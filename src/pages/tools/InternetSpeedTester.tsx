@@ -580,42 +580,38 @@ export default function InternetSpeedTester() {
 
     let raf = 0;
     const phaseStart = performance.now();
-    let smoothed = 0;
+    smoothedRef.current = 0;
 
     const tick = (now: number) => {
       const elapsed = now - phaseStart;
+      const target = liveSpeedRef.current;
 
       setDisplaySpeed((prev) => {
-        const target = liveSpeedRef.current;
-
         if (phase === "resetting") {
-          // Ultra-smooth exponential decay with ease-out
           if (prev <= 0.08) return 0;
-          const t = Math.min(elapsed / 3000, 1);
-          const easedFactor = 0.97 - t * 0.06; // accelerates decay over time
+          const t = Math.min(elapsed / 3500, 1);
+          const easedFactor = 0.98 - t * 0.05;
           return +Math.max(0, prev * easedFactor).toFixed(2);
         }
 
         if (target > 0.35) {
-          // Very gentle spring-like interpolation
-          const diff = target - prev;
-          const lerpFactor = 0.025 + Math.abs(diff) * 0.0003; // adaptive: faster when far, slower when close
-          smoothed = prev + diff * Math.min(lerpFactor, 0.08);
+          // Ultra-gentle lerp with adaptive factor — key to smooth needle
+          const diff = target - smoothedRef.current;
+          const lerpFactor = 0.018 + Math.abs(diff) * 0.00015;
+          smoothedRef.current += diff * Math.min(lerpFactor, 0.06);
 
-          // Organic micro-oscillation (like a real needle)
-          const breathe = Math.sin(elapsed / 700) * Math.min(target * 0.015, 0.8);
-          const tremor = Math.sin(elapsed / 200) * Math.min(target * 0.005, 0.3);
-          return +Math.max(0.1, smoothed + breathe + tremor).toFixed(2);
+          // Organic micro-oscillation
+          const breathe = Math.sin(elapsed / 800) * Math.min(target * 0.012, 0.6);
+          const tremor = Math.sin(elapsed / 250) * Math.min(target * 0.004, 0.2);
+          return +Math.max(0.1, smoothedRef.current + breathe + tremor).toFixed(2);
         }
 
-        // Synthetic sweep while waiting for data — gentle sine wave
-        const peak = phase === "download" ? 30 : 18;
-        // Slow breathing sweep
-        const wave1 = peak * 0.5 * (1 + Math.sin((elapsed / 1200) - Math.PI / 2));
-        const wave2 = peak * 0.08 * Math.sin(elapsed / 450);
-        const combined = wave1 + wave2;
+        // Synthetic sweep — very slow breathing wave
+        const peak = phase === "download" ? 25 : 15;
+        const wave = peak * 0.5 * (1 + Math.sin((elapsed / 1500) - Math.PI / 2));
+        const ripple = peak * 0.06 * Math.sin(elapsed / 500);
         // Smooth transition from previous value
-        const eased = prev + (combined - prev) * 0.03;
+        const eased = prev + (wave + ripple - prev) * 0.02;
         return +Math.max(0.2, eased).toFixed(2);
       });
 
