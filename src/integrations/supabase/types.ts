@@ -260,6 +260,48 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_gateways: {
+        Row: {
+          account_name: string
+          account_number: string
+          color: string
+          created_at: string
+          display_order: number
+          gateway_id: string
+          id: string
+          instructions: string
+          is_enabled: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          account_name?: string
+          account_number?: string
+          color?: string
+          created_at?: string
+          display_order?: number
+          gateway_id: string
+          id?: string
+          instructions?: string
+          is_enabled?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          color?: string
+          created_at?: string
+          display_order?: number
+          gateway_id?: string
+          id?: string
+          instructions?: string
+          is_enabled?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_requests: {
         Row: {
           admin_note: string
@@ -428,9 +470,13 @@ export type Database = {
           is_popular: boolean
           name: string
           price_annual: number
+          price_annual_bdt: number
           price_lifetime: number
+          price_lifetime_bdt: number
           price_monthly: number
+          price_monthly_bdt: number
           price_semi_annual: number
+          price_semi_annual_bdt: number
           updated_at: string
         }
         Insert: {
@@ -445,9 +491,13 @@ export type Database = {
           is_popular?: boolean
           name: string
           price_annual?: number
+          price_annual_bdt?: number
           price_lifetime?: number
+          price_lifetime_bdt?: number
           price_monthly?: number
+          price_monthly_bdt?: number
           price_semi_annual?: number
+          price_semi_annual_bdt?: number
           updated_at?: string
         }
         Update: {
@@ -462,9 +512,13 @@ export type Database = {
           is_popular?: boolean
           name?: string
           price_annual?: number
+          price_annual_bdt?: number
           price_lifetime?: number
+          price_lifetime_bdt?: number
           price_monthly?: number
+          price_monthly_bdt?: number
           price_semi_annual?: number
+          price_semi_annual_bdt?: number
           updated_at?: string
         }
         Relationships: []
