@@ -3,7 +3,7 @@ import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, RefreshCw, Phone, MessageSquare, Trash2, Globe, Shield, Clock, Signal, Smartphone, Search, X, Check, KeyRound, ArrowLeft, Volume2, VolumeX, Bell, BellOff, Download, FileJson, FileSpreadsheet, Eye } from "lucide-react";
+import { Copy, RefreshCw, Phone, MessageSquare, Trash2, Globe, Shield, Clock, Signal, Smartphone, Search, X, Check, KeyRound, ArrowLeft, Volume2, VolumeX, Bell, BellOff, Download, FileJson, FileSpreadsheet, Eye, Plus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 // ── Helpers ──
@@ -62,8 +62,9 @@ const countryFlags: Record<string, string> = {
 };
 function getFlag(country: string) { return countryFlags[country.toLowerCase()] || "🌍"; }
 
-interface NumberInfo { number: string; country: string; slug: string; }
+interface NumberInfo { number: string; country: string; slug: string; source?: string; pageUrl?: string; }
 interface SMSMessage { id: string; message: string; sender: string; time: string; }
+interface CountryPage { country: string; url: string; count: number; code: string; }
 
 async function callAPI(action: string, params: Record<string, string> = {}) {
   const { data, error } = await supabase.functions.invoke("temp-number", { body: { action, ...params } });
@@ -89,6 +90,9 @@ export default function TempNumber() {
   const prevMsgCountRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const copyResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [countryPages, setCountryPages] = useState<CountryPage[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadedCountries, setLoadedCountries] = useState<Set<string>>(new Set());
 
   // Copy effect
   const triggerCopy = useCallback((key: string) => {
@@ -126,7 +130,12 @@ export default function TempNumber() {
     if (!activeNumber) return;
     setRefreshing(true);
     try {
-      const data = await callAPI("getMessages", { numberSlug: activeNumber.slug });
+      const params: Record<string, string> = { numberSlug: activeNumber.slug };
+      if (activeNumber.source === "receivesms-co" && activeNumber.pageUrl) {
+        params.source = "receivesms-co";
+        params.pageUrl = activeNumber.pageUrl;
+      }
+      const data = await callAPI("getMessages", params);
       const msgs: SMSMessage[] = data?.messages || [];
       if (msgs.length > prevMsgCountRef.current && prevMsgCountRef.current > 0) {
         if (soundEnabled) playNotifSound();
@@ -144,8 +153,37 @@ export default function TempNumber() {
     }
   }, [activeNumber, soundEnabled, notifEnabled]);
 
+  // Fetch country pages list
+  const fetchCountryPages = useCallback(async () => {
+    try {
+      const data = await callAPI("getCountryList");
+      setCountryPages(data?.countries || []);
+    } catch {}
+  }, []);
+
+  // Load more numbers from a specific country
+  const loadMoreNumbers = useCallback(async (cp: CountryPage) => {
+    setLoadingMore(true);
+    try {
+      const data = await callAPI("getCountryNumbers", { countryUrl: cp.url, countryName: cp.country });
+      const newNums: NumberInfo[] = data?.numbers || [];
+      if (newNums.length === 0) { toast.error("No additional numbers found"); return; }
+      setNumbers(prev => {
+        const existingSlugs = new Set(prev.map(n => n.slug));
+        const unique = newNums.filter(n => !existingSlugs.has(n.slug));
+        return [...prev, ...unique];
+      });
+      setLoadedCountries(prev => new Set(prev).add(cp.country));
+      toast.success(`${newNums.length} numbers loaded for ${cp.country}!`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to load more numbers");
+    } finally {
+      setLoadingMore(false);
+    }
+  }, []);
+
   // Initial load
-  useEffect(() => { fetchNumbers(); }, []);
+  useEffect(() => { fetchNumbers(); fetchCountryPages(); }, []);
 
   // Fetch messages when number changes
   useEffect(() => {
@@ -284,11 +322,54 @@ export default function TempNumber() {
                   <span className="text-base">{getFlag(n.country)}</span>
                   <div className="flex-1 min-w-0">
                     <p className="font-mono text-xs sm:text-sm font-bold truncate">{n.number}</p>
-                    <p className="text-[9px] sm:text-[10px] text-muted-foreground">{n.country}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground flex items-center gap-1">
+                      {n.country}
+                      {n.source === "receivesms-co" && <span className="text-[7px] px-1 py-0 rounded bg-primary/10 text-primary font-bold">NEW</span>}
+                    </p>
                   </div>
                   {n.slug === activeNumber?.slug && <Signal className="w-3 h-3 text-primary shrink-0" />}
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* Load More from Country */}
+          {countryPages.length > 0 && (
+            <div className="mt-2">
+              <p className="text-[10px] text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
+                <Plus className="w-3 h-3" /> Load more numbers by country:
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {countryPages
+                  .filter(cp => cp.count > 0)
+                  .sort((a, b) => b.count - a.count)
+                  .slice(0, 20)
+                  .map(cp => {
+                    const alreadyLoaded = loadedCountries.has(cp.country);
+                    return (
+                      <button
+                        key={cp.url}
+                        disabled={loadingMore || alreadyLoaded}
+                        onClick={() => loadMoreNumbers(cp)}
+                        className={`px-2 py-1 rounded-lg text-[10px] sm:text-xs font-medium transition-all whitespace-nowrap flex items-center gap-1 ${
+                          alreadyLoaded
+                            ? "bg-primary/10 text-primary/50 border border-primary/20 cursor-default"
+                            : "bg-accent/50 text-muted-foreground border border-transparent hover:bg-primary/10 hover:text-primary hover:border-primary/20"
+                        }`}
+                      >
+                        {getFlag(cp.country)} {cp.country}
+                        <span className="text-[8px] opacity-60">({cp.count})</span>
+                        {alreadyLoaded && <Check className="w-2.5 h-2.5" />}
+                      </button>
+                    );
+                  })}
+              </div>
+              {loadingMore && (
+                <div className="flex items-center gap-2 mt-2 text-xs text-primary">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span className="font-medium">Loading numbers...</span>
+                </div>
+              )}
             </div>
           )}
         </div>
