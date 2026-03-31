@@ -672,16 +672,61 @@ export default function StudentIdCard() {
     drawFront(0);
   }, [name, studentId, department, institution, session, blood, phone, email, dob, fatherName, motherName, address, emergencyContact, theme, photo, showBack, validUntil]);
 
-  const downloadCard = () => {
+  const getCardCanvas = (side: "front" | "back" | "both"): HTMLCanvasElement | null => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+    const W = 920, CH = 560;
+    const scale = 2;
+
+    if (side === "both") return canvas;
+
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = W * scale;
+    tempCanvas.height = CH * scale;
+    const tCtx = tempCanvas.getContext("2d");
+    if (!tCtx) return null;
+
+    const srcY = side === "front" ? 0 : (CH + 50) * scale;
+    tCtx.drawImage(canvas, 0, srcY, W * scale, CH * scale, 0, 0, W * scale, CH * scale);
+    return tempCanvas;
+  };
+
+  const downloadAs = (side: "front" | "back" | "both", format: "png" | "jpg" | "pdf") => {
     generate();
-    setTimeout(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const a = document.createElement("a");
-      a.download = `student-id-${studentId}.png`;
-      a.href = canvas.toDataURL("image/png");
-      a.click();
-      toast.success("Student ID Card downloaded!");
+    setTimeout(async () => {
+      const src = getCardCanvas(side);
+      if (!src) return;
+
+      const filename = `student-id-${side}-${studentId}`;
+
+      if (format === "png") {
+        const a = document.createElement("a");
+        a.download = `${filename}.png`;
+        a.href = src.toDataURL("image/png");
+        a.click();
+      } else if (format === "jpg") {
+        const a = document.createElement("a");
+        a.download = `${filename}.jpg`;
+        a.href = src.toDataURL("image/jpeg", 0.95);
+        a.click();
+      } else if (format === "pdf") {
+        const imgData = src.toDataURL("image/png");
+        const imgBytes = await fetch(imgData).then(r => r.arrayBuffer());
+        const pdfDoc = await PDFDocument.create();
+        const pngImage = await pdfDoc.embedPng(imgBytes);
+        const { width, height } = pngImage.scale(0.5);
+        const page = pdfDoc.addPage([width, height]);
+        page.drawImage(pngImage, { x: 0, y: 0, width, height });
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: "application/pdf" });
+        const a = document.createElement("a");
+        a.download = `${filename}.pdf`;
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+
+      toast.success(`${side === "both" ? "Full card" : side === "front" ? "Front side" : "Back side"} downloaded as ${format.toUpperCase()}!`);
     }, 500);
   };
 
