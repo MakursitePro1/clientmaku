@@ -1,209 +1,77 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowUpRight, Sparkles, Grid3X3, BookOpen, Shield, Info, Facebook, Twitter, Instagram, Youtube, Github, Globe, Mail, Heart } from "lucide-react";
+import { ArrowUpRight, Sparkles, Globe, Heart } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
-import { useToolCatalog } from "@/contexts/ToolCatalogContext";
-
-const navLinks = [
-  { name: "Category", path: "/categories", icon: Grid3X3 },
-  { name: "About", hash: "about", icon: Info },
-  { name: "Blog", path: "/blog", icon: BookOpen },
-  { name: "Policy", path: "/policy", icon: Shield },
-];
-
-const socialLinks = [
-  { name: "Facebook", icon: Facebook, url: "https://facebook.com", color: "hover:text-blue-500 hover:border-blue-500/30 hover:bg-blue-500/10 hover:shadow-blue-500/20" },
-  { name: "Twitter", icon: Twitter, url: "https://twitter.com", color: "hover:text-sky-400 hover:border-sky-400/30 hover:bg-sky-400/10 hover:shadow-sky-400/20" },
-  { name: "Instagram", icon: Instagram, url: "https://instagram.com", color: "hover:text-pink-500 hover:border-pink-500/30 hover:bg-pink-500/10 hover:shadow-pink-500/20" },
-  { name: "Youtube", icon: Youtube, url: "https://youtube.com", color: "hover:text-red-500 hover:border-red-500/30 hover:bg-red-500/10 hover:shadow-red-500/20" },
-  { name: "GitHub", icon: Github, url: "https://github.com", color: "hover:text-foreground hover:border-foreground/30 hover:bg-foreground/10 hover:shadow-foreground/20" },
-];
 
 export function Footer() {
   const navigate = useNavigate();
   const { settings } = useSiteSettings();
-  const { totalTools, totalCategories } = useToolCatalog();
-  const footerText = (settings.footer_text || `${totalTools} free, fast, and powerful web tools across ${totalCategories} categories for developers, designers, and everyone. Built with ❤️ for the community.`)
-    .replace(/\b\d+\+?\s*free,\s*fast,\s*and\s*powerful\s*web\s*tools/gi, `${totalTools} free, fast, and powerful web tools`)
-    .replace(/\b\d+\+?\s*free\s*tools/gi, `${totalTools} free tools`)
-    .replace(/\b\d+\+?\s*tools/gi, `${totalTools} tools`)
-    .replace(/\bacross\s+\d+\+?\s*categories/gi, `across ${totalCategories} categories`)
-    .replace(/\b\d+\+?\s*categories/gi, `${totalCategories} categories`);
-
-  const handleNav = (link: typeof navLinks[0]) => {
-    if (link.path) {
-      navigate(link.path);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else if (link.hash) {
-      if (window.location.pathname !== "/") {
-        navigate("/");
-        setTimeout(() => {
-          const el = document.getElementById(link.hash!);
-          if (el) el.scrollIntoView({ behavior: "smooth" });
-        }, 200);
-      } else {
-        const el = document.getElementById(link.hash!);
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  };
 
   return (
-    <footer className="relative px-4 pb-8 pt-6">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] max-w-3xl h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+    <footer className="relative px-4 pb-6 pt-4">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] max-w-md h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-      <div className="max-w-6xl mx-auto">
-        <div className="relative rounded-3xl border-2 border-primary/15 bg-card/60 backdrop-blur-2xl overflow-hidden shadow-2xl shadow-primary/5">
-          {/* Ambient glow effects */}
-          <div className="absolute top-0 left-0 w-[300px] h-[200px] bg-primary/[0.04] rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute bottom-0 right-0 w-[250px] h-[200px] bg-pink-500/[0.04] rounded-full blur-[100px] pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[200px] bg-primary/[0.02] rounded-full blur-[120px] pointer-events-none" />
+      <div className="max-w-3xl mx-auto">
+        <div className="relative rounded-2xl border border-primary/10 bg-card/60 backdrop-blur-xl overflow-hidden shadow-lg shadow-primary/5">
+          <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
-          {/* Top gradient line */}
-          <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          <div className="relative z-10 px-5 sm:px-8 py-5 sm:py-6">
+            {/* Top row: logo + nav links */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+              <Link to="/" className="flex items-center gap-2 group">
+                <img
+                  src={settings.site_logo_url || "/logo.png"}
+                  alt={settings.site_name}
+                  className="w-8 h-8 rounded-xl object-cover shadow-md shadow-primary/15 ring-1 ring-primary/10"
+                />
+                <span className="text-sm font-extrabold tracking-tight">
+                  <span className="gradient-text">{settings.navbar_brand_text}</span>
+                  <span className="text-foreground"> {settings.navbar_brand_accent}</span>
+                </span>
+              </Link>
 
-          <div className="relative z-10 px-6 sm:px-10 lg:px-14 py-10 sm:py-12">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
-
-              {/* Brand Column */}
-              <div className="md:col-span-5 flex flex-col gap-4">
-                <Link to="/" className="flex items-center gap-3 group w-fit">
-                  {settings.site_logo_url ? (
-                    <img
-                      src={settings.site_logo_url}
-                      alt={settings.site_name}
-                      className="w-12 h-12 rounded-2xl object-cover shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow ring-2 ring-primary/10 group-hover:ring-primary/30"
-                    />
-                  ) : (
-                    <img
-                      src="/logo.png"
-                      alt={settings.site_name}
-                      className="w-12 h-12 rounded-2xl object-cover shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow ring-2 ring-primary/10 group-hover:ring-primary/30"
-                    />
-                  )}
-                  <div>
-                    <span className="text-xl font-extrabold tracking-tight block">
-                      <span className="gradient-text">{settings.navbar_brand_text}</span>
-                      <span className="text-foreground"> {settings.navbar_brand_accent}</span>
-                    </span>
-                    <span className="text-[10px] text-muted-foreground/50 font-medium tracking-wider uppercase">{settings.site_tagline}</span>
-                  </div>
-                </Link>
-                <p className="text-sm text-muted-foreground/70 max-w-xs leading-relaxed">
-                  {footerText}
-                </p>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-xs font-semibold text-primary">
-                    <Sparkles className="w-3 h-3" /> {totalTools} Tools
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-xs font-semibold text-primary">
-                    <Grid3X3 className="w-3 h-3" /> {totalCategories} Categories
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/50 border border-border/40 text-xs font-semibold text-foreground/80">
-                    100% Free
-                  </span>
-                </div>
-
-                {/* Social Media Links */}
-                <div className="flex items-center gap-2 mt-2">
-                  {socialLinks.map((social) => (
-                    <a
-                      key={social.name}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title={social.name}
-                      className={`w-9 h-9 rounded-xl border border-border/30 bg-accent/30 flex items-center justify-center text-muted-foreground/60 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 ${social.color}`}
-                    >
-                      <social.icon className="w-4 h-4" />
-                    </a>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quick Links */}
-              <div className="md:col-span-3">
-                <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-5">Navigate</h3>
-                <nav className="flex flex-col gap-1">
-                  {navLinks.map((link) => (
-                    <button
-                      key={link.name}
-                      onClick={() => handleNav(link)}
-                      className="group flex items-center gap-3 px-3 py-2.5 -ml-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all text-left"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center group-hover:bg-primary/10 group-hover:border-primary/20 transition-all">
-                        <link.icon className="w-3.5 h-3.5 text-primary/70 group-hover:text-primary transition-colors" />
-                      </div>
-                      {link.name}
-                      <ArrowUpRight className="w-3 h-3 ml-auto opacity-0 -translate-y-0.5 translate-x-0.5 group-hover:opacity-50 group-hover:translate-y-0 group-hover:translate-x-0 transition-all" />
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              {/* CTA Column */}
-              <div className="md:col-span-4">
-                <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-5">Get Started</h3>
-                <p className="text-sm text-muted-foreground/60 mb-4 leading-relaxed">
-                  Explore our massive collection of free tools. No signup required for most tools — just open and use!
-                </p>
-                <div className="flex flex-col gap-2">
+              <nav className="flex items-center gap-1 flex-wrap justify-center">
+                {[
+                  { name: "Tools", path: "/tools" },
+                  { name: "Blog", path: "/blog" },
+                  { name: "About", path: "/about" },
+                  { name: "Policy", path: "/policy" },
+                ].map(link => (
                   <Link
-                    to="/tools"
-                    className="group flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-primary/10 border border-primary/20 text-sm font-semibold text-primary hover:bg-primary/20 hover:border-primary/30 transition-all"
+                    key={link.name}
+                    to={link.path}
+                    className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
                   >
-                    <Sparkles className="w-4 h-4" />
-                    Explore All Tools
-                    <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    {link.name}
                   </Link>
-                  <Link
-                    to="/categories"
-                    className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-border/30 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
-                  >
-                    <Grid3X3 className="w-4 h-4" />
-                    Browse Categories
-                  </Link>
-                </div>
-
-                {/* Newsletter-style contact */}
-                <div className="mt-4 flex items-center gap-2 px-3 py-2.5 rounded-xl border border-border/20 bg-accent/20">
-                  <Mail className="w-4 h-4 text-muted-foreground/50 shrink-0" />
-                  <span className="text-xs text-muted-foreground/60">Have questions? Reach us anytime!</span>
-                </div>
-              </div>
+                ))}
+              </nav>
             </div>
 
-            {/* Bottom Bar */}
-            <div className="mt-10 pt-6 border-t border-border/20">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-xs text-muted-foreground/50 flex items-center gap-1.5">
-                  {settings.footer_copyright || "All rights reserved by"} <span className="font-semibold gradient-text">{settings.site_name}</span>
-                </p>
+            {/* Divider */}
+            <div className="my-4 h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
 
-                {/* Makursite.com credit */}
-                <a
-                  href="https://www.makursite.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/40 to-primary/10 border border-primary/20 hover:border-primary/40 transition-all duration-500 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-primary/70 group-hover:text-primary transition-colors" />
-                    <span className="text-[11px] text-muted-foreground/70">Designed & Developed by</span>
-                  </div>
-                  <span className="text-xs font-extrabold gradient-text group-hover:opacity-90 transition-opacity flex items-center gap-1.5">
-                    <Sparkles className="w-3 h-3 text-primary animate-pulse" />
-                    Makursite.com
-                    <ArrowUpRight className="w-3 h-3 opacity-50 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </span>
-                </a>
-              </div>
+            {/* Bottom: copyright + credit */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <p className="text-[11px] text-muted-foreground/50 flex items-center gap-1">
+                {settings.footer_copyright || "© 2024"} <span className="font-semibold gradient-text">{settings.site_name}</span>
+                <span className="mx-1">·</span>
+                Made with <Heart className="w-2.5 h-2.5 text-red-400/60 fill-red-400/60" />
+              </p>
 
-              {/* Made with love line */}
-              <div className="mt-4 flex items-center justify-center">
-                <span className="text-[10px] text-muted-foreground/30 flex items-center gap-1">
-                  Made with <Heart className="w-2.5 h-2.5 text-red-400/60 fill-red-400/60" /> for the community
+              <a
+                href="https://www.makursite.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary/8 via-accent/30 to-primary/8 border border-primary/15 hover:border-primary/35 transition-all duration-500 hover:shadow-md hover:shadow-primary/10 hover:-translate-y-0.5"
+              >
+                <Globe className="w-3 h-3 text-primary/60 group-hover:text-primary transition-colors" />
+                <span className="text-[10px] text-muted-foreground/60">Designed & Developed by</span>
+                <span className="text-[11px] font-extrabold gradient-text flex items-center gap-1">
+                  <Sparkles className="w-2.5 h-2.5 text-primary animate-pulse" />
+                  Makursite.com
+                  <ArrowUpRight className="w-2.5 h-2.5 opacity-50 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </span>
-              </div>
+              </a>
             </div>
           </div>
         </div>
