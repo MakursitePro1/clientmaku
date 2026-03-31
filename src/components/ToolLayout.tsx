@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { ArrowLeft, Share2, Facebook, Twitter, Linkedin, Copy, Check, Sparkles } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft, Share2, Facebook, Twitter, Linkedin, Copy, Check, Sparkles, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 
 interface ToolLayoutProps {
   title: string;
