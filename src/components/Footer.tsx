@@ -161,7 +161,7 @@ export function Footer() {
           <div className="h-px bg-gradient-to-r from-transparent via-border/40 to-transparent" />
 
           {/* Bottom bar */}
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between py-5">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between py-3">
             <p className="text-[10px] sm:text-[11px] text-muted-foreground/35 flex items-center gap-1.5 flex-wrap justify-center">
               {settings.footer_copyright || "© 2024"}{" "}
               <span className="font-semibold gradient-text">{settings.site_name}</span>
