@@ -90,7 +90,8 @@ function parseCountryPages(html: string): CountryPage[] {
     const url = m[1];
     // Only country list pages (not individual number pages)
     if (url.includes("-phone-numbers/")) {
-      pages.push({ url, code: m[2], country: m[3].trim(), count: parseInt(m[4]) });
+      const fullUrl = url.startsWith("http") ? url : `${BASE_URL_2}${url.startsWith("/") ? "" : "/"}${url}`;
+      pages.push({ url: fullUrl, code: m[2], country: m[3].trim(), count: parseInt(m[4]) });
     }
   }
   return pages;
