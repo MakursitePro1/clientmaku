@@ -263,26 +263,42 @@ export function ToolSidebar({ currentToolId, currentCategory }: ToolSidebarProps
       </AnimatePresence>
 
       {/* Quick Stats */}
-      <div className="tool-section-card p-5">
-        <div className="flex items-center gap-2.5 mb-3">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="tool-section-card p-5 relative overflow-hidden"
+      >
+        {/* Background glow */}
+        <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-accent/10 blur-2xl pointer-events-none" />
+        
+        <div className="flex items-center gap-2.5 mb-4 relative">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary/10" style={{ boxShadow: '0 4px 12px -6px hsl(var(--primary) / 0.4)' }}>
             <Sparkles className="w-3.5 h-3.5 text-primary" />
           </div>
           <span className="text-xs font-extrabold uppercase tracking-[0.2em] text-foreground/70">Quick Stats</span>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 relative">
           {[
-            { label: "Total Tools", value: totalTools, emoji: "🛠️" },
-            { label: "Categories", value: totalCategories, emoji: "📂" },
-          ].map(s => (
-            <div key={s.label} className="tool-stat-card">
-              <div className="text-lg mb-0.5">{s.emoji}</div>
-              <div className="stat-value text-xl">{s.value}</div>
-              <div className="stat-label">{s.label}</div>
-            </div>
+            { label: "Total Tools", value: totalTools, emoji: "🛠️", gradient: "from-blue-500/15 via-indigo-500/10 to-purple-500/5", border: "border-blue-500/20", glow: "shadow-blue-500/10" },
+            { label: "Categories", value: totalCategories, emoji: "📂", gradient: "from-amber-500/15 via-orange-500/10 to-red-500/5", border: "border-amber-500/20", glow: "shadow-amber-500/10" },
+          ].map((s, i) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 + i * 0.1, type: "spring", stiffness: 300 }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              className={`group relative rounded-2xl border ${s.border} bg-gradient-to-br ${s.gradient} p-4 text-center cursor-default transition-shadow duration-300 hover:shadow-lg ${s.glow} backdrop-blur-sm`}
+            >
+              <div className="text-2xl mb-1.5 group-hover:scale-110 transition-transform duration-300">{s.emoji}</div>
+              <div className="text-2xl font-black bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">{s.value}</div>
+              <div className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider mt-0.5">{s.label}</div>
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </motion.aside>
   );
 }
