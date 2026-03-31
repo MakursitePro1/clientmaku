@@ -765,16 +765,31 @@ export default function InternetSpeedTester() {
           {/* Latency & Jitter */}
           {(ping !== null || jitter !== null) && (
             <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 12, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: "spring", stiffness: 180, damping: 18 }}
               className="mt-3 grid grid-cols-2 divide-x divide-foreground/10 rounded-xl border border-foreground/10 py-3"
             >
               <div className="flex flex-col items-center gap-0.5">
-                <span className="text-lg font-light text-foreground">{ping ?? "—"} ms</span>
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-lg font-light text-foreground"
+                >
+                  {ping ?? "—"} ms
+                </motion.span>
                 <span className="text-[11px] text-muted-foreground">Latency</span>
               </div>
               <div className="flex flex-col items-center gap-0.5">
-                <span className="text-lg font-light text-foreground">{jitter ?? "—"} ms</span>
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-lg font-light text-foreground"
+                >
+                  {jitter ?? "—"} ms
+                </motion.span>
                 <span className="text-[11px] text-muted-foreground">Jitter</span>
               </div>
             </motion.div>
