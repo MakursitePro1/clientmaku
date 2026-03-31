@@ -232,6 +232,42 @@ export default function TempMail() {
           </div>
         </motion.div>
 
+        {/* Domain Selector */}
+        {domainsLoaded && availableDomains.length > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="tool-result-card"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: "linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.05))" }}>
+                <Globe className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-1">Select Domain</p>
+                <Select value={selectedDomain} onValueChange={setSelectedDomain}>
+                  <SelectTrigger className="h-9 rounded-xl text-sm font-mono">
+                    <SelectValue placeholder="Choose domain..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableDomains.map((d) => (
+                      <SelectItem key={d.domain} value={d.domain}>
+                        @{d.domain}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => createAccount(selectedDomain)} disabled={creating || !selectedDomain}
+                className="rounded-xl text-xs gap-1 shrink-0">
+                {creating ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                Generate
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           <div className="tool-stat-card">
