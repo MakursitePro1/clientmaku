@@ -140,8 +140,16 @@ function SpeedGauge({
             <stop offset="0%" stopColor="hsl(142 76% 36%)" />
             <stop offset="100%" stopColor="hsl(160 70% 45%)" />
           </linearGradient>
-          <filter id="arcGlow2">
-            <feGaussianBlur stdDeviation="5" result="b" />
+          <filter
+            id="arcGlow2"
+            x="-24"
+            y="-24"
+            width="368"
+            height="278"
+            filterUnits="userSpaceOnUse"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur stdDeviation="4" result="b" />
             <feMerge>
               <feMergeNode in="b" />
               <feMergeNode in="SourceGraphic" />
@@ -166,14 +174,26 @@ function SpeedGauge({
 
         {/* Active arc */}
         {displayVal > 0.1 && (
-          <path
-            d={arcPath(START_ANGLE, angle, r)}
-            fill="none"
-            stroke={isGreenPhase ? "url(#gaugeUpGrad)" : "url(#gaugeDownGrad)"}
-            strokeWidth="18"
-            strokeLinecap="butt"
-            filter="url(#arcGlow2)"
-          />
+          <>
+            <path
+              d={arcPath(START_ANGLE, angle, r)}
+              fill="none"
+              stroke={isGreenPhase ? "url(#gaugeUpGrad)" : "url(#gaugeDownGrad)"}
+              strokeWidth="24"
+              strokeLinecap="butt"
+              opacity="0.18"
+              shapeRendering="geometricPrecision"
+            />
+            <path
+              d={arcPath(START_ANGLE, angle, r)}
+              fill="none"
+              stroke={isGreenPhase ? "url(#gaugeUpGrad)" : "url(#gaugeDownGrad)"}
+              strokeWidth="18"
+              strokeLinecap="butt"
+              shapeRendering="geometricPrecision"
+              filter="url(#arcGlow2)"
+            />
+          </>
         )}
 
         {/* Scale labels */}
