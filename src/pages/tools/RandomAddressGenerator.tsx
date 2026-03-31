@@ -311,12 +311,33 @@ export default function RandomAddressGenerator() {
             <h3 className="text-xs sm:text-sm font-bold">Configuration</h3>
           </div>
 
+          {/* Continent Tabs */}
+          <div className="flex flex-wrap gap-1 sm:gap-1.5">
+            <button
+              onClick={() => setActiveContinent("All")}
+              className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold transition-all border
+                ${activeContinent === "All" ? "border-primary bg-primary/15 text-primary" : "border-transparent hover:bg-muted/50 text-muted-foreground"}`}
+            >
+              🌐 All ({Object.keys(countriesData).length})
+            </button>
+            {(Object.keys(continentCountries) as ContinentKey[]).map(cont => (
+              <button
+                key={cont}
+                onClick={() => setActiveContinent(cont)}
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-semibold transition-all border
+                  ${activeContinent === cont ? "border-primary bg-primary/15 text-primary" : "border-transparent hover:bg-muted/50 text-muted-foreground"}`}
+              >
+                {continentEmojis[cont]} {cont} ({continentCountries[cont].filter(c => c in countriesData).length})
+              </button>
+            ))}
+          </div>
+
           {/* Country Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
               type="text"
-              placeholder={`Search ${Object.keys(countriesData).length}+ countries...`}
+              placeholder={`Search countries...`}
               value={countrySearch}
               onChange={e => setCountrySearch(e.target.value)}
               className="w-full pl-9 pr-3 py-2 rounded-xl tool-input-colorful text-xs sm:text-sm bg-background"
@@ -324,10 +345,8 @@ export default function RandomAddressGenerator() {
           </div>
 
           {/* Country Grid */}
-          <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-1 sm:gap-1.5 max-h-[280px] overflow-y-auto rounded-xl p-1">
-            {(Object.keys(countriesData) as CountryKey[])
-              .filter(c => !countrySearch || c.toLowerCase().includes(countrySearch.toLowerCase()))
-              .map(c => (
+          <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-1 sm:gap-1.5 max-h-[240px] overflow-y-auto rounded-xl p-1">
+            {filteredCountries.map(c => (
               <button
                 key={c}
                 onClick={() => { setCountry(c); setCountrySearch(""); }}
@@ -343,6 +362,9 @@ export default function RandomAddressGenerator() {
                 </span>
               </button>
             ))}
+            {filteredCountries.length === 0 && (
+              <div className="col-span-full text-center py-4 text-xs text-muted-foreground">No countries found</div>
+            )}
           </div>
           
           <div className="text-[10px] sm:text-xs text-muted-foreground text-center">
