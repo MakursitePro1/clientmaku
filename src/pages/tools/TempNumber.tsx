@@ -221,13 +221,17 @@ export default function TempNumber() {
     try {
       const data = await callAPI("getCountryNumbers", { countryUrl: cp.url, countryName: cp.country });
       const newNums: NumberInfo[] = data?.numbers || [];
-      if (newNums.length === 0) { toast.error("No additional numbers found"); return; }
+      if (newNums.length === 0) { toast.error(`No numbers available for ${cp.country}`); return; }
       setNumbers(prev => {
         const existingSlugs = new Set(prev.map(n => n.slug));
         const unique = newNums.filter(n => !existingSlugs.has(n.slug));
         return [...prev, ...unique];
       });
       setLoadedCountries(prev => new Set(prev).add(cp.country));
+      // Auto-select first number from this country
+      if (newNums.length > 0) {
+        selectNumber(newNums[0]);
+      }
       toast.success(`${newNums.length} numbers loaded for ${cp.country}!`);
     } catch (err: any) {
       toast.error(err.message || "Failed to load more numbers");
