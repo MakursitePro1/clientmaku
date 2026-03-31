@@ -374,6 +374,7 @@ export default function TempMail() {
                   </Button>
                 </div>
                 <h3 className="font-bold text-lg leading-tight">{selected.subject || "(No Subject)"}</h3>
+                <OTPBanner text={selected.text || selected.intro || ""} subject={selected.subject} />
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                   <span>From: <strong className="text-foreground">{selected.from?.name || selected.from?.address}</strong></span>
                   <span>•</span>
