@@ -723,24 +723,24 @@ export default function TempMail() {
                         <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full bg-primary" />
                       )}
 
-                      <div className="flex items-start gap-3">
+                       <div className="flex items-start gap-2.5 sm:gap-3">
                         {/* Avatar */}
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-sm font-bold ${isUnread ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 text-xs sm:text-sm font-bold ${isUnread ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
                           {(m.from?.name || m.from?.address || "?")[0].toUpperCase()}
                         </div>
 
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2 mb-0.5">
-                            <span className={`text-sm truncate ${isUnread ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>
+                            <span className={`text-xs sm:text-sm truncate ${isUnread ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>
                               {m.from?.name || m.from?.address || "Unknown"}
                             </span>
-                            <span className="text-[10px] text-muted-foreground/50 shrink-0 tabular-nums">{timeDiff(m.createdAt)}</span>
+                            <span className="text-[9px] sm:text-[10px] text-muted-foreground/50 shrink-0 tabular-nums">{timeDiff(m.createdAt)}</span>
                           </div>
-                          <p className={`text-xs truncate mb-0.5 ${isUnread ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
+                          <p className={`text-[11px] sm:text-xs truncate mb-0.5 ${isUnread ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
                             {m.subject || "(No Subject)"}
                           </p>
-                          <p className="text-[11px] text-muted-foreground/50 truncate leading-relaxed">{m.intro}</p>
+                          <p className="text-[10px] sm:text-[11px] text-muted-foreground/50 truncate leading-relaxed">{m.intro}</p>
 
                           {/* OTP Banner inline */}
                           {otp && (
