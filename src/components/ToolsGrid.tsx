@@ -193,8 +193,18 @@ export function ToolsGrid() {
                   transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.5), type: "spring", stiffness: 120 }}
                 >
                   <Link
-                    to={tool.path}
-                    className="group relative block rounded-2xl overflow-hidden h-full border-[3px] border-primary/40 transition-all duration-500 hover:-translate-y-3 hover:border-primary/70"
+                    to={isToolLocked(tool.id) ? "#" : tool.path}
+                    onClick={(e) => {
+                      if (isToolLocked(tool.id)) {
+                        e.preventDefault();
+                        navigate("/pricing");
+                        toast.info("This is a premium tool. Subscribe to unlock!");
+                      }
+                    }}
+                    className={cn(
+                      "group relative block rounded-2xl overflow-hidden h-full border-[3px] transition-all duration-500 hover:-translate-y-3",
+                      isToolLocked(tool.id) ? "border-amber-500/40 hover:border-amber-500/70" : "border-primary/40 hover:border-primary/70"
+                    )}
                     style={{
                       boxShadow: `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}`,
                       '--tool-color': tool.color,
@@ -202,7 +212,13 @@ export function ToolsGrid() {
                     onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 25px 60px -12px ${tool.color.replace(')', ' / 0.25)')}, 0 8px 20px -8px ${tool.color.replace(')', ' / 0.15)')}`; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px -5px ${tool.color.replace(')', ' / 0.08)')}`; }}
                   >
-                    
+                    {/* Premium Badge */}
+                    {premiumToolIds.includes(tool.id) && (
+                      <div className="absolute top-2 right-2 z-20 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold shadow-lg shadow-amber-500/30">
+                        <Crown className="w-3 h-3" />
+                        {isToolLocked(tool.id) ? <Lock className="w-3 h-3" /> : "PRO"}
+                      </div>
+                    )}
                     <div className="absolute inset-[1.5px] rounded-2xl bg-card/98 backdrop-blur-md" />
 
                     {/* Continuous shine sweep animation */}
