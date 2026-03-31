@@ -784,7 +784,7 @@ export default function TempMail() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 rounded-lg text-[11px] gap-1.5 font-semibold hover:bg-accent"
+                          className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 sm:gap-1.5 font-semibold hover:bg-accent px-2 sm:px-3"
                           onClick={(e) => {
                             e.stopPropagation();
                             viewMessage(m);
