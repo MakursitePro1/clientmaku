@@ -806,7 +806,7 @@ export default function TempMail() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 rounded-lg text-[11px] gap-1.5 text-destructive/70 hover:text-destructive hover:bg-destructive/10 ml-auto"
+                          className="h-6 sm:h-7 rounded-lg text-[10px] sm:text-[11px] gap-1 text-destructive/70 hover:text-destructive hover:bg-destructive/10 ml-auto px-1.5 sm:px-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             deleteMessage(m.id);
