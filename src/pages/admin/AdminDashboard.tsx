@@ -103,12 +103,12 @@ export default function AdminDashboard() {
         supabase.from("payment_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("payment_requests").select("amount").eq("status", "approved"),
         supabase.from("payment_requests").select("amount, status, created_at, payment_method").order("created_at", { ascending: false }).limit(5),
-        // Visitor analytics
-        supabase.from("page_views").select("id", { count: "exact", head: true }),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", weekAgo.toISOString()),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()),
-        supabase.from("page_views").select("page_path, created_at").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
+        // Visitor analytics - fetch visitor_id for unique counting
+        supabase.from("page_views").select("visitor_id").limit(1000),
+        supabase.from("page_views").select("visitor_id").gte("created_at", todayStart.toISOString()).limit(1000),
+        supabase.from("page_views").select("visitor_id").gte("created_at", weekAgo.toISOString()).limit(1000),
+        supabase.from("page_views").select("visitor_id").gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()).limit(1000),
+        supabase.from("page_views").select("page_path, created_at, visitor_id").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
       ]);
 
       const allProfiles = allProfilesRes.data || [];
@@ -175,26 +175,36 @@ export default function AdminDashboard() {
       // Revenue
       const totalRevenue = (approvedPayRes.data || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
 
-      // Visitor analytics processing
+      // Visitor analytics - count unique visitors by visitor_id
+      const countUnique = (data: any[] | null) => {
+        if (!data) return 0;
+        const ids = new Set(data.map((v: any) => v.visitor_id).filter(Boolean));
+        // Count entries without visitor_id as individual views
+        const noIdCount = (data || []).filter((v: any) => !v.visitor_id).length;
+        return ids.size + noIdCount;
+      };
+
       const allViews = allViewsRes.data || [];
       const pageCounts: Record<string, number> = {};
-      const viewsByDay: Record<string, number> = {};
+      const viewsByDay: Record<string, Set<string>> = {};
       for (let i = 29; i >= 0; i--) {
         const d = new Date(now);
         d.setDate(d.getDate() - i);
-        viewsByDay[d.toLocaleDateString("en", { month: "short", day: "numeric" })] = 0;
+        viewsByDay[d.toLocaleDateString("en", { month: "short", day: "numeric" })] = new Set();
       }
       allViews.forEach((v: any) => {
         pageCounts[v.page_path] = (pageCounts[v.page_path] || 0) + 1;
         const d = new Date(v.created_at);
         const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
-        if (key in viewsByDay) viewsByDay[key]++;
+        if (key in viewsByDay) {
+          viewsByDay[key].add(v.visitor_id || v.created_at);
+        }
       });
       const topPages = Object.entries(pageCounts)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 8)
         .map(([name, views]) => ({ name: name === "/" ? "Home" : name.replace("/tools/", "").replace("/", ""), views }));
-      const viewsOverTime = Object.entries(viewsByDay).map(([date, views]) => ({ date, views }));
+      const viewsOverTime = Object.entries(viewsByDay).map(([date, set]) => ({ date, views: set.size }));
 
       setStats({
         users: profilesRes.count || 0,
@@ -218,10 +228,10 @@ export default function AdminDashboard() {
         usersLastWeek,
         favsThisWeek,
         favsLastWeek,
-        totalViews: totalViewsRes.count || 0,
-        viewsToday: viewsTodayRes.count || 0,
-        viewsThisWeek: viewsWeekRes.count || 0,
-        viewsLastWeek: viewsLastWeekRes.count || 0,
+        totalViews: countUnique(totalViewsRes.data),
+        viewsToday: countUnique(viewsTodayRes.data),
+        viewsThisWeek: countUnique(viewsWeekRes.data),
+        viewsLastWeek: countUnique(viewsLastWeekRes.data),
         topPages,
         viewsOverTime,
       });
