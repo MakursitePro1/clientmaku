@@ -12,6 +12,20 @@ function getVisitorId(): string {
   return id;
 }
 
+async function getCountry(): Promise<string> {
+  try {
+    const cached = sessionStorage.getItem("cv_country");
+    if (cached) return cached;
+    const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(3000) });
+    const data = await res.json();
+    const country = data.country_name || "";
+    if (country) sessionStorage.setItem("cv_country", country);
+    return country;
+  } catch {
+    return "";
+  }
+}
+
 export function usePageTracker() {
   const location = useLocation();
   const lastPath = useRef("");
@@ -25,11 +39,14 @@ export function usePageTracker() {
 
     const visitorId = getVisitorId();
 
-    supabase.from("page_views").insert({
-      page_path: path,
-      referrer: document.referrer || "",
-      user_agent: navigator.userAgent || "",
-      visitor_id: visitorId,
-    } as any).then(() => {});
+    getCountry().then((country) => {
+      supabase.from("page_views").insert({
+        page_path: path,
+        referrer: document.referrer || "",
+        user_agent: navigator.userAgent || "",
+        visitor_id: visitorId,
+        country: country || "",
+      } as any).then(() => {});
+    });
   }, [location.pathname]);
 }
