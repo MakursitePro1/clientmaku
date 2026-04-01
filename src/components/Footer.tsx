@@ -21,6 +21,7 @@ const quickLinks = [
 const resourceLinks = [
   { name: "About", path: "/about" },
   { name: "FAQ", path: "/faq" },
+  { name: "Contact", path: "/contact" },
   { name: "Policy", path: "/policy" },
 ];
 
