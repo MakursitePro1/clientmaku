@@ -118,8 +118,8 @@ const App = () => (
               <Toaster />
               <Sonner />
                <CodeInjector />
-                <PageTracker />
                <BrowserRouter>
+                <PageTracker />
                 <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Index />} />
