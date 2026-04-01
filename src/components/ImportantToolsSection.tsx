@@ -44,7 +44,7 @@ export function ImportantToolsSection() {
         <div className="relative mb-4 overflow-hidden mask-fade-x">
           <div className="flex gap-4 animate-marquee-left">
             {[...row1, ...row1, ...row1, ...row1].map((tool, i) => (
-              <ToolCard key={`r1-${i}`} tool={tool} />
+              <ToolCard key={`r1-${i}`} tool={tool} isPremium={premiumToolIds.includes(tool.id)} isLocked={isToolLocked(tool.id)} navigate={navigate} />
             ))}
           </div>
         </div>
