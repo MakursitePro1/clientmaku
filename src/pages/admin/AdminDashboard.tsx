@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { tools, categories } from "@/data/tools";
+import { MapPin } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import {
   Users, Wrench, Heart, Settings, TrendingUp, Shield, FileCode,
