@@ -103,12 +103,12 @@ export default function AdminDashboard() {
         supabase.from("payment_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("payment_requests").select("amount").eq("status", "approved"),
         supabase.from("payment_requests").select("amount, status, created_at, payment_method").order("created_at", { ascending: false }).limit(5),
-        // Visitor analytics
-        supabase.from("page_views").select("id", { count: "exact", head: true }),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", weekAgo.toISOString()),
-        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()),
-        supabase.from("page_views").select("page_path, created_at").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
+        // Visitor analytics - fetch visitor_id for unique counting
+        supabase.from("page_views").select("visitor_id").limit(1000),
+        supabase.from("page_views").select("visitor_id").gte("created_at", todayStart.toISOString()).limit(1000),
+        supabase.from("page_views").select("visitor_id").gte("created_at", weekAgo.toISOString()).limit(1000),
+        supabase.from("page_views").select("visitor_id").gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()).limit(1000),
+        supabase.from("page_views").select("page_path, created_at, visitor_id").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
       ]);
 
       const allProfiles = allProfilesRes.data || [];
