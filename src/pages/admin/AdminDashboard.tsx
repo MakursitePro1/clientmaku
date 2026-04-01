@@ -317,10 +317,56 @@ export default function AdminDashboard() {
         ))}
       </div>
 
+      {/* Visitor Traffic Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="lg:col-span-2">
+          <Card className="border-border/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Eye className="w-4 h-4 text-primary" /> Page Views (30 Days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={stats.viewsOverTime} margin={{ top: 5, right: 10, left: -10, bottom: 50 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }} angle={-45} textAnchor="end" interval={2} />
+                    <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                    <Tooltip contentStyle={chartTooltipStyle} />
+                    <Area type="monotone" dataKey="views" stroke="hsl(142, 71%, 45%)" fill="hsl(142, 71%, 45%)" fillOpacity={0.15} strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card className="border-border/50 h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-primary" /> Top Pages
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {stats.topPages.length > 0 ? stats.topPages.map((page, i) => (
+                <div key={i} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
+                  <span className="text-xs text-foreground truncate max-w-[150px]">{page.name}</span>
+                  <Badge variant="secondary" className="text-[10px] shrink-0">{page.views} views</Badge>
+                </div>
+              )) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No visitor data yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* User Growth Area Chart */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
           <Card className="border-border/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
