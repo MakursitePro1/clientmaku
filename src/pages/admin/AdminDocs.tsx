@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search, Globe, Shield, Zap, ExternalLink, CheckCircle, AlertTriangle,
   BookOpen, FileText, ArrowRight, Copy, Monitor, Smartphone, Settings,
-  Eye, BarChart3, Link2, Code, Bell, Users, Crown, Upload
+  Eye, BarChart3, Link2, Code, Bell, Users, Crown, Upload, Languages,
+  Database, Key, Terminal, FolderOpen, Lock, Server, Layers, HardDrive
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
@@ -17,26 +18,36 @@ const fadeIn = (i: number) => ({
   transition: { delay: i * 0.06 },
 });
 
+type Lang = "bn" | "en";
+
+const t = (lang: Lang, bn: string, en: string) => lang === "bn" ? bn : en;
+
 interface StepItem {
   step: number;
   title: string;
   description: string;
   tip?: string;
+  code?: string;
 }
 
 function StepCard({ item }: { item: StepItem }) {
   return (
     <div className="flex gap-3 items-start">
-      <div className="w-7 h-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+      <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
         <span className="text-xs font-bold text-primary">{item.step}</span>
       </div>
-      <div className="flex-1 space-y-1">
+      <div className="flex-1 space-y-1.5">
         <p className="text-sm font-semibold text-foreground">{item.title}</p>
         <p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
+        {item.code && (
+          <div className="mt-2 p-2.5 rounded-lg bg-muted/80 border border-border/50 font-mono text-[11px] text-foreground overflow-x-auto whitespace-pre">
+            {item.code}
+          </div>
+        )}
         {item.tip && (
-          <div className="flex items-start gap-1.5 mt-1.5 p-2 rounded-lg bg-primary/5 border border-primary/10">
-            <Zap className="w-3 h-3 text-primary shrink-0 mt-0.5" />
-            <p className="text-[11px] text-primary/80">{item.tip}</p>
+          <div className="flex items-start gap-1.5 mt-2 p-2.5 rounded-lg bg-primary/5 border border-primary/10">
+            <Zap className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+            <p className="text-[11px] text-primary/80 leading-relaxed">{item.tip}</p>
           </div>
         )}
       </div>
@@ -44,143 +55,370 @@ function StepCard({ item }: { item: StepItem }) {
   );
 }
 
-const gscSteps: StepItem[] = [
-  { step: 1, title: "Go to Google Search Console", description: "Visit https://search.google.com/search-console and sign in with your Google account.", tip: "Use the same Google account that you want to manage all your websites from." },
-  { step: 2, title: "Add Your Property", description: "Click 'Add property'. Choose 'URL prefix' method and enter your full domain (e.g., https://cybervenoms.com).", tip: "URL prefix is easier — Domain verification requires DNS access." },
-  { step: 3, title: "Choose HTML Tag Verification", description: "From the verification methods, select 'HTML tag'. You'll see a meta tag like: <meta name=\"google-site-verification\" content=\"ABC123...\" />", },
-  { step: 4, title: "Copy the Content Value", description: "Copy ONLY the content value (e.g., ABC123...) — not the entire meta tag. This is your verification code." },
-  { step: 5, title: "Paste in Admin → Indexing & Code", description: "Go to your Admin Panel → Indexing & Code → Verification Codes tab. Paste the code in the 'Google Verification' field and click Save." },
-  { step: 6, title: "Verify in Search Console", description: "Go back to Google Search Console and click 'Verify'. It should now detect your verification tag and confirm ownership.", tip: "If verification fails, wait a few minutes and try again. Make sure your site is published." },
-  { step: 7, title: "Submit Your Sitemap", description: "After verification, go to Sitemaps → Add a new sitemap. Enter 'sitemap.xml' and click Submit. Google will start crawling your pages." },
-];
+function CodeBlock({ code, label }: { code: string; label?: string }) {
+  return (
+    <div className="mt-2">
+      {label && <p className="text-[10px] text-muted-foreground mb-1 font-medium">{label}</p>}
+      <div className="p-3 rounded-lg bg-muted/80 border border-border/50 font-mono text-[11px] text-foreground overflow-x-auto whitespace-pre">
+        {code}
+      </div>
+    </div>
+  );
+}
 
-const bingSteps: StepItem[] = [
-  { step: 1, title: "Go to Bing Webmaster Tools", description: "Visit https://www.bing.com/webmasters and sign in with your Microsoft account." },
-  { step: 2, title: "Add Your Site", description: "Click 'Add a site' and enter your website URL. You can also import from Google Search Console." },
-  { step: 3, title: "Choose Meta Tag Verification", description: "Select the 'HTML Meta Tag' option and copy the content value from the provided meta tag." },
-  { step: 4, title: "Paste in Admin Panel", description: "Go to Admin → Indexing & Code → Verification Codes. Paste in the 'Bing Verification' field and Save." },
-  { step: 5, title: "Verify & Submit Sitemap", description: "Click Verify in Bing Webmaster Tools, then submit your sitemap URL." },
-];
-
-const yandexSteps: StepItem[] = [
-  { step: 1, title: "Go to Yandex Webmaster", description: "Visit https://webmaster.yandex.com and sign in." },
-  { step: 2, title: "Add Site", description: "Add your website URL and select the meta tag verification method." },
-  { step: 3, title: "Copy & Paste Code", description: "Copy the verification code, paste it in Admin → Indexing & Code → Yandex Verification field." },
-  { step: 4, title: "Verify", description: "Complete verification in Yandex Webmaster and submit your sitemap." },
-];
-
-const adminGuides = [
+const getDeploySteps = (lang: Lang): StepItem[] => [
   {
-    title: "Managing Tools",
+    step: 1,
+    title: t(lang, "Supabase প্রজেক্ট তৈরি করুন", "Create a Supabase Project"),
+    description: t(lang,
+      "supabase.com-এ যান → Sign Up / Login করুন → 'New Project' ক্লিক করুন → প্রজেক্টের নাম দিন → ডেটাবেজ পাসওয়ার্ড সেট করুন → আপনার নিকটতম রিজিয়ন সিলেক্ট করুন → 'Create new project' ক্লিক করুন। প্রজেক্ট তৈরি হতে ১-২ মিনিট সময় লাগবে।",
+      "Go to supabase.com → Sign Up / Login → Click 'New Project' → Enter project name → Set a database password → Select your nearest region → Click 'Create new project'. It takes 1-2 minutes to set up."
+    ),
+    tip: t(lang,
+      "প্রজেক্ট তৈরি হওয়ার পর Settings → API পেজে যান। সেখান থেকে 'Project URL' (যেমন: https://xyzabc.supabase.co) এবং 'anon/public key' (যা eyJ... দিয়ে শুরু হয়) — এই দুটি কপি করে রাখুন। ⚠️ service_role key কখনো শেয়ার করবেন না!",
+      "After creation, go to Settings → API. Copy your 'Project URL' (e.g., https://xyzabc.supabase.co) and 'anon/public key' (starts with eyJ...). ⚠️ NEVER share your service_role key!"
+    ),
+  },
+  {
+    step: 2,
+    title: t(lang, "ডেটাবেজ স্কিমা সেটআপ করুন", "Set Up Database Schema"),
+    description: t(lang,
+      "Supabase Dashboard → বাম মেনু থেকে 'SQL Editor' ক্লিক করুন → 'New query' ক্লিক করুন → আপনার কোড ফোল্ডারে থাকা database-setup.sql ফাইলটি ওপেন করুন → পুরো SQL কোড কপি করে SQL Editor-এ পেস্ট করুন → নিচের 'Run' বাটনে ক্লিক করুন।",
+      "Go to Supabase Dashboard → Click 'SQL Editor' from left menu → Click 'New query' → Open the database-setup.sql file from your code folder → Copy the entire SQL code and paste it into the SQL Editor → Click the 'Run' button at the bottom."
+    ),
+    tip: t(lang,
+      "এই SQL ফাইলটি ১৮টি টেবিল তৈরি করবে: profiles, user_roles, site_settings, tool_settings, tool_seo, page_seo, custom_tools, favorites, ad_slots, blog_posts, page_views, subscription_plans, user_subscriptions, payment_requests, payment_gateways, premium_tools, totp_secrets, tool_ratings। সাথে RLS পলিসি, ফাংশন ও ট্রিগারও সেটআপ হবে।",
+      "This SQL file creates 18 tables: profiles, user_roles, site_settings, tool_settings, tool_seo, page_seo, custom_tools, favorites, ad_slots, blog_posts, page_views, subscription_plans, user_subscriptions, payment_requests, payment_gateways, premium_tools, totp_secrets, tool_ratings. It also sets up RLS policies, functions, and triggers."
+    ),
+  },
+  {
+    step: 3,
+    title: t(lang, "Storage Bucket তৈরি করুন", "Create Storage Bucket"),
+    description: t(lang,
+      "Supabase Dashboard → বাম মেনু থেকে 'Storage' ক্লিক করুন → 'New Bucket' বাটনে ক্লিক করুন → নাম দিন: admin-uploads → 'Public bucket' টগল চালু করুন → 'Create bucket' ক্লিক করুন।",
+      "Go to Supabase Dashboard → Click 'Storage' from left menu → Click 'New Bucket' → Name it: admin-uploads → Enable the 'Public bucket' toggle → Click 'Create bucket'."
+    ),
+    tip: t(lang,
+      "এই বাকেটটি সাইটের লোগো, ফেভিকন, ব্লগ পোস্টের ফিচারড ইমেজ, কাস্টম টুলস এবং এডমিন প্যানেল থেকে আপলোড করা সকল ফাইলের জন্য ব্যবহৃত হবে। Public bucket না করলে ইমেজ লোড হবে না!",
+      "This bucket stores site logos, favicons, blog featured images, custom tools files, and all uploads from the admin panel. If not set to Public, images won't load!"
+    ),
+  },
+  {
+    step: 4,
+    title: t(lang, "Environment Variables কনফিগার করুন", "Configure Environment Variables"),
+    description: t(lang,
+      "আপনার কোড ফোল্ডারে .env.example ফাইলটি আছে। এটি কপি করে .env নামে সংরক্ষণ করুন। তারপর নিচের ৩টি মান আপনার Supabase প্রজেক্ট থেকে দিন:",
+      "In your code folder, there's a .env.example file. Copy it and save as .env. Then fill in the 3 values from your Supabase project:"
+    ),
+    code: `VITE_SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJ...YOUR_ANON_KEY
+VITE_SUPABASE_PROJECT_ID=YOUR_PROJECT_ID`,
+    tip: t(lang,
+      "VITE_SUPABASE_URL → Supabase Settings → API → Project URL থেকে কপি করুন। VITE_SUPABASE_PUBLISHABLE_KEY → একই পেজে anon/public key কপি করুন। VITE_SUPABASE_PROJECT_ID → আপনার URL-এর https:// ও .supabase.co মধ্যবর্তী অংশটি।",
+      "VITE_SUPABASE_URL → Copy from Supabase Settings → API → Project URL. VITE_SUPABASE_PUBLISHABLE_KEY → Copy the anon/public key from the same page. VITE_SUPABASE_PROJECT_ID → The part between https:// and .supabase.co in your URL."
+    ),
+  },
+  {
+    step: 5,
+    title: t(lang, "Edge Functions ডিপ্লয় করুন", "Deploy Edge Functions"),
+    description: t(lang,
+      "Edge Functions হলো সার্ভার-সাইড ফাংশন যা বিশেষ কাজের জন্য দরকার (যেমন: ইউজার ম্যানেজমেন্ট, টেম্প মেইল ইত্যাদি)। এগুলো ডিপ্লয় করতে Supabase CLI ব্যবহার করতে হবে।",
+      "Edge Functions are server-side functions needed for special operations (e.g., user management, temp mail). You need the Supabase CLI to deploy them."
+    ),
+    code: `# Step 1: Install Supabase CLI
+npm install -g supabase
+
+# Step 2: Login to Supabase
+supabase login
+
+# Step 3: Link to your project
+supabase link --project-ref YOUR_PROJECT_ID
+
+# Step 4: Deploy all functions
+supabase functions deploy admin-user-manage
+supabase functions deploy temp-mail
+supabase functions deploy temp-number
+supabase functions deploy totp-manage`,
+    tip: t(lang,
+      "YOUR_PROJECT_ID-এর জায়গায় আপনার Supabase প্রজেক্টের ID দিন। Edge Functions ছাড়াও মূল ওয়েবসাইট কাজ করবে, তবে কিছু এডমিন ফিচার (যেমন: ইউজার ব্যান/আনব্যান) কাজ করবে না।",
+      "Replace YOUR_PROJECT_ID with your actual Supabase project ID. The main website works without Edge Functions, but some admin features (e.g., user ban/unban) won't work without them."
+    ),
+  },
+  {
+    step: 6,
+    title: t(lang, "প্রথম এডমিন অ্যাকাউন্ট সেটআপ করুন", "Set Up the First Admin Account"),
+    description: t(lang,
+      "আপনার ওয়েবসাইটে যান → Sign Up করুন আপনার ইমেইল দিয়ে → ইমেইল ভেরিফিকেশন সম্পন্ন করুন → তারপর Supabase Dashboard → SQL Editor-এ গিয়ে নিচের SQL চালান:",
+      "Go to your website → Sign Up with your email → Complete email verification → Then go to Supabase Dashboard → SQL Editor and run this SQL:"
+    ),
+    code: `-- আপনার ইমেইল দিয়ে পরিবর্তন করুন / Replace with your email
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'admin'
+FROM auth.users
+WHERE email = 'your-email@example.com'
+ON CONFLICT (user_id, role) DO NOTHING;`,
+    tip: t(lang,
+      "ভবিষ্যতে স্বয়ংক্রিয়ভাবে এডমিন অ্যাসাইন করতে auto_assign_admin() ফাংশনে আপনার ইমেইল সেট করুন। এটি করলে ওই ইমেইল দিয়ে সাইনআপ করলে অটোমেটিক্যালি এডমিন রোল পাবে।",
+      "For auto-admin assignment in the future, update the auto_assign_admin() function with your email. When someone signs up with that email, they'll automatically get the admin role."
+    ),
+  },
+  {
+    step: 7,
+    title: t(lang, "ফ্রন্টএন্ড ডিপ্লয় করুন", "Deploy the Frontend"),
+    description: t(lang,
+      "আপনার কোডটি যেকোনো হোস্টিং প্ল্যাটফর্মে ডিপ্লয় করতে পারবেন। নিচে ৩টি জনপ্রিয় অপশন দেওয়া হলো:",
+      "You can deploy your code to any hosting platform. Here are 3 popular options:"
+    ),
+    tip: t(lang,
+      "যেকোনো হোস্টিং-এই ডিপ্লয় করুন, Environment Variables (VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID) যোগ করতে ভুলবেন না!",
+      "Whichever hosting you choose, don't forget to add the Environment Variables (VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID)!"
+    ),
+  },
+  {
+    step: 8,
+    title: t(lang, "এডমিন প্যানেল থেকে সাইট কনফিগার করুন", "Configure Site from Admin Panel"),
+    description: t(lang,
+      "এডমিন প্যানেলে যান (ডিফল্ট URL: /makuadmingowebs99) → Settings ট্যাবে যান → সাইটের নাম, লোগো, ফেভিকন, যোগাযোগ, সোশ্যাল মিডিয়া লিংক সেট করুন → SEO ট্যাবে মেটা তথ্য দিন → Subscriptions-এ প্ল্যান কনফিগার করুন → Tools-এ টুলস ম্যানেজ করুন।",
+      "Go to Admin Panel (default URL: /makuadmingowebs99) → Go to Settings tab → Set site name, logo, favicon, contact info, social media links → Add meta info in SEO tab → Configure plans in Subscriptions → Manage tools in Tools."
+    ),
+    tip: t(lang,
+      "⚠️ গুরুত্বপূর্ণ: প্রথম কাজ হিসেবে Admin → Settings → Security থেকে ডিফল্ট এডমিন URL (/makuadmingowebs99) পরিবর্তন করুন! এটি আপনার সাইটের নিরাপত্তার জন্য অত্যন্ত জরুরি।",
+      "⚠️ IMPORTANT: As your first task, change the default admin URL (/makuadmingowebs99) from Admin → Settings → Security! This is critical for your site's security."
+    ),
+  },
+];
+
+const getHostingDetails = (lang: Lang) => [
+  {
+    name: "Vercel",
+    badge: t(lang, "রেকমেন্ডেড", "Recommended"),
+    steps: [
+      t(lang, "GitHub-এ কোড পুশ করুন", "Push code to GitHub"),
+      t(lang, "vercel.com → Import Project → আপনার রিপো সিলেক্ট করুন", "vercel.com → Import Project → Select your repo"),
+      t(lang, "Framework Preset: Vite সিলেক্ট করুন", "Select Framework Preset: Vite"),
+      t(lang, "Environment Variables যোগ করুন (৩টি VITE_ ভেরিয়েবল)", "Add Environment Variables (3 VITE_ variables)"),
+      t(lang, "'Deploy' ক্লিক করুন — ব্যাস, হয়ে গেছে!", "Click 'Deploy' — that's it!"),
+    ],
+  },
+  {
+    name: "Netlify",
+    badge: t(lang, "সহজ", "Easy"),
+    steps: [
+      t(lang, "GitHub-এ কোড পুশ করুন", "Push code to GitHub"),
+      t(lang, "netlify.com → Add new site → Import from Git", "netlify.com → Add new site → Import from Git"),
+      t(lang, "Build command: npm run build", "Build command: npm run build"),
+      t(lang, "Publish directory: dist", "Publish directory: dist"),
+      t(lang, "Environment Variables যোগ করুন ও Deploy করুন", "Add Environment Variables and Deploy"),
+    ],
+  },
+  {
+    name: "cPanel / Shared Hosting",
+    badge: t(lang, "ম্যানুয়াল", "Manual"),
+    steps: [
+      t(lang, "লোকালে npm install ও npm run build চালান", "Run npm install and npm run build locally"),
+      t(lang, "dist/ ফোল্ডারের ভেতরের সব ফাইল public_html-এ আপলোড করুন", "Upload all files from dist/ folder to public_html"),
+      t(lang, ".htaccess ফাইল তৈরি করুন SPA রাউটিং-এর জন্য (নিচে দেওয়া হলো)", "Create .htaccess file for SPA routing (shown below)"),
+    ],
+    code: `# .htaccess for SPA routing
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>`,
+  },
+];
+
+const getTroubleshootItems = (lang: Lang) => [
+  {
+    problem: t(lang, "সাইট লোড হচ্ছে না / ফাঁকা পেজ দেখাচ্ছে", "Site not loading / showing blank page"),
+    solution: t(lang, ".env ফাইলের VITE_SUPABASE_URL ও VITE_SUPABASE_PUBLISHABLE_KEY সঠিক কিনা চেক করুন। ব্রাউজার কনসোলে (F12) এরর মেসেজ দেখুন।", "Check if VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in .env are correct. Check browser console (F12) for error messages."),
+  },
+  {
+    problem: t(lang, "সাইনআপ/লগইন কাজ করছে না", "Sign up / Login not working"),
+    solution: t(lang, "Supabase Dashboard → Authentication → Settings → Site URL আপনার ডোমেইন দিন। Email Templates-এ Confirm Signup URL সঠিক কিনা চেক করুন।", "Go to Supabase Dashboard → Authentication → Settings → Set your domain in Site URL. Check if Confirm Signup URL is correct in Email Templates."),
+  },
+  {
+    problem: t(lang, "ডেটা দেখাচ্ছে না / টেবিল খালি", "Data not showing / Tables empty"),
+    solution: t(lang, "database-setup.sql সম্পূর্ণ রান হয়েছে কিনা চেক করুন। Supabase → Table Editor-এ গিয়ে টেবিলগুলো আছে কিনা দেখুন। RLS পলিসি সঠিক কিনা দেখুন।", "Check if database-setup.sql ran completely. Go to Supabase → Table Editor and verify tables exist. Check RLS policies are correct."),
+  },
+  {
+    problem: t(lang, "এডমিন প্যানেলে অ্যাক্সেস নেই", "No access to Admin Panel"),
+    solution: t(lang, "user_roles টেবিলে আপনার user_id-তে 'admin' রোল আছে কিনা চেক করুন। Step 6 অনুযায়ী SQL চালান।", "Check if your user_id has 'admin' role in user_roles table. Run the SQL from Step 6."),
+  },
+  {
+    problem: t(lang, "ইমেজ আপলোড হচ্ছে না", "Image upload not working"),
+    solution: t(lang, "admin-uploads নামে Storage Bucket আছে কিনা চেক করুন। Bucket টি Public সেট আছে কিনা দেখুন। Storage → Policies-এ upload/read পলিসি আছে কিনা দেখুন।", "Check if admin-uploads Storage Bucket exists. Verify it's set to Public. Check Storage → Policies for upload/read policies."),
+  },
+  {
+    problem: t(lang, "পেজ রিফ্রেশ করলে 404 দেখায়", "Page shows 404 on refresh"),
+    solution: t(lang, "SPA রাউটিং কনফিগার করুন: Vercel-এ vercel.json, Netlify-তে _redirects ফাইল, cPanel-এ .htaccess ফাইল দরকার।", "Configure SPA routing: Vercel needs vercel.json, Netlify needs _redirects file, cPanel needs .htaccess file."),
+  },
+  {
+    problem: t(lang, "Edge Functions কাজ করছে না", "Edge Functions not working"),
+    solution: t(lang, "supabase functions deploy কমান্ড সঠিকভাবে চালিয়েছেন কিনা চেক করুন। Supabase Dashboard → Edge Functions-এ ফাংশনগুলো দেখা যাচ্ছে কিনা দেখুন।", "Check if you ran supabase functions deploy correctly. Verify functions are visible in Supabase Dashboard → Edge Functions."),
+  },
+];
+
+const getAdminGuides = (lang: Lang) => [
+  {
+    title: t(lang, "টুলস ম্যানেজমেন্ট", "Managing Tools"),
     icon: Settings,
     color: "text-blue-400",
     items: [
-      "Go to Admin → Tools to enable/disable any tool",
-      "Click the edit icon to rename any tool",
-      "Use the toggle switch to show/hide tools from the website",
-      "Drag to reorder tools (display order)",
-      "Premium tools can be set from Admin → Subscriptions",
+      t(lang, "Admin → Tools-এ যান — যেকোনো টুল Enable/Disable করতে পারবেন", "Go to Admin → Tools to enable/disable any tool"),
+      t(lang, "এডিট আইকনে ক্লিক করে যেকোনো টুলের নাম পরিবর্তন করুন", "Click the edit icon to rename any tool"),
+      t(lang, "টগল সুইচ দিয়ে টুলস ওয়েবসাইটে দেখানো/লুকানো করুন", "Use the toggle switch to show/hide tools"),
+      t(lang, "ড্র্যাগ করে টুলসের ক্রম পরিবর্তন করুন", "Drag to reorder tools display order"),
+      t(lang, "Premium টুলস সেট করুন Admin → Subscriptions থেকে", "Set premium tools from Admin → Subscriptions"),
     ],
   },
   {
-    title: "Blog Management",
+    title: t(lang, "ব্লগ ম্যানেজমেন্ট", "Blog Management"),
     icon: FileText,
     color: "text-green-400",
     items: [
-      "Admin → Blog to create, edit, or delete blog posts",
-      "Use the rich text editor for formatted content",
-      "Set featured images, categories, and tags",
-      "Posts can be saved as 'Draft' or 'Published'",
-      "SEO meta tags are auto-generated but can be customized",
+      t(lang, "Admin → Blog-এ যান — নতুন পোস্ট তৈরি, এডিট বা ডিলিট করুন", "Go to Admin → Blog to create, edit, or delete posts"),
+      t(lang, "রিচ টেক্সট এডিটরে Bold, Italic, ইমেজ, লিংক ইত্যাদি যোগ করুন", "Use rich text editor for Bold, Italic, images, links"),
+      t(lang, "ফিচারড ইমেজ, ক্যাটাগরি ও ট্যাগ সেট করুন", "Set featured images, categories, and tags"),
+      t(lang, "পোস্ট 'Draft' বা 'Published' হিসেবে সংরক্ষণ করুন", "Save posts as 'Draft' or 'Published'"),
+      t(lang, "SEO মেটা ট্যাগ অটো-জেনারেট হয় তবে কাস্টমাইজও করা যায়", "SEO meta tags are auto-generated but customizable"),
     ],
   },
   {
-    title: "Subscription & Premium",
+    title: t(lang, "সাবস্ক্রিপশন ও প্রিমিয়াম", "Subscription & Premium"),
     icon: Crown,
     color: "text-yellow-400",
     items: [
-      "Admin → Subscriptions to manage plans and pricing",
-      "Edit plan names, prices (USD & BDT), and features",
-      "Mark tools as premium to require subscription",
-      "Review and approve/reject payment requests",
-      "Configure payment gateways (bKash, Nagad, etc.)",
+      t(lang, "Admin → Subscriptions-এ প্ল্যান ও প্রাইসিং ম্যানেজ করুন", "Manage plans and pricing in Admin → Subscriptions"),
+      t(lang, "প্ল্যানের নাম, দাম (USD ও BDT), ফিচার এডিট করুন", "Edit plan names, prices (USD & BDT), and features"),
+      t(lang, "টুলস প্রিমিয়াম মার্ক করে সাবস্ক্রিপশন বাধ্যতামূলক করুন", "Mark tools as premium to require subscription"),
+      t(lang, "পেমেন্ট রিকোয়েস্ট রিভিউ ও অ্যাপ্রুভ/রিজেক্ট করুন", "Review and approve/reject payment requests"),
+      t(lang, "পেমেন্ট গেটওয়ে (bKash, Nagad ইত্যাদি) কনফিগার করুন", "Configure payment gateways (bKash, Nagad, etc.)"),
     ],
   },
   {
-    title: "SEO Management",
+    title: t(lang, "SEO ম্যানেজমেন্ট", "SEO Management"),
     icon: Search,
     color: "text-purple-400",
     items: [
-      "Admin → SEO to edit meta tags for every page and tool",
-      "Set custom titles, descriptions, keywords, and OG images",
-      "Structured data (JSON-LD) is auto-generated",
-      "Canonical URLs prevent duplicate content issues",
-      "Robots meta tags control search engine indexing",
+      t(lang, "Admin → SEO-তে প্রতিটি পেজ ও টুলের মেটা ট্যাগ এডিট করুন", "Edit meta tags for every page and tool in Admin → SEO"),
+      t(lang, "কাস্টম টাইটেল, ডেসক্রিপশন, কীওয়ার্ড ও OG ইমেজ সেট করুন", "Set custom titles, descriptions, keywords, OG images"),
+      t(lang, "Structured Data (JSON-LD) অটো-জেনারেট হয়", "Structured Data (JSON-LD) is auto-generated"),
+      t(lang, "Canonical URL ডুপ্লিকেট কন্টেন্ট সমস্যা প্রতিরোধ করে", "Canonical URLs prevent duplicate content issues"),
+      t(lang, "Robots মেটা ট্যাগ সার্চ ইঞ্জিন ইনডেক্সিং নিয়ন্ত্রণ করে", "Robots meta tags control search engine indexing"),
     ],
   },
   {
-    title: "User Management",
+    title: t(lang, "ইউজার ম্যানেজমেন্ট", "User Management"),
     icon: Users,
     color: "text-red-400",
     items: [
-      "Admin → Users shows all registered users",
-      "Admin → Roles to assign admin/moderator roles",
-      "Users can be managed (view details, subscriptions)",
-      "Role-based access control protects admin features",
+      t(lang, "Admin → Users-এ সকল রেজিস্টার্ড ইউজার দেখুন", "View all registered users in Admin → Users"),
+      t(lang, "Admin → Roles-এ এডমিন/মডারেটর রোল অ্যাসাইন করুন", "Assign admin/moderator roles in Admin → Roles"),
+      t(lang, "ইউজারদের ডিটেইলস ও সাবস্ক্রিপশন দেখুন", "View user details and subscriptions"),
+      t(lang, "রোল-ভিত্তিক অ্যাক্সেস কন্ট্রোল এডমিন ফিচার সুরক্ষিত রাখে", "Role-based access control protects admin features"),
     ],
   },
   {
-    title: "Custom Tools",
+    title: t(lang, "কাস্টম টুলস", "Custom Tools"),
     icon: Upload,
     color: "text-cyan-400",
     items: [
-      "Admin → Custom Tools to upload HTML-based tools",
-      "Upload .html files or paste HTML content directly",
-      "Custom tools get their own URL and SEO settings",
-      "Set category, icon, color, and description",
-      "Enable/disable custom tools anytime",
+      t(lang, "Admin → Custom Tools-এ HTML-ভিত্তিক টুলস আপলোড করুন", "Upload HTML-based tools in Admin → Custom Tools"),
+      t(lang, ".html ফাইল আপলোড করুন অথবা সরাসরি HTML কোড পেস্ট করুন", "Upload .html files or paste HTML content directly"),
+      t(lang, "কাস্টম টুলস তাদের নিজস্ব URL ও SEO সেটিংস পায়", "Custom tools get their own URL and SEO settings"),
+      t(lang, "ক্যাটাগরি, আইকন, রং ও বর্ণনা সেট করুন", "Set category, icon, color, and description"),
+      t(lang, "যেকোনো সময় কাস্টম টুলস Enable/Disable করুন", "Enable/disable custom tools anytime"),
     ],
   },
+];
+
+const getGscSteps = (lang: Lang): StepItem[] => [
+  { step: 1, title: t(lang, "Google Search Console-এ যান", "Go to Google Search Console"), description: t(lang, "https://search.google.com/search-console ভিজিট করুন এবং আপনার Google অ্যাকাউন্ট দিয়ে সাইন ইন করুন।", "Visit https://search.google.com/search-console and sign in with your Google account."), tip: t(lang, "যে Google অ্যাকাউন্ট দিয়ে সব ওয়েবসাইট ম্যানেজ করতে চান সেটি ব্যবহার করুন।", "Use the Google account you want to manage all your websites from.") },
+  { step: 2, title: t(lang, "আপনার সাইট যোগ করুন", "Add Your Property"), description: t(lang, "'Add property' ক্লিক করুন → 'URL prefix' মেথড সিলেক্ট করুন → আপনার পূর্ণ ডোমেইন দিন (যেমন: https://yourdomain.com)।", "Click 'Add property' → Choose 'URL prefix' method → Enter your full domain (e.g., https://yourdomain.com)."), tip: t(lang, "URL prefix মেথড সবচেয়ে সহজ — Domain verification-এ DNS অ্যাক্সেস লাগে।", "URL prefix is easier — Domain verification requires DNS access.") },
+  { step: 3, title: t(lang, "HTML Tag ভেরিফিকেশন সিলেক্ট করুন", "Choose HTML Tag Verification"), description: t(lang, "ভেরিফিকেশন মেথড থেকে 'HTML tag' সিলেক্ট করুন। আপনি একটি meta tag দেখতে পাবেন।", "Select 'HTML tag' from verification methods. You'll see a meta tag.") },
+  { step: 4, title: t(lang, "Content Value কপি করুন", "Copy the Content Value"), description: t(lang, "শুধু content-এর মান কপি করুন (যেমন: ABC123...) — পুরো meta tag নয়।", "Copy ONLY the content value (e.g., ABC123...) — not the entire meta tag.") },
+  { step: 5, title: t(lang, "Admin Panel-এ পেস্ট করুন", "Paste in Admin Panel"), description: t(lang, "Admin → Indexing & Code → Verification Codes ট্যাবে যান। 'Google Verification' ফিল্ডে কোড পেস্ট করুন ও Save করুন।", "Go to Admin → Indexing & Code → Verification Codes tab. Paste the code in 'Google Verification' field and Save.") },
+  { step: 6, title: t(lang, "Search Console-এ ভেরিফাই করুন", "Verify in Search Console"), description: t(lang, "Google Search Console-এ ফিরে যান এবং 'Verify' ক্লিক করুন।", "Go back to Google Search Console and click 'Verify'."), tip: t(lang, "ভেরিফিকেশন ব্যর্থ হলে কয়েক মিনিট অপেক্ষা করুন। সাইট পাবলিশ করা আছে কিনা নিশ্চিত করুন।", "If verification fails, wait a few minutes. Make sure your site is published.") },
+  { step: 7, title: t(lang, "সাইটম্যাপ সাবমিট করুন", "Submit Your Sitemap"), description: t(lang, "ভেরিফিকেশনের পর Sitemaps → 'Add a new sitemap' → 'sitemap.xml' লিখুন → Submit করুন।", "After verification, go to Sitemaps → 'Add a new sitemap' → Enter 'sitemap.xml' → Submit.") },
+];
+
+const getBingSteps = (lang: Lang): StepItem[] => [
+  { step: 1, title: t(lang, "Bing Webmaster Tools-এ যান", "Go to Bing Webmaster Tools"), description: t(lang, "https://www.bing.com/webmasters ভিজিট করুন এবং Microsoft অ্যাকাউন্ট দিয়ে সাইন ইন করুন।", "Visit https://www.bing.com/webmasters and sign in with your Microsoft account.") },
+  { step: 2, title: t(lang, "সাইট যোগ করুন", "Add Your Site"), description: t(lang, "'Add a site' ক্লিক করুন ও ওয়েবসাইটের URL দিন। Google Search Console থেকেও ইমপোর্ট করতে পারেন।", "Click 'Add a site' and enter your URL. You can also import from Google Search Console.") },
+  { step: 3, title: t(lang, "Meta Tag ভেরিফিকেশন সিলেক্ট করুন", "Choose Meta Tag Verification"), description: t(lang, "'HTML Meta Tag' অপশন সিলেক্ট করুন ও content value কপি করুন।", "Select 'HTML Meta Tag' option and copy the content value.") },
+  { step: 4, title: t(lang, "Admin Panel-এ পেস্ট করুন", "Paste in Admin Panel"), description: t(lang, "Admin → Indexing & Code → Verification Codes → 'Bing Verification' ফিল্ডে পেস্ট করুন ও Save করুন।", "Go to Admin → Indexing & Code → Verification Codes → Paste in 'Bing Verification' field and Save.") },
+  { step: 5, title: t(lang, "ভেরিফাই ও সাইটম্যাপ সাবমিট করুন", "Verify & Submit Sitemap"), description: t(lang, "Bing Webmaster Tools-এ Verify ক্লিক করুন, তারপর সাইটম্যাপ URL সাবমিট করুন।", "Click Verify in Bing Webmaster Tools, then submit your sitemap URL.") },
+];
+
+const getYandexSteps = (lang: Lang): StepItem[] => [
+  { step: 1, title: t(lang, "Yandex Webmaster-এ যান", "Go to Yandex Webmaster"), description: t(lang, "https://webmaster.yandex.com ভিজিট করুন ও সাইন ইন করুন।", "Visit https://webmaster.yandex.com and sign in.") },
+  { step: 2, title: t(lang, "সাইট যোগ করুন", "Add Site"), description: t(lang, "ওয়েবসাইটের URL দিন ও meta tag ভেরিফিকেশন মেথড সিলেক্ট করুন।", "Enter your website URL and select meta tag verification.") },
+  { step: 3, title: t(lang, "কোড কপি ও পেস্ট করুন", "Copy & Paste Code"), description: t(lang, "ভেরিফিকেশন কোড কপি করুন ও Admin → Indexing & Code → Yandex Verification ফিল্ডে পেস্ট করুন।", "Copy verification code and paste in Admin → Indexing & Code → Yandex Verification field.") },
+  { step: 4, title: t(lang, "ভেরিফাই করুন", "Verify"), description: t(lang, "Yandex Webmaster-এ ভেরিফিকেশন সম্পন্ন করুন ও সাইটম্যাপ সাবমিট করুন।", "Complete verification in Yandex Webmaster and submit sitemap.") },
 ];
 
 export default function AdminDocs() {
   const [activeTab, setActiveTab] = useState("deploy");
+  const [lang, setLang] = useState<Lang>("bn");
   const { settings } = useSiteSettings();
   const domain = settings.site_domain?.trim() || "https://cybervenoms.com";
 
   const tabs = [
-    { id: "deploy", label: "Deployment", icon: Upload },
+    { id: "deploy", label: t(lang, "ডিপ্লয়মেন্ট", "Deployment"), icon: Upload },
     { id: "gsc", label: "Google", icon: Search },
     { id: "bing", label: "Bing", icon: Globe },
     { id: "yandex", label: "Yandex", icon: Globe },
-    { id: "guides", label: "Admin Guides", icon: BookOpen },
-    { id: "checklist", label: "SEO Checklist", icon: CheckCircle },
+    { id: "guides", label: t(lang, "এডমিন গাইড", "Admin Guides"), icon: BookOpen },
+    { id: "checklist", label: t(lang, "SEO চেকলিস্ট", "SEO Checklist"), icon: CheckCircle },
   ];
+
+  const deploySteps = getDeploySteps(lang);
+  const hostingDetails = getHostingDetails(lang);
+  const troubleshootItems = getTroubleshootItems(lang);
+  const adminGuides = getAdminGuides(lang);
+  const gscSteps = getGscSteps(lang);
+  const bingSteps = getBingSteps(lang);
+  const yandexSteps = getYandexSteps(lang);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
-          <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-          Documentation & Guides
-        </h1>
-        <p className="text-muted-foreground text-xs sm:text-sm mt-1">
-          Step-by-step guides for setting up search engines, managing your site, and SEO best practices
-        </p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
+            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+            {t(lang, "ডকুমেন্টেশন ও গাইড", "Documentation & Guides")}
+          </h1>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-1">
+            {t(lang, "ডিপ্লয়মেন্ট, সার্চ ইঞ্জিন সেটআপ, সাইট ম্যানেজমেন্ট এবং SEO-এর জন্য বিস্তারিত গাইড", "Detailed guides for deployment, search engine setup, site management, and SEO")}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 text-xs"
+          onClick={() => setLang(lang === "bn" ? "en" : "bn")}
+        >
+          <Languages className="w-3.5 h-3.5" />
+          {lang === "bn" ? "English" : "বাংলা"}
+        </Button>
       </div>
 
-      {/* Domain info banner */}
+      {/* Domain info */}
       <motion.div {...fadeIn(0)}>
         <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/15">
           <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
             <Link2 className="w-4 h-4 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-foreground">Your Domain</p>
+            <p className="text-xs font-medium text-foreground">{t(lang, "আপনার ডোমেইন", "Your Domain")}</p>
             <p className="text-sm font-mono text-primary truncate">{domain}</p>
           </div>
           <Badge variant="outline" className="text-[10px] shrink-0">
-            <CheckCircle className="w-3 h-3 mr-1" /> Active
+            <CheckCircle className="w-3 h-3 mr-1" /> {t(lang, "সক্রিয়", "Active")}
           </Badge>
         </div>
       </motion.div>
@@ -199,97 +437,146 @@ export default function AdminDocs() {
           ))}
         </TabsList>
 
-        {/* Deployment Guide */}
+        {/* ===== DEPLOYMENT TAB ===== */}
         <TabsContent value="deploy" className="space-y-4 mt-4">
           <motion.div {...fadeIn(0)}>
             <Card className="border-border/50">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Upload className="w-4 h-4 text-primary" />
-                  ডিপ্লয়মেন্ট ও স্ক্রিপ্ট বিতরণ গাইড
+                  {t(lang, "ডিপ্লয়মেন্ট ও স্ক্রিপ্ট বিতরণ গাইড", "Deployment & Script Distribution Guide")}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground">
-                  ওয়েবসাইট ডিপ্লয়, ডেটাবেজ সেটআপ, এবং স্ক্রিপ্ট বিক্রির জন্য সম্পূর্ণ নির্দেশিকা
+                  {t(lang, "ওয়েবসাইট ডিপ্লয়, ডেটাবেজ সেটআপ, এবং স্ক্রিপ্ট বিক্রির জন্য সম্পূর্ণ নির্দেশিকা", "Complete guide for website deployment, database setup, and script distribution")}
                 </p>
               </CardHeader>
               <CardContent className="space-y-5">
                 {/* Architecture */}
-                <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
+                <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
                   <h4 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
-                    <Code className="w-3.5 h-3.5 text-primary" /> আর্কিটেকচার
+                    <Layers className="w-3.5 h-3.5 text-primary" /> {t(lang, "আর্কিটেকচার কিভাবে কাজ করে?", "How Does the Architecture Work?")}
                   </h4>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    প্রতিটি ক্রেতা একই ফ্রন্টএন্ড কোড পায়, কিন্তু <strong>নিজস্ব Supabase প্রজেক্ট</strong> কানেক্ট করে — ফলে প্রতিটি ইন্সট্যান্সের ডেটা সম্পূর্ণ আলাদা ও স্বতন্ত্র।
+                  <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+                    {t(lang,
+                      "এই প্ল্যাটফর্মটি একটি Frontend-Backend ডিকাপলড আর্কিটেকচারে তৈরি। প্রতিটি ক্রেতা/ব্যবহারকারী একই ফ্রন্টএন্ড কোড (React + Vite) পায়, কিন্তু নিজস্ব Supabase প্রজেক্ট কানেক্ট করে। ফলে:",
+                      "This platform uses a Frontend-Backend Decoupled architecture. Every buyer/user gets the same frontend code (React + Vite) but connects their own Supabase project. This means:"
+                    )}
                   </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                    {[
+                      { icon: Code, text: t(lang, "একই কোড — সবার জন্য", "Same code — for everyone") },
+                      { icon: Database, text: t(lang, "আলাদা ডেটাবেজ — প্রতিটি ইন্সট্যান্সের জন্য", "Separate database — for each instance") },
+                      { icon: Lock, text: t(lang, "স্বতন্ত্র Auth — নিজস্ব ইউজার সিস্টেম", "Independent Auth — own user system") },
+                      { icon: Server, text: t(lang, "নিজস্ব এডমিন — পূর্ণ নিয়ন্ত্রণ", "Own admin — full control") },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-background/50 border border-border/30">
+                        <item.icon className="w-3.5 h-3.5 text-primary shrink-0" />
+                        <span className="text-muted-foreground">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                <StepCard item={{ step: 1, title: "Supabase প্রজেক্ট তৈরি", description: "supabase.com-এ গিয়ে নতুন প্রজেক্ট তৈরি করুন। Settings → API থেকে Project URL এবং anon key কপি করুন।", tip: "service_role key কখনো শেয়ার করবেন না বা ফ্রন্টএন্ড কোডে রাখবেন না!" }} />
-                <StepCard item={{ step: 2, title: "ডেটাবেজ সেটআপ", description: "Supabase Dashboard → SQL Editor → database-setup.sql ফাইলের সম্পূর্ণ SQL কোড পেস্ট করে Run করুন। এটি ১৮টি টেবিল, RLS পলিসি, ফাংশন ও ট্রিগার তৈরি করবে।" }} />
-                <StepCard item={{ step: 3, title: "Storage Bucket তৈরি", description: "Supabase → Storage → New Bucket → নাম: admin-uploads → Public bucket চালু করুন।", tip: "এই বাকেট ব্লগ ইমেজ, লোগো, ফেভিকন আপলোডের জন্য ব্যবহৃত হবে।" }} />
-                <StepCard item={{ step: 4, title: ".env ফাইল কনফিগার করুন", description: ".env.example কপি করে .env নামে সংরক্ষণ করুন। VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID এর মান আপনার Supabase প্রজেক্ট থেকে দিন।" }} />
-                <StepCard item={{ step: 5, title: "Edge Functions ডিপ্লয়", description: "Supabase CLI ইনস্টল করে `supabase link` ও `supabase functions deploy` কমান্ড চালান।" }} />
-                <StepCard item={{ step: 6, title: "প্রথম এডমিন সেটআপ", description: "সাইনআপ করুন, তারপর Supabase SQL Editor-এ গিয়ে user_roles টেবিলে আপনার ইউজারকে 'admin' রোল দিন।", tip: "auto_assign_admin() ট্রিগার সেটআপ করলে ভবিষ্যতে নির্দিষ্ট ইমেইল দিয়ে সাইনআপ করলে স্বয়ংক্রিয়ভাবে এডমিন হবে।" }} />
-                <StepCard item={{ step: 7, title: "ফ্রন্টএন্ড ডিপ্লয়", description: "Vercel (রেকমেন্ডেড), Netlify, বা যেকোনো হোস্টিং-এ ডিপ্লয় করুন। Environment Variables যোগ করতে ভুলবেন না।" }} />
-                <StepCard item={{ step: 8, title: "সাইট কনফিগার করুন", description: "এডমিন প্যানেলে গিয়ে সাইটের নাম, লোগো, যোগাযোগ, সোশ্যাল মিডিয়া, SEO, সাবস্ক্রিপশন প্ল্যান ইত্যাদি কনফিগার করুন।" }} />
+                {/* Steps */}
+                <div className="space-y-4">
+                  {deploySteps.map((item) => (
+                    <StepCard key={item.step} item={item} />
+                  ))}
+                </div>
+
+                {/* Hosting Details */}
+                <div className="mt-4 space-y-3">
+                  <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                    <Monitor className="w-3.5 h-3.5 text-primary" /> {t(lang, "হোস্টিং অপশন বিস্তারিত", "Hosting Options in Detail")}
+                  </h4>
+                  {hostingDetails.map((host) => (
+                    <div key={host.name} className="p-3 rounded-xl bg-muted/30 border border-border/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <HardDrive className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-xs font-bold text-foreground">{host.name}</span>
+                        <Badge variant="outline" className="text-[9px]">{host.badge}</Badge>
+                      </div>
+                      <div className="space-y-1.5 ml-5">
+                        {host.steps.map((step, i) => (
+                          <div key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
+                            <span className="text-primary font-bold shrink-0">{i + 1}.</span>
+                            <span>{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {host.code && <CodeBlock code={host.code} />}
+                    </div>
+                  ))}
+                </div>
 
                 {/* Ownership Table */}
                 <div className="mt-4">
                   <h4 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5 text-primary" /> মালিকানা কাঠামো
+                    <Shield className="w-3.5 h-3.5 text-primary" /> {t(lang, "মালিকানা কাঠামো", "Ownership Structure")}
                   </h4>
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
                     {[
-                      { label: "ফ্রন্টএন্ড কোড", shared: true },
-                      { label: "UI ডিজাইন", shared: true },
-                      { label: "ডেটাবেজ", shared: false },
-                      { label: "ইউজার ও Auth", shared: false },
-                      { label: "এডমিন প্যানেল", shared: false },
-                      { label: "সাবস্ক্রিপশন", shared: false },
+                      { label: t(lang, "ফ্রন্টএন্ড কোড", "Frontend Code"), shared: true },
+                      { label: t(lang, "UI ডিজাইন", "UI Design"), shared: true },
+                      { label: t(lang, "ডেটাবেজ", "Database"), shared: false },
+                      { label: t(lang, "ইউজার ও Auth", "Users & Auth"), shared: false },
+                      { label: t(lang, "এডমিন প্যানেল", "Admin Panel"), shared: false },
+                      { label: t(lang, "সাবস্ক্রিপশন", "Subscriptions"), shared: false },
+                      { label: t(lang, "সাইট সেটিংস", "Site Settings"), shared: false },
+                      { label: t(lang, "ব্লগ কন্টেন্ট", "Blog Content"), shared: false },
                     ].map((item) => (
-                      <div key={item.label} className="flex items-center gap-1.5 p-1.5 rounded-lg bg-muted/50">
+                      <div key={item.label} className="flex items-center gap-1.5 p-2 rounded-lg bg-muted/50">
                         <CheckCircle className={`w-3 h-3 ${item.shared ? "text-blue-400" : "text-green-400"}`} />
                         <span>{item.label}</span>
                         <Badge variant="outline" className="text-[9px] ml-auto">
-                          {item.shared ? "শেয়ারড" : "স্বতন্ত্র"}
+                          {item.shared ? t(lang, "শেয়ারড", "Shared") : t(lang, "স্বতন্ত্র", "Independent")}
                         </Badge>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Hosting options */}
-                <div className="mt-4 p-3 rounded-xl bg-muted/30 border border-border/50">
-                  <h4 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
-                    <Monitor className="w-3.5 h-3.5 text-primary" /> হোস্টিং অপশন
-                  </h4>
-                  <div className="space-y-1.5">
-                    {[
-                      { name: "Vercel", desc: "সবচেয়ে সহজ, ফ্রি প্ল্যান আছে, GitHub ইন্টিগ্রেশন" },
-                      { name: "Netlify", desc: "ফ্রি প্ল্যান, সহজ সেটআপ, ফর্ম সাপোর্ট" },
-                      { name: "cPanel", desc: "npm run build → dist/ ফোল্ডার আপলোড করুন" },
-                    ].map((h) => (
-                      <div key={h.name} className="flex items-start gap-2 text-[11px]">
-                        <ArrowRight className="w-3 h-3 text-primary/50 shrink-0 mt-0.5" />
-                        <span><strong>{h.name}:</strong> {h.desc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Security checklist */}
-                <div className="mt-4 p-3 rounded-xl bg-destructive/5 border border-destructive/15">
+                {/* Security */}
+                <div className="mt-4 p-4 rounded-xl bg-destructive/5 border border-destructive/15">
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-xs font-semibold text-destructive">নিরাপত্তা চেকলিস্ট</p>
-                      <ul className="text-[11px] text-destructive/70 mt-1 space-y-1">
-                        <li>• ডিফল্ট এডমিন URL অবশ্যই পরিবর্তন করুন</li>
-                        <li>• 2FA (Google Authenticator) চালু করুন</li>
-                        <li>• Supabase service_role key কখনো শেয়ার করবেন না</li>
-                        <li>• Email verification চালু রাখুন</li>
-                        <li>• শক্তিশালী পাসওয়ার্ড ব্যবহার করুন</li>
+                      <p className="text-xs font-semibold text-destructive">{t(lang, "নিরাপত্তা চেকলিস্ট", "Security Checklist")}</p>
+                      <ul className="text-[11px] text-destructive/70 mt-1.5 space-y-1.5">
+                        <li>• {t(lang, "ডিফল্ট এডমিন URL (/makuadmingowebs99) অবশ্যই পরিবর্তন করুন", "Change the default admin URL (/makuadmingowebs99)")}</li>
+                        <li>• {t(lang, "2FA (Google Authenticator) চালু করুন — Admin → Security", "Enable 2FA (Google Authenticator) — Admin → Security")}</li>
+                        <li>• {t(lang, "Supabase service_role key কখনো ফ্রন্টএন্ডে রাখবেন না বা শেয়ার করবেন না", "Never put Supabase service_role key in frontend or share it")}</li>
+                        <li>• {t(lang, "Email verification চালু রাখুন — সাইনআপের পর ইমেইল ভেরিফাই ছাড়া লগইন হবে না", "Keep email verification enabled — users can't login without verifying email")}</li>
+                        <li>• {t(lang, "শক্তিশালী পাসওয়ার্ড ব্যবহার করুন (বড় হাতের অক্ষর, সংখ্যা, বিশেষ চিহ্ন)", "Use strong passwords (uppercase, numbers, special characters)")}</li>
+                        <li>• {t(lang, "HTTPS সার্টিফিকেট সক্রিয় রাখুন", "Keep HTTPS certificate active")}</li>
                       </ul>
                     </div>
+                  </div>
+                </div>
+
+                {/* Files to deliver */}
+                <div className="mt-4 p-4 rounded-xl bg-muted/30 border border-border/50">
+                  <h4 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+                    <FolderOpen className="w-3.5 h-3.5 text-primary" /> {t(lang, "ক্রেতাকে যা দিতে হবে", "What to Deliver to the Buyer")}
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                    {[
+                      { name: "src/", desc: t(lang, "সোর্স কোড", "Source code") },
+                      { name: "public/", desc: t(lang, "স্ট্যাটিক অ্যাসেট", "Static assets") },
+                      { name: "supabase/", desc: t(lang, "Edge Functions", "Edge Functions") },
+                      { name: "database-setup.sql", desc: t(lang, "ডেটাবেজ স্কিমা", "Database schema") },
+                      { name: "package.json", desc: t(lang, "ডিপেন্ডেন্সি", "Dependencies") },
+                      { name: ".env.example", desc: t(lang, "টেমপ্লেট env ফাইল", "Template env file") },
+                    ].map((item) => (
+                      <div key={item.name} className="flex items-center gap-2 p-1.5 rounded-lg bg-background/50">
+                        <Code className="w-3 h-3 text-primary shrink-0" />
+                        <span className="font-mono font-semibold text-foreground">{item.name}</span>
+                        <span className="text-muted-foreground ml-auto">{item.desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-2 p-2 rounded-lg bg-destructive/5 border border-destructive/10 text-[11px] text-destructive/70">
+                    ⚠️ {t(lang, "দিবেন না: .env (আপনার credentials), node_modules/, dist/", "DO NOT include: .env (your credentials), node_modules/, dist/")}
                   </div>
                 </div>
               </CardContent>
@@ -302,20 +589,13 @@ export default function AdminDocs() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                  ট্রাবলশুটিং
+                  {t(lang, "সমস্যা সমাধান (ট্রাবলশুটিং)", "Troubleshooting")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {[
-                    { problem: "সাইট লোড হচ্ছে না", solution: ".env ফাইলের মান সঠিক কিনা চেক করুন" },
-                    { problem: "লগইন কাজ করছে না", solution: "Supabase Auth সেটিংস ও email confirmation চেক করুন" },
-                    { problem: "ডেটা দেখাচ্ছে না", solution: "RLS পলিসি ও টেবিল সঠিকভাবে তৈরি হয়েছে কিনা চেক করুন" },
-                    { problem: "এডমিন অ্যাক্সেস নেই", solution: "user_roles টেবিলে আপনার admin রোল আছে কিনা চেক করুন" },
-                    { problem: "ইমেজ আপলোড হচ্ছে না", solution: "admin-uploads বাকেট তৈরি ও Public সেট আছে কিনা চেক করুন" },
-                    { problem: "রাউটিং সমস্যা", solution: ".htaccess / _redirects ফাইল সঠিকভাবে কনফিগার করুন" },
-                  ].map((item) => (
-                    <div key={item.problem} className="flex items-start gap-2 text-[11px] p-2 rounded-lg bg-muted/30">
+                  {troubleshootItems.map((item) => (
+                    <div key={item.problem} className="flex items-start gap-2 text-[11px] p-2.5 rounded-lg bg-muted/30">
                       <AlertTriangle className="w-3 h-3 text-yellow-500 shrink-0 mt-0.5" />
                       <div>
                         <span className="font-semibold text-foreground">{item.problem}:</span>{" "}
@@ -329,7 +609,7 @@ export default function AdminDocs() {
           </motion.div>
         </TabsContent>
 
-        {/* Google Search Console */}
+        {/* ===== GOOGLE TAB ===== */}
         <TabsContent value="gsc" className="space-y-4 mt-4">
           <motion.div {...fadeIn(0)}>
             <Card className="border-border/50">
@@ -346,24 +626,21 @@ export default function AdminDocs() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Google Search Console helps you monitor your site's presence in Google search results. Follow these steps to set it up.
+                  {t(lang, "Google Search Console আপনার সাইটকে Google-এ মনিটর ও অপ্টিমাইজ করতে সাহায্য করে।", "Google Search Console helps you monitor and optimize your site in Google search.")}
                 </p>
               </CardHeader>
               <CardContent className="space-y-5">
-                {gscSteps.map((item) => (
-                  <StepCard key={item.step} item={item} />
-                ))}
-
+                {gscSteps.map((item) => <StepCard key={item.step} item={item} />)}
                 <div className="mt-4 p-3 rounded-xl bg-destructive/5 border border-destructive/15">
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-xs font-semibold text-destructive">Common Issues</p>
+                      <p className="text-xs font-semibold text-destructive">{t(lang, "সাধারণ সমস্যা", "Common Issues")}</p>
                       <ul className="text-[11px] text-destructive/70 mt-1 space-y-1">
-                        <li>• Make sure your site is published before verifying</li>
-                        <li>• Only paste the content VALUE, not the full meta tag</li>
-                        <li>• DNS propagation may take up to 48 hours</li>
-                        <li>• Ensure sitemap.xml is accessible at {domain}/sitemap.xml</li>
+                        <li>• {t(lang, "ভেরিফাই করার আগে সাইট পাবলিশ করা আছে কিনা নিশ্চিত করুন", "Make sure your site is published before verifying")}</li>
+                        <li>• {t(lang, "পুরো meta tag নয়, শুধু content VALUE পেস্ট করুন", "Only paste the content VALUE, not the full meta tag")}</li>
+                        <li>• {t(lang, "DNS propagation-এ ৪৮ ঘণ্টা পর্যন্ত সময় লাগতে পারে", "DNS propagation may take up to 48 hours")}</li>
+                        <li>• {t(lang, `নিশ্চিত করুন sitemap.xml অ্যাক্সেসযোগ্য: ${domain}/sitemap.xml`, `Ensure sitemap.xml is accessible at ${domain}/sitemap.xml`)}</li>
                       </ul>
                     </div>
                   </div>
@@ -371,8 +648,6 @@ export default function AdminDocs() {
               </CardContent>
             </Card>
           </motion.div>
-
-          {/* After GSC - Google Analytics */}
           <motion.div {...fadeIn(1)}>
             <Card className="border-border/50">
               <CardHeader className="pb-3">
@@ -382,15 +657,15 @@ export default function AdminDocs() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <StepCard item={{ step: 1, title: "Create a GA4 Property", description: "Go to https://analytics.google.com → Admin → Create Property. Follow the setup wizard." }} />
-                <StepCard item={{ step: 2, title: "Get Your Measurement ID", description: "After creating the property, go to Data Streams → Web. Your Measurement ID looks like G-XXXXXXXXXX." }} />
-                <StepCard item={{ step: 3, title: "Add to Admin Panel", description: "Go to Admin → Indexing & Code → Analytics tab. Paste your GA4 Measurement ID and save.", tip: "For Google Tag Manager, use the GTM-XXXXXXX format ID instead." }} />
+                <StepCard item={{ step: 1, title: t(lang, "GA4 Property তৈরি করুন", "Create a GA4 Property"), description: t(lang, "https://analytics.google.com → Admin → Create Property। সেটআপ উইজার্ড অনুসরণ করুন।", "Go to https://analytics.google.com → Admin → Create Property. Follow the setup wizard.") }} />
+                <StepCard item={{ step: 2, title: t(lang, "Measurement ID নিন", "Get Your Measurement ID"), description: t(lang, "Property তৈরির পর Data Streams → Web-এ যান। আপনার ID দেখতে G-XXXXXXXXXX এরকম হবে।", "After creating, go to Data Streams → Web. Your ID looks like G-XXXXXXXXXX.") }} />
+                <StepCard item={{ step: 3, title: t(lang, "Admin Panel-এ যোগ করুন", "Add to Admin Panel"), description: t(lang, "Admin → Indexing & Code → Analytics ট্যাবে GA4 Measurement ID পেস্ট করুন ও সেভ করুন।", "Go to Admin → Indexing & Code → Analytics tab. Paste your GA4 Measurement ID and save."), tip: t(lang, "Google Tag Manager ব্যবহার করলে GTM-XXXXXXX ফরম্যাটের ID দিন।", "For Google Tag Manager, use the GTM-XXXXXXX format ID.") }} />
               </CardContent>
             </Card>
           </motion.div>
         </TabsContent>
 
-        {/* Bing */}
+        {/* ===== BING TAB ===== */}
         <TabsContent value="bing" className="space-y-4 mt-4">
           <motion.div {...fadeIn(0)}>
             <Card className="border-border/50">
@@ -407,19 +682,17 @@ export default function AdminDocs() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Bing Webmaster Tools lets you optimize your website for Bing search. You can also import your Google Search Console data.
+                  {t(lang, "Bing Webmaster Tools আপনার সাইটকে Bing সার্চে অপ্টিমাইজ করতে সাহায্য করে। Google Search Console থেকেও ইমপোর্ট করতে পারেন।", "Bing Webmaster Tools helps optimize your site for Bing search. You can also import from Google Search Console.")}
                 </p>
               </CardHeader>
               <CardContent className="space-y-5">
-                {bingSteps.map((item) => (
-                  <StepCard key={item.step} item={item} />
-                ))}
+                {bingSteps.map((item) => <StepCard key={item.step} item={item} />)}
               </CardContent>
             </Card>
           </motion.div>
         </TabsContent>
 
-        {/* Yandex */}
+        {/* ===== YANDEX TAB ===== */}
         <TabsContent value="yandex" className="space-y-4 mt-4">
           <motion.div {...fadeIn(0)}>
             <Card className="border-border/50">
@@ -437,15 +710,13 @@ export default function AdminDocs() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-5">
-                {yandexSteps.map((item) => (
-                  <StepCard key={item.step} item={item} />
-                ))}
+                {yandexSteps.map((item) => <StepCard key={item.step} item={item} />)}
               </CardContent>
             </Card>
           </motion.div>
         </TabsContent>
 
-        {/* Admin Guides */}
+        {/* ===== ADMIN GUIDES TAB ===== */}
         <TabsContent value="guides" className="space-y-4 mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {adminGuides.map((guide, i) => (
@@ -473,49 +744,49 @@ export default function AdminDocs() {
           </div>
         </TabsContent>
 
-        {/* SEO Checklist */}
+        {/* ===== SEO CHECKLIST TAB ===== */}
         <TabsContent value="checklist" className="space-y-4 mt-4">
           <motion.div {...fadeIn(0)}>
             <Card className="border-border/50">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-400" />
-                  SEO Optimization Checklist
+                  {t(lang, "SEO অপ্টিমাইজেশন চেকলিস্ট", "SEO Optimization Checklist")}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground">
-                  Ensure your website is fully optimized for search engines
+                  {t(lang, "আপনার ওয়েবসাইট সার্চ ইঞ্জিনের জন্য সম্পূর্ণ অপ্টিমাইজড কিনা নিশ্চিত করুন", "Ensure your website is fully optimized for search engines")}
                 </p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {[
-                    { category: "Technical SEO", items: [
-                      { text: "Sitemap.xml submitted to Google & Bing", done: true },
-                      { text: "Robots.txt configured correctly", done: true },
-                      { text: "SSL certificate active (HTTPS)", done: true },
-                      { text: "All pages have unique meta titles", done: true },
-                      { text: "All pages have meta descriptions", done: true },
-                      { text: "Canonical URLs set for all pages", done: true },
-                      { text: "Open Graph tags for social sharing", done: true },
-                      { text: "Structured data (JSON-LD) added", done: true },
+                    { category: t(lang, "টেকনিক্যাল SEO", "Technical SEO"), items: [
+                      { text: t(lang, "Sitemap.xml Google ও Bing-এ সাবমিট করা হয়েছে", "Sitemap.xml submitted to Google & Bing"), done: true },
+                      { text: t(lang, "Robots.txt সঠিকভাবে কনফিগার করা হয়েছে", "Robots.txt configured correctly"), done: true },
+                      { text: t(lang, "SSL সার্টিফিকেট (HTTPS) সক্রিয়", "SSL certificate active (HTTPS)"), done: true },
+                      { text: t(lang, "সকল পেজে ইউনিক মেটা টাইটেল আছে", "All pages have unique meta titles"), done: true },
+                      { text: t(lang, "সকল পেজে মেটা ডেসক্রিপশন আছে", "All pages have meta descriptions"), done: true },
+                      { text: t(lang, "Canonical URL সেট করা আছে", "Canonical URLs set for all pages"), done: true },
+                      { text: t(lang, "Open Graph ট্যাগ সোশ্যাল শেয়ারিং-এর জন্য", "Open Graph tags for social sharing"), done: true },
+                      { text: t(lang, "Structured Data (JSON-LD) যোগ করা হয়েছে", "Structured data (JSON-LD) added"), done: true },
                     ]},
-                    { category: "Content SEO", items: [
-                      { text: "Each tool has a unique description", done: true },
-                      { text: "Blog posts have categories and tags", done: true },
-                      { text: "Images have alt text attributes", done: false },
-                      { text: "Internal linking between pages", done: true },
-                      { text: "Focus keywords set for tools", done: true },
+                    { category: t(lang, "কন্টেন্ট SEO", "Content SEO"), items: [
+                      { text: t(lang, "প্রতিটি টুলের ইউনিক ডেসক্রিপশন আছে", "Each tool has a unique description"), done: true },
+                      { text: t(lang, "ব্লগ পোস্টে ক্যাটাগরি ও ট্যাগ আছে", "Blog posts have categories and tags"), done: true },
+                      { text: t(lang, "ইমেজে alt text আছে", "Images have alt text"), done: false },
+                      { text: t(lang, "পেজগুলোর মধ্যে ইন্টারনাল লিংকিং আছে", "Internal linking between pages"), done: true },
+                      { text: t(lang, "টুলসে Focus Keyword সেট করা আছে", "Focus keywords set for tools"), done: true },
                     ]},
-                    { category: "Performance", items: [
-                      { text: "Lazy loading for images", done: true },
-                      { text: "Code splitting (lazy routes)", done: true },
-                      { text: "Minified CSS and JavaScript", done: true },
-                      { text: "Responsive design for mobile", done: true },
+                    { category: t(lang, "পারফরম্যান্স", "Performance"), items: [
+                      { text: t(lang, "ইমেজে Lazy Loading সক্রিয়", "Lazy loading for images"), done: true },
+                      { text: t(lang, "Code Splitting (Lazy Routes) সক্রিয়", "Code splitting (lazy routes)"), done: true },
+                      { text: t(lang, "CSS ও JavaScript Minified", "Minified CSS and JavaScript"), done: true },
+                      { text: t(lang, "মোবাইলের জন্য Responsive Design", "Responsive design for mobile"), done: true },
                     ]},
-                    { category: "Analytics & Monitoring", items: [
-                      { text: "Google Search Console connected", done: false },
-                      { text: "Google Analytics configured", done: false },
-                      { text: "Bing Webmaster Tools connected", done: false },
+                    { category: t(lang, "অ্যানালিটিক্স ও মনিটরিং", "Analytics & Monitoring"), items: [
+                      { text: t(lang, "Google Search Console কানেক্ট করা হয়েছে", "Google Search Console connected"), done: false },
+                      { text: t(lang, "Google Analytics কনফিগার করা হয়েছে", "Google Analytics configured"), done: false },
+                      { text: t(lang, "Bing Webmaster Tools কানেক্ট করা হয়েছে", "Bing Webmaster Tools connected"), done: false },
                     ]},
                   ].map((section) => (
                     <div key={section.category}>
@@ -523,15 +794,11 @@ export default function AdminDocs() {
                       <div className="space-y-1.5">
                         {section.items.map((item, i) => (
                           <div key={i} className="flex items-center gap-2 text-xs">
-                            <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                              item.done ? "bg-green-500/10 text-green-500" : "bg-muted text-muted-foreground"
-                            }`}>
+                            <div className={`w-4 h-4 rounded-full flex items-center justify-center ${item.done ? "bg-green-500/10 text-green-500" : "bg-muted text-muted-foreground"}`}>
                               {item.done ? <CheckCircle className="w-3 h-3" /> : <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />}
                             </div>
-                            <span className={item.done ? "text-muted-foreground" : "text-foreground font-medium"}>
-                              {item.text}
-                            </span>
-                            {!item.done && <Badge variant="outline" className="text-[9px] ml-auto">Pending</Badge>}
+                            <span className={item.done ? "text-muted-foreground" : "text-foreground font-medium"}>{item.text}</span>
+                            {!item.done && <Badge variant="outline" className="text-[9px] ml-auto">{t(lang, "বাকি", "Pending")}</Badge>}
                           </div>
                         ))}
                       </div>
