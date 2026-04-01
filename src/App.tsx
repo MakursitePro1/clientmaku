@@ -9,6 +9,7 @@ import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { ToolCatalogProvider } from "@/contexts/ToolCatalogContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { CodeInjector } from "@/components/CodeInjector";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
