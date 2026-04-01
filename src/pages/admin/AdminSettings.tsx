@@ -73,7 +73,7 @@ const defaultSettings: SiteSettings = {
   site_logo_url: "",
   favicon_url: "",
   contact_email: "contact@cybervenom.com",
-  contact_phone: "+880 1635-915989",
+  contact_phone: "+880 1754-839834",
   contact_address: "",
   contact_form_email: "",
   hero_title: "Your Ultimate Collection",
