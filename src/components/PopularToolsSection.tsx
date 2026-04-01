@@ -15,6 +15,8 @@ const popularToolIds = [
 const popularTools = popularToolIds.map(id => tools.find(t => t.id === id)).filter(Boolean) as typeof tools;
 
 export function PopularToolsSection() {
+  const { premiumToolIds, isToolLocked } = useSubscription();
+  const navigate = useNavigate();
   return (
     <section className="py-24 px-4 relative overflow-hidden">
       {/* Animated background elements */}
