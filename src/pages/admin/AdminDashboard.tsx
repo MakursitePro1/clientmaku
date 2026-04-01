@@ -175,26 +175,36 @@ export default function AdminDashboard() {
       // Revenue
       const totalRevenue = (approvedPayRes.data || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
 
-      // Visitor analytics processing
+      // Visitor analytics - count unique visitors by visitor_id
+      const countUnique = (data: any[] | null) => {
+        if (!data) return 0;
+        const ids = new Set(data.map((v: any) => v.visitor_id).filter(Boolean));
+        // Count entries without visitor_id as individual views
+        const noIdCount = (data || []).filter((v: any) => !v.visitor_id).length;
+        return ids.size + noIdCount;
+      };
+
       const allViews = allViewsRes.data || [];
       const pageCounts: Record<string, number> = {};
-      const viewsByDay: Record<string, number> = {};
+      const viewsByDay: Record<string, Set<string>> = {};
       for (let i = 29; i >= 0; i--) {
         const d = new Date(now);
         d.setDate(d.getDate() - i);
-        viewsByDay[d.toLocaleDateString("en", { month: "short", day: "numeric" })] = 0;
+        viewsByDay[d.toLocaleDateString("en", { month: "short", day: "numeric" })] = new Set();
       }
       allViews.forEach((v: any) => {
         pageCounts[v.page_path] = (pageCounts[v.page_path] || 0) + 1;
         const d = new Date(v.created_at);
         const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
-        if (key in viewsByDay) viewsByDay[key]++;
+        if (key in viewsByDay) {
+          viewsByDay[key].add(v.visitor_id || v.created_at);
+        }
       });
       const topPages = Object.entries(pageCounts)
         .sort(([, a], [, b]) => b - a)
         .slice(0, 8)
         .map(([name, views]) => ({ name: name === "/" ? "Home" : name.replace("/tools/", "").replace("/", ""), views }));
-      const viewsOverTime = Object.entries(viewsByDay).map(([date, views]) => ({ date, views }));
+      const viewsOverTime = Object.entries(viewsByDay).map(([date, set]) => ({ date, views: set.size }));
 
       setStats({
         users: profilesRes.count || 0,
