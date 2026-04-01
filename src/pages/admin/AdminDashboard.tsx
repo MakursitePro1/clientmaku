@@ -37,6 +37,13 @@ interface DashboardStats {
   usersLastWeek: number;
   favsThisWeek: number;
   favsLastWeek: number;
+  // Visitor analytics
+  totalViews: number;
+  viewsToday: number;
+  viewsThisWeek: number;
+  viewsLastWeek: number;
+  topPages: { name: string; views: number }[];
+  viewsOverTime: { date: string; views: number }[];
 }
 
 const CHART_COLORS = [
