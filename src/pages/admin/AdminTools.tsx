@@ -605,7 +605,34 @@ export default function AdminTools() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h3 className="font-medium text-sm text-foreground truncate">{tool.name}</h3>
+                        {editingName === tool.id ? (
+                          <div className="flex items-center gap-1.5">
+                            <Input
+                              value={editNameValue}
+                              onChange={(e) => setEditNameValue(e.target.value)}
+                              placeholder={tool.name}
+                              className="h-7 text-xs w-40"
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") saveCustomName(tool.id);
+                                if (e.key === "Escape") setEditingName(null);
+                              }}
+                            />
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => saveCustomName(tool.id)}>
+                              <Check className="w-3.5 h-3.5 text-green-500" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setEditingName(null)}>
+                              <XIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <h3 className="font-medium text-sm text-foreground truncate">{getDisplayName(tool)}</h3>
+                            <Button variant="ghost" size="icon" className="h-5 w-5 opacity-50 hover:opacity-100" onClick={() => startEditName(tool.id)}>
+                              <Pencil className="w-3 h-3" />
+                            </Button>
+                          </>
+                        )}
                         <Badge variant="secondary" className="text-[10px] shrink-0 hidden sm:inline-flex">{tool.category}</Badge>
                         {hasSeo(tool.id) ? (
                           <Badge className="text-[10px] bg-green-500/10 text-green-600 border-0 shrink-0">
@@ -617,6 +644,9 @@ export default function AdminTools() {
                           </Badge>
                         )}
                       </div>
+                      {toolSettings[tool.id]?.custom_name && (
+                        <p className="text-[10px] text-primary/70 mt-0.5">Original: {tool.name}</p>
+                      )}
                       <p className="text-xs text-muted-foreground truncate mt-0.5">{tool.description}</p>
                     </div>
                   </div>
