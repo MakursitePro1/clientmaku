@@ -48,7 +48,8 @@ export default function AdminLayout() {
     navigate("/");
   };
 
-  const SidebarContent = () => (
+  const SidebarContent = ({ forceExpanded = false }: { forceExpanded?: boolean }) => {
+    const showText = forceExpanded || !collapsed;
     <>
       <div className="p-4 border-b border-border/50">
         <Link to={ADMIN_BASE} className="flex items-center gap-3">
