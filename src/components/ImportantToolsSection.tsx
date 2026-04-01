@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
-import { Star, ArrowRight, Shield } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Star, ArrowRight, Shield, Crown, Lock } from "lucide-react";
 import { tools } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 const importantToolIds = [
   "bin-checker", "ip-blacklist-checker", "whois-lookup",
