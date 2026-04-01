@@ -36,6 +36,7 @@ export interface SiteSettings {
   announcement_text: string;
   announcement_enabled: string;
   admin_slug: string;
+  site_domain: string;
   [key: string]: string;
 }
 
@@ -74,6 +75,7 @@ const defaults: SiteSettings = {
   announcement_text: "",
   announcement_enabled: "false",
   admin_slug: "makuadmingowebs99",
+  site_domain: "https://cybervenoms.com",
 };
 
 interface SiteSettingsContextType {

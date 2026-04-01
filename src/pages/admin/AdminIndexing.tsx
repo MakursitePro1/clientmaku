@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import {
   Save, Globe, Code, FileText, Search, CheckCircle, ExternalLink,
   Copy, AlertTriangle, Zap
@@ -102,6 +103,7 @@ export default function AdminIndexing() {
   const [activeTab, setActiveTab] = useState("indexing");
   const { toast } = useToast();
   const { user } = useAuth();
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     const fetchCodes = async () => {
@@ -146,8 +148,10 @@ export default function AdminIndexing() {
     toast({ title: "Copied!", description: "Text copied to clipboard." });
   };
 
-  const sitemapUrl = `${window.location.origin}/sitemap.xml`;
-  const robotsUrl = `${window.location.origin}/robots.txt`;
+  const baseDomain = settings.site_domain?.trim() || window.location.origin;
+  const origin = baseDomain.replace(/\/+$/, '');
+  const sitemapUrl = `${origin}/sitemap.xml`;
+  const robotsUrl = `${origin}/robots.txt`;
 
   return (
     <div className="space-y-6">
