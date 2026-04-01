@@ -24,6 +24,7 @@ const AdminRoles = lazy(() => import("./pages/admin/AdminRoles"));
 const AdminSEO = lazy(() => import("./pages/admin/AdminSEO"));
 const AdminCustomTools = lazy(() => import("./pages/admin/AdminCustomTools"));
 const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions"));
+const AdminIndexing = lazy(() => import("./pages/admin/AdminIndexing"));
 import { AdminSlugChecker } from "@/components/AdminRouteWrapper";
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
