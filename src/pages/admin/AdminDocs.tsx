@@ -866,7 +866,7 @@ export default function AdminDocs() {
                     },
                     {
                       q: t(lang, "এডমিন URL পরিবর্তন করা কি জরুরি?", "Is it important to change the admin URL?"),
-                      a: t(lang, "অবশ্যই! ডিফল্ট URL (/makuadmingowebs99) সবাই জানে। Admin → Settings → Security থেকে এটি পরিবর্তন করুন। এটি brute-force অ্যাটাক থেকে সুরক্ষিত রাখবে।", "Absolutely! The default URL (/makuadmingowebs99) is known to everyone. Change it from Admin → Settings → Security. This protects against brute-force attacks."),
+                      a: t(lang, "অবশ্যই! ডিফল্ট URL (/makuadm******) সবাই জানে। Admin → Settings → Security থেকে এটি পরিবর্তন করুন। এটি brute-force অ্যাটাক থেকে সুরক্ষিত রাখবে।", "Absolutely! The default URL (/makuadm******) is known to everyone. Change it from Admin → Settings → Security. This protects against brute-force attacks."),
                     },
                     {
                       q: t(lang, "Edge Functions ছাড়া কি ওয়েবসাইট চলবে?", "Will the website work without Edge Functions?"),
