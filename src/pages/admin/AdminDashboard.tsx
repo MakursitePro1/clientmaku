@@ -109,7 +109,7 @@ export default function AdminDashboard() {
         supabase.from("page_views").select("visitor_id").gte("created_at", todayStart.toISOString()).limit(1000),
         supabase.from("page_views").select("visitor_id").gte("created_at", weekAgo.toISOString()).limit(1000),
         supabase.from("page_views").select("visitor_id").gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()).limit(1000),
-        supabase.from("page_views").select("page_path, created_at, visitor_id").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
+        supabase.from("page_views").select("page_path, created_at, visitor_id, country").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
       ]);
 
       const allProfiles = allProfilesRes.data || [];
