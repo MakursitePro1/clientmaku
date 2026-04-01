@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { tools, categories } from "@/data/tools";
+import { MapPin } from "lucide-react";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import {
   Users, Wrench, Heart, Settings, TrendingUp, Shield, FileCode,
@@ -44,6 +45,7 @@ interface DashboardStats {
   viewsLastWeek: number;
   topPages: { name: string; views: number }[];
   viewsOverTime: { date: string; views: number }[];
+  countryData: { name: string; visitors: number }[];
 }
 
 const CHART_COLORS = [
@@ -72,7 +74,7 @@ export default function AdminDashboard() {
     toolSettings: [], favoritesByTool: [], userGrowth: [],
     usersThisWeek: 0, usersLastWeek: 0, favsThisWeek: 0, favsLastWeek: 0,
     totalViews: 0, viewsToday: 0, viewsThisWeek: 0, viewsLastWeek: 0,
-    topPages: [], viewsOverTime: [],
+    topPages: [], viewsOverTime: [], countryData: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -108,7 +110,7 @@ export default function AdminDashboard() {
         supabase.from("page_views").select("visitor_id").gte("created_at", todayStart.toISOString()).limit(1000),
         supabase.from("page_views").select("visitor_id").gte("created_at", weekAgo.toISOString()).limit(1000),
         supabase.from("page_views").select("visitor_id").gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()).limit(1000),
-        supabase.from("page_views").select("page_path, created_at, visitor_id").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
+        supabase.from("page_views").select("page_path, created_at, visitor_id, country").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
       ]);
 
       const allProfiles = allProfilesRes.data || [];
@@ -206,6 +208,20 @@ export default function AdminDashboard() {
         .map(([name, views]) => ({ name: name === "/" ? "Home" : name.replace("/tools/", "").replace("/", ""), views }));
       const viewsOverTime = Object.entries(viewsByDay).map(([date, set]) => ({ date, views: set.size }));
 
+      // Country data - unique visitors per country
+      const countryCounts: Record<string, Set<string>> = {};
+      allViews.forEach((v: any) => {
+        const c = v.country?.trim();
+        if (c) {
+          if (!countryCounts[c]) countryCounts[c] = new Set();
+          countryCounts[c].add(v.visitor_id || v.created_at);
+        }
+      });
+      const countryData = Object.entries(countryCounts)
+        .map(([name, set]) => ({ name, visitors: set.size }))
+        .sort((a, b) => b.visitors - a.visitors)
+        .slice(0, 12);
+
       setStats({
         users: profilesRes.count || 0,
         favorites: favData.length,
@@ -234,6 +250,7 @@ export default function AdminDashboard() {
         viewsLastWeek: countUnique(viewsLastWeekRes.data),
         topPages,
         viewsOverTime,
+        countryData,
       });
       setLoading(false);
     };
@@ -486,6 +503,40 @@ export default function AdminDashboard() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Country-wise Visitors */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }}>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-primary" /> Visitors by Country (Last 30 Days)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {stats.countryData.length > 0 ? (
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.countryData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} interval={0} angle={-30} textAnchor="end" height={60} />
+                    <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                    <Tooltip contentStyle={chartTooltipStyle} />
+                    <Bar dataKey="visitors" radius={[4, 4, 0, 0]}>
+                      {stats.countryData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-[200px] flex items-center justify-center text-muted-foreground text-sm">
+                No country data yet. Visitor locations will appear as traffic comes in.
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
