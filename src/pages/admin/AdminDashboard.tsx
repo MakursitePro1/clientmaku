@@ -207,6 +207,20 @@ export default function AdminDashboard() {
         .map(([name, views]) => ({ name: name === "/" ? "Home" : name.replace("/tools/", "").replace("/", ""), views }));
       const viewsOverTime = Object.entries(viewsByDay).map(([date, set]) => ({ date, views: set.size }));
 
+      // Country data - unique visitors per country
+      const countryCounts: Record<string, Set<string>> = {};
+      allViews.forEach((v: any) => {
+        const c = v.country?.trim();
+        if (c) {
+          if (!countryCounts[c]) countryCounts[c] = new Set();
+          countryCounts[c].add(v.visitor_id || v.created_at);
+        }
+      });
+      const countryData = Object.entries(countryCounts)
+        .map(([name, set]) => ({ name, visitors: set.size }))
+        .sort((a, b) => b.visitors - a.visitors)
+        .slice(0, 12);
+
       setStats({
         users: profilesRes.count || 0,
         favorites: favData.length,
@@ -235,6 +249,7 @@ export default function AdminDashboard() {
         viewsLastWeek: countUnique(viewsLastWeekRes.data),
         topPages,
         viewsOverTime,
+        countryData,
       });
       setLoading(false);
     };
