@@ -22,7 +22,7 @@ const Index = () => {
       <ImportantToolsSection />
       <ToolsGrid />
       <TestimonialsSection />
-      <ContactSection />
+      
       <ToolsBanner />
       <Footer />
       <ScrollToTop />
