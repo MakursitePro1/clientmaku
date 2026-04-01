@@ -5,7 +5,7 @@ import { PopularToolsSection } from "@/components/PopularToolsSection";
 import { ImportantToolsSection } from "@/components/ImportantToolsSection";
 import { ToolsGrid } from "@/components/ToolsGrid";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
-import { ContactSection } from "@/components/ContactSection";
+
 import { Footer } from "@/components/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -22,7 +22,7 @@ const Index = () => {
       <ImportantToolsSection />
       <ToolsGrid />
       <TestimonialsSection />
-      <ContactSection />
+      
       <ToolsBanner />
       <Footer />
       <ScrollToTop />
