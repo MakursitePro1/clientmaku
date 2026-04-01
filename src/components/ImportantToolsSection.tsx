@@ -19,6 +19,8 @@ const row1 = importantTools.slice(0, 5);
 const row2 = importantTools.slice(5);
 
 export function ImportantToolsSection() {
+  const { premiumToolIds, isToolLocked } = useSubscription();
+  const navigate = useNavigate();
   return (
     <section className="py-20 px-4 relative overflow-hidden">
       <div className="absolute inset-0 cyber-grid opacity-10" />
