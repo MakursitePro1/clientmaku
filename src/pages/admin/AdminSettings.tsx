@@ -72,7 +72,7 @@ const defaultSettings: SiteSettings = {
   site_description: "Your ultimate collection of free online web tools",
   site_logo_url: "",
   favicon_url: "",
-  contact_email: "contact@cybervenom.com",
+  contact_email: "contact@cybervenoms.com",
   contact_phone: "+880 1754-839834",
   contact_address: "",
   contact_form_email: "",
