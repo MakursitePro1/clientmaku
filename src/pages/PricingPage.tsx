@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, Crown, Sparkles, Zap, Shield, ArrowRight } from "lucide-react";
+import { Check, Crown, Sparkles, Zap, Shield, ArrowRight, ShieldCheck, MessageCircle, ChevronDown, RefreshCcw } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -33,6 +33,49 @@ interface Gateway {
   account_name: string;
   instructions: string;
   color: string;
+}
+
+const pricingFaqs = [
+  { q: "How does the subscription work?", a: "Choose a plan, make payment via your preferred method, and submit the transaction ID. Once verified by our team, your premium access is activated instantly." },
+  { q: "Can I upgrade or downgrade my plan?", a: "Yes! You can change your plan at any time. The new plan will take effect after your current billing period ends." },
+  { q: "What payment methods are accepted?", a: "We accept bKash, Nagad, Rocket, Upay, Bank Transfer, and Card payments. More options are being added regularly." },
+  { q: "How long does verification take?", a: "Most payments are verified within 1-2 hours during business hours. You'll be notified once your subscription is activated." },
+  { q: "What happens when my subscription expires?", a: "Premium tools will be locked again, but your data and settings are preserved. You can renew anytime to regain access." },
+  { q: "Is there a free trial available?", a: "While we don't offer a free trial, we have a 7-day money-back guarantee. Try premium risk-free!" },
+];
+
+function PricingFAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  return (
+    <div className="space-y-3">
+      {pricingFaqs.map((faq, i) => (
+        <div key={i}
+          className={cn(
+            "rounded-2xl border overflow-hidden transition-all duration-300 cursor-pointer",
+            openIndex === i ? "border-primary/30 bg-primary/5 shadow-lg shadow-primary/5" : "border-border/50 bg-card hover:border-primary/20"
+          )}
+          onClick={() => setOpenIndex(openIndex === i ? null : i)}>
+          <div className="flex items-center justify-between px-5 py-4">
+            <h3 className="font-semibold text-sm pr-4">{faq.q}</h3>
+            <motion.div animate={{ rotate: openIndex === i ? 180 : 0 }} transition={{ duration: 0.25 }}
+              className={cn("shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors",
+                openIndex === i ? "bg-primary/10 text-primary" : "bg-accent/50 text-muted-foreground")}>
+              <ChevronDown className="w-4 h-4" />
+            </motion.div>
+          </div>
+          <motion.div initial={false}
+            animate={{ height: openIndex === i ? "auto" : 0, opacity: openIndex === i ? 1 : 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            className="overflow-hidden">
+            <div className="px-5 pb-4">
+              <div className="h-px bg-border/50 mb-3" />
+              <p className="text-muted-foreground text-sm leading-relaxed">{faq.a}</p>
+            </div>
+          </motion.div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function PricingPage() {
@@ -223,6 +266,33 @@ export default function PricingPage() {
               );
             })}
           </div>
+
+          {/* Money-Back Guarantee */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+            className="mt-16 flex justify-center">
+            <div className="inline-flex items-center gap-4 px-8 py-5 rounded-2xl border-2 border-green-500/20 bg-green-500/5 backdrop-blur-sm">
+              <div className="w-14 h-14 rounded-xl bg-green-500/10 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-7 h-7 text-green-500" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">7-Day Money-Back Guarantee</h3>
+                <p className="text-sm text-muted-foreground">Not satisfied? Get a full refund within 7 days. No questions asked.</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* FAQ Section */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+            className="mt-20 max-w-3xl mx-auto">
+            <div className="text-center mb-10">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-sm font-semibold text-primary mb-4">
+                <MessageCircle className="w-4 h-4" />
+                FAQ
+              </span>
+              <h2 className="text-3xl font-extrabold tracking-tight">Frequently Asked <span className="gradient-text">Questions</span></h2>
+            </div>
+            <PricingFAQ />
+          </motion.div>
         </div>
       </main>
 
