@@ -146,8 +146,10 @@ export default function AdminIndexing() {
     toast({ title: "Copied!", description: "Text copied to clipboard." });
   };
 
-  const sitemapUrl = `${window.location.origin}/sitemap.xml`;
-  const robotsUrl = `${window.location.origin}/robots.txt`;
+  const baseDomain = settings.site_domain?.trim() || window.location.origin;
+  const origin = baseDomain.replace(/\/+$/, '');
+  const sitemapUrl = `${origin}/sitemap.xml`;
+  const robotsUrl = `${origin}/robots.txt`;
 
   return (
     <div className="space-y-6">
