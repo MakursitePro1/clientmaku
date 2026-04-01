@@ -69,7 +69,7 @@ We strive to keep all ${totalTools} tools free and accessible to everyone.`
     icon: Mail,
     title: "Contact Us",
     content: `If you have any questions about our Privacy Policy, Terms of Service, or any other concerns, please reach out to us:
-• Email: contact@cybervenom.com
+• Email: contact@cybervenoms.com
 • Use the Contact form on our website
 • Response time: within 48 hours
 

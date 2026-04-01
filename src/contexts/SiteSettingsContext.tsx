@@ -44,7 +44,7 @@ const defaults: SiteSettings = {
   site_tagline: "Free Online Web Tools",
   site_description: "Your ultimate collection of free online web tools",
   site_logo_url: "",
-  contact_email: "hello@cybervenom.com",
+  contact_email: "contact@cybervenoms.com",
   contact_phone: "+880 1754-839834",
   contact_address: "Dhaka, Bangladesh",
   hero_title: "Your Ultimate Collection",
