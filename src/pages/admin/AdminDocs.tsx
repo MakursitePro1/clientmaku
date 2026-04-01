@@ -144,7 +144,7 @@ const adminGuides = [
 ];
 
 export default function AdminDocs() {
-  const [activeTab, setActiveTab] = useState("gsc");
+  const [activeTab, setActiveTab] = useState("deploy");
   const { settings } = useSiteSettings();
   const domain = settings.site_domain?.trim() || "https://cybervenoms.com";
 
