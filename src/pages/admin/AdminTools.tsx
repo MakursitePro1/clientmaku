@@ -61,6 +61,8 @@ export default function AdminTools() {
   const [seoData, setSeoData] = useState<ToolSEO | null>(null);
   const [seoSaving, setSeoSaving] = useState(false);
   const [structuredDataStr, setStructuredDataStr] = useState("");
+  const [editingName, setEditingName] = useState<string | null>(null);
+  const [editNameValue, setEditNameValue] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
