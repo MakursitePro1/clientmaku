@@ -268,6 +268,7 @@ export type Database = {
           page_path: string
           referrer: string | null
           user_agent: string | null
+          visitor_id: string | null
         }
         Insert: {
           country?: string | null
@@ -276,6 +277,7 @@ export type Database = {
           page_path?: string
           referrer?: string | null
           user_agent?: string | null
+          visitor_id?: string | null
         }
         Update: {
           country?: string | null
@@ -284,6 +286,7 @@ export type Database = {
           page_path?: string
           referrer?: string | null
           user_agent?: string | null
+          visitor_id?: string | null
         }
         Relationships: []
       }
