@@ -65,14 +65,7 @@ export function ImportantToolsSection() {
 function ToolCard({ tool, isPremium, isLocked, navigate }: { tool: typeof tools[0]; isPremium: boolean; isLocked: boolean; navigate: ReturnType<typeof useNavigate> }) {
   return (
     <Link
-      to={isLocked ? "#" : tool.path}
-      onClick={(e) => {
-        if (isLocked) {
-          e.preventDefault();
-          navigate("/pricing");
-          toast.info("This is a premium tool. Subscribe to unlock!");
-        }
-      }}
+      to={tool.path}
       className="group relative shrink-0 w-[280px] block rounded-2xl border border-foreground/20 bg-card/80 backdrop-blur-sm shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.08)] p-5 transition-all duration-500 hover:-translate-y-1 hover:border-foreground/40 overflow-hidden"
     >
       {/* Premium Badge */}

@@ -88,14 +88,7 @@ export function PopularToolsSection() {
               transition={{ delay: i * 0.04, duration: 0.4, ease: "easeOut" }}
             >
               <Link
-                to={isToolLocked(tool.id) ? "#" : tool.path}
-                onClick={(e) => {
-                  if (isToolLocked(tool.id)) {
-                    e.preventDefault();
-                    navigate("/pricing");
-                    toast.info("This is a premium tool. Subscribe to unlock!");
-                  }
-                }}
+                to={tool.path}
                 className="group relative flex flex-col items-center text-center p-5 rounded-2xl border border-foreground/20 bg-card/60 backdrop-blur-md shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.08)] transition-all duration-500 hover:-translate-y-3 hover:border-foreground/40 hover:shadow-[0_20px_60px_-15px] overflow-hidden h-full"
                 style={{
                   // @ts-ignore

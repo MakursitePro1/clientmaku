@@ -193,14 +193,7 @@ export function ToolsGrid() {
                   transition={{ duration: 0.4, delay: Math.min(index * 0.03, 0.5), type: "spring", stiffness: 120 }}
                 >
                   <Link
-                    to={isToolLocked(tool.id) ? "#" : tool.path}
-                    onClick={(e) => {
-                      if (isToolLocked(tool.id)) {
-                        e.preventDefault();
-                        navigate("/pricing");
-                        toast.info("This is a premium tool. Subscribe to unlock!");
-                      }
-                    }}
+                    to={tool.path}
                     className={cn(
                       "group relative block rounded-2xl overflow-hidden h-full border-[3px] transition-all duration-500 hover:-translate-y-3",
                       isToolLocked(tool.id) ? "border-amber-500/40 hover:border-amber-500/70" : "border-primary/40 hover:border-primary/70"
