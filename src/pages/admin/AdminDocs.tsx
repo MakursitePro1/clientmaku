@@ -7,7 +7,8 @@ import {
   Search, Globe, Shield, Zap, ExternalLink, CheckCircle, AlertTriangle,
   BookOpen, FileText, ArrowRight, Copy, Monitor, Smartphone, Settings,
   Eye, BarChart3, Link2, Code, Bell, Users, Crown, Upload, Languages,
-  Database, Key, Terminal, FolderOpen, Lock, Server, Layers, HardDrive
+  Database, Key, Terminal, FolderOpen, Lock, Server, Layers, HardDrive,
+  HelpCircle, ChevronDown
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
@@ -374,6 +375,7 @@ export default function AdminDocs() {
     { id: "yandex", label: "Yandex", icon: Globe },
     { id: "guides", label: t(lang, "এডমিন গাইড", "Admin Guides"), icon: BookOpen },
     { id: "checklist", label: t(lang, "SEO চেকলিস্ট", "SEO Checklist"), icon: CheckCircle },
+    { id: "faq", label: "FAQ", icon: HelpCircle },
   ];
 
   const deploySteps = getDeploySteps(lang);
@@ -803,6 +805,90 @@ export default function AdminDocs() {
                         ))}
                       </div>
                     </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
+
+        {/* ===== FAQ TAB ===== */}
+        <TabsContent value="faq" className="space-y-4 mt-4">
+          <motion.div {...fadeIn(0)}>
+            <Card className="border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-primary" />
+                  {t(lang, "সাধারণ প্রশ্ন-উত্তর (FAQ)", "Frequently Asked Questions (FAQ)")}
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  {t(lang, "এই প্ল্যাটফর্ম সম্পর্কে সবচেয়ে বেশি জিজ্ঞাসিত প্রশ্ন ও উত্তর", "Most commonly asked questions about this platform")}
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[
+                    {
+                      q: t(lang, "একটি সাইটে পরিবর্তন করলে কি অন্য সাইটেও পরিবর্তন হবে?", "Will changes on one site affect another site?"),
+                      a: t(lang, "না! প্রতিটি সাইটের নিজস্ব Supabase ডেটাবেজ আছে। একটি সাইটে করা পরিবর্তন ১০০% আলাদা এবং অন্য কোনো সাইটকে প্রভাবিত করবে না।", "No! Each site has its own Supabase database. Changes are 100% isolated and won't affect any other site."),
+                    },
+                    {
+                      q: t(lang, "প্ল্যাটফর্মে কতগুলো টুলস আছে?", "How many tools does the platform include?"),
+                      a: t(lang, "২১০+ বিল্ট-ইন টুলস আছে ১২+ ক্যাটাগরিতে। এছাড়াও Admin Panel থেকে কাস্টম HTML টুলস আপলোড করা যায়।", "210+ built-in tools across 12+ categories, plus custom HTML tool upload support from the Admin Panel."),
+                    },
+                    {
+                      q: t(lang, "ক্রেতারা কি নিজের টুলস যোগ করতে পারবে?", "Can buyers add their own tools?"),
+                      a: t(lang, "হ্যাঁ! Admin Panel → Custom Tools থেকে .html ফাইল আপলোড করে বা সরাসরি HTML কোড পেস্ট করে নতুন টুলস যোগ করা যায়। প্রতিটি কাস্টম টুলের নিজস্ব URL, SEO সেটিংস ও ক্যাটাগরি থাকবে।", "Yes! Upload .html files or paste HTML code directly from Admin → Custom Tools. Each custom tool gets its own URL, SEO settings, and category."),
+                    },
+                    {
+                      q: t(lang, "কোন হোস্টিং-এ ডিপ্লয় করা ভালো?", "Which hosting is best for deployment?"),
+                      a: t(lang, "Vercel সবচেয়ে সহজ এবং রেকমেন্ডেড — ফ্রি প্ল্যান আছে, GitHub ইন্টিগ্রেশন আছে, অটো-ডিপ্লয় আছে। Netlify-ও ভালো অপশন। cPanel/Shared Hosting-এও চলবে তবে .htaccess কনফিগার করতে হবে।", "Vercel is the easiest and recommended — has a free plan, GitHub integration, and auto-deploy. Netlify is also a good option. cPanel/Shared Hosting works too but requires .htaccess configuration."),
+                    },
+                    {
+                      q: t(lang, "সাবস্ক্রিপশন/পেমেন্ট সিস্টেম কিভাবে কাজ করে?", "How does the subscription/payment system work?"),
+                      a: t(lang, "Admin Panel → Subscriptions থেকে প্ল্যান তৈরি করুন (USD ও BDT দামসহ)। পেমেন্ট গেটওয়ে (bKash, Nagad ইত্যাদি) সেটআপ করুন। ইউজাররা পেমেন্ট করে ট্রানজেকশন ID দিলে এডমিন ম্যানুয়ালি অ্যাপ্রুভ করবেন।", "Create plans (with USD & BDT prices) from Admin → Subscriptions. Set up payment gateways (bKash, Nagad, etc.). When users pay and submit transaction IDs, admin manually approves them."),
+                    },
+                    {
+                      q: t(lang, "প্রিমিয়াম টুলস কিভাবে সেটআপ করবো?", "How do I set up premium tools?"),
+                      a: t(lang, "Admin → Subscriptions → Premium Tools সেকশনে যান। যে টুলসগুলো প্রিমিয়াম করতে চান সেগুলো সিলেক্ট করুন এবং মিনিমাম প্ল্যান সেট করুন। প্রিমিয়াম টুলসে স্বয়ংক্রিয়ভাবে Premium Badge দেখাবে।", "Go to Admin → Subscriptions → Premium Tools section. Select tools you want to make premium and set the minimum plan. Premium tools will automatically show a Premium Badge."),
+                    },
+                    {
+                      q: t(lang, "SEO কিভাবে ম্যানেজ করবো?", "How do I manage SEO?"),
+                      a: t(lang, "Admin → SEO-তে প্রতিটি পেজ ও টুলের মেটা টাইটেল, ডেসক্রিপশন, কীওয়ার্ড, OG ইমেজ এডিট করতে পারবেন। Structured Data (JSON-LD) অটো-জেনারেট হয়। সার্চ ইঞ্জিনে ইনডেক্স করতে Admin → Indexing & Code থেকে ভেরিফিকেশন কোড দিন।", "Edit meta titles, descriptions, keywords, OG images for every page and tool in Admin → SEO. Structured Data (JSON-LD) is auto-generated. For search engine indexing, add verification codes from Admin → Indexing & Code."),
+                    },
+                    {
+                      q: t(lang, "ব্লগ সিস্টেম কি কাস্টমাইজেবল?", "Is the blog system customizable?"),
+                      a: t(lang, "হ্যাঁ! Admin → Blog থেকে পোস্ট তৈরি, এডিট ও ডিলিট করতে পারবেন। রিচ টেক্সট এডিটর (Bold, Italic, ইমেজ, লিংক, হেডিং) আছে। ফিচারড ইমেজ, ক্যাটাগরি, ট্যাগ সব কাস্টমাইজ করা যায়।", "Yes! Create, edit, and delete posts from Admin → Blog. Rich text editor (Bold, Italic, images, links, headings) is included. Featured images, categories, and tags are all customizable."),
+                    },
+                    {
+                      q: t(lang, "2FA / Two-Factor Authentication কিভাবে চালু করবো?", "How do I enable 2FA / Two-Factor Authentication?"),
+                      a: t(lang, "Admin → Security-তে যান → 'Enable 2FA' ক্লিক করুন → Google Authenticator অ্যাপ দিয়ে QR কোড স্ক্যান করুন → 6-ডিজিট কোড দিয়ে ভেরিফাই করুন। এরপর থেকে প্রতিবার এডমিন লগইনে OTP লাগবে।", "Go to Admin → Security → Click 'Enable 2FA' → Scan QR code with Google Authenticator app → Verify with 6-digit code. After this, OTP will be required for every admin login."),
+                    },
+                    {
+                      q: t(lang, "এডমিন URL পরিবর্তন করা কি জরুরি?", "Is it important to change the admin URL?"),
+                      a: t(lang, "অবশ্যই! ডিফল্ট URL (/makuadmingowebs99) সবাই জানে। Admin → Settings → Security থেকে এটি পরিবর্তন করুন। এটি brute-force অ্যাটাক থেকে সুরক্ষিত রাখবে।", "Absolutely! The default URL (/makuadmingowebs99) is known to everyone. Change it from Admin → Settings → Security. This protects against brute-force attacks."),
+                    },
+                    {
+                      q: t(lang, "Edge Functions ছাড়া কি ওয়েবসাইট চলবে?", "Will the website work without Edge Functions?"),
+                      a: t(lang, "হ্যাঁ, মূল ওয়েবসাইট ও বেশিরভাগ ফিচার চলবে। তবে কিছু এডমিন ফিচার (ইউজার ব্যান/আনব্যান, টেম্প মেইল, টেম্প নম্বর, TOTP ম্যানেজমেন্ট) Edge Functions ছাড়া কাজ করবে না।", "Yes, the main website and most features will work. However, some admin features (user ban/unban, temp mail, temp number, TOTP management) won't work without Edge Functions."),
+                    },
+                    {
+                      q: t(lang, "সাইটের লোগো ও ফেভিকন কিভাবে পরিবর্তন করবো?", "How do I change the site logo and favicon?"),
+                      a: t(lang, "Admin → Settings → General ট্যাবে যান। সেখানে লোগো ও ফেভিকন আপলোড করার অপশন পাবেন। ইমেজ আপলোড করলে তা admin-uploads বাকেটে সংরক্ষিত হবে এবং পুরো সাইটে আপডেট হবে।", "Go to Admin → Settings → General tab. You'll find options to upload logo and favicon. Uploaded images are stored in the admin-uploads bucket and update across the entire site."),
+                    },
+                  ].map((faq, i) => (
+                    <details key={i} className="group rounded-xl border border-border/50 bg-muted/20 overflow-hidden">
+                      <summary className="flex items-center gap-3 p-3.5 cursor-pointer hover:bg-muted/40 transition-colors list-none">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <span className="text-[10px] font-bold text-primary">{i + 1}</span>
+                        </div>
+                        <span className="text-xs font-semibold text-foreground flex-1">{faq.q}</span>
+                        <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0 transition-transform group-open:rotate-180" />
+                      </summary>
+                      <div className="px-3.5 pb-3.5 pt-0 ml-9">
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">{faq.a}</p>
+                      </div>
+                    </details>
                   ))}
                 </div>
               </CardContent>
