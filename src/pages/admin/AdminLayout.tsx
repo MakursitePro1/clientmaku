@@ -6,7 +6,7 @@ import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { useSessionTimeout } from "@/hooks/useSessionTimeout";
 import {
   LayoutDashboard, Wrench, Users, Settings, ChevronLeft, ChevronRight,
-  LogOut, Home, Shield, Menu, X, FileText, Megaphone, UserCog, Search, Upload, Crown
+  LogOut, Home, Shield, Menu, X, FileText, Megaphone, UserCog, Search, Upload, Crown, Globe2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
