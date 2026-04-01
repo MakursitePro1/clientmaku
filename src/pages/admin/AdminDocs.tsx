@@ -375,6 +375,7 @@ export default function AdminDocs() {
     { id: "yandex", label: "Yandex", icon: Globe },
     { id: "guides", label: t(lang, "এডমিন গাইড", "Admin Guides"), icon: BookOpen },
     { id: "checklist", label: t(lang, "SEO চেকলিস্ট", "SEO Checklist"), icon: CheckCircle },
+    { id: "faq", label: "FAQ", icon: HelpCircle },
   ];
 
   const deploySteps = getDeploySteps(lang);
