@@ -115,6 +115,7 @@ const App = () => (
             <TooltipProvider>
               <Toaster />
               <Sonner />
+              <CodeInjector />
               <BrowserRouter>
                 <Suspense fallback={<Loading />}>
           <Routes>
