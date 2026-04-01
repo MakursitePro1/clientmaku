@@ -175,6 +175,27 @@ export default function AdminDashboard() {
       // Revenue
       const totalRevenue = (approvedPayRes.data || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
 
+      // Visitor analytics processing
+      const allViews = allViewsRes.data || [];
+      const pageCounts: Record<string, number> = {};
+      const viewsByDay: Record<string, number> = {};
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        viewsByDay[d.toLocaleDateString("en", { month: "short", day: "numeric" })] = 0;
+      }
+      allViews.forEach((v: any) => {
+        pageCounts[v.page_path] = (pageCounts[v.page_path] || 0) + 1;
+        const d = new Date(v.created_at);
+        const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
+        if (key in viewsByDay) viewsByDay[key]++;
+      });
+      const topPages = Object.entries(pageCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 8)
+        .map(([name, views]) => ({ name: name === "/" ? "Home" : name.replace("/tools/", "").replace("/", ""), views }));
+      const viewsOverTime = Object.entries(viewsByDay).map(([date, views]) => ({ date, views }));
+
       setStats({
         users: profilesRes.count || 0,
         favorites: favData.length,
@@ -197,6 +218,12 @@ export default function AdminDashboard() {
         usersLastWeek,
         favsThisWeek,
         favsLastWeek,
+        totalViews: totalViewsRes.count || 0,
+        viewsToday: viewsTodayRes.count || 0,
+        viewsThisWeek: viewsWeekRes.count || 0,
+        viewsLastWeek: viewsLastWeekRes.count || 0,
+        topPages,
+        viewsOverTime,
       });
       setLoading(false);
     };
