@@ -44,6 +44,7 @@ interface DashboardStats {
   viewsLastWeek: number;
   topPages: { name: string; views: number }[];
   viewsOverTime: { date: string; views: number }[];
+  countryData: { name: string; visitors: number }[];
 }
 
 const CHART_COLORS = [
