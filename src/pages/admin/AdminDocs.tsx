@@ -7,7 +7,8 @@ import {
   Search, Globe, Shield, Zap, ExternalLink, CheckCircle, AlertTriangle,
   BookOpen, FileText, ArrowRight, Copy, Monitor, Smartphone, Settings,
   Eye, BarChart3, Link2, Code, Bell, Users, Crown, Upload, Languages,
-  Database, Key, Terminal, FolderOpen, Lock, Server, Layers, HardDrive
+  Database, Key, Terminal, FolderOpen, Lock, Server, Layers, HardDrive,
+  HelpCircle, ChevronDown
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
