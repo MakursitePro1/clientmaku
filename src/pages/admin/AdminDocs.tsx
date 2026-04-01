@@ -144,11 +144,12 @@ const adminGuides = [
 ];
 
 export default function AdminDocs() {
-  const [activeTab, setActiveTab] = useState("gsc");
+  const [activeTab, setActiveTab] = useState("deploy");
   const { settings } = useSiteSettings();
   const domain = settings.site_domain?.trim() || "https://cybervenoms.com";
 
   const tabs = [
+    { id: "deploy", label: "Deployment", icon: Upload },
     { id: "gsc", label: "Google", icon: Search },
     { id: "bing", label: "Bing", icon: Globe },
     { id: "yandex", label: "Yandex", icon: Globe },
@@ -197,6 +198,136 @@ export default function AdminDocs() {
             </TabsTrigger>
           ))}
         </TabsList>
+
+        {/* Deployment Guide */}
+        <TabsContent value="deploy" className="space-y-4 mt-4">
+          <motion.div {...fadeIn(0)}>
+            <Card className="border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Upload className="w-4 h-4 text-primary" />
+                  ডিপ্লয়মেন্ট ও স্ক্রিপ্ট বিতরণ গাইড
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  ওয়েবসাইট ডিপ্লয়, ডেটাবেজ সেটআপ, এবং স্ক্রিপ্ট বিক্রির জন্য সম্পূর্ণ নির্দেশিকা
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                {/* Architecture */}
+                <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
+                  <h4 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+                    <Code className="w-3.5 h-3.5 text-primary" /> আর্কিটেকচার
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    প্রতিটি ক্রেতা একই ফ্রন্টএন্ড কোড পায়, কিন্তু <strong>নিজস্ব Supabase প্রজেক্ট</strong> কানেক্ট করে — ফলে প্রতিটি ইন্সট্যান্সের ডেটা সম্পূর্ণ আলাদা ও স্বতন্ত্র।
+                  </p>
+                </div>
+
+                <StepCard item={{ step: 1, title: "Supabase প্রজেক্ট তৈরি", description: "supabase.com-এ গিয়ে নতুন প্রজেক্ট তৈরি করুন। Settings → API থেকে Project URL এবং anon key কপি করুন।", tip: "service_role key কখনো শেয়ার করবেন না বা ফ্রন্টএন্ড কোডে রাখবেন না!" }} />
+                <StepCard item={{ step: 2, title: "ডেটাবেজ সেটআপ", description: "Supabase Dashboard → SQL Editor → database-setup.sql ফাইলের সম্পূর্ণ SQL কোড পেস্ট করে Run করুন। এটি ১৮টি টেবিল, RLS পলিসি, ফাংশন ও ট্রিগার তৈরি করবে।" }} />
+                <StepCard item={{ step: 3, title: "Storage Bucket তৈরি", description: "Supabase → Storage → New Bucket → নাম: admin-uploads → Public bucket চালু করুন।", tip: "এই বাকেট ব্লগ ইমেজ, লোগো, ফেভিকন আপলোডের জন্য ব্যবহৃত হবে।" }} />
+                <StepCard item={{ step: 4, title: ".env ফাইল কনফিগার করুন", description: ".env.example কপি করে .env নামে সংরক্ষণ করুন। VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID এর মান আপনার Supabase প্রজেক্ট থেকে দিন।" }} />
+                <StepCard item={{ step: 5, title: "Edge Functions ডিপ্লয়", description: "Supabase CLI ইনস্টল করে `supabase link` ও `supabase functions deploy` কমান্ড চালান।" }} />
+                <StepCard item={{ step: 6, title: "প্রথম এডমিন সেটআপ", description: "সাইনআপ করুন, তারপর Supabase SQL Editor-এ গিয়ে user_roles টেবিলে আপনার ইউজারকে 'admin' রোল দিন।", tip: "auto_assign_admin() ট্রিগার সেটআপ করলে ভবিষ্যতে নির্দিষ্ট ইমেইল দিয়ে সাইনআপ করলে স্বয়ংক্রিয়ভাবে এডমিন হবে।" }} />
+                <StepCard item={{ step: 7, title: "ফ্রন্টএন্ড ডিপ্লয়", description: "Vercel (রেকমেন্ডেড), Netlify, বা যেকোনো হোস্টিং-এ ডিপ্লয় করুন। Environment Variables যোগ করতে ভুলবেন না।" }} />
+                <StepCard item={{ step: 8, title: "সাইট কনফিগার করুন", description: "এডমিন প্যানেলে গিয়ে সাইটের নাম, লোগো, যোগাযোগ, সোশ্যাল মিডিয়া, SEO, সাবস্ক্রিপশন প্ল্যান ইত্যাদি কনফিগার করুন।" }} />
+
+                {/* Ownership Table */}
+                <div className="mt-4">
+                  <h4 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-primary" /> মালিকানা কাঠামো
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    {[
+                      { label: "ফ্রন্টএন্ড কোড", shared: true },
+                      { label: "UI ডিজাইন", shared: true },
+                      { label: "ডেটাবেজ", shared: false },
+                      { label: "ইউজার ও Auth", shared: false },
+                      { label: "এডমিন প্যানেল", shared: false },
+                      { label: "সাবস্ক্রিপশন", shared: false },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center gap-1.5 p-1.5 rounded-lg bg-muted/50">
+                        <CheckCircle className={`w-3 h-3 ${item.shared ? "text-blue-400" : "text-green-400"}`} />
+                        <span>{item.label}</span>
+                        <Badge variant="outline" className="text-[9px] ml-auto">
+                          {item.shared ? "শেয়ারড" : "স্বতন্ত্র"}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Hosting options */}
+                <div className="mt-4 p-3 rounded-xl bg-muted/30 border border-border/50">
+                  <h4 className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+                    <Monitor className="w-3.5 h-3.5 text-primary" /> হোস্টিং অপশন
+                  </h4>
+                  <div className="space-y-1.5">
+                    {[
+                      { name: "Vercel", desc: "সবচেয়ে সহজ, ফ্রি প্ল্যান আছে, GitHub ইন্টিগ্রেশন" },
+                      { name: "Netlify", desc: "ফ্রি প্ল্যান, সহজ সেটআপ, ফর্ম সাপোর্ট" },
+                      { name: "cPanel", desc: "npm run build → dist/ ফোল্ডার আপলোড করুন" },
+                    ].map((h) => (
+                      <div key={h.name} className="flex items-start gap-2 text-[11px]">
+                        <ArrowRight className="w-3 h-3 text-primary/50 shrink-0 mt-0.5" />
+                        <span><strong>{h.name}:</strong> {h.desc}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Security checklist */}
+                <div className="mt-4 p-3 rounded-xl bg-destructive/5 border border-destructive/15">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-semibold text-destructive">নিরাপত্তা চেকলিস্ট</p>
+                      <ul className="text-[11px] text-destructive/70 mt-1 space-y-1">
+                        <li>• ডিফল্ট এডমিন URL অবশ্যই পরিবর্তন করুন</li>
+                        <li>• 2FA (Google Authenticator) চালু করুন</li>
+                        <li>• Supabase service_role key কখনো শেয়ার করবেন না</li>
+                        <li>• Email verification চালু রাখুন</li>
+                        <li>• শক্তিশালী পাসওয়ার্ড ব্যবহার করুন</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Troubleshooting */}
+          <motion.div {...fadeIn(1)}>
+            <Card className="border-border/50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                  ট্রাবলশুটিং
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {[
+                    { problem: "সাইট লোড হচ্ছে না", solution: ".env ফাইলের মান সঠিক কিনা চেক করুন" },
+                    { problem: "লগইন কাজ করছে না", solution: "Supabase Auth সেটিংস ও email confirmation চেক করুন" },
+                    { problem: "ডেটা দেখাচ্ছে না", solution: "RLS পলিসি ও টেবিল সঠিকভাবে তৈরি হয়েছে কিনা চেক করুন" },
+                    { problem: "এডমিন অ্যাক্সেস নেই", solution: "user_roles টেবিলে আপনার admin রোল আছে কিনা চেক করুন" },
+                    { problem: "ইমেজ আপলোড হচ্ছে না", solution: "admin-uploads বাকেট তৈরি ও Public সেট আছে কিনা চেক করুন" },
+                    { problem: "রাউটিং সমস্যা", solution: ".htaccess / _redirects ফাইল সঠিকভাবে কনফিগার করুন" },
+                  ].map((item) => (
+                    <div key={item.problem} className="flex items-start gap-2 text-[11px] p-2 rounded-lg bg-muted/30">
+                      <AlertTriangle className="w-3 h-3 text-yellow-500 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-semibold text-foreground">{item.problem}:</span>{" "}
+                        <span className="text-muted-foreground">{item.solution}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </TabsContent>
 
         {/* Google Search Console */}
         <TabsContent value="gsc" className="space-y-4 mt-4">
