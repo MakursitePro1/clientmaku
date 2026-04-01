@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Crown, TrendingUp } from "lucide-react";
+import { ArrowRight, Flame, Crown, TrendingUp, Lock } from "lucide-react";
 import { tools } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
-
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { toast } from "sonner";
 const popularToolIds = [
   "internet-speed-tester", "password-generator", "qr-code-maker",
   "hash-generator", "encryption-tool", "typing-test",
