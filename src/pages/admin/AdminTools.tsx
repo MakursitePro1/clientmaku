@@ -119,6 +119,36 @@ export default function AdminTools() {
     setSaving(null);
   };
 
+  const startEditName = (toolId: string) => {
+    const current = toolSettings[toolId]?.custom_name || "";
+    setEditingName(toolId);
+    setEditNameValue(current);
+  };
+
+  const saveCustomName = async (toolId: string) => {
+    setSaving(toolId);
+    const { error } = await supabase
+      .from("tool_settings")
+      .upsert({ tool_id: toolId, custom_name: editNameValue, updated_at: new Date().toISOString() }, { onConflict: "tool_id" });
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      setToolSettings((prev) => ({
+        ...prev,
+        [toolId]: { ...(prev[toolId] || { tool_id: toolId, is_enabled: true, is_featured: false, custom_name: "" }), custom_name: editNameValue },
+      }));
+      toast({ title: "✅ Name Updated!", description: `Tool name saved.` });
+    }
+    setEditingName(null);
+    setSaving(null);
+  };
+
+  const getDisplayName = (tool: Tool) => {
+    const custom = toolSettings[tool.id]?.custom_name;
+    return custom || tool.name;
+  };
+
   const openSeoEditor = (tool: Tool) => {
     const existing = toolSeoMap[tool.id];
     setSeoTool(tool);
