@@ -249,7 +249,7 @@ export default function AdminSettings() {
         icon: MessageCircle,
         description: "Contact details for the website",
         fields: [
-          { key: "contact_email", label: "Contact Email", type: "input", placeholder: "contact@cybervenom.com", icon: Mail },
+          { key: "contact_email", label: "Contact Email", type: "input", placeholder: "contact@cybervenoms.com", icon: Mail },
           { key: "contact_phone", label: "Phone Number", type: "input", placeholder: "+880...", icon: Phone },
           { key: "contact_address", label: "Address", type: "textarea", placeholder: "Your address...", icon: MapPin },
           { key: "contact_form_email", label: "Form Submission Email", type: "input", placeholder: "forms@cybervenom.com", icon: Mail },
