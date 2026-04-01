@@ -71,7 +71,7 @@ export default function AdminTools() {
   }, []);
 
   const fetchSettings = async () => {
-    const { data } = await supabase.from("tool_settings").select("tool_id, is_enabled, is_featured");
+    const { data } = await supabase.from("tool_settings").select("tool_id, is_enabled, is_featured, custom_name");
     if (data) {
       const map: Record<string, ToolSetting> = {};
       data.forEach((s: any) => { map[s.tool_id] = s; });
