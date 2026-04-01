@@ -223,6 +223,33 @@ export default function PricingPage() {
               );
             })}
           </div>
+
+          {/* Money-Back Guarantee */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+            className="mt-16 flex justify-center">
+            <div className="inline-flex items-center gap-4 px-8 py-5 rounded-2xl border-2 border-green-500/20 bg-green-500/5 backdrop-blur-sm">
+              <div className="w-14 h-14 rounded-xl bg-green-500/10 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-7 h-7 text-green-500" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">7-Day Money-Back Guarantee</h3>
+                <p className="text-sm text-muted-foreground">Not satisfied? Get a full refund within 7 days. No questions asked.</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* FAQ Section */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+            className="mt-20 max-w-3xl mx-auto">
+            <div className="text-center mb-10">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-sm font-semibold text-primary mb-4">
+                <MessageCircle className="w-4 h-4" />
+                FAQ
+              </span>
+              <h2 className="text-3xl font-extrabold tracking-tight">Frequently Asked <span className="gradient-text">Questions</span></h2>
+            </div>
+            <PricingFAQ />
+          </motion.div>
         </div>
       </main>
 
