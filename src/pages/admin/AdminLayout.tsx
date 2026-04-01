@@ -50,13 +50,14 @@ export default function AdminLayout() {
 
   const SidebarContent = ({ forceExpanded = false }: { forceExpanded?: boolean }) => {
     const showText = forceExpanded || !collapsed;
+    return (
     <>
       <div className="p-4 border-b border-border/50">
         <Link to={ADMIN_BASE} className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
             <Shield className="w-5 h-5 text-primary" />
           </div>
-          {!collapsed && (
+          {showText && (
             <div>
               <h1 className="font-bold text-foreground text-sm">Admin Panel</h1>
               <p className="text-[10px] text-muted-foreground">Cyber Venom</p>
@@ -65,7 +66,7 @@ export default function AdminLayout() {
         </Link>
       </div>
 
-      <nav className="flex-1 p-3 space-y-1">
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {sidebarLinks.map((link) => (
           <Link
             key={link.path}
@@ -79,7 +80,7 @@ export default function AdminLayout() {
             )}
           >
             <link.icon className="w-4 h-4 shrink-0" />
-            {!collapsed && <span>{link.name}</span>}
+            {showText && <span>{link.name}</span>}
           </Link>
         ))}
       </nav>
@@ -90,18 +91,19 @@ export default function AdminLayout() {
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-all"
         >
           <Home className="w-4 h-4 shrink-0" />
-          {!collapsed && <span>Back to Site</span>}
+          {showText && <span>Back to Site</span>}
         </Link>
         <button
           onClick={handleSignOut}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all"
         >
           <LogOut className="w-4 h-4 shrink-0" />
-          {!collapsed && <span>Sign Out</span>}
+          {showText && <span>Sign Out</span>}
         </button>
       </div>
     </>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen flex bg-background">
