@@ -103,7 +103,7 @@ export default function AdminTools() {
 
   const toggleSetting = async (toolId: string, field: "is_enabled" | "is_featured") => {
     setSaving(toolId);
-    const current = toolSettings[toolId] || { tool_id: toolId, is_enabled: true, is_featured: false };
+    const current = toolSettings[toolId] || { tool_id: toolId, is_enabled: true, is_featured: false, custom_name: "" };
     const newValue = !current[field];
     const updated = { ...current, [field]: newValue };
 
