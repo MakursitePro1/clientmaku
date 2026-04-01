@@ -122,8 +122,20 @@ export function PopularToolsSection() {
                   }}
                 />
 
+                {/* Premium Badge */}
+                {premiumToolIds.includes(tool.id) && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-2.5 right-2.5 z-30 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-bold shadow-lg shadow-amber-500/30"
+                  >
+                    <Crown className="w-3 h-3" />
+                    {isToolLocked(tool.id) ? <Lock className="w-2.5 h-2.5" /> : "PRO"}
+                  </motion.div>
+                )}
+
                 {/* Rank badge for top 3 */}
-                {i < 3 && (
+                {i < 3 && !premiumToolIds.includes(tool.id) && (
                   <div className="absolute top-2.5 right-2.5 z-20">
                     <motion.div
                       initial={{ scale: 0, rotate: -30 }}
