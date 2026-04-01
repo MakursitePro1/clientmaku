@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ImageUploadField } from "@/components/ImageUploadField";
 import {
   Search, Star, Wrench, ArrowLeft, Save, Globe, FileText,
-  Share2, Twitter, Code, CheckCircle, AlertTriangle, Eye, Settings2, Link2
+  Share2, Twitter, Code, CheckCircle, AlertTriangle, Eye, Settings2, Link2, Pencil, X as XIcon, Check
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
