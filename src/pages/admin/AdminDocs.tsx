@@ -149,6 +149,7 @@ export default function AdminDocs() {
   const domain = settings.site_domain?.trim() || "https://cybervenoms.com";
 
   const tabs = [
+    { id: "deploy", label: "Deployment", icon: Upload },
     { id: "gsc", label: "Google", icon: Search },
     { id: "bing", label: "Bing", icon: Globe },
     { id: "yandex", label: "Yandex", icon: Globe },
