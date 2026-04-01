@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, ArrowRight, ChevronDown, X, Sparkles, Wrench, Zap, TrendingUp, Star, Grid3X3 } from "lucide-react";
+import { Search, Filter, ArrowRight, ChevronDown, X, Sparkles, Wrench, Zap, TrendingUp, Star, Grid3X3, Crown, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { type ToolCategory } from "@/data/tools";
 import { Navbar } from "@/components/Navbar";
@@ -11,7 +11,9 @@ import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useToolCatalog } from "@/contexts/ToolCatalogContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 
 export default function ToolsPage() {
