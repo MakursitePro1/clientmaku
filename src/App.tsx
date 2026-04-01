@@ -198,6 +198,7 @@ const App = () => (
               <Route path="custom-tools" element={<AdminCustomTools />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="indexing" element={<AdminIndexing />} />
+              <Route path="docs" element={<AdminDocs />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="roles" element={<AdminRoles />} />
               <Route path="security" element={<AdminSecurity />} />
