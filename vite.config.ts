@@ -27,7 +27,8 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           "vendor-react": ["react", "react-dom", "react-router-dom"],
-          "vendor-ui": ["framer-motion", "lucide-react", "sonner"],
+          "vendor-motion": ["framer-motion"],
+          "vendor-icons": ["lucide-react"],
           "vendor-supabase": ["@supabase/supabase-js"],
           "vendor-query": ["@tanstack/react-query"],
           "vendor-editor": ["@tiptap/react", "@tiptap/starter-kit"],
