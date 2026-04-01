@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, ArrowRight, ChevronDown, X, Sparkles, Wrench, Zap, TrendingUp, Star, Grid3X3 } from "lucide-react";
+import { Search, Filter, ArrowRight, ChevronDown, X, Sparkles, Wrench, Zap, TrendingUp, Star, Grid3X3, Crown, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { type ToolCategory } from "@/data/tools";
 import { Navbar } from "@/components/Navbar";
@@ -11,7 +11,9 @@ import { SEOHead } from "@/components/SEOHead";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useToolCatalog } from "@/contexts/ToolCatalogContext";
+import { useSubscription } from "@/contexts/SubscriptionContext";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 
 export default function ToolsPage() {
@@ -330,6 +332,11 @@ export default function ToolsPage() {
 
 /* ===== COLORFUL TOOL CARD ===== */
 function ToolCard({ tool, index }: { tool: import("@/data/tools").Tool; index: number }) {
+  const { premiumToolIds, isToolLocked } = useSubscription();
+  const navigate = useNavigate();
+  const isPremium = premiumToolIds.includes(tool.id);
+  const locked = isToolLocked(tool.id);
+
   return (
     <motion.div
       layout
@@ -339,10 +346,32 @@ function ToolCard({ tool, index }: { tool: import("@/data/tools").Tool; index: n
       transition={{ duration: 0.3, delay: Math.min(index * 0.015, 0.3) }}
     >
       <Link
-        to={tool.path}
-        className="group relative block rounded-2xl p-5 border border-border/30 transition-all duration-500 overflow-hidden h-full hover:border-transparent hover:shadow-xl hover:-translate-y-1"
+        to={locked ? "#" : tool.path}
+        onClick={(e) => {
+          if (locked) {
+            e.preventDefault();
+            navigate("/pricing");
+            toast.info("This is a premium tool. Subscribe to unlock!");
+          }
+        }}
+        className={cn(
+          "group relative block rounded-2xl p-5 border transition-all duration-500 overflow-hidden h-full hover:border-transparent hover:shadow-xl hover:-translate-y-1",
+          locked ? "border-amber-500/30" : "border-border/30"
+        )}
         style={{ background: 'hsl(var(--card))' }}
       >
+        {/* Premium Badge */}
+        {isPremium && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute top-2 right-2 z-30 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-bold shadow-lg shadow-amber-500/30"
+          >
+            <Crown className="w-3 h-3" />
+            {locked ? <Lock className="w-2.5 h-2.5" /> : "PRO"}
+          </motion.div>
+        )}
+
         {/* Top accent stripe */}
         <div className="absolute top-0 left-0 right-0 h-[2px] transition-all duration-500 opacity-40 group-hover:opacity-100"
           style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
