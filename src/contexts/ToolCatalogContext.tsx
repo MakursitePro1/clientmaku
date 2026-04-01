@@ -28,50 +28,55 @@ const ToolCatalogContext = createContext<ToolCatalogContextValue>({
 
 export function ToolCatalogProvider({ children }: { children: ReactNode }) {
   const [customTools, setCustomTools] = useState<Tool[]>([]);
+  const [customNames, setCustomNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
 
-    supabase
-      .from("custom_tools")
-      .select("*")
-      .eq("is_enabled", true)
-      .is("deleted_at", null)
-      .then(({ data, error }) => {
-        if (!mounted) return;
+    Promise.all([
+      supabase.from("custom_tools").select("*").eq("is_enabled", true).is("deleted_at", null),
+      supabase.from("tool_settings").select("tool_id, custom_name").neq("custom_name", ""),
+    ]).then(([customRes, namesRes]) => {
+      if (!mounted) return;
 
-        if (!error && data) {
-          setCustomTools(
-            data.map((tool: any) => ({
-              id: `custom-${tool.slug}`,
-              name: tool.name,
-              description: tool.description || "Custom tool",
-              icon: ((lucideIcons as Record<string, LucideIcon>)[tool.icon_name]) || FileCode,
-              category: (tool.category || "utility") as ToolCategory,
-              path: `/tools/custom/${tool.slug}`,
-              color: tool.color || "hsl(263, 85%, 58%)",
-            }))
-          );
-        }
+      if (!customRes.error && customRes.data) {
+        setCustomTools(
+          customRes.data.map((tool: any) => ({
+            id: `custom-${tool.slug}`,
+            name: tool.name,
+            description: tool.description || "Custom tool",
+            icon: ((lucideIcons as Record<string, LucideIcon>)[tool.icon_name]) || FileCode,
+            category: (tool.category || "utility") as ToolCategory,
+            path: `/tools/custom/${tool.slug}`,
+            color: tool.color || "hsl(263, 85%, 58%)",
+          }))
+        );
+      }
 
-        setLoading(false);
-      });
+      if (!namesRes.error && namesRes.data) {
+        const map: Record<string, string> = {};
+        namesRes.data.forEach((r: any) => { if (r.custom_name) map[r.tool_id] = r.custom_name; });
+        setCustomNames(map);
+      }
 
-    return () => {
-      mounted = false;
-    };
+      setLoading(false);
+    });
+
+    return () => { mounted = false; };
   }, []);
 
   const tools = useMemo(() => {
     const seen = new Set<string>();
 
-    return [...staticTools, ...customTools].filter((tool) => {
-      if (seen.has(tool.id)) return false;
-      seen.add(tool.id);
-      return true;
-    });
-  }, [customTools]);
+    return [...staticTools, ...customTools]
+      .filter((tool) => {
+        if (seen.has(tool.id)) return false;
+        seen.add(tool.id);
+        return true;
+      })
+      .map((tool) => customNames[tool.id] ? { ...tool, name: customNames[tool.id] } : tool);
+  }, [customTools, customNames]);
 
   const categoryCounts = useMemo(() => {
     return tools.reduce<Record<string, number>>((acc, tool) => {
