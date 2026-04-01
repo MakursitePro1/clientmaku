@@ -485,6 +485,15 @@ CREATE POLICY "Service role full access" ON public.totp_secrets FOR ALL TO servi
 
 CREATE INDEX idx_page_views_created_at ON public.page_views (created_at DESC);
 CREATE INDEX idx_page_views_page_path ON public.page_views (page_path);
+CREATE INDEX idx_page_views_visitor_id ON public.page_views (visitor_id);
+CREATE INDEX idx_page_views_country ON public.page_views (country);
+CREATE INDEX idx_favorites_user_id ON public.favorites (user_id);
+CREATE INDEX idx_tool_settings_tool_id ON public.tool_settings (tool_id);
+CREATE INDEX idx_blog_posts_slug ON public.blog_posts (slug);
+CREATE INDEX idx_blog_posts_status ON public.blog_posts (status);
+CREATE INDEX idx_custom_tools_slug ON public.custom_tools (slug);
+CREATE INDEX idx_user_subscriptions_user_id ON public.user_subscriptions (user_id);
+CREATE INDEX idx_payment_requests_user_id ON public.payment_requests (user_id);
 
 -- ================================================================
 -- Done! Your database is ready.
