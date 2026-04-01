@@ -83,10 +83,13 @@ export default function AdminDashboard() {
       const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
       const thirtyDaysAgo = new Date(now); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+      const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+
       const [
         profilesRes, allProfilesRes, favoritesRes, blogRes, customToolsRes,
         toolSettingsRes, rolesRes, premiumRes,
-        subsRes, pendingPayRes, approvedPayRes, recentPayRes
+        subsRes, pendingPayRes, approvedPayRes, recentPayRes,
+        totalViewsRes, viewsTodayRes, viewsWeekRes, viewsLastWeekRes, allViewsRes
       ] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("display_name, created_at").order("created_at", { ascending: false }).limit(200),
@@ -100,6 +103,12 @@ export default function AdminDashboard() {
         supabase.from("payment_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("payment_requests").select("amount").eq("status", "approved"),
         supabase.from("payment_requests").select("amount, status, created_at, payment_method").order("created_at", { ascending: false }).limit(5),
+        // Visitor analytics
+        supabase.from("page_views").select("id", { count: "exact", head: true }),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", weekAgo.toISOString()),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()),
+        supabase.from("page_views").select("page_path, created_at").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
       ]);
 
       const allProfiles = allProfilesRes.data || [];
