@@ -106,6 +106,7 @@ const defaultSettings: SiteSettings = {
   announcement_text: "",
   announcement_enabled: "false",
   admin_slug: "makuadmingowebs99",
+  site_domain: "https://cybervenoms.com",
 };
 
 type SettingField = {
