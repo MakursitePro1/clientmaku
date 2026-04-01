@@ -10,6 +10,7 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { ToolCatalogProvider } from "@/contexts/ToolCatalogContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import { CodeInjector } from "@/components/CodeInjector";
+import { PageTracker } from "@/components/PageTracker";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -116,8 +117,9 @@ const App = () => (
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <CodeInjector />
-              <BrowserRouter>
+               <CodeInjector />
+               <BrowserRouter>
+                <PageTracker />
                 <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Index />} />

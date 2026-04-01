@@ -37,6 +37,13 @@ interface DashboardStats {
   usersLastWeek: number;
   favsThisWeek: number;
   favsLastWeek: number;
+  // Visitor analytics
+  totalViews: number;
+  viewsToday: number;
+  viewsThisWeek: number;
+  viewsLastWeek: number;
+  topPages: { name: string; views: number }[];
+  viewsOverTime: { date: string; views: number }[];
 }
 
 const CHART_COLORS = [
@@ -64,6 +71,8 @@ export default function AdminDashboard() {
     recentUsers: [], recentPayments: [], categoryData: [],
     toolSettings: [], favoritesByTool: [], userGrowth: [],
     usersThisWeek: 0, usersLastWeek: 0, favsThisWeek: 0, favsLastWeek: 0,
+    totalViews: 0, viewsToday: 0, viewsThisWeek: 0, viewsLastWeek: 0,
+    topPages: [], viewsOverTime: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -74,10 +83,13 @@ export default function AdminDashboard() {
       const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
       const thirtyDaysAgo = new Date(now); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+      const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+
       const [
         profilesRes, allProfilesRes, favoritesRes, blogRes, customToolsRes,
         toolSettingsRes, rolesRes, premiumRes,
-        subsRes, pendingPayRes, approvedPayRes, recentPayRes
+        subsRes, pendingPayRes, approvedPayRes, recentPayRes,
+        totalViewsRes, viewsTodayRes, viewsWeekRes, viewsLastWeekRes, allViewsRes
       ] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("profiles").select("display_name, created_at").order("created_at", { ascending: false }).limit(200),
@@ -91,6 +103,12 @@ export default function AdminDashboard() {
         supabase.from("payment_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("payment_requests").select("amount").eq("status", "approved"),
         supabase.from("payment_requests").select("amount, status, created_at, payment_method").order("created_at", { ascending: false }).limit(5),
+        // Visitor analytics
+        supabase.from("page_views").select("id", { count: "exact", head: true }),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", todayStart.toISOString()),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", weekAgo.toISOString()),
+        supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()),
+        supabase.from("page_views").select("page_path, created_at").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
       ]);
 
       const allProfiles = allProfilesRes.data || [];
@@ -157,6 +175,27 @@ export default function AdminDashboard() {
       // Revenue
       const totalRevenue = (approvedPayRes.data || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
 
+      // Visitor analytics processing
+      const allViews = allViewsRes.data || [];
+      const pageCounts: Record<string, number> = {};
+      const viewsByDay: Record<string, number> = {};
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        viewsByDay[d.toLocaleDateString("en", { month: "short", day: "numeric" })] = 0;
+      }
+      allViews.forEach((v: any) => {
+        pageCounts[v.page_path] = (pageCounts[v.page_path] || 0) + 1;
+        const d = new Date(v.created_at);
+        const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
+        if (key in viewsByDay) viewsByDay[key]++;
+      });
+      const topPages = Object.entries(pageCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 8)
+        .map(([name, views]) => ({ name: name === "/" ? "Home" : name.replace("/tools/", "").replace("/", ""), views }));
+      const viewsOverTime = Object.entries(viewsByDay).map(([date, views]) => ({ date, views }));
+
       setStats({
         users: profilesRes.count || 0,
         favorites: favData.length,
@@ -179,6 +218,12 @@ export default function AdminDashboard() {
         usersLastWeek,
         favsThisWeek,
         favsLastWeek,
+        totalViews: totalViewsRes.count || 0,
+        viewsToday: viewsTodayRes.count || 0,
+        viewsThisWeek: viewsWeekRes.count || 0,
+        viewsLastWeek: viewsLastWeekRes.count || 0,
+        topPages,
+        viewsOverTime,
       });
       setLoading(false);
     };
@@ -193,10 +238,10 @@ export default function AdminDashboard() {
   };
 
   const statCards = [
+    { title: "Total Views", value: stats.totalViews, icon: Eye, change: getChangeText(stats.viewsThisWeek, stats.viewsLastWeek), up: stats.viewsThisWeek >= stats.viewsLastWeek },
+    { title: "Today Views", value: stats.viewsToday, icon: Activity, change: "today", up: stats.viewsToday > 0 },
     { title: "Total Tools", value: tools.length + stats.customTools, icon: Wrench, change: `${stats.enabledTools} active`, up: true },
     { title: "Registered Users", value: stats.users, icon: Users, change: getChangeText(stats.usersThisWeek, stats.usersLastWeek), up: stats.usersThisWeek >= stats.usersLastWeek },
-    { title: "Total Favorites", value: stats.favorites, icon: Heart, change: getChangeText(stats.favsThisWeek, stats.favsLastWeek), up: stats.favsThisWeek >= stats.favsLastWeek },
-    { title: "Blog Posts", value: stats.blogPosts, icon: Globe, change: "published", up: true },
     { title: "Active Subs", value: stats.activeSubscriptions, icon: Crown, change: `${stats.pendingPayments} pending`, up: stats.activeSubscriptions > 0 },
     { title: "Revenue", value: `$${stats.totalRevenue.toFixed(0)}`, icon: DollarSign, change: "total", up: stats.totalRevenue > 0 },
   ];
@@ -272,10 +317,56 @@ export default function AdminDashboard() {
         ))}
       </div>
 
+      {/* Visitor Traffic Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="lg:col-span-2">
+          <Card className="border-border/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Eye className="w-4 h-4 text-primary" /> Page Views (30 Days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[280px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={stats.viewsOverTime} margin={{ top: 5, right: 10, left: -10, bottom: 50 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="date" tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }} angle={-45} textAnchor="end" interval={2} />
+                    <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                    <Tooltip contentStyle={chartTooltipStyle} />
+                    <Area type="monotone" dataKey="views" stroke="hsl(142, 71%, 45%)" fill="hsl(142, 71%, 45%)" fillOpacity={0.15} strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <Card className="border-border/50 h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-primary" /> Top Pages
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {stats.topPages.length > 0 ? stats.topPages.map((page, i) => (
+                <div key={i} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
+                  <span className="text-xs text-foreground truncate max-w-[150px]">{page.name}</span>
+                  <Badge variant="secondary" className="text-[10px] shrink-0">{page.views} views</Badge>
+                </div>
+              )) : (
+                <p className="text-sm text-muted-foreground text-center py-4">No visitor data yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* User Growth Area Chart */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
           <Card className="border-border/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
