@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
-import { Star, ArrowRight, Shield } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Star, ArrowRight, Shield, Crown, Lock } from "lucide-react";
 import { tools } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 const importantToolIds = [
   "bin-checker", "ip-blacklist-checker", "whois-lookup",
@@ -16,6 +19,8 @@ const row1 = importantTools.slice(0, 5);
 const row2 = importantTools.slice(5);
 
 export function ImportantToolsSection() {
+  const { premiumToolIds, isToolLocked } = useSubscription();
+  const navigate = useNavigate();
   return (
     <section className="py-20 px-4 relative overflow-hidden">
       <div className="absolute inset-0 cyber-grid opacity-10" />
@@ -39,7 +44,7 @@ export function ImportantToolsSection() {
         <div className="relative mb-4 overflow-hidden mask-fade-x">
           <div className="flex gap-4 animate-marquee-left">
             {[...row1, ...row1, ...row1, ...row1].map((tool, i) => (
-              <ToolCard key={`r1-${i}`} tool={tool} />
+              <ToolCard key={`r1-${i}`} tool={tool} isPremium={premiumToolIds.includes(tool.id)} isLocked={isToolLocked(tool.id)} navigate={navigate} />
             ))}
           </div>
         </div>
@@ -48,7 +53,7 @@ export function ImportantToolsSection() {
         <div className="relative overflow-hidden mask-fade-x">
           <div className="flex gap-4 animate-marquee-right">
             {[...row2, ...row2, ...row2, ...row2].map((tool, i) => (
-              <ToolCard key={`r2-${i}`} tool={tool} />
+              <ToolCard key={`r2-${i}`} tool={tool} isPremium={premiumToolIds.includes(tool.id)} isLocked={isToolLocked(tool.id)} navigate={navigate} />
             ))}
           </div>
         </div>
@@ -57,12 +62,30 @@ export function ImportantToolsSection() {
   );
 }
 
-function ToolCard({ tool }: { tool: typeof tools[0] }) {
+function ToolCard({ tool, isPremium, isLocked, navigate }: { tool: typeof tools[0]; isPremium: boolean; isLocked: boolean; navigate: ReturnType<typeof useNavigate> }) {
   return (
     <Link
-      to={tool.path}
+      to={isLocked ? "#" : tool.path}
+      onClick={(e) => {
+        if (isLocked) {
+          e.preventDefault();
+          navigate("/pricing");
+          toast.info("This is a premium tool. Subscribe to unlock!");
+        }
+      }}
       className="group relative shrink-0 w-[280px] block rounded-2xl border border-foreground/20 bg-card/80 backdrop-blur-sm shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.08)] p-5 transition-all duration-500 hover:-translate-y-1 hover:border-foreground/40 overflow-hidden"
     >
+      {/* Premium Badge */}
+      {isPremium && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute top-2 right-2 z-30 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-bold shadow-lg shadow-amber-500/30"
+        >
+          <Crown className="w-3 h-3" />
+          {isLocked ? <Lock className="w-2.5 h-2.5" /> : "PRO"}
+        </motion.div>
+      )}
       <div className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity"
         style={{ background: `linear-gradient(90deg, transparent, ${tool.color}, transparent)` }}
       />

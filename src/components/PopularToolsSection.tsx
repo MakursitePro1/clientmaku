@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Crown, TrendingUp } from "lucide-react";
+import { ArrowRight, Flame, Crown, TrendingUp, Lock } from "lucide-react";
 import { tools } from "@/data/tools";
 import { FavoriteButton } from "@/components/FavoriteButton";
-
+import { useSubscription } from "@/contexts/SubscriptionContext";
+import { toast } from "sonner";
 const popularToolIds = [
   "internet-speed-tester", "password-generator", "qr-code-maker",
   "hash-generator", "encryption-tool", "typing-test",
@@ -14,6 +15,8 @@ const popularToolIds = [
 const popularTools = popularToolIds.map(id => tools.find(t => t.id === id)).filter(Boolean) as typeof tools;
 
 export function PopularToolsSection() {
+  const { premiumToolIds, isToolLocked } = useSubscription();
+  const navigate = useNavigate();
   return (
     <section className="py-24 px-4 relative overflow-hidden">
       {/* Animated background elements */}
@@ -85,7 +88,14 @@ export function PopularToolsSection() {
               transition={{ delay: i * 0.04, duration: 0.4, ease: "easeOut" }}
             >
               <Link
-                to={tool.path}
+                to={isToolLocked(tool.id) ? "#" : tool.path}
+                onClick={(e) => {
+                  if (isToolLocked(tool.id)) {
+                    e.preventDefault();
+                    navigate("/pricing");
+                    toast.info("This is a premium tool. Subscribe to unlock!");
+                  }
+                }}
                 className="group relative flex flex-col items-center text-center p-5 rounded-2xl border border-foreground/20 bg-card/60 backdrop-blur-md shadow-[0_4px_24px_-6px_hsl(var(--primary)/0.08)] transition-all duration-500 hover:-translate-y-3 hover:border-foreground/40 hover:shadow-[0_20px_60px_-15px] overflow-hidden h-full"
                 style={{
                   // @ts-ignore
@@ -112,8 +122,20 @@ export function PopularToolsSection() {
                   }}
                 />
 
+                {/* Premium Badge */}
+                {premiumToolIds.includes(tool.id) && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-2.5 right-2.5 z-30 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-bold shadow-lg shadow-amber-500/30"
+                  >
+                    <Crown className="w-3 h-3" />
+                    {isToolLocked(tool.id) ? <Lock className="w-2.5 h-2.5" /> : "PRO"}
+                  </motion.div>
+                )}
+
                 {/* Rank badge for top 3 */}
-                {i < 3 && (
+                {i < 3 && !premiumToolIds.includes(tool.id) && (
                   <div className="absolute top-2.5 right-2.5 z-20">
                     <motion.div
                       initial={{ scale: 0, rotate: -30 }}
