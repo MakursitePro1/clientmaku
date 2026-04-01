@@ -79,181 +79,236 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAll = async () => {
-      const now = new Date();
-      const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
-      const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-      const thirtyDaysAgo = new Date(now); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const PAGE_BATCH_SIZE = 1000;
 
-      const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+    const normalizeVisitorId = (visitorId: string | null | undefined) => {
+      const normalized = visitorId?.trim();
+      return normalized ? normalized : null;
+    };
 
-      const [
-        profilesRes, allProfilesRes, favoritesRes, blogRes, customToolsRes,
-        toolSettingsRes, rolesRes, premiumRes,
-        subsRes, pendingPayRes, approvedPayRes, recentPayRes,
-        totalViewsRes, viewsTodayRes, viewsWeekRes, viewsLastWeekRes, allViewsRes
-      ] = await Promise.all([
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("display_name, created_at").order("created_at", { ascending: false }).limit(200),
-        supabase.from("favorites").select("*"),
-        supabase.from("blog_posts").select("id", { count: "exact", head: true }),
-        supabase.from("custom_tools").select("id, is_enabled", { count: "exact" }).is("deleted_at", null),
-        supabase.from("tool_settings").select("tool_id, is_enabled, is_featured"),
-        supabase.from("user_roles").select("id", { count: "exact", head: true }),
-        supabase.from("premium_tools").select("id", { count: "exact", head: true }),
-        supabase.from("user_subscriptions").select("id", { count: "exact", head: true }).eq("status", "active"),
-        supabase.from("payment_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
-        supabase.from("payment_requests").select("amount").eq("status", "approved"),
-        supabase.from("payment_requests").select("amount, status, created_at, payment_method").order("created_at", { ascending: false }).limit(5),
-        // Visitor analytics - fetch visitor_id for unique counting
-        supabase.from("page_views").select("visitor_id").limit(1000),
-        supabase.from("page_views").select("visitor_id").gte("created_at", todayStart.toISOString()).limit(1000),
-        supabase.from("page_views").select("visitor_id").gte("created_at", weekAgo.toISOString()).limit(1000),
-        supabase.from("page_views").select("visitor_id").gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString()).limit(1000),
-        supabase.from("page_views").select("page_path, created_at, visitor_id, country").gte("created_at", thirtyDaysAgo.toISOString()).order("created_at", { ascending: false }).limit(1000),
-      ]);
+    const fetchPageViews = async (columns: string, applyFilters?: (query: any) => any) => {
+      const rows: any[] = [];
+      let from = 0;
 
-      const allProfiles = allProfilesRes.data || [];
-      const favData = favoritesRes.data || [];
+      while (true) {
+        let query = supabase
+          .from("page_views")
+          .select(columns)
+          .order("created_at", { ascending: false })
+          .range(from, from + PAGE_BATCH_SIZE - 1);
 
-      // User growth - last 30 days grouped by date
-      const growthMap: Record<string, number> = {};
-      for (let i = 29; i >= 0; i--) {
-        const d = new Date(now);
-        d.setDate(d.getDate() - i);
-        const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
-        growthMap[key] = 0;
+        if (applyFilters) {
+          query = applyFilters(query);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        const batch = data || [];
+        rows.push(...batch);
+
+        if (batch.length < PAGE_BATCH_SIZE) break;
+        from += PAGE_BATCH_SIZE;
       }
-      allProfiles.forEach((p: any) => {
-        const d = new Date(p.created_at);
-        const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
-        if (key in growthMap) growthMap[key]++;
-      });
-      // Cumulative
-      const userGrowth: { date: string; users: number }[] = [];
-      let cumulative = 0;
-      const baseCount = (profilesRes.count || 0) - allProfiles.length;
-      cumulative = baseCount > 0 ? baseCount : 0;
-      Object.entries(growthMap).forEach(([date, count]) => {
-        cumulative += count;
-        userGrowth.push({ date, users: cumulative });
-      });
 
-      // Weekly comparison
-      const usersThisWeek = allProfiles.filter((p: any) => new Date(p.created_at) >= weekAgo).length;
-      const usersLastWeek = allProfiles.filter((p: any) => {
-        const d = new Date(p.created_at);
-        return d >= twoWeeksAgo && d < weekAgo;
-      }).length;
-      const favsThisWeek = favData.filter((f: any) => new Date(f.created_at) >= weekAgo).length;
-      const favsLastWeek = favData.filter((f: any) => {
-        const d = new Date(f.created_at);
-        return d >= twoWeeksAgo && d < weekAgo;
-      }).length;
+      return rows;
+    };
 
-      // Category distribution
-      const catCounts: Record<string, number> = {};
-      tools.forEach(t => { catCounts[t.category] = (catCounts[t.category] || 0) + 1; });
-      const categoryData = categories
-        .filter(c => c.id !== "all" && catCounts[c.id])
-        .map(c => ({ name: c.label, count: catCounts[c.id] || 0 }))
-        .sort((a, b) => b.count - a.count);
+    const countUniqueVisitors = (data: any[]) => {
+      const ids = new Set(
+        data
+          .map((item: any) => normalizeVisitorId(item.visitor_id))
+          .filter(Boolean)
+      );
 
-      // Favorites by tool (top 10)
-      const favCounts: Record<string, number> = {};
-      favData.forEach((f: any) => { favCounts[f.tool_id] = (favCounts[f.tool_id] || 0) + 1; });
-      const favoritesByTool = Object.entries(favCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 10)
-        .map(([id, count]) => {
-          const tool = tools.find(t => t.id === id);
-          return { name: tool?.name?.slice(0, 18) || id.slice(0, 18), count };
+      return ids.size;
+    };
+
+    const fetchAll = async () => {
+      try {
+        const now = new Date();
+        const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
+        const twoWeeksAgo = new Date(now); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+        const thirtyDaysAgo = new Date(now); thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+
+        const [
+          profilesRes, allProfilesRes, favoritesRes, blogRes, customToolsRes,
+          toolSettingsRes, rolesRes, premiumRes,
+          subsRes, pendingPayRes, approvedPayRes, recentPayRes,
+          totalViews, viewsToday, viewsThisWeek, viewsLastWeek, allViews
+        ] = await Promise.all([
+          supabase.from("profiles").select("id", { count: "exact", head: true }),
+          supabase.from("profiles").select("display_name, created_at").order("created_at", { ascending: false }).limit(200),
+          supabase.from("favorites").select("*"),
+          supabase.from("blog_posts").select("id", { count: "exact", head: true }),
+          supabase.from("custom_tools").select("id, is_enabled", { count: "exact" }).is("deleted_at", null),
+          supabase.from("tool_settings").select("tool_id, is_enabled, is_featured"),
+          supabase.from("user_roles").select("id", { count: "exact", head: true }),
+          supabase.from("premium_tools").select("id", { count: "exact", head: true }),
+          supabase.from("user_subscriptions").select("id", { count: "exact", head: true }).eq("status", "active"),
+          supabase.from("payment_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
+          supabase.from("payment_requests").select("amount").eq("status", "approved"),
+          supabase.from("payment_requests").select("amount, status, created_at, payment_method").order("created_at", { ascending: false }).limit(5),
+          fetchPageViews("visitor_id"),
+          fetchPageViews("visitor_id", (query) => query.gte("created_at", todayStart.toISOString())),
+          fetchPageViews("visitor_id", (query) => query.gte("created_at", weekAgo.toISOString())),
+          fetchPageViews("visitor_id", (query) => query.gte("created_at", twoWeeksAgo.toISOString()).lt("created_at", weekAgo.toISOString())),
+          fetchPageViews("page_path, created_at, visitor_id, country", (query) => query.gte("created_at", thirtyDaysAgo.toISOString())),
+        ]);
+
+        const allProfiles = allProfilesRes.data || [];
+        const favData = favoritesRes.data || [];
+
+        // User growth - last 30 days grouped by date
+        const growthMap: Record<string, number> = {};
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - i);
+          const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
+          growthMap[key] = 0;
+        }
+        allProfiles.forEach((p: any) => {
+          const d = new Date(p.created_at);
+          const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
+          if (key in growthMap) growthMap[key]++;
+        });
+        const userGrowth: { date: string; users: number }[] = [];
+        let cumulative = 0;
+        const baseCount = (profilesRes.count || 0) - allProfiles.length;
+        cumulative = baseCount > 0 ? baseCount : 0;
+        Object.entries(growthMap).forEach(([date, count]) => {
+          cumulative += count;
+          userGrowth.push({ date, users: cumulative });
         });
 
-      // Tool settings stats
-      const settingsData = toolSettingsRes.data || [];
-      const disabledTools = settingsData.filter((s: any) => !s.is_enabled).length;
+        // Weekly comparison
+        const usersThisWeek = allProfiles.filter((p: any) => new Date(p.created_at) >= weekAgo).length;
+        const usersLastWeek = allProfiles.filter((p: any) => {
+          const d = new Date(p.created_at);
+          return d >= twoWeeksAgo && d < weekAgo;
+        }).length;
+        const favsThisWeek = favData.filter((f: any) => new Date(f.created_at) >= weekAgo).length;
+        const favsLastWeek = favData.filter((f: any) => {
+          const d = new Date(f.created_at);
+          return d >= twoWeeksAgo && d < weekAgo;
+        }).length;
 
-      // Revenue
-      const totalRevenue = (approvedPayRes.data || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+        // Category distribution
+        const catCounts: Record<string, number> = {};
+        tools.forEach(t => { catCounts[t.category] = (catCounts[t.category] || 0) + 1; });
+        const categoryData = categories
+          .filter(c => c.id !== "all" && catCounts[c.id])
+          .map(c => ({ name: c.label, count: catCounts[c.id] || 0 }))
+          .sort((a, b) => b.count - a.count);
 
-      // Visitor analytics - count unique visitors by visitor_id
-      const countUnique = (data: any[] | null) => {
-        if (!data) return 0;
-        const ids = new Set(data.map((v: any) => v.visitor_id).filter(Boolean));
-        // Count entries without visitor_id as individual views
-        const noIdCount = (data || []).filter((v: any) => !v.visitor_id).length;
-        return ids.size + noIdCount;
-      };
+        // Favorites by tool (top 10)
+        const favCounts: Record<string, number> = {};
+        favData.forEach((f: any) => { favCounts[f.tool_id] = (favCounts[f.tool_id] || 0) + 1; });
+        const favoritesByTool = Object.entries(favCounts)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 10)
+          .map(([id, count]) => {
+            const tool = tools.find(t => t.id === id);
+            return { name: tool?.name?.slice(0, 18) || id.slice(0, 18), count };
+          });
 
-      const allViews = allViewsRes.data || [];
-      const pageCounts: Record<string, number> = {};
-      const viewsByDay: Record<string, Set<string>> = {};
-      for (let i = 29; i >= 0; i--) {
-        const d = new Date(now);
-        d.setDate(d.getDate() - i);
-        viewsByDay[d.toLocaleDateString("en", { month: "short", day: "numeric" })] = new Set();
+        // Tool settings stats
+        const settingsData = toolSettingsRes.data || [];
+        const disabledTools = settingsData.filter((s: any) => !s.is_enabled).length;
+
+        // Revenue
+        const totalRevenue = (approvedPayRes.data || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+
+        const recentViews = allViews || [];
+        const pageCounts: Record<string, Set<string>> = {};
+        const viewsByDay: Record<string, Set<string>> = {};
+
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - i);
+          viewsByDay[d.toLocaleDateString("en", { month: "short", day: "numeric" })] = new Set();
+        }
+
+        recentViews.forEach((view: any) => {
+          const visitorId = normalizeVisitorId(view.visitor_id);
+          if (!visitorId) return;
+
+          const pagePath = view.page_path || "/";
+          if (!pageCounts[pagePath]) pageCounts[pagePath] = new Set();
+          pageCounts[pagePath].add(visitorId);
+
+          const d = new Date(view.created_at);
+          const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
+          if (key in viewsByDay) {
+            viewsByDay[key].add(visitorId);
+          }
+        });
+
+        const topPages = Object.entries(pageCounts)
+          .map(([name, visitors]) => ({
+            name: name === "/" ? "Home" : name.replace("/tools/", "").replace("/", ""),
+            views: visitors.size,
+          }))
+          .sort((a, b) => b.views - a.views)
+          .slice(0, 8);
+
+        const viewsOverTime = Object.entries(viewsByDay).map(([date, set]) => ({ date, views: set.size }));
+
+        // Country data - unique visitors per country
+        const countryCounts: Record<string, Set<string>> = {};
+        recentViews.forEach((view: any) => {
+          const visitorId = normalizeVisitorId(view.visitor_id);
+          const country = view.country?.trim();
+          if (!visitorId || !country) return;
+
+          if (!countryCounts[country]) countryCounts[country] = new Set();
+          countryCounts[country].add(visitorId);
+        });
+
+        const countryData = Object.entries(countryCounts)
+          .map(([name, visitors]) => ({ name, visitors: visitors.size }))
+          .sort((a, b) => b.visitors - a.visitors)
+          .slice(0, 12);
+
+        setStats({
+          users: profilesRes.count || 0,
+          favorites: favData.length,
+          blogPosts: blogRes.count || 0,
+          customTools: customToolsRes.count || 0,
+          enabledTools: tools.length - disabledTools,
+          disabledTools,
+          admins: rolesRes.count || 0,
+          premiumTools: premiumRes.count || 0,
+          activeSubscriptions: subsRes.count || 0,
+          pendingPayments: pendingPayRes.count || 0,
+          totalRevenue,
+          recentUsers: allProfiles.slice(0, 5),
+          recentPayments: recentPayRes.data || [],
+          categoryData,
+          toolSettings: settingsData as any,
+          favoritesByTool,
+          userGrowth,
+          usersThisWeek,
+          usersLastWeek,
+          favsThisWeek,
+          favsLastWeek,
+          totalViews: countUniqueVisitors(totalViews),
+          viewsToday: countUniqueVisitors(viewsToday),
+          viewsThisWeek: countUniqueVisitors(viewsThisWeek),
+          viewsLastWeek: countUniqueVisitors(viewsLastWeek),
+          topPages,
+          viewsOverTime,
+          countryData,
+        });
+      } catch (error) {
+        console.error("Failed to load dashboard analytics:", error);
+      } finally {
+        setLoading(false);
       }
-      allViews.forEach((v: any) => {
-        pageCounts[v.page_path] = (pageCounts[v.page_path] || 0) + 1;
-        const d = new Date(v.created_at);
-        const key = d.toLocaleDateString("en", { month: "short", day: "numeric" });
-        if (key in viewsByDay) {
-          viewsByDay[key].add(v.visitor_id || v.created_at);
-        }
-      });
-      const topPages = Object.entries(pageCounts)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 8)
-        .map(([name, views]) => ({ name: name === "/" ? "Home" : name.replace("/tools/", "").replace("/", ""), views }));
-      const viewsOverTime = Object.entries(viewsByDay).map(([date, set]) => ({ date, views: set.size }));
-
-      // Country data - unique visitors per country
-      const countryCounts: Record<string, Set<string>> = {};
-      allViews.forEach((v: any) => {
-        const c = v.country?.trim();
-        if (c) {
-          if (!countryCounts[c]) countryCounts[c] = new Set();
-          countryCounts[c].add(v.visitor_id || v.created_at);
-        }
-      });
-      const countryData = Object.entries(countryCounts)
-        .map(([name, set]) => ({ name, visitors: set.size }))
-        .sort((a, b) => b.visitors - a.visitors)
-        .slice(0, 12);
-
-      setStats({
-        users: profilesRes.count || 0,
-        favorites: favData.length,
-        blogPosts: blogRes.count || 0,
-        customTools: customToolsRes.count || 0,
-        enabledTools: tools.length - disabledTools,
-        disabledTools,
-        admins: rolesRes.count || 0,
-        premiumTools: premiumRes.count || 0,
-        activeSubscriptions: subsRes.count || 0,
-        pendingPayments: pendingPayRes.count || 0,
-        totalRevenue,
-        recentUsers: allProfiles.slice(0, 5),
-        recentPayments: recentPayRes.data || [],
-        categoryData,
-        toolSettings: settingsData as any,
-        favoritesByTool,
-        userGrowth,
-        usersThisWeek,
-        usersLastWeek,
-        favsThisWeek,
-        favsLastWeek,
-        totalViews: countUnique(totalViewsRes.data),
-        viewsToday: countUnique(viewsTodayRes.data),
-        viewsThisWeek: countUnique(viewsWeekRes.data),
-        viewsLastWeek: countUnique(viewsLastWeekRes.data),
-        topPages,
-        viewsOverTime,
-        countryData,
-      });
-      setLoading(false);
     };
+
     fetchAll();
   }, []);
 
@@ -265,8 +320,8 @@ export default function AdminDashboard() {
   };
 
   const statCards = [
-    { title: "Total Views", value: stats.totalViews, icon: Eye, change: getChangeText(stats.viewsThisWeek, stats.viewsLastWeek), up: stats.viewsThisWeek >= stats.viewsLastWeek },
-    { title: "Today Views", value: stats.viewsToday, icon: Activity, change: "today", up: stats.viewsToday > 0 },
+    { title: "Total Visitors", value: stats.totalViews, icon: Eye, change: getChangeText(stats.viewsThisWeek, stats.viewsLastWeek), up: stats.viewsThisWeek >= stats.viewsLastWeek },
+    { title: "Today Visitors", value: stats.viewsToday, icon: Activity, change: "today", up: stats.viewsToday > 0 },
     { title: "Total Tools", value: tools.length + stats.customTools, icon: Wrench, change: `${stats.enabledTools} active`, up: true },
     { title: "Registered Users", value: stats.users, icon: Users, change: getChangeText(stats.usersThisWeek, stats.usersLastWeek), up: stats.usersThisWeek >= stats.usersLastWeek },
     { title: "Active Subs", value: stats.activeSubscriptions, icon: Crown, change: `${stats.pendingPayments} pending`, up: stats.activeSubscriptions > 0 },
@@ -350,7 +405,7 @@ export default function AdminDashboard() {
           <Card className="border-border/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
-                <Eye className="w-4 h-4 text-primary" /> Page Views (30 Days)
+                <Eye className="w-4 h-4 text-primary" /> Unique Visitors (30 Days)
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -380,7 +435,7 @@ export default function AdminDashboard() {
               {stats.topPages.length > 0 ? stats.topPages.map((page, i) => (
                 <div key={i} className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0">
                   <span className="text-xs text-foreground truncate max-w-[150px]">{page.name}</span>
-                  <Badge variant="secondary" className="text-[10px] shrink-0">{page.views} views</Badge>
+                  <Badge variant="secondary" className="text-[10px] shrink-0">{page.views} visitors</Badge>
                 </div>
               )) : (
                 <p className="text-sm text-muted-foreground text-center py-4">No visitor data yet</p>
