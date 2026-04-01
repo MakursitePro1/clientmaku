@@ -73,7 +73,7 @@ export default function AdminDashboard() {
     toolSettings: [], favoritesByTool: [], userGrowth: [],
     usersThisWeek: 0, usersLastWeek: 0, favsThisWeek: 0, favsLastWeek: 0,
     totalViews: 0, viewsToday: 0, viewsThisWeek: 0, viewsLastWeek: 0,
-    topPages: [], viewsOverTime: [],
+    topPages: [], viewsOverTime: [], countryData: [],
   });
   const [loading, setLoading] = useState(true);
 
