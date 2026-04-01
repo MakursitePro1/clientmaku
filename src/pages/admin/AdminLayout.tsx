@@ -149,7 +149,7 @@ export default function AdminLayout() {
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="md:hidden fixed top-14 left-0 bottom-0 w-[260px] bg-card border-r border-border/50 z-50 flex flex-col"
             >
-              <SidebarContent />
+              <SidebarContent forceExpanded />
             </motion.aside>
           </>
         )}
