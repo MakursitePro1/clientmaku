@@ -9,6 +9,7 @@ import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { ToolCatalogProvider } from "@/contexts/ToolCatalogContext";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
+import { CodeInjector } from "@/components/CodeInjector";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -24,6 +25,7 @@ const AdminRoles = lazy(() => import("./pages/admin/AdminRoles"));
 const AdminSEO = lazy(() => import("./pages/admin/AdminSEO"));
 const AdminCustomTools = lazy(() => import("./pages/admin/AdminCustomTools"));
 const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions"));
+const AdminIndexing = lazy(() => import("./pages/admin/AdminIndexing"));
 import { AdminSlugChecker } from "@/components/AdminRouteWrapper";
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
@@ -113,6 +115,7 @@ const App = () => (
             <TooltipProvider>
               <Toaster />
               <Sonner />
+              <CodeInjector />
               <BrowserRouter>
                 <Suspense fallback={<Loading />}>
           <Routes>
@@ -193,6 +196,7 @@ const App = () => (
               <Route path="seo" element={<AdminSEO />} />
               <Route path="custom-tools" element={<AdminCustomTools />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
+              <Route path="indexing" element={<AdminIndexing />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="roles" element={<AdminRoles />} />
               <Route path="security" element={<AdminSecurity />} />

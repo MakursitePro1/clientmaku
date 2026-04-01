@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ImageUploadField } from "@/components/ImageUploadField";
 import {
   Search, Star, Wrench, ArrowLeft, Save, Globe, FileText,
-  Share2, Twitter, Code, CheckCircle, AlertTriangle, Eye, Settings2, Link2
+  Share2, Twitter, Code, CheckCircle, AlertTriangle, Eye, Settings2, Link2, Pencil, X as XIcon, Check
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
@@ -22,6 +22,7 @@ interface ToolSetting {
   tool_id: string;
   is_enabled: boolean;
   is_featured: boolean;
+  custom_name: string;
 }
 
 interface ToolSEO {
@@ -60,6 +61,8 @@ export default function AdminTools() {
   const [seoData, setSeoData] = useState<ToolSEO | null>(null);
   const [seoSaving, setSeoSaving] = useState(false);
   const [structuredDataStr, setStructuredDataStr] = useState("");
+  const [editingName, setEditingName] = useState<string | null>(null);
+  const [editNameValue, setEditNameValue] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -68,7 +71,7 @@ export default function AdminTools() {
   }, []);
 
   const fetchSettings = async () => {
-    const { data } = await supabase.from("tool_settings").select("tool_id, is_enabled, is_featured");
+    const { data } = await supabase.from("tool_settings").select("tool_id, is_enabled, is_featured, custom_name");
     if (data) {
       const map: Record<string, ToolSetting> = {};
       data.forEach((s: any) => { map[s.tool_id] = s; });
@@ -100,7 +103,7 @@ export default function AdminTools() {
 
   const toggleSetting = async (toolId: string, field: "is_enabled" | "is_featured") => {
     setSaving(toolId);
-    const current = toolSettings[toolId] || { tool_id: toolId, is_enabled: true, is_featured: false };
+    const current = toolSettings[toolId] || { tool_id: toolId, is_enabled: true, is_featured: false, custom_name: "" };
     const newValue = !current[field];
     const updated = { ...current, [field]: newValue };
 
@@ -114,6 +117,36 @@ export default function AdminTools() {
       setToolSettings((prev) => ({ ...prev, [toolId]: updated }));
     }
     setSaving(null);
+  };
+
+  const startEditName = (toolId: string) => {
+    const current = toolSettings[toolId]?.custom_name || "";
+    setEditingName(toolId);
+    setEditNameValue(current);
+  };
+
+  const saveCustomName = async (toolId: string) => {
+    setSaving(toolId);
+    const { error } = await supabase
+      .from("tool_settings")
+      .upsert({ tool_id: toolId, custom_name: editNameValue, updated_at: new Date().toISOString() }, { onConflict: "tool_id" });
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      setToolSettings((prev) => ({
+        ...prev,
+        [toolId]: { ...(prev[toolId] || { tool_id: toolId, is_enabled: true, is_featured: false, custom_name: "" }), custom_name: editNameValue },
+      }));
+      toast({ title: "✅ Name Updated!", description: `Tool name saved.` });
+    }
+    setEditingName(null);
+    setSaving(null);
+  };
+
+  const getDisplayName = (tool: Tool) => {
+    const custom = toolSettings[tool.id]?.custom_name;
+    return custom || tool.name;
   };
 
   const openSeoEditor = (tool: Tool) => {
@@ -572,7 +605,34 @@ export default function AdminTools() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h3 className="font-medium text-sm text-foreground truncate">{tool.name}</h3>
+                        {editingName === tool.id ? (
+                          <div className="flex items-center gap-1.5">
+                            <Input
+                              value={editNameValue}
+                              onChange={(e) => setEditNameValue(e.target.value)}
+                              placeholder={tool.name}
+                              className="h-7 text-xs w-40"
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") saveCustomName(tool.id);
+                                if (e.key === "Escape") setEditingName(null);
+                              }}
+                            />
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => saveCustomName(tool.id)}>
+                              <Check className="w-3.5 h-3.5 text-green-500" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setEditingName(null)}>
+                              <XIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <h3 className="font-medium text-sm text-foreground truncate">{getDisplayName(tool)}</h3>
+                            <Button variant="ghost" size="icon" className="h-5 w-5 opacity-50 hover:opacity-100" onClick={() => startEditName(tool.id)}>
+                              <Pencil className="w-3 h-3" />
+                            </Button>
+                          </>
+                        )}
                         <Badge variant="secondary" className="text-[10px] shrink-0 hidden sm:inline-flex">{tool.category}</Badge>
                         {hasSeo(tool.id) ? (
                           <Badge className="text-[10px] bg-green-500/10 text-green-600 border-0 shrink-0">
@@ -584,6 +644,9 @@ export default function AdminTools() {
                           </Badge>
                         )}
                       </div>
+                      {toolSettings[tool.id]?.custom_name && (
+                        <p className="text-[10px] text-primary/70 mt-0.5">Original: {tool.name}</p>
+                      )}
                       <p className="text-xs text-muted-foreground truncate mt-0.5">{tool.description}</p>
                     </div>
                   </div>

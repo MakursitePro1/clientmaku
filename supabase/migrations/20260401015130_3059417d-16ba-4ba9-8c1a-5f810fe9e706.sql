@@ -1,0 +1,1 @@
+ALTER TABLE public.tool_settings ADD COLUMN IF NOT EXISTS custom_name text NOT NULL DEFAULT '';

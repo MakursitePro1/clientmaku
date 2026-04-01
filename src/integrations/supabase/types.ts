@@ -632,6 +632,7 @@ export type Database = {
       }
       tool_settings: {
         Row: {
+          custom_name: string
           display_order: number | null
           id: string
           is_enabled: boolean
@@ -641,6 +642,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          custom_name?: string
           display_order?: number | null
           id?: string
           is_enabled?: boolean
@@ -650,6 +652,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          custom_name?: string
           display_order?: number | null
           id?: string
           is_enabled?: boolean
