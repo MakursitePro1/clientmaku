@@ -22,6 +22,7 @@ interface ToolSetting {
   tool_id: string;
   is_enabled: boolean;
   is_featured: boolean;
+  custom_name: string;
 }
 
 interface ToolSEO {
