@@ -16,7 +16,7 @@ export default function QrCodeMaker() {
   const [bgColor, setBgColor] = useState("#ffffff");
 
   // URL/Text
-  const [text, setText] = useState("https://cybervenom.com");
+  const [text, setText] = useState("https://cybervenoms.com");
 
   // WiFi
   const [wifiSSID, setWifiSSID] = useState("");
