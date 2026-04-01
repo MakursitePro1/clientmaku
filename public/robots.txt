@@ -12,5 +12,8 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin*
+Disallow: /profile
+Disallow: /auth
 
-Sitemap: https://makuwebtools.lovable.app/sitemap.xml
+Sitemap: https://clientmaku.lovable.app/sitemap.xml
