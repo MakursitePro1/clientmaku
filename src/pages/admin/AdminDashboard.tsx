@@ -238,10 +238,10 @@ export default function AdminDashboard() {
   };
 
   const statCards = [
+    { title: "Total Views", value: stats.totalViews, icon: Eye, change: getChangeText(stats.viewsThisWeek, stats.viewsLastWeek), up: stats.viewsThisWeek >= stats.viewsLastWeek },
+    { title: "Today Views", value: stats.viewsToday, icon: Activity, change: "today", up: stats.viewsToday > 0 },
     { title: "Total Tools", value: tools.length + stats.customTools, icon: Wrench, change: `${stats.enabledTools} active`, up: true },
     { title: "Registered Users", value: stats.users, icon: Users, change: getChangeText(stats.usersThisWeek, stats.usersLastWeek), up: stats.usersThisWeek >= stats.usersLastWeek },
-    { title: "Total Favorites", value: stats.favorites, icon: Heart, change: getChangeText(stats.favsThisWeek, stats.favsLastWeek), up: stats.favsThisWeek >= stats.favsLastWeek },
-    { title: "Blog Posts", value: stats.blogPosts, icon: Globe, change: "published", up: true },
     { title: "Active Subs", value: stats.activeSubscriptions, icon: Crown, change: `${stats.pendingPayments} pending`, up: stats.activeSubscriptions > 0 },
     { title: "Revenue", value: `$${stats.totalRevenue.toFixed(0)}`, icon: DollarSign, change: "total", up: stats.totalRevenue > 0 },
   ];
