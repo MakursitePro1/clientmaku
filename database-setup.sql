@@ -263,6 +263,7 @@ CREATE TABLE public.page_views (
   referrer text DEFAULT '',
   user_agent text DEFAULT '',
   country text DEFAULT '',
+  visitor_id text DEFAULT '',
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
