@@ -117,8 +117,9 @@ const App = () => (
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <CodeInjector />
-              <BrowserRouter>
+               <CodeInjector />
+                <PageTracker />
+               <BrowserRouter>
                 <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Index />} />
