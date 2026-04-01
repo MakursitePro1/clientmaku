@@ -73,7 +73,7 @@ function ToolCard({ tool, isPremium, isLocked, navigate }: { tool: typeof tools[
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="absolute top-2 right-2 z-30 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-bold shadow-lg shadow-amber-500/30"
+          className="absolute top-2 left-2 z-30 flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[9px] font-bold shadow-lg shadow-amber-500/30"
         >
           <Crown className="w-3 h-3" />
           {isLocked ? <Lock className="w-2.5 h-2.5" /> : "PRO"}
