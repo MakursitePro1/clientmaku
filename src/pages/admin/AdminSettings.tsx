@@ -64,6 +64,8 @@ interface SiteSettings {
   announcement_enabled: string;
   // Admin
   admin_slug: string;
+  // Domain
+  site_domain: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -104,6 +106,7 @@ const defaultSettings: SiteSettings = {
   announcement_text: "",
   announcement_enabled: "false",
   admin_slug: "makuadmingowebs99",
+  site_domain: "https://cybervenoms.com",
 };
 
 type SettingField = {
@@ -184,6 +187,7 @@ export default function AdminSettings() {
           { key: "site_name", label: "Site Name", type: "input", placeholder: "Cyber Venom" },
           { key: "site_tagline", label: "Tagline", type: "input", placeholder: "Free Online Web Tools" },
           { key: "site_description", label: "Site Description", type: "textarea", placeholder: "Describe your website..." },
+          { key: "site_domain", label: "Site Domain (Full URL)", type: "url", placeholder: "https://cybervenoms.com", icon: Globe },
           { key: "site_logo_url", label: "Logo Image", type: "image", placeholder: "Upload or paste URL..." },
           { key: "favicon_url", label: "Favicon Image", type: "image", placeholder: "Upload or paste URL..." },
         ],

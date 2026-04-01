@@ -26,6 +26,7 @@ const AdminSEO = lazy(() => import("./pages/admin/AdminSEO"));
 const AdminCustomTools = lazy(() => import("./pages/admin/AdminCustomTools"));
 const AdminSubscriptions = lazy(() => import("./pages/admin/AdminSubscriptions"));
 const AdminIndexing = lazy(() => import("./pages/admin/AdminIndexing"));
+const AdminDocs = lazy(() => import("./pages/admin/AdminDocs"));
 import { AdminSlugChecker } from "@/components/AdminRouteWrapper";
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ToolsPage = lazy(() => import("./pages/ToolsPage"));
@@ -197,6 +198,7 @@ const App = () => (
               <Route path="custom-tools" element={<AdminCustomTools />} />
               <Route path="subscriptions" element={<AdminSubscriptions />} />
               <Route path="indexing" element={<AdminIndexing />} />
+              <Route path="docs" element={<AdminDocs />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="roles" element={<AdminRoles />} />
               <Route path="security" element={<AdminSecurity />} />
