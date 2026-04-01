@@ -103,6 +103,7 @@ export default function AdminIndexing() {
   const [activeTab, setActiveTab] = useState("indexing");
   const { toast } = useToast();
   const { user } = useAuth();
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     const fetchCodes = async () => {

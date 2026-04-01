@@ -35,7 +35,7 @@ export interface SiteSettings {
   stats_categories_count: string;
   announcement_text: string;
   announcement_enabled: string;
-  admin_slug: string;
+  site_domain: string;
   [key: string]: string;
 }
 
